@@ -33,23 +33,44 @@ SpaaaceEngine.prototype.onPlayerConnected = function(socket){
 SpaaaceEngine.prototype.step = function(delta){
     this.world.stepCount++;
     this.updateGameWorld();
-    this.io.emit('worldUpdate',this.world);
+    // this.io.emit('worldUpdate',this.world);
+    this.io.emit('worldUpdate',this.serializeWorld());
 };
 
 SpaaaceEngine.prototype.processInput = function(data){
     if (data=="up") {
-        this.world.ships[0].isAccelerating = true
+        this.world.objects[0].isAccelerating = true
     }
     else if (data=="right") {
-        this.world.ships[0].isRotatingRight = true
+        this.world.objects[0].isRotatingRight = true
     }
     else if (data=="left") {
-        this.world.ships[0].isRotatingLeft = true
+        this.world.objects[0].isRotatingLeft = true
     }
 };
 
-SpaaaceEngine.prototype.getWorld = function(){
-    
+SpaaaceEngine.prototype.serializeWorld = function(){
+    var bufferSize = 0;
+    var bufferIndex = 0;
+
+    for (let x=0; x<this.world.objects.length; x++){
+        let obj = this.world.objects[x];
+        bufferSize += obj.getNetSchemeBufferSize();
+    }
+
+    var worldBuffer = new Int8Array(bufferSize);
+
+    for (let x=0; x<this.world.objects.length; x++){
+        let obj = this.world.objects[x];
+        let netSchemeBufferSize = obj.getNetSchemeBufferSize();
+        var serializedObj = obj.serialize();
+        worldBuffer.set(serializedObj, netSchemeBufferSize);
+        bufferIndex += netSchemeBufferSize;
+    }
+
+    //todo solve buffer concat
+
+    return this.world.objects[0].serialize();
 };
 
 
@@ -59,13 +80,13 @@ const path = require('path');
 var Ship = require(path.join(__dirname, 'Ship'));
 
 SpaaaceEngine.prototype.initWorld = function(){
-    this.world.ships = [];
+    this.world.objects = [];
     this.makeShip();
 };
 
 SpaaaceEngine.prototype.makeShip = function(){
     var ship = new Ship(300,300);
-    this.world.ships.push(ship);
+    this.world.objects.push(ship);
 
     //todo deal with what goes over the wire
     ship.velocity = new Point();
@@ -76,8 +97,8 @@ SpaaaceEngine.prototype.makeShip = function(){
 };
 
 SpaaaceEngine.prototype.updateGameWorld = function(){
-    for (var x=0; x<this.world.ships.length; x++){
-        let ship = this.world.ships[x];
+    for (var x=0; x<this.world.objects.length; x++){
+        let ship = this.world.objects[x];
 
         if (ship.isRotatingRight){ ship.angle += ship.rotationSpeed; }
         if (ship.isRotatingLeft){ship.angle -= ship.rotationSpeed; }

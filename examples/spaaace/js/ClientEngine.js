@@ -13,7 +13,7 @@ ClientEngine.prototype.start = function(){
     };
 
    this.socket.on('worldUpdate', function(worldData) {
-       that.onWorldStep(worldData);
+         that.onWorldStep(worldData);
    });
 
     this.outboundInputInterval = setInterval(this.handleOutboundInput.bind(this),16);
@@ -46,11 +46,23 @@ ClientEngine.prototype.handleOutboundInput = function(){
 
 //IO
 
+
+//TODO deserialize world
 ClientEngine.prototype.onWorldStep = function(worldData){
-    if (worldData.stepCount > this.world.stepCount){
-        this.world.stepCount = worldData.stepCount;
-        sprite.x = worldData.ships[0].x;
-        sprite.y = worldData.ships[0].y;
-        sprite.angle = worldData.ships[0].angle;
-    }
+     var ship = new Ship();
+     var shipData = ship.deserialize(worldData);
+
+    // this.world.stepCount = worldData.stepCount;
+     sprite.x = shipData.x;
+     sprite.y = shipData.y;
+     sprite.angle = shipData.angle;
 };
+
+// ClientEngine.prototype.onWorldStep = function(worldData){
+//     if (worldData.stepCount > this.world.stepCount){
+//         this.world.stepCount = worldData.stepCount;
+//         sprite.x = worldData.objects[0].x;
+//         sprite.y = worldData.objects[0].y;
+//         sprite.angle = worldData.objects[0].angle;
+//     }
+// };
