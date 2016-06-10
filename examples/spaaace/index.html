@@ -1,13 +1,78 @@
 <html>
-<body>
-<p id='server-time'></p>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    var socket = io();
-    var el = document.getElementById('server-time');
-    socket.on('time', function(timeString) {
-        el.innerHTML = 'Server time: ' + timeString;
-    });
-</script>
-</body>
+    <head>
+        <title>Spaaace a multiplayer spacing fighting game</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.4.8/phaser.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/ClientEngine.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+            var socket = io();
+            var clientEngine = new ClientEngine(socket);
+
+            var game = new Phaser.Game(800, 600, Phaser.AUTO, 'spaaace', { preload: preload, create: create, update: update, render: render });
+
+            function preload() {
+                game.load.image('ship', 'assets/ship1.png');
+            }
+
+            var sprite ,cursors;
+
+            function create() {
+
+                game.physics.startSystem(Phaser.Physics.ARCADE);
+
+                game.stage.backgroundColor = 'black';
+
+                sprite = game.add.sprite(400, 300, 'ship');
+                sprite.anchor.setTo(0.5, 0.5);
+                sprite.width = 100;
+                sprite.height = 90;
+
+
+                //  Game input
+                cursors = game.input.keyboard.createCursorKeys();
+                game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
+
+                clientEngine.start();
+            }
+
+            function update() {
+
+                if (cursors.up.isDown)
+                {
+                    clientEngine.sendInput('up');
+    //                game.physics.arcade.accelerationFromRotation(sprite.rotation, 200, sprite.body.acceleration);
+                }
+
+                if (cursors.left.isDown)
+                {
+
+                }
+                else if (cursors.right.isDown)
+                {
+
+                }
+                else
+                {
+
+                }
+
+    //            if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
+    //            {
+    //                fireBullet();
+    //            }
+    //
+    //
+
+            }
+
+            function render() {
+
+    //            game.debug.spriteInfo(sprite, 32, 32);
+
+            }
+        </script>
+    </body>
 </html>
