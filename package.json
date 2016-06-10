@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Node base game server",
   "dependencies": {
+    "express": "4.13.4",
     "socket.io": "^1.4.6"
+  },
+  "scripts": {
+    "start": "node main.js"
   }
 }
