@@ -1,6 +1,7 @@
 "use strict";
 
-var gameloop = require('node-gameloop');
+var Gameloop = require('node-gameloop');
+var Point= require('./Point');
 
 
 var SpaaaceEngine = function(io){
@@ -15,7 +16,7 @@ SpaaaceEngine.prototype.start = function(){
     };
     this.initWorld();
 
-    this.gameLoopId = gameloop.setGameLoop(this.step.bind(this), 1000 / 60);
+    this.gameLoopId = Gameloop.setGameLoop(this.step.bind(this), 1000 / 60);
 
 };
 
@@ -25,10 +26,7 @@ SpaaaceEngine.prototype.onPlayerConnected = function(socket){
     //save player
     this.connectedPlayers[socket.id] = socket;
 
-    socket.on ('move', function (data) {
-        // io.sockets.emit ('updatePlayer', msg);
-        that.world.ships[0].isAccelerating = true
-    });
+    socket.on ('move', this.processInput.bind(this));
 
 };
 
@@ -38,8 +36,16 @@ SpaaaceEngine.prototype.step = function(delta){
     this.io.emit('worldUpdate',this.world);
 };
 
-SpaaaceEngine.prototype.processInput = function(input){
-    
+SpaaaceEngine.prototype.processInput = function(data){
+    if (data=="up") {
+        this.world.ships[0].isAccelerating = true
+    }
+    else if (data=="right") {
+        this.world.ships[0].isRotatingRight = true
+    }
+    else if (data=="left") {
+        this.world.ships[0].isRotatingLeft = true
+    }
 };
 
 SpaaaceEngine.prototype.getWorld = function(){
@@ -58,20 +64,48 @@ SpaaaceEngine.prototype.initWorld = function(){
 };
 
 SpaaaceEngine.prototype.makeShip = function(){
-    this.world.ships.push(new Ship(300,300));
+    var ship = new Ship(300,300);
+    this.world.ships.push(ship);
+
+    //todo deal with what goes over the wire
+    ship.velocity = new Point();
+    ship.temp={
+        accelerationVector: new Point()
+    };
+
 };
 
 SpaaaceEngine.prototype.updateGameWorld = function(){
     for (var x=0; x<this.world.ships.length; x++){
         let ship = this.world.ships[x];
+
+        if (ship.isRotatingRight){ ship.angle += ship.rotationSpeed; }
+        if (ship.isRotatingLeft){ship.angle -= ship.rotationSpeed; }
+
+        if(ship.angle>360){ ship.angle -= 360; }
+        if(ship.angle<0){ ship.angle += 360; }
+
         if (ship.isAccelerating) {
-            ship.velocity = Math.min(ship.velocity + ship.acceleration, ship.maxSpeed);
+            ship.temp.accelerationVector.set(
+                Math.cos( ship.angle * (Math.PI / 180) ),
+                Math.sin( ship.angle * (Math.PI / 180) )
+            ).setMagnitude(ship.acceleration);
         }
         else{
-            ship.velocity = Math.max(ship.velocity - ship.deceleration, 0);
+            ship.temp.accelerationVector.set(0,0);
         }
+
+        // console.log(ship.temp.accelerationVector.x,ship.temp.accelerationVector.y);
+        // console.log(ship.temp.accelerationVector.x, ship.temp.accelerationVector.y);
+        // console.log(ship.temp.accelerationVector.x, ship.temp.accelerationVector.y);
+        Point.add(ship.velocity,ship.temp.accelerationVector, ship.velocity);
+        ship.velocity.multiply(ship.deceleration, ship.deceleration);
+
         ship.isAccelerating = false;
-        ship.x = ship.x + ship.velocity;
+        ship.isRotatingLeft = false;
+        ship.isRotatingRight = false;
+        ship.x = ship.x + ship.velocity.x;
+        ship.y = ship.y + ship.velocity.y;
     }
 };
 

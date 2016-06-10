@@ -27,8 +27,8 @@
 
                 sprite = game.add.sprite(400, 300, 'ship');
                 sprite.anchor.setTo(0.5, 0.5);
-                sprite.width = 100;
-                sprite.height = 90;
+                sprite.width = 50;
+                sprite.height = 45;
 
 
                 //  Game input
@@ -48,15 +48,11 @@
 
                 if (cursors.left.isDown)
                 {
-
+                    clientEngine.sendInput('left');
                 }
                 else if (cursors.right.isDown)
                 {
-
-                }
-                else
-                {
-
+                    clientEngine.sendInput('right');
                 }
 
     //            if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))

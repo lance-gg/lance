@@ -27,7 +27,7 @@ ClientEngine.prototype.start = function(){
 ClientEngine.prototype.sendInput = function(input){
     this.outboundInput.push({
         command: 'move',
-        params:  ['up']
+        params:  input
     });
 };
 
@@ -51,5 +51,6 @@ ClientEngine.prototype.onWorldStep = function(worldData){
         this.world.stepCount = worldData.stepCount;
         sprite.x = worldData.ships[0].x;
         sprite.y = worldData.ships[0].y;
+        sprite.angle = worldData.ships[0].angle;
     }
 };
