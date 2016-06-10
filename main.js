@@ -4,6 +4,7 @@ const express = require('express');
 const socketIO = require('socket.io');
 const path = require('path');
 
+const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'examples/spaaace/index.html');
 
 const server = express();
@@ -15,9 +16,7 @@ server.get('/', function (req, res) {
 
 server.use('/', express.static(path.join(__dirname, 'examples/spaaace')));
 
-var requestHandler = server.listen(process.env.PORT || 3000, function(){
-    console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
-});
+var requestHandler = server.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 const io = socketIO(requestHandler);
 
@@ -26,7 +25,7 @@ const io = socketIO(requestHandler);
     Game logic
  */
 
-const ServerEngine = require("./examples/spaaace/js/ServerEngine.js");
+const ServerEngine = require(path.join(__dirname, 'examples/spaaace/js/ServerEngine.js'));
 const serverEngine = new ServerEngine(io);
 serverEngine.start();
 
