@@ -50,7 +50,7 @@ SpaaaceEngine.prototype.getWorld = function(){
 // private functions
 
 const path = require('path');
-var Ship = require(path.join(__dirname, 'ship'));
+var Ship = require(path.join(__dirname, 'Ship'));
 
 SpaaaceEngine.prototype.initWorld = function(){
     this.world.ships = [];
