@@ -1,3 +1,5 @@
+"use strict";
+
 var gameloop = require('node-gameloop');
 
 
