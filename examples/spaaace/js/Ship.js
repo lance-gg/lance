@@ -1,7 +1,7 @@
 var Ship = function(id, x,y){
     this.id = id; //instance id
     this.x = x;
-    this.y = x;
+    this.y = y;
     this.angle = 90;
     this.rotationSpeed = 3;
     this.acceleration = 0.1;
@@ -9,7 +9,6 @@ var Ship = function(id, x,y){
     this.maxSpeed = 2;
 
     this.class = Ship;
-    // console.log(this.deserialize(this.serialize()));
 };
 
 Ship.properties = {
@@ -47,10 +46,10 @@ Ship.prototype.serialize = function(){
     }
 
     //buffer has one Uint8Array for class id, then payload
-    var dataBuffer = new ArrayBuffer(Uint8Array.BYTES_PER_ELEMENT + Ship.getNetSchemeBufferSize());
+    var dataBuffer = new ArrayBuffer(Ship.getNetSchemeBufferSize());
     var dataView = new DataView(dataBuffer);
 
-    //first set the size of the payload in bytes
+    //first set the id of the class, so that the deserializer can fetch information about it
     dataView.setUint8(0, Ship.properties.id);
     //advance the offset counter
     var dataByteOffset = Uint8Array.BYTES_PER_ELEMENT;
@@ -68,6 +67,7 @@ Ship.prototype.serialize = function(){
             else if (Ship.netScheme[property]==Uint8Array){
                 dataView.setUint8(dataByteOffset, this[property]);
             }
+
             dataByteOffset += Ship.netScheme[property].BYTES_PER_ELEMENT;
         }
     }
@@ -76,12 +76,14 @@ Ship.prototype.serialize = function(){
 };
 
 Ship.deserialize = function(dataBuffer){
-    var dataBufferIndex = 0;
+    var dataBufferIndex = Uint8Array.BYTES_PER_ELEMENT;
     var dataView = new DataView(dataBuffer);
     var data = {};
 
     for (var property in Ship.netScheme) {
         if (Ship.netScheme.hasOwnProperty(property)) {
+
+            //TODO refactor this ugly if clause
             if (Ship.netScheme[property]==Int16Array){
                 data[property] = dataView.getInt16(dataBufferIndex);
             }
