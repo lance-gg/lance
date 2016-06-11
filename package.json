@@ -9,10 +9,13 @@
   },
   "scripts": {
     "start": "node main.js",
-    "postinstall": "browserify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js",
-    "watchify": "watchify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js"
+    "postinstall": "browserify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js -t [ babelify --presets [ es2015 ] ",
+    "watchify": "watchify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js -d -t [ babelify --presets [ es2015 ] "
   },
   "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015": "^6.9.0",
+    "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "watchify": "^3.7.0"
   }
