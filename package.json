@@ -13,7 +13,7 @@
   },
   "scripts": {
     "start": "node main.js",
-    "postinstall": "echo pwd && browserify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js -t [ babelify --presets [ es2015 ] ",
+    "postinstall": "browserify ./examples/spaaace/js/clientMain.js -o examples/spaaace/dist/bundle.js -t [ babelify --presets [ es2015 ] ",
     "watchify": "watchify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js -d -t [ babelify --presets [ es2015 ] "
   },
   "devDependencies": {
