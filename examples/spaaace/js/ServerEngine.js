@@ -155,9 +155,10 @@ SpaaaceEngine.prototype.makeShip = function(id) {
         return null;
     };
 
-    var ship = new Ship(id,
-        Math.random()*(this.worldSettings.width-200) + 200,
-        Math.random()*(this.worldSettings.height-200) + 200);
+    var newShipX = Math.floor(Math.random()*(this.worldSettings.width-200)) + 200;
+    var newShipY = Math.floor(Math.random()*(this.worldSettings.height-200)) + 200;
+
+    var ship = new Ship(id, newShipX, newShipY);
     this.world.objects[id]=ship;
 
     //todo deal with what goes over the wire

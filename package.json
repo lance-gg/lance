@@ -8,6 +8,12 @@
     "socket.io": "^1.4.6"
   },
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "postinstall": "browserify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js",
+    "watchify": "watchify ./examples/spaaace/js/clientMain.js -o ./examples/spaaace/dist/bundle.js"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.1",
+    "watchify": "^3.7.0"
   }
 }

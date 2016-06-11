@@ -1,3 +1,5 @@
+var Ship = require("./Ship");
+
 var ClientEngine = function(socket){
     var that = this;
     this.socket = socket;
@@ -70,10 +72,10 @@ ClientEngine.prototype.onWorldStep = function(worldData){
         while (byteOffset < worldData.byteLength) {
             var objectClassId = worldDataDV.getUint8(byteOffset);
 
-            var objectByteSize = Ship.getNetSchemeBufferSize() - 1; //remove the class id
+            var objectByteSize = Ship.getNetSchemeBufferSize();
 
-            var objectData = Ship.deserialize(worldData.slice(byteOffset + Uint8Array.BYTES_PER_ELEMENT, byteOffset + Uint8Array.BYTES_PER_ELEMENT + objectByteSize));
-            byteOffset += (Uint8Array.BYTES_PER_ELEMENT + objectByteSize);
+            var objectData = Ship.deserialize(worldData.slice(byteOffset, byteOffset + objectByteSize));
+            byteOffset += objectByteSize;
 
             var localObj;
             var sprite;
@@ -84,7 +86,7 @@ ClientEngine.prototype.onWorldStep = function(worldData){
             }
             else{
                 localObj = this.world.objects[objectData.id] = new Ship(objectData.id, objectData.x, objectData.y);
-                sprite = localObj.sprite = game.add.sprite(localObj.x, localObj.y, 'ship');
+                sprite = localObj.sprite = window.game.add.sprite(localObj.x, localObj.y, 'ship');
 
                 //if own player's ship - color it
                 if (this.playerId == objectData.id){
@@ -121,3 +123,5 @@ ClientEngine.prototype.onWorldStep = function(worldData){
 
     }
 };
+
+module.exports = ClientEngine;
