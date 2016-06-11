@@ -9,7 +9,7 @@
     "babel-cli": "^6.10.1",
     "babel-preset-es2015": "^6.9.0",
     "babelify": "^7.3.0",
-    "browserify": "^13.0.1",
+    "browserify": "^13.0.1"
   },
   "scripts": {
     "start": "node main.js",
