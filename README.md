@@ -6,6 +6,7 @@ Things to do:
 
 * Separate ClientEngine from SpaaaceEngine
 * Generalize client side prediction
+* Input validation (check player can control ship)
 * Optimize what goes over the wire:
     * Only dirty items get sent, with periodic sync
     * Option to specify incremental updates

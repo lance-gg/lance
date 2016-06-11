@@ -1,5 +1,5 @@
-var Ship = function(x,y){
-    this.id = 0;
+var Ship = function(id, x,y){
+    this.id = id; //instance id
     this.x = x;
     this.y = x;
     this.angle = 90;
@@ -13,11 +13,12 @@ var Ship = function(x,y){
 };
 
 Ship.properties = {
-    id: 13,
+    id: 0, //class id
     name: "ship"
 };
 
 Ship.netScheme = {
+    id: Uint8Array,
     x: Int16Array,
     y: Int16Array,
     angle: Int16Array
@@ -64,6 +65,9 @@ Ship.prototype.serialize = function(){
             else if (Ship.netScheme[property]==Int8Array){
                 dataView.setInt8(dataByteOffset, this[property]);
             }
+            else if (Ship.netScheme[property]==Uint8Array){
+                dataView.setUint8(dataByteOffset, this[property]);
+            }
             dataByteOffset += Ship.netScheme[property].BYTES_PER_ELEMENT;
         }
     }
@@ -83,6 +87,9 @@ Ship.deserialize = function(dataBuffer){
             }
             else if (Ship.netScheme[property]==Int8Array){
                 data[property] = dataView.getInt8(dataBufferIndex);
+            }
+            else if (Ship.netScheme[property]==Uint8Array){
+                data[property] = dataView.getUint8(dataBufferIndex);
             }
 
             dataBufferIndex += Ship.netScheme[property].BYTES_PER_ELEMENT;

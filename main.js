@@ -36,16 +36,9 @@ serverEngine.start();
 io.on('connection', onClientConnect);
 
 function onClientConnect(socket){
-    console.log('Client connected');
-
     serverEngine.onPlayerConnected(socket);
-
-    socket.on('disconnect', onClientDisconnect);
 }
 
-function onClientDisconnect(socket){
-    console.log('Client disconnected')
-}
 
 
 // setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
