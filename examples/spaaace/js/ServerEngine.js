@@ -17,6 +17,11 @@ SpaaaceEngine.prototype.start = function(){
         playerCount: 0
     };
 
+    this.worldSettings = {
+        width: 800,
+        height: 600
+    };
+
     this.registerClass(Ship);
 
     this.initWorld();
@@ -150,7 +155,9 @@ SpaaaceEngine.prototype.makeShip = function(id) {
         return null;
     };
 
-    var ship = new Ship(id,300,300);
+    var ship = new Ship(id,
+        Math.random()*(this.worldSettings.width-200) + 200,
+        Math.random()*(this.worldSettings.height-200) + 200);
     this.world.objects[id]=ship;
 
     //todo deal with what goes over the wire
@@ -194,6 +201,11 @@ SpaaaceEngine.prototype.updateGameWorld = function(){
             ship.isRotatingRight = false;
             ship.x = ship.x + ship.velocity.x;
             ship.y = ship.y + ship.velocity.y;
+
+            if (ship.x>=this.worldSettings.width){ ship.x = this.worldSettings.width - ship.x;}
+            else if (ship.y>=this.worldSettings.height){ ship.y = this.worldSettings.height - ship.y;}
+            else if (ship.x < 0){ ship.x = this.worldSettings.width + ship.x;}
+            else if (ship.y<0){ ship.y = this.worldSettings.width + ship.y;}
         }
     }
 
