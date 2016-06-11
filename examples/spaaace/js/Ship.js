@@ -8,73 +8,84 @@ var Ship = function(x,y){
     this.deceleration = 0.999;
     this.maxSpeed = 2;
 
+    this.class = Ship;
     // console.log(this.deserialize(this.serialize()));
 };
 
-Ship.prototype.netScheme = {
+Ship.properties = {
+    id: 13,
+    name: "ship"
+};
+
+Ship.netScheme = {
     x: Int16Array,
     y: Int16Array,
     angle: Int16Array
 };
 
-Ship.prototype.getNetSchemeBufferSize = function(){
+Ship.getNetSchemeBufferSize = function(){
+    
+    if (typeof Ship.netSchemeBufferSize=="undefined"){
+        Ship.netSchemeBufferSize = Uint8Array.BYTES_PER_ELEMENT; //every scheme starts with the class id
 
-    if (typeof Ship.prototype.netSchemeBufferSize=="undefined"){
-        Ship.prototype.netSchemeBufferSize = 0;
-
-        for (var property in this.netScheme) {
-            if (this.netScheme.hasOwnProperty(property)) {
+        for (var property in Ship.netScheme) {
+            if (Ship.netScheme.hasOwnProperty(property)) {
                 //count the bytesize required for the netScheme buffer
-                Ship.prototype.netSchemeBufferSize += Ship.prototype.netScheme[property].BYTES_PER_ELEMENT
+                Ship.netSchemeBufferSize += Ship.netScheme[property].BYTES_PER_ELEMENT
             }
         }
     }
 
-    return this.netSchemeBufferSize;
+    return Ship.netSchemeBufferSize;
 };
 
 Ship.prototype.serialize = function(){
     //todo define behaviour when a netScheme is undefined
-    if (typeof this.netScheme == "undefined"){
+    if (typeof Ship.netScheme == "undefined"){
         console.warn("no netScheme defined! This will result in awful performance");
     }
 
-    var dataBuffer = new ArrayBuffer(this.getNetSchemeBufferSize());
+    //buffer has one Uint8Array for class id, then payload
+    var dataBuffer = new ArrayBuffer(Uint8Array.BYTES_PER_ELEMENT + Ship.getNetSchemeBufferSize());
     var dataView = new DataView(dataBuffer);
-    var dataBufferIndex = 0;
 
-    for (var property in this.netScheme) {
-        if (this.netScheme.hasOwnProperty(property)) {
+    //first set the size of the payload in bytes
+    dataView.setUint8(0, Ship.properties.id);
+    //advance the offset counter
+    var dataByteOffset = Uint8Array.BYTES_PER_ELEMENT;
+
+    for (var property in Ship.netScheme) {
+        if (Ship.netScheme.hasOwnProperty(property)) {
             //create bytearrays of the required properties
             // console.log(property, dataBufferIndex);
-            if (this.netScheme[property]==Int16Array){
-                dataView.setInt16(dataBufferIndex, this[property]);
+            if (Ship.netScheme[property]==Int16Array){
+                dataView.setInt16(dataByteOffset, this[property]);
             }
-            else if (this.netScheme[property]==Int8Array){
-                dataView.setInt8(dataBufferIndex, this[property]);
+            else if (Ship.netScheme[property]==Int8Array){
+                dataView.setInt8(dataByteOffset, this[property]);
             }
-            dataBufferIndex += this.netScheme[property].BYTES_PER_ELEMENT;
+            dataByteOffset += Ship.netScheme[property].BYTES_PER_ELEMENT;
         }
     }
 
     return dataBuffer;
 };
 
-Ship.prototype.deserialize = function(dataBuffer){
+Ship.deserialize = function(dataBuffer){
     var dataBufferIndex = 0;
     var dataView = new DataView(dataBuffer);
     var data = {};
 
-    for (var property in this.netScheme) {
-        if (this.netScheme.hasOwnProperty(property)) {
-            if (this.netScheme[property]==Int16Array){
+    for (var property in Ship.netScheme) {
+        if (Ship.netScheme.hasOwnProperty(property)) {
+            if (Ship.netScheme[property]==Int16Array){
                 data[property] = dataView.getInt16(dataBufferIndex);
             }
-            else if (this.netScheme[property]==Int8Array){
+            else if (Ship.netScheme[property]==Int8Array){
                 data[property] = dataView.getInt8(dataBufferIndex);
             }
 
-            dataBufferIndex += this.netScheme[property].BYTES_PER_ELEMENT;
+            dataBufferIndex += Ship.netScheme[property].BYTES_PER_ELEMENT;
         }
     }
 

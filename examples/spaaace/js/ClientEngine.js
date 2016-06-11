@@ -49,13 +49,30 @@ ClientEngine.prototype.handleOutboundInput = function(){
 
 //TODO deserialize world
 ClientEngine.prototype.onWorldStep = function(worldData){
-     var ship = new Ship();
-     var shipData = ship.deserialize(worldData);
+    var worldDataDV = new DataView(worldData);
+    var stepCount =  worldDataDV.getInt32(0);
 
-    // this.world.stepCount = worldData.stepCount;
-     sprite.x = shipData.x;
-     sprite.y = shipData.y;
-     sprite.angle = shipData.angle;
+    //if packet is out of date, ignore
+    if (stepCount > this.world.stepCount) {
+        this.world.stepCount = stepCount;
+
+
+        var byteOffset = Int32Array.BYTES_PER_ELEMENT;
+
+        //go ever the buffer and deserialize items
+        while (byteOffset < worldData.byteLength) {
+            var objectClassId = worldDataDV.getUint8(byteOffset);
+
+            var objectByteSize = Ship.getNetSchemeBufferSize() - 1; //remove the class id
+
+            var objectData = Ship.deserialize(worldData.slice(byteOffset + Uint8Array.BYTES_PER_ELEMENT, byteOffset + Uint8Array.BYTES_PER_ELEMENT + objectByteSize));
+            byteOffset += (Int16Array.BYTES_PER_ELEMENT + objectByteSize);
+
+            sprite.x = objectData.x;
+            sprite.y = objectData.y;
+            sprite.angle = objectData.angle;
+        }
+    }
 };
 
 // ClientEngine.prototype.onWorldStep = function(worldData){

@@ -8,16 +8,19 @@ var SpaaaceEngine = function(io){
     this.io = io;
 
     this.connectedPlayers = {};
+    this.registeredClasses = {};
 };
 
 SpaaaceEngine.prototype.start = function(){
     this.world = {
         stepCount: 0
     };
+
+    this.registerClass(Ship);
+
     this.initWorld();
 
     this.gameLoopId = Gameloop.setGameLoop(this.step.bind(this), 1000 / 60);
-
 };
 
 SpaaaceEngine.prototype.onPlayerConnected = function(socket){
@@ -49,28 +52,54 @@ SpaaaceEngine.prototype.processInput = function(data){
     }
 };
 
+SpaaaceEngine.prototype.registerClass = function(classObj){
+    this.registeredClasses[classObj.properties.id] = classObj;
+};
+
 SpaaaceEngine.prototype.serializeWorld = function(){
     var bufferSize = 0;
-    var bufferIndex = 0;
+    var bufferOffset = 0;
 
+    //count the object byte size to determine what buffer size do we need
     for (let x=0; x<this.world.objects.length; x++){
         let obj = this.world.objects[x];
-        bufferSize += obj.getNetSchemeBufferSize();
+        let objClass = obj.class;
+
+        //reminder - object is made from its class id (Uint8) and its payload
+        bufferSize += objClass.getNetSchemeBufferSize();
     }
 
-    var worldBuffer = new Int8Array(bufferSize);
+    bufferSize += Int32Array.BYTES_PER_ELEMENT; //world buffer starts with step count
+    var worldBuffer = new ArrayBuffer(bufferSize);
+    var worldBufferDV = new DataView(worldBuffer);
+
+    //write step count
+    worldBufferDV.setInt32(0,this.world.stepCount);
+    bufferOffset += Int32Array.BYTES_PER_ELEMENT;
 
     for (let x=0; x<this.world.objects.length; x++){
         let obj = this.world.objects[x];
-        let netSchemeBufferSize = obj.getNetSchemeBufferSize();
+        let objClass = obj.class;
+        let netSchemeBufferSize = objClass.getNetSchemeBufferSize();
+
         var serializedObj = obj.serialize();
-        worldBuffer.set(serializedObj, netSchemeBufferSize);
-        bufferIndex += netSchemeBufferSize;
+        let serializedObjDV = new DataView(serializedObj);
+
+        //go over the serialized object, writing it byte by byte to the world buffer
+        for (let y=0; y<netSchemeBufferSize; y++){
+            worldBufferDV.setInt8(bufferOffset + y , serializedObjDV.getInt8(y));
+        }
+        bufferOffset += netSchemeBufferSize;
     }
 
-    //todo solve buffer concat
+    // var dv = new DataView(serializedObj);
+      // console.log(dv.getInt16(5));
 
-    return this.world.objects[0].serialize();
+      // var dv = new DataView(worldBuffer);
+      // console.log(this.registeredClasses[dv.getUint8(4)].getNetSchemeBufferSize());
+
+
+    return worldBuffer;
 };
 
 
