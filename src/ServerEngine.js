@@ -9,7 +9,7 @@ class ServerEngine{
         this.connectedPlayers = {};
 
         this.options = {
-            updateRate: 20,
+            updateRate: 30,
             frameRate: 60
         }
     }
