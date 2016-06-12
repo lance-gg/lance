@@ -1,6 +1,6 @@
 class GameEngine{
     constructor(){
-
+        this.registeredClasses = {};
     }
 
     initWorld(){
@@ -13,6 +13,10 @@ class GameEngine{
 
     start(){
         this.initWorld();
+    };
+
+    registerClass(classObj){
+        this.registeredClasses[classObj.properties.id] = classObj;
     };
 
 }

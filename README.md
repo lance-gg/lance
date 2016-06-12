@@ -12,8 +12,8 @@ Still in early development. Check back with me soon :P
 
 Things to do:
 
-* Separate ClientEngine from SpaaaceEngine
 * Generalize client side prediction
+* Implement lag compensation
 * Input validation (check player can control ship)
 * Optimize what goes over the wire:
     * Only dirty items get sent, with periodic sync
@@ -23,3 +23,8 @@ Things to do:
 * seperate Spaace to a different repo using the NPM package
 * Recording and replaying sessions
 * tests tests tests
+
+
+Caveats:
+
+* Due to websocket limitations, only TCP and no UDP :(

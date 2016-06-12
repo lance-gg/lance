@@ -1,12 +1,22 @@
+const Point= require('./Point');
+
 var Ship = function(id, x,y){
     this.id = id; //instance id
     this.x = x;
     this.y = y;
+    this.velX = 0;
+    this.velY = 0;
     this.angle = 90;
     this.rotationSpeed = 3;
     this.acceleration = 0.1;
-    this.deceleration = 0.999;
+    this.deceleration = 0.99;
     this.maxSpeed = 2;
+
+    //todo deal with what goes over the wire
+    this.velocity = new Point();
+    this.temp={
+        accelerationVector: new Point()
+    };
 
     this.class = Ship;
 };
@@ -20,6 +30,8 @@ Ship.netScheme = {
     id: Uint8Array,
     x: Int16Array,
     y: Int16Array,
+    velX: Int16Array,
+    velY: Int16Array,
     angle: Int16Array
 };
 

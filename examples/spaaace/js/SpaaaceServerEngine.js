@@ -11,8 +11,6 @@ class SpaaaceServerEngine extends ServerEngine{
 
     start(){
         super.start();
-
-        this.registerClass(Ship);
     };
 
     onPlayerConnected(socket){

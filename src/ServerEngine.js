@@ -7,10 +7,10 @@ class ServerEngine{
         this.gameEngine = gameEngine;
 
         this.connectedPlayers = {};
-        this.registeredClasses = {};
 
         this.options = {
-            updateRate: 1
+            updateRate: 20,
+            frameRate: 60
         }
     }
 
@@ -21,18 +21,15 @@ class ServerEngine{
         this.gameLoopId = Gameloop.setGameLoop(function(){
             that.step();
 
-        }, 1000 / 60);
+        }, 1000 / this.options.frameRate);
     }
 
     step(){
+        this.serverTime = (new Date().getTime());
         this.gameEngine.step();
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
             this.io.emit('worldUpdate',this.serializeWorld());
         }
-    };
-
-    registerClass(classObj){
-        this.registeredClasses[classObj.properties.id] = classObj;
     };
 
     serializeWorld(){

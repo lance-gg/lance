@@ -5,6 +5,8 @@ const Point= require('./Point');
 class SpaaaceGameEngine extends GameEngine {
     constructor(){
         super();
+
+        this.registerClass(Ship);
     }
     
     start(){
@@ -47,6 +49,8 @@ class SpaaaceGameEngine extends GameEngine {
                 // console.log(ship.temp.accelerationVector.x, ship.temp.accelerationVector.y);
                 Point.add(ship.velocity,ship.temp.accelerationVector, ship.velocity);
                 ship.velocity.multiply(ship.deceleration, ship.deceleration);
+                ship.velX = ship.velocity.x;
+                ship.velY = ship.velocity.y;
 
                 ship.isAccelerating = false;
                 ship.isRotatingLeft = false;
@@ -74,12 +78,6 @@ class SpaaaceGameEngine extends GameEngine {
 
         var ship = new Ship(id, newShipX, newShipY);
         this.world.objects[id]=ship;
-
-        //todo deal with what goes over the wire
-        ship.velocity = new Point();
-        ship.temp={
-            accelerationVector: new Point()
-        };
 
         return ship;
     };
