@@ -8,6 +8,10 @@ class ServerEngine{
 
         this.connectedPlayers = {};
         this.registeredClasses = {};
+
+        this.options = {
+            updateRate: 1
+        }
     }
 
     start(){
@@ -22,7 +26,9 @@ class ServerEngine{
 
     step(){
         this.gameEngine.step();
-        this.io.emit('worldUpdate',this.serializeWorld());
+        if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
+            this.io.emit('worldUpdate',this.serializeWorld());
+        }
     };
 
     registerClass(classObj){

@@ -23,7 +23,7 @@ class SpaaaceServerEngine extends ServerEngine{
         this.gameEngine.makeShip(socket.playerId);
 
         socket.on('move', function(data){
-            that.processInput(data, socket)
+            that.gameEngine.processInput(data, socket.playerId)
         });
 
     };
@@ -32,24 +32,6 @@ class SpaaaceServerEngine extends ServerEngine{
         super.onPlayerDisconnected(socketId, playerId);
 
         delete this.gameEngine.world.objects[playerId];
-    };
-
-
-    processInput(data, socket){
-        //get the player ship tied to the player socket
-        var playerShip = this.gameEngine.world.objects[socket.playerId];
-
-        if (playerShip) {
-            if (data == "up") {
-                playerShip.isAccelerating = true
-            }
-            else if (data == "right") {
-                playerShip.isRotatingRight = true
-            }
-            else if (data == "left") {
-                playerShip.isRotatingLeft = true
-            }
-        }
     };
 
 }

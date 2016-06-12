@@ -1,7 +1,9 @@
-var ClientEngine = require("./ClientEngine");
+const SpaaaceClientEngine = require("./SpaaaceClientEngine");
+const SpaaaceGameEngine = require('./SpaaaceGameEngine');
 
 var socket = io();
-var clientEngine = new ClientEngine(socket);
+var gameEngine = new SpaaaceGameEngine();
+var spaaaceClientEngine = new SpaaaceClientEngine(socket, gameEngine);
 
 var game = window.game = new Phaser.Game(800, 600, Phaser.AUTO, 'spaaace', { preload: preload, create: create, update: update, render: render });
 
@@ -22,24 +24,24 @@ function create() {
     cursors = game.input.keyboard.createCursorKeys();
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
 
-    clientEngine.start();
+    spaaaceClientEngine.start();
 }
 
 function update() {
 
     if (cursors.up.isDown)
     {
-        clientEngine.sendInput('up');
+        spaaaceClientEngine.sendInput('up');
         //                game.physics.arcade.accelerationFromRotation(sprite.rotation, 200, sprite.body.acceleration);
     }
 
     if (cursors.left.isDown)
     {
-        clientEngine.sendInput('left');
+        spaaaceClientEngine.sendInput('left');
     }
     else if (cursors.right.isDown)
     {
-        clientEngine.sendInput('right');
+        spaaaceClientEngine.sendInput('right');
     }
 
     //            if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
@@ -52,7 +54,5 @@ function update() {
 }
 
 function render() {
-
-    //            game.debug.spriteInfo(sprite, 32, 32);
-
+    spaaaceClientEngine.step();
 }

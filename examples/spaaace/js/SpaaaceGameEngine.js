@@ -83,6 +83,24 @@ class SpaaaceGameEngine extends GameEngine {
 
         return ship;
     };
+
+    processInput(data, playerId){
+
+        //get the player ship tied to the player socket
+        var playerShip = this.world.objects[playerId];
+
+        if (playerShip) {
+            if (data == "up") {
+                playerShip.isAccelerating = true
+            }
+            else if (data == "right") {
+                playerShip.isRotatingRight = true
+            }
+            else if (data == "left") {
+                playerShip.isRotatingLeft = true
+            }
+        }
+    };
 }
 
 module.exports = SpaaaceGameEngine;
