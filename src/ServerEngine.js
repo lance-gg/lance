@@ -11,7 +11,7 @@ class ServerEngine{
         this.connectedPlayers = {};
 
         this.options = {
-            updateRate: 1,
+            updateRate: 6,
             frameRate: 60
         }
     }
@@ -30,11 +30,19 @@ class ServerEngine{
         this.serverTime = (new Date().getTime());
         this.gameEngine.step();
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
-            this.io.emit('worldUpdate',this.serializeWorld());
+
+            for (let socketId in this.connectedPlayers) {
+                if (this.connectedPlayers.hasOwnProperty(socketId)) {
+                    let playerMessage =  this.serializeWorld(socketId);
+                    this.connectedPlayers[socketId].emit('worldUpdate',playerMessage);
+                }
+            }
+
+
         }
     };
 
-    serializeWorld(){
+    serializeWorld(socketId){
         var bufferSize = 0;
         var bufferOffset = 0;
         var world = this.gameEngine.world;
@@ -50,13 +58,18 @@ class ServerEngine{
             }
         }
 
-        bufferSize += Int32Array.BYTES_PER_ELEMENT; //world buffer starts with step count
+        //world buffer starts with step count followed by last handled input for player
+        bufferSize += Int32Array.BYTES_PER_ELEMENT + Int16Array.BYTES_PER_ELEMENT;
         var worldBuffer = new ArrayBuffer(bufferSize);
         var worldBufferDV = new DataView(worldBuffer);
 
         //write step count
         worldBufferDV.setInt32(0,world.stepCount);
         bufferOffset += Int32Array.BYTES_PER_ELEMENT;
+
+        //write handled input
+        worldBufferDV.setInt16(0, this.connectedPlayers[socketId].lastHandledInput);
+        bufferOffset += Int16Array.BYTES_PER_ELEMENT;
 
         for (let objId in world.objects) {
             if (world.objects.hasOwnProperty(objId)) {
@@ -86,6 +99,8 @@ class ServerEngine{
         //save player
         this.connectedPlayers[socket.id] = socket;
         var playerId = socket.playerId = ++this.gameEngine.world.playerCount;
+        socket.lastHandledInput = null;
+
         console.log("Client Connected", socket.id);
 
 
@@ -93,9 +108,14 @@ class ServerEngine{
             playerId: playerId
         });
 
-
         socket.on('disconnect', function(){
             that.onPlayerDisconnected(socket.id, playerId)
+        });
+
+
+        //todo rename, use number instead of name
+        socket.on('move', function(data){
+            that.onReceivedInput(data, socket)
         });
     };
 
@@ -103,6 +123,11 @@ class ServerEngine{
         delete this.connectedPlayers[socketId];
         console.log('Client disconnected')
     };
+
+    onReceivedInput(data, socket){
+        this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
+        // console.log("last handled input", this.connectedPlayers[socket.id].lastHandledInput);
+    }
 }
 
 module.exports = ServerEngine;

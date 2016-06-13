@@ -30,8 +30,8 @@ Ship.netScheme = {
     id: Uint8Array,
     x: Int16Array,
     y: Int16Array,
-    velX: Int16Array,
-    velY: Int16Array,
+    velX: Float32Array,
+    velY: Float32Array,
     angle: Int16Array
 };
 
@@ -68,8 +68,12 @@ Ship.prototype.serialize = function(){
 
     for (var property in Ship.netScheme) {
         if (Ship.netScheme.hasOwnProperty(property)) {
+
             //create bytearrays of the required properties
             // console.log(property, dataBufferIndex);
+            if (Ship.netScheme[property]==Float32Array){
+                dataView.setFloat32(dataByteOffset, this[property]);
+            }
             if (Ship.netScheme[property]==Int16Array){
                 dataView.setInt16(dataByteOffset, this[property]);
             }
@@ -96,6 +100,10 @@ Ship.deserialize = function(dataBuffer){
         if (Ship.netScheme.hasOwnProperty(property)) {
 
             //TODO refactor this ugly if clause
+            //TODO type checking and warnings
+            if (Ship.netScheme[property]==Float32Array){
+                data[property] = dataView.getFloat32(dataBufferIndex);
+            }
             if (Ship.netScheme[property]==Int16Array){
                 data[property] = dataView.getInt16(dataBufferIndex);
             }
@@ -110,7 +118,14 @@ Ship.deserialize = function(dataBuffer){
         }
     }
 
-    return data;
+    var ship = new Ship(data.id, data.x, data.y);
+    ship.angle = data.angle;
+    ship.velX = data.velX;
+    ship.velY = data.velY;
+    ship.velocity.set(data.velX, data.velY);
+
+    return ship;
 };
+
 
 module.exports = Ship;

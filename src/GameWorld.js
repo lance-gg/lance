@@ -1,6 +1,3 @@
-var Ship = require("../examples/spaaace/js/Ship");
-
-
 class GameWorld{
     constructor(){
         this.stepCount = 0;
@@ -13,8 +10,10 @@ class GameWorld{
 
         var worldDataDV = new DataView(worldData);
         world.stepCount = worldDataDV.getInt32(0);
-
         var byteOffset = Int32Array.BYTES_PER_ELEMENT;
+
+        world.lastHandledInput = worldDataDV.getInt16(0);
+        byteOffset += Int16Array.BYTES_PER_ELEMENT;
 
         //go ever the buffer and deserialize items
         while (byteOffset < worldData.byteLength) {
@@ -23,13 +22,10 @@ class GameWorld{
 
             var objectByteSize = objectClass.getNetSchemeBufferSize();
 
-            var objectData = objectClass.deserialize(worldData.slice(byteOffset, byteOffset + objectByteSize));
+            var object = objectClass.deserialize(worldData.slice(byteOffset, byteOffset + objectByteSize));
+            world.objects[object.id] = object;
             byteOffset += objectByteSize;
 
-            //todo generalize ship
-            var localObj = world.objects[objectData.id]= new Ship(objectData.id, objectData.x, objectData.y)
-            // localObj.velocity.set(objectData.velX, objectData.velY);
-            localObj.angle = objectData.angle;
         }
 
         return world;

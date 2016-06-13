@@ -5,7 +5,11 @@ class ClientEngine {
         this.socket = socket;
         this.gameEngine = gameEngine;
 
-        this.outboundInput = [];
+
+        this.messageIndex = 0;
+        this.pendingInput = []; //holds all the input yet to be processed by the server
+        this.outboundMessages = [];
+
 
         this.socket.on('playerJoined', function(playerData) {
             that.playerId = playerData.playerId;
@@ -19,25 +23,38 @@ class ClientEngine {
             that.onServerStep(worldData);
         });
 
-        this.outboundInputInterval = setInterval(this.handleOutboundInput.bind(this),16);
+        //todo, rename, shouldn't work on setInterval
+        this.outboundMessageInterval = setInterval(this.handleOutboundInput.bind(this),16);
 
         this.gameEngine.start();
     }
 
-    sendInput(input){
-        this.gameEngine.processInput(input, this.playerId);
+    step(){
+        this.gameEngine.step();
+    }
 
-        this.outboundInput.push({
+    sendInput(input){
+        var message = {
             command: 'move',
-            params:  input
-        });
+            data: {
+                messageIndex: this.messageIndex,
+                input: input
+            }
+        };
+
+        this.gameEngine.processInput(message.data, this.playerId);
+
+        this.outboundMessages.push(message);
+        this.pendingInput.push(message);
+
+        this.messageIndex++;
     };
 
     handleOutboundInput (){
-        for (var x=0; x<this.outboundInput.length; x++){
-            this.socket.emit(this.outboundInput[x].command, this.outboundInput[x].params);
+        for (var x=0; x<this.outboundMessages.length; x++){
+            this.socket.emit(this.outboundMessages[x].command, this.outboundMessages[x].data);
         }
-        this.outboundInput = [];
+        this.outboundMessages = [];
     };
 
 }

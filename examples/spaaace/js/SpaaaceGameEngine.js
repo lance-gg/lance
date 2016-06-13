@@ -51,6 +51,9 @@ class SpaaaceGameEngine extends GameEngine {
                 // console.log(ship.temp.accelerationVector.x, ship.temp.accelerationVector.y);
                 Point.add(ship.velocity,ship.temp.accelerationVector, ship.velocity);
                 ship.velocity.multiply(ship.deceleration, ship.deceleration);
+                ship.velocity.x = Math.round(ship.velocity.x * 100)/100;
+                ship.velocity.y = Math.round(ship.velocity.y * 100)/100;
+
                 ship.velX = ship.velocity.x;
                 ship.velY = ship.velocity.y;
 
@@ -84,20 +87,19 @@ class SpaaaceGameEngine extends GameEngine {
         return ship;
     };
 
-    processInput(data, playerId){
-
+    processInput(inputData, playerId){
         //get the player ship tied to the player socket
         var playerShip = this.world.objects[playerId];
-
+        
         if (playerShip) {
-            if (data == "up") {
-                playerShip.isAccelerating = true
+            if (inputData.input == "up") {
+                playerShip.isAccelerating = true;
             }
-            else if (data == "right") {
-                playerShip.isRotatingRight = true
+            else if (inputData.input == "right") {
+                playerShip.isRotatingRight = true;
             }
-            else if (data == "left") {
-                playerShip.isRotatingLeft = true
+            else if (inputData.input == "left") {
+                playerShip.isRotatingLeft = true;
             }
         }
     };

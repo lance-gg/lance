@@ -20,9 +20,7 @@ class SpaaaceServerEngine extends ServerEngine{
 
         this.gameEngine.makeShip(socket.playerId);
 
-        socket.on('move', function(data){
-            that.gameEngine.processInput(data, socket.playerId)
-        });
+
 
     };
 
@@ -31,6 +29,11 @@ class SpaaaceServerEngine extends ServerEngine{
 
         delete this.gameEngine.world.objects[playerId];
     };
+
+    onReceivedInput(inputData, socket){
+        super.onReceivedInput(inputData, socket);
+        this.gameEngine.processInput(inputData, socket.playerId)
+    }
 
 }
 
