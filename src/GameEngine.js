@@ -6,6 +6,7 @@ class GameEngine{
     }
 
     initWorld(){
+        //TODO use proper world objects
         this.world = {
             stepCount: 0,
             playerCount: 0,
