@@ -12,7 +12,7 @@ class GameWorld{
         world.stepCount = worldDataDV.getInt32(0);
         var byteOffset = Int32Array.BYTES_PER_ELEMENT;
 
-        world.lastHandledInput = worldDataDV.getInt16(0);
+        world.lastHandledInput = worldDataDV.getInt16(byteOffset);
         byteOffset += Int16Array.BYTES_PER_ELEMENT;
 
         //go ever the buffer and deserialize items

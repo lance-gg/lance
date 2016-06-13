@@ -64,11 +64,11 @@ class ServerEngine{
         var worldBufferDV = new DataView(worldBuffer);
 
         //write step count
-        worldBufferDV.setInt32(0,world.stepCount);
+        worldBufferDV.setInt32(bufferOffset,world.stepCount);
         bufferOffset += Int32Array.BYTES_PER_ELEMENT;
 
         //write handled input
-        worldBufferDV.setInt16(0, this.connectedPlayers[socketId].lastHandledInput);
+        worldBufferDV.setInt16(bufferOffset, this.connectedPlayers[socketId].lastHandledInput);
         bufferOffset += Int16Array.BYTES_PER_ELEMENT;
 
         for (let objId in world.objects) {
