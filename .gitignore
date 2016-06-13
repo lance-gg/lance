@@ -39,5 +39,4 @@ jspm_packages
 #jetbrains project files
 .idea
 
-#built code
-dist
+**/dist/bundle.js

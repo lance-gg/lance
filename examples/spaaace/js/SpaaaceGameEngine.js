@@ -1,3 +1,5 @@
+"use strict";
+
 const GameEngine = require('../../../src/GameEngine');
 const Ship = require('./Ship');
 const Point= require('./Point');

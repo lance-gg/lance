@@ -1,3 +1,5 @@
+"use strict";
+
 class GameEngine{
     constructor(){
         this.registeredClasses = {};

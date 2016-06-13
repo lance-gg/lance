@@ -1,3 +1,5 @@
+"use strict";
+
 const Gameloop = require('node-gameloop');
 
 class ServerEngine{
@@ -9,7 +11,7 @@ class ServerEngine{
         this.connectedPlayers = {};
 
         this.options = {
-            updateRate: 30,
+            updateRate: 1,
             frameRate: 60
         }
     }
