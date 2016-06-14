@@ -129,7 +129,7 @@ class SpaaaceClientEngine extends ClientEngine{
 
     }
 
-    onServerStep(worldData) {
+    handleInboundMessage(worldData) {
         var worldSnapshot = GameWorld.deserialize(this.gameEngine, worldData);
         // console.log(world.stepCount - this.gameEngine.world.stepCount);
         // console.log("last handled input", world.lastHandledInput);

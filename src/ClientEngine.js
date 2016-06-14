@@ -8,6 +8,7 @@ class ClientEngine {
 
         this.messageIndex = 1; // server "already accepted" 0, so this has to be larger
         this.pendingInput = []; //holds all the input yet to be processed by the server
+        this.inboundMessages = [];
         this.outboundMessages = [];
 
 
@@ -18,15 +19,18 @@ class ClientEngine {
 
     start(){
         var that = this;
-
         this.socket.on('worldUpdate', function(worldData) {
-            that.onServerStep(worldData);
+            that.inboundMessages.push(worldData);
         });
 
         this.gameEngine.start();
     }
 
     step(){
+        while(this.inboundMessages.length>0){
+            this.handleInboundMessage(this.inboundMessages.pop());
+        }
+
         this.handleOutboundInput();
         this.gameEngine.step();
     }

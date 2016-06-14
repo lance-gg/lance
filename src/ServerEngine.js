@@ -125,7 +125,9 @@ class ServerEngine{
     };
 
     onReceivedInput(data, socket){
-        this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
+        if (this.connectedPlayers[socket.id]) {
+            this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
+        }
         // console.log("last handled input", this.connectedPlayers[socket.id].lastHandledInput);
     }
 }
