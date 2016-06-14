@@ -43,6 +43,9 @@ class SpaaaceGameEngine extends GameEngine {
         var newShipX = Math.floor(Math.random()*(this.worldSettings.width-200)) + 200;
         var newShipY = Math.floor(Math.random()*(this.worldSettings.height-200)) + 200;
 
+        newShipX = 300;
+        newShipY = 300;
+
         var ship = new Ship(id, newShipX, newShipY);
         this.world.objects[id]=ship;
 

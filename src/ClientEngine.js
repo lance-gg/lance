@@ -6,7 +6,7 @@ class ClientEngine {
         this.gameEngine = gameEngine;
 
 
-        this.messageIndex = 0;
+        this.messageIndex = 1; // server "already accepted" 0, so this has to be larger
         this.pendingInput = []; //holds all the input yet to be processed by the server
         this.outboundMessages = [];
 
@@ -36,6 +36,7 @@ class ClientEngine {
             command: 'move',
             data: {
                 messageIndex: this.messageIndex,
+                step: this.gameEngine.world.stepCount,
                 input: input
             }
         };
@@ -50,6 +51,7 @@ class ClientEngine {
 
     handleOutboundInput (){
         for (var x=0; x<this.outboundMessages.length; x++){
+            // console.log("sent", this.outboundMessages[x].data.messageIndex, "step", this.outboundMessages[x].data.step);
             this.socket.emit(this.outboundMessages[x].command, this.outboundMessages[x].data);
         }
         this.outboundMessages = [];

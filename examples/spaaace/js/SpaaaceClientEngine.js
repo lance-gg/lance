@@ -133,7 +133,6 @@ class SpaaaceClientEngine extends ClientEngine{
         var worldSnapshot = GameWorld.deserialize(this.gameEngine, worldData);
         // console.log(world.stepCount - this.gameEngine.world.stepCount);
         // console.log("last handled input", world.lastHandledInput);
-        this.gameEngine.world.stepCount = worldSnapshot.stepCount;
 
         this.worldBuffer.push(worldSnapshot);
         if (this.worldBuffer.length >= 5) {
@@ -148,7 +147,6 @@ class SpaaaceClientEngine extends ClientEngine{
                     let localObj = this.gameEngine.world.objects[objId];
 
                     // console.log(worldSnapshot.objects[objId]);
-
                     localObj.x = worldSnapshot.objects[objId].x;
                     localObj.y = worldSnapshot.objects[objId].y;
                     localObj.velX = worldSnapshot.objects[objId].velX;
@@ -163,14 +161,13 @@ class SpaaaceClientEngine extends ClientEngine{
                     var j = 0;
                     while (j < this.pendingInput.length) {
                         var message = this.pendingInput[j];
-
                         if (message.data.messageIndex <= worldSnapshot.lastHandledInput) {
                             // Already processed. Its effect is already taken into account
                             // into the world update we just got, so we can drop it.
                             this.pendingInput.splice(j, 1);
                         } else {
                             // Not processed by the server yet. Re-apply it.
-
+                            // console.log("S last input", worldSnapshot.lastHandledInput ,"rerun input", message.data.messageIndex, "server step ",worldSnapshot.stepCount, "current step", this.gameEngine.world.stepCount);
                             this.gameEngine.processInput(message.data, this.playerId);
                             this.gameEngine.world.objects[this.playerId].step(this.gameEngine.worldSettings);
 
@@ -178,12 +175,12 @@ class SpaaaceClientEngine extends ClientEngine{
                         }
                     }
 
-                    this.sprites[objId].x = localObj.x;
-                    this.sprites[objId].y = localObj.y;
-                    this.sprites[objId].angle = localObj.angle;
                 }
             }
         }
+
+        //finally update the stepCount
+        this.gameEngine.world.stepCount = worldSnapshot.stepCount;
     };
 
     processInputs(){
