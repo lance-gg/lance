@@ -23,13 +23,11 @@ class ClientEngine {
             that.onServerStep(worldData);
         });
 
-        //todo, rename, shouldn't work on setInterval
-        this.outboundMessageInterval = setInterval(this.handleOutboundInput.bind(this),16);
-
         this.gameEngine.start();
     }
 
     step(){
+        this.handleOutboundInput();
         this.gameEngine.step();
     }
 
