@@ -1,4 +1,5 @@
 "use strict";
+const GameWorld = require('./GameWorld');
 
 class GameEngine{
     constructor(){
@@ -6,12 +7,7 @@ class GameEngine{
     }
 
     initWorld(){
-        //TODO use proper world objects
-        this.world = {
-            stepCount: 0,
-            playerCount: 0,
-            objects: {}
-        };
+        this.world = new GameWorld();
     };
 
     start(){

@@ -2,6 +2,7 @@ class GameWorld{
     constructor(){
         this.stepCount = 0;
         this.objects = {};
+        this.playerCount = 0;
     }
 
     static deserialize(gameEngine, worldData){
