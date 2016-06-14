@@ -1,3 +1,5 @@
+"use strict";
+
 class GameWorld{
     constructor(){
         this.stepCount = 0;
