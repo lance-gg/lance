@@ -19,8 +19,6 @@ Things to do:
     * Only dirty items get sent, with periodic sync
     * Option to specify incremental updates
     * client to server should also be binary
-* Package as NPM
-* seperate Spaace to a different repo using the NPM package
 * Recording and replaying sessions
 * tests tests tests
 
