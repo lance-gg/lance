@@ -1,8 +1,10 @@
+var io = require("socket.io-client");
+
 class ClientEngine {
 
-    constructor(socket, gameEngine){
+    constructor(gameEngine){
         var that = this;
-        this.socket = socket;
+        this.socket = io();
         this.gameEngine = gameEngine;
 
 

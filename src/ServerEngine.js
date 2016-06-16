@@ -4,16 +4,22 @@ const Gameloop = require('node-gameloop');
 
 class ServerEngine{
 
-    constructor(io, gameEngine){
+    constructor(io, gameEngine, inputOptions){
+        this.options = Object.assign({
+            updateRate: 6,
+            frameRate: 60,
+            debug: {
+                serverSendLag: false
+            }
+        }, inputOptions);
+
         this.io = io;
         this.gameEngine = gameEngine;
 
         this.connectedPlayers = {};
 
-        this.options = {
-            updateRate: 6,
-            frameRate: 60
-        }
+
+        io.on('connection', this.onPlayerConnected.bind(this));
     }
 
     start(){
@@ -27,6 +33,8 @@ class ServerEngine{
     }
 
     step(){
+        var that = this;
+
         this.serverTime = (new Date().getTime());
         this.gameEngine.step();
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
@@ -34,7 +42,17 @@ class ServerEngine{
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
                     let playerMessage =  this.serializeWorld(socketId);
-                    this.connectedPlayers[socketId].emit('worldUpdate',playerMessage);
+
+                    //simulate server send lag
+                    if (this.options.debug.serverSendLag !== false){
+                        setTimeout(function(){
+                            that.connectedPlayers[socketId].emit('worldUpdate',playerMessage);
+                        }, that.options.debug.serverSendLag)
+                    }
+                    else{
+                        this.connectedPlayers[socketId].emit('worldUpdate',playerMessage);
+                    }
+
                 }
             }
 
