@@ -46,7 +46,10 @@ class ServerEngine{
                     //simulate server send lag
                     if (this.options.debug.serverSendLag !== false){
                         setTimeout(function(){
-                            that.connectedPlayers[socketId].emit('worldUpdate',playerMessage);
+                            //verify again that the player exists
+                            if (that.connectedPlayers[socketId]) {
+                                that.connectedPlayers[socketId].emit('worldUpdate', playerMessage);
+                            }
                         }, that.options.debug.serverSendLag)
                     }
                     else{

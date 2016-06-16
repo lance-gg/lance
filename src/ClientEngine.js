@@ -1,15 +1,20 @@
 var io = require("socket.io-client");
+var PlayerSnap = require("./SyncStrategies/PlayerSnap");
 
 class ClientEngine {
 
-    constructor(gameEngine){
+    constructor(gameEngine, inputOptions){
         var that = this;
+
+        this.options = Object.assign({
+            syncStrategy: new PlayerSnap(gameEngine) //default sync strategy
+        }, inputOptions);
+
         this.socket = io();
         this.gameEngine = gameEngine;
 
 
-        this.messageIndex = 1; // server "already accepted" 0, so this has to be larger
-        this.pendingInput = []; //holds all the input yet to be processed by the server
+        this.worldBuffer=[]; // buffer for server world updates
         this.inboundMessages = [];
         this.outboundMessages = [];
 
@@ -50,9 +55,28 @@ class ClientEngine {
         this.gameEngine.processInput(message.data, this.playerId);
 
         this.outboundMessages.push(message);
-        this.pendingInput.push(message);
 
         this.messageIndex++;
+    };
+
+    handleInboundMessage(worldData) {
+        var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(this.gameEngine, worldData);
+        // console.log(world.stepCount - this.gameEngine.world.stepCount);
+        // console.log("last handled input", world.lastHandledInput);
+
+        this.worldBuffer.push(worldSnapshot);
+        if (this.worldBuffer.length >= 5) { //pick a proper buffer length, make it configurable
+            this.worldBuffer.shift();
+        }
+
+        for (var objId in worldSnapshot.objects) {
+            if (worldSnapshot.objects.hasOwnProperty(objId)) {
+                this.options.syncStrategy.handleObject(this.gameEngine, worldSnapshot, objId);
+            }
+        }
+
+        //finally update the stepCount
+        this.gameEngine.world.stepCount = worldSnapshot.stepCount;
     };
 
     handleOutboundInput (){
