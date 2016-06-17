@@ -1,6 +1,7 @@
 "use strict";
 
 const Gameloop = require('node-gameloop');
+const Serializable= require('./Composables/Serializable');
 
 class ServerEngine{
 
@@ -75,7 +76,8 @@ class ServerEngine{
                 let objClass = obj.class;
 
                 //reminder - object is made from its class id (Uint8) and its payload
-                bufferSize += objClass.getNetSchemeBufferSize();
+                let netSchemeBufferSize = Serializable.getNetSchemeBufferSize(obj.class);
+                bufferSize += netSchemeBufferSize;
             }
         }
 
@@ -95,8 +97,7 @@ class ServerEngine{
         for (let objId in world.objects) {
             if (world.objects.hasOwnProperty(objId)) {
                 let obj = world.objects[objId];
-                let objClass = obj.class;
-                let netSchemeBufferSize = objClass.getNetSchemeBufferSize();
+                let netSchemeBufferSize = Serializable.getNetSchemeBufferSize(obj.class);
 
                 var serializedObj = obj.serialize();
                 let serializedObjDV = new DataView(serializedObj);

@@ -3,9 +3,14 @@ var Incheon = {
     ServerEngine: require("./src/ServerEngine"),
     ClientEngine: require("./src/ClientEngine"),
     GameWorld: require("./src/GameWorld"),
-    syncStrategies:{
-        playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap")
+    Point: require("./src/Point"),
+    Composables: {
+        Serializable: require("./src/Composables/Serializable")
+    },
+    SyncStrategies:{
+        playerGradualSnap: require("./src/SyncStrategies/PlayerGradualSnap")
     }
+
 };
 
 module.exports = Incheon;

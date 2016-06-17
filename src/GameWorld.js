@@ -1,5 +1,7 @@
 "use strict";
 
+const Serializable = require("./Composables/Serializable");
+
 class GameWorld{
     constructor(){
         this.stepCount = 0;
@@ -23,9 +25,9 @@ class GameWorld{
             var objectClassId = worldDataDV.getUint8(byteOffset);
             var objectClass = gameEngine.registeredClasses[objectClassId];
 
-            var objectByteSize = objectClass.getNetSchemeBufferSize();
+            var objectByteSize = objectClass.getNetSchemeBufferSize(objectClass);
 
-            var object = objectClass.deserialize(worldData.slice(byteOffset, byteOffset + objectByteSize));
+            var object = Serializable.deserialize(objectClass, worldData.slice(byteOffset, byteOffset + objectByteSize));
             world.objects[object.id] = object;
             byteOffset += objectByteSize;
 
