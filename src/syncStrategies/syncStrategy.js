@@ -1,3 +1,5 @@
+"use strict";
+
 class SyncStrategy{
 
     constructor(gameEngine, inputOptions){
