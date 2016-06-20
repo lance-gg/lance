@@ -37,6 +37,7 @@ class GameEngine{
     };
 
     step(){
+        this.world.stepCount++;
         this.emit("step",this.world.stepCount);
     }
 
