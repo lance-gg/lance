@@ -1,5 +1,5 @@
 {
-  "name": "Incheon",
+  "name": "incheon",
   "version": "0.0.3",
   "description": "A Node.js based real-time game server",
   "dependencies": {
