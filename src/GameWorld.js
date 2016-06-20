@@ -25,6 +25,10 @@ class GameWorld{
             var objectClassId = worldDataDV.getUint8(byteOffset);
             var objectClass = gameEngine.registeredClasses[objectClassId];
 
+            if (objectClass == null){
+                console.warn(`Object with class id ${objectClassId} not found! Did you forget to register it with the game engine?`);
+            }
+
             var objectByteSize = objectClass.getNetSchemeBufferSize(objectClass);
 
             var object = Serializable.deserialize(objectClass, worldData.slice(byteOffset, byteOffset + objectByteSize));
