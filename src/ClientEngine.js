@@ -72,7 +72,7 @@ class ClientEngine {
 
         for (var objId in worldSnapshot.objects) {
             if (worldSnapshot.objects.hasOwnProperty(objId)) {
-                this.options.syncStrategy.handleObject(this.gameEngine, worldSnapshot, objId);
+                this.options.syncStrategy.handleObject(worldSnapshot, objId);
             }
         }
 
