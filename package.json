@@ -3,6 +3,7 @@
   "version": "0.0.3",
   "description": "A Node.js based real-time game server",
   "dependencies": {
+    "eventemitter3": "^1.2.0",
     "node-gameloop": "^0.1.0",
     "socket.io": "^1.4.6",
     "socket.io-client": "^1.4.6"
