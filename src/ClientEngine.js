@@ -65,6 +65,11 @@ class ClientEngine {
         // console.log(world.stepCount - this.gameEngine.world.stepCount);
         // console.log("last handled input", world.lastHandledInput);
 
+        // release worldBuffer resources
+        if (this.worldBuffer.length > 0) {
+            this.worldBuffer[this.worldBuffer.length - 1].release();
+        }
+
         this.worldBuffer.push(worldSnapshot);
         if (this.worldBuffer.length >= 5) { //pick a proper buffer length, make it configurable
             this.worldBuffer.shift();
@@ -74,6 +79,9 @@ class ClientEngine {
             if (worldSnapshot.objects.hasOwnProperty(objId)) {
                 this.options.syncStrategy.handleObject(worldSnapshot, objId);
             }
+        }
+        if (typeof this.gameEngine.worldUpdateHandler === 'function') {
+            this.gameEngine.worldUpdateHandler();
         }
 
         //finally update the stepCount

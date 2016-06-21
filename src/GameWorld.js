@@ -3,10 +3,20 @@
 const Serializable = require("./Composables/Serializable");
 
 class GameWorld{
+
     constructor(){
         this.stepCount = 0;
         this.objects = {};
         this.playerCount = 0;
+    }
+
+    release() {
+        for (var objId in this.objects) {
+            let o = this.objects[objId];
+            if (typeof o.release === 'function') {
+                o.release();
+            }
+        }
     }
 
     static deserialize(gameEngine, worldData){
