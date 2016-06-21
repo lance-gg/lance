@@ -8,7 +8,7 @@ var Incheon = {
         Serializable: require("./src/composables/Serializable")
     },
     SyncStrategies:{
-        playerGradualSnap: require("./src/SyncStrategies/PlayerGradualSnap")
+        playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap")
     }
 
 };

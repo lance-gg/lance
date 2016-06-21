@@ -1,6 +1,6 @@
 "use strict";
 var io = require("socket.io-client");
-var PlayerSnap = require("./SyncStrategies/PlayerSnap");
+var PlayerSnap = require("./syncStrategies/PlayerSnap");
 
 class ClientEngine {
 
