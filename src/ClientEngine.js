@@ -80,8 +80,8 @@ class ClientEngine {
                 this.options.syncStrategy.handleObject(worldSnapshot, objId);
             }
         }
-        if (typeof this.gameEngine.worldUpdateHandler === 'function') {
-            this.gameEngine.worldUpdateHandler();
+        if (typeof this.worldUpdateHandler === 'function') {
+            this.worldUpdateHandler();
         }
 
         //finally update the stepCount
