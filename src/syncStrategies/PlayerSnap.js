@@ -1,6 +1,6 @@
 "use strict";
 
-var SyncStrategy = require("./SyncStrategy");
+var SyncStrategy = require("./syncStrategy");
 
 /**
  * Snaps every object to its updated position from the server. Might cause rubber-banding on lagged connections

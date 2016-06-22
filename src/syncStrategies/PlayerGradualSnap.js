@@ -1,6 +1,6 @@
 "use strict";
 
-var SyncStrategy = require("./SyncStrategy");
+var SyncStrategy = require("./syncStrategy");
 
 class PlayerGradualSnap extends SyncStrategy{
 
