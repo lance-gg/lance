@@ -29,7 +29,7 @@ class GameEngine{
         this.timer = new Timer();
         this.timer.play();
 
-        this.on("step", function(){
+        this.on("poststep", function(){
             that.timer.tick();
         });
     };
@@ -40,8 +40,6 @@ class GameEngine{
 
     step(){
         this.world.stepCount++;
-        this.emit("step",this.world.stepCount);
-        
         this.updateGameWorld();
     }
 

@@ -29,7 +29,6 @@ class ServerEngine{
 
         this.gameLoopId = Gameloop.setGameLoop(function(){
             that.step();
-
         }, 1000 / this.options.frameRate);
     }
 
@@ -37,9 +36,12 @@ class ServerEngine{
         var that = this;
 
         this.serverTime = (new Date().getTime());
-        this.gameEngine.step();
-        if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
 
+        that.gameEngine.emit("prestep",that.gameEngine.world.stepCount);
+        this.gameEngine.step();
+        that.gameEngine.emit("poststep",that.gameEngine.world.stepCount);
+
+        if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
                     let playerMessage =  this.serializeWorld(socketId);
