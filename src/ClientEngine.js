@@ -8,7 +8,7 @@ class ClientEngine {
         var that = this;
 
         this.options = Object.assign({
-            syncStrategy: new PlayerSnap(gameEngine) //default sync strategy
+            syncStrategy: new PlayerSnap(this) //default sync strategy
         }, inputOptions);
 
         this.socket = io();
@@ -22,6 +22,11 @@ class ClientEngine {
 
         this.socket.on('playerJoined', function(playerData) {
             that.playerId = playerData.playerId;
+        });
+
+        //when objects get added, tag them as playerControlled if necessary
+        this.gameEngine.on('objectAdded', function(object){
+            object.isPlayerControlled = that.playerId == object.playerId;
         });
     }
 

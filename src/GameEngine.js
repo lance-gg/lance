@@ -24,6 +24,8 @@ class GameEngine{
 
         this.world = new GameWorld();
 
+        this.worldSettings = {};
+
         this.timer = new Timer();
         this.timer.play();
 
@@ -39,6 +41,22 @@ class GameEngine{
     step(){
         this.world.stepCount++;
         this.emit("step",this.world.stepCount);
+        
+        this.updateGameWorld();
+    }
+
+    updateGameWorld (){
+        for (var objId in this.world.objects) {
+            if (this.world.objects.hasOwnProperty(objId)) {
+                this.world.objects[objId].step(this.worldSettings);
+            }
+        }
+
+    };
+
+    addObjectToWorld(object){
+        this.world.objects[object.id] = object;
+        this.emit("objectAdded", object);
     }
 
     registerClass(classObj){
