@@ -7,24 +7,30 @@ var SyncStrategy = require("./SyncStrategy");
  */
 class PlayerSnap extends SyncStrategy{
 
-    constructor(gameEngine, inputOptions){
-        super(gameEngine, inputOptions);
+    constructor(clientEngine, inputOptions){
+        super(clientEngine, inputOptions);
     }
 
     handleObject(worldSnapshot, objId){
         //update player character
-        var localObj = this.gameEngine.world.objects[objId];
+        var world = this.clientEngine.gameEngine.world;
+        var snapshotObj = worldSnapshot.objects[objId];
+        snapshotObj.isPlayerControlled = this.clientEngine.playerId == snapshotObj.playerId;
 
-        if (localObj && localObj.isPlayerControlled === true) {
+        //we only care about player controlled objects
+        if (snapshotObj.isPlayerControlled){
 
-            //todo generalize property assignment
-            localObj.x = worldSnapshot.objects[objId].x;
-            localObj.y = worldSnapshot.objects[objId].y;
-            localObj.velX = worldSnapshot.objects[objId].velX;
-            localObj.velY = worldSnapshot.objects[objId].velY;
-            localObj.velocity.set(worldSnapshot.objects[objId].velX, worldSnapshot.objects[objId].velY);
-            localObj.angle = worldSnapshot.objects[objId].angle;
+            //object doesn't exist yet - create it
+            if (! (objId in world.objects)){
+                world.objects[objId] = worldSnapshot.objects[objId].class.newFrom(snapshotObj);
+
+            }
+            else{
+                world.objects[objId].copyFrom(worldSnapshot.objects[objId]);
+            }
+
         }
+
     }
 
 }
