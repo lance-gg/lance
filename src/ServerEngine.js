@@ -1,7 +1,7 @@
 "use strict";
 
 const Gameloop = require('node-gameloop');
-const Serializable= require('./Composables/Serializable');
+const Serializable= require('./composables/Serializable');
 
 class ServerEngine{
 

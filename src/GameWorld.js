@@ -1,6 +1,6 @@
 "use strict";
 
-const Serializable = require("./Composables/Serializable");
+const Serializable = require("./composables/Serializable");
 
 class GameWorld{
     constructor(){
