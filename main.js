@@ -4,11 +4,11 @@ var Incheon = {
     ClientEngine: require("./src/ClientEngine"),
     GameWorld: require("./src/GameWorld"),
     Point: require("./src/Point"),
-    Composables: {
-        Serializable: require("./src/Composables/Serializable")
+    composables: {
+        Serializable: require("./src/composables/Serializable")
     },
-    SyncStrategies:{
-        playerGradualSnap: require("./src/SyncStrategies/PlayerGradualSnap")
+    syncStrategies:{
+        playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap")
     }
 
 };
