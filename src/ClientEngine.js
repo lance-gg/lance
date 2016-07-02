@@ -81,6 +81,16 @@ class ClientEngine {
             if (worldSnapshot.objects.hasOwnProperty(objId)) {
                 this.options.syncStrategy.handleObject(worldSnapshot, objId);
             }
+
+            //todo refactor into the other player controlled sync strategy
+            var isPlayerControlled = this.playerId == worldSnapshot.objects[objId].playerId;
+            if (isPlayerControlled == false){
+                let localObj = this.gameEngine.world.objects[objId];
+                //copy the most recent object data
+                if(localObj){
+                    localObj.copyFrom(worldSnapshot.objects[objId]);
+                }
+            }
         }
 
         //finally update the stepCount
