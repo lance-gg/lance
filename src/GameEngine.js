@@ -4,7 +4,7 @@ const Timer = require('./Timer');
 const EventEmitter = require('eventemitter3');
 
 class GameEngine{
-    constructor(inputOptions, physicsEngine){
+    constructor(inputOptions){
         //if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld
@@ -12,8 +12,8 @@ class GameEngine{
 
         this.registeredClasses = {}; //todo be refactored into the serializer
 
-        if (physicsEngine) {
-            this.physicsEngine = physicsEngine;
+        if (this.options.physicsEngine) {
+            this.physicsEngine = this.options.physicsEngine;
             this.physicsEngine.init();
         }
 
