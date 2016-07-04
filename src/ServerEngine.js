@@ -127,13 +127,19 @@ class ServerEngine{
 
         console.log("Client Connected", socket.id);
 
+        this.gameEngine.emit('server.playerJoined', {
+            playerId: playerId
+        });
 
         socket.emit('playerJoined',{
             playerId: playerId
         });
 
         socket.on('disconnect', function(){
-            that.onPlayerDisconnected(socket.id, playerId)
+            that.onPlayerDisconnected(socket.id, playerId);
+            that.gameEngine.emit('server.playerDisconnected', {
+                playerId: playerId
+            });
         });
 
 
@@ -152,6 +158,10 @@ class ServerEngine{
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
         }
+        this.gameEngine.emit('server.inputReceived', {
+            input: data,
+            playerId: socket.playerId
+        });
         // console.log("last handled input", this.connectedPlayers[socket.id].lastHandledInput);
     }
 }
