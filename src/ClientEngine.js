@@ -87,7 +87,7 @@ class ClientEngine {
             if (isPlayerControlled == false){
                 let localObj = this.gameEngine.world.objects[objId];
                 //copy the most recent object data
-                if(localObj){
+                if(localObj && localObj.hasOwnProperty('copyFrom')){
                     localObj.copyFrom(worldSnapshot.objects[objId]);
                 }
             }

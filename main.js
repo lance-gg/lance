@@ -7,6 +7,10 @@ var Incheon = {
     composables: {
         Serializable: require("./src/composables/Serializable")
     },
+    physics: {
+        PhysicsEngine: require("./src/physics/PhysicsEngine"),
+        PhysijsPhysicsEngine: require("./src/physics/PhysijsPhysicsEngine")
+    },
     syncStrategies:{
         playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap")
     }
