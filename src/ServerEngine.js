@@ -127,7 +127,7 @@ class ServerEngine{
 
         console.log("Client Connected", socket.id);
 
-        this.gameEngine.emit('playerJoinedOnServer', {
+        this.gameEngine.emit('server.playerJoined', {
             playerId: playerId
         });
 
@@ -137,7 +137,7 @@ class ServerEngine{
 
         socket.on('disconnect', function(){
             that.onPlayerDisconnected(socket.id, playerId);
-            that.gameEngine.emit('playerDisconnectedOnServer', {
+            that.gameEngine.emit('server.playerDisconnected', {
                 playerId: playerId
             });
         });
@@ -158,7 +158,7 @@ class ServerEngine{
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
         }
-        this.gameEngine.emit('inputReceivedOnServer', {
+        this.gameEngine.emit('server.inputReceived', {
             input: data,
             playerId: socket.playerId
         });
