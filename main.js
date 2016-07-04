@@ -11,6 +11,10 @@ var Incheon = {
         PhysicsEngine: require("./src/physics/PhysicsEngine"),
         PhysijsPhysicsEngine: require("./src/physics/PhysijsPhysicsEngine")
     },
+    render: {
+        Renderer: require("./src/render/Renderer"),
+        ThreeRenderer: require("./src/render/ThreeRenderer")
+    },
     syncStrategies:{
         playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap")
     }

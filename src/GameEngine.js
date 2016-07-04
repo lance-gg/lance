@@ -12,9 +12,16 @@ class GameEngine{
 
         this.registeredClasses = {}; //todo be refactored into the serializer
 
+        // get the physics engine and initialize it
         if (this.options.physicsEngine) {
             this.physicsEngine = this.options.physicsEngine;
             this.physicsEngine.init();
+        }
+
+        // get the renderer and initialize it
+        if (this.options.renderer) {
+            this.renderer = this.options.renderer;
+            this.renderer.init();
         }
 
         //set up event emitting and interface
@@ -46,6 +53,16 @@ class GameEngine{
     step(){
         this.world.stepCount++;
         this.updateGameWorld();
+
+        // physics step
+        if (this.physicsEngine) {
+            this.physicsEngine.step();
+        }
+
+        // rendering step
+        if (this.renderer) {
+            this.renderer.draw();
+        }
     }
 
     updateGameWorld (){
