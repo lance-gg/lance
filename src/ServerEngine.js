@@ -127,7 +127,10 @@ class ServerEngine{
 
         console.log("Client Connected", socket.id);
 
-
+        this.gameEngine.emit('playerJoinedOnServer', {
+            playerId: playerId
+        });
+        
         socket.emit('playerJoined',{
             playerId: playerId
         });
