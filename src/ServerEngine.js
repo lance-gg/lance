@@ -158,6 +158,10 @@ class ServerEngine{
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
         }
+        this.gameEngine.emit('inputReceivedOnServer', {
+            input: data,
+            playerId: socket.playerId
+        });
         // console.log("last handled input", this.connectedPlayers[socket.id].lastHandledInput);
     }
 }
