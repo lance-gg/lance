@@ -130,13 +130,16 @@ class ServerEngine{
         this.gameEngine.emit('playerJoinedOnServer', {
             playerId: playerId
         });
-        
+
         socket.emit('playerJoined',{
             playerId: playerId
         });
 
         socket.on('disconnect', function(){
-            that.onPlayerDisconnected(socket.id, playerId)
+            that.onPlayerDisconnected(socket.id, playerId);
+            that.gameEngine.emit('playerDisconnectedOnServer', {
+                playerId: playerId
+            });
         });
 
 
