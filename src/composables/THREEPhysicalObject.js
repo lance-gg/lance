@@ -39,7 +39,7 @@ class THREEPhysicalObject extends PhysicalObject {
 
         // update the renderer-specific data structures
         if (!this.renderObject) {
-            this.renderObject = this.renderer.addObject(this.id);
+            super.initRender(this.renderer);
         }
         this.renderObject.position.set(this.x, this.y, this.z);
         this.renderObject.rotation.set(this.rx, this.ry, this.rz);
