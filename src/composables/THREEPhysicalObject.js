@@ -38,9 +38,6 @@ class THREEPhysicalObject extends PhysicalObject {
         this.rz = eRotationNow.z;
 
         // update the renderer-specific data structures
-        if (!this.renderObject) {
-            super.initRender(this.renderer);
-        }
         this.renderObject.position.set(this.x, this.y, this.z);
         this.renderObject.rotation.set(this.rx, this.ry, this.rz);
     }
