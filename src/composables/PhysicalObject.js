@@ -70,6 +70,13 @@ class PhysicalObject extends Serializable {
         this.class = PhysicalObject;
     }
 
+    // for debugging purposes mostly
+    toString() {
+        function round3(x) { return Math.round(x*1000)/1000; }
+        function showVec(x,y,z) { return `(${round3(x)},${round3(y)},${round3(z)})`; }
+        return `PhysicalObject[${this.id}] position${showVec(this.x, this.y, this.z)} rotation${showVec(this.rx, this.ry, this.rz)}`;
+    }
+
     // intialize physics for this object
     initPhysics(physicsEngine) {
         if (!this.physicalObject) {

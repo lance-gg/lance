@@ -13,8 +13,14 @@ class THREEPhysicalObject extends PhysicalObject {
     }
 
     constructor(id, x, y, z, rx, ry, rz) {
-        super(id, x, y, z, rx, ry, rz);  // note: calling apply with arguments array doesn't work on constructor
+        super(id, x, y, z, rx, ry, rz); // note: calling apply with arguments array doesn't work on constructor
         this.class = THREEPhysicalObject;
+    }
+
+    // update the physics object with current position/rotation
+    updateRenderObject() {
+        this.renderObject.position.set(this.x, this.y, this.z);
+        this.renderObject.rotation.set(this.rx, this.ry, this.rz);
     }
 
     // synchronize using interpolation
