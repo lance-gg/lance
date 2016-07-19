@@ -61,11 +61,6 @@ class GameEngine{
 
         // handle post-physics business logic
         this.updateGameWorld();
-
-        // rendering step
-        if (this.renderer) {
-            this.renderer.draw();
-        }
     }
 
     updateGameWorld (){

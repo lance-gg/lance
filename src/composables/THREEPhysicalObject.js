@@ -24,7 +24,7 @@ class THREEPhysicalObject extends PhysicalObject {
     }
 
     // synchronize using interpolation
-    syncInterpolated(obj1, obj2, percent) {
+    interpolate(obj1, obj2, percent) {
         // TODO: switch from three parameters (x,y,z) to a single Point instance
         // TODO: switch from three parameters (rx,ry,rz) to a single Euler instance
         // interpolate the position coordinate values

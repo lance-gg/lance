@@ -78,7 +78,7 @@ class PhysicalObject extends Serializable {
     }
 
     // intialize physics for this object
-    initPhysics(physicsEngine) {
+    initPhysicsObject(physicsEngine) {
         if (!this.physicalObject) {
             this.physicsEngine = physicsEngine;
             this.physicalObject = physicsEngine.addObject(this.id);
@@ -86,7 +86,7 @@ class PhysicalObject extends Serializable {
     }
 
     // initialize rendering for this object
-    initRender(renderer) {
+    initRenderObject(renderer) {
         if (!this.renderObject) {
             this.renderer = renderer;
             this.renderObject = renderer.addObject(this.id);
