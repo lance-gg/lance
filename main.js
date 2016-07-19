@@ -6,7 +6,8 @@ var Incheon = {
     Point: require("./src/Point"),
     composables: {
         Serializable: require("./src/composables/Serializable"),
-        PhysicalObject: require("./src/composables/PhysicalObject")
+        PhysicalObject: require("./src/composables/PhysicalObject"),
+        THREEPhysicalObject: require("./src/composables/THREEPhysicalObject")
     },
     physics: {
         PhysicsEngine: require("./src/physics/PhysicsEngine"),

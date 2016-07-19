@@ -48,6 +48,10 @@ class ClientEngine {
         this.gameEngine.emit("prestep",this.gameEngine.world.stepCount);
         this.gameEngine.step();
         this.gameEngine.emit("poststep",this.gameEngine.world.stepCount);
+
+        if (this.gameEngine.renderer) {
+            this.gameEngine.renderer.draw();
+        }
     }
 
     sendInput(input){

@@ -52,17 +52,15 @@ class GameEngine{
 
     step(){
         this.world.stepCount++;
-        this.updateGameWorld();
+
 
         // physics step
         if (this.physicsEngine) {
             this.physicsEngine.step();
         }
 
-        // rendering step
-        if (this.renderer) {
-            this.renderer.draw();
-        }
+        // handle post-physics business logic
+        this.updateGameWorld();
     }
 
     updateGameWorld (){
@@ -71,7 +69,6 @@ class GameEngine{
                 this.world.objects[objId].step(this.worldSettings);
             }
         }
-
     };
 
     addObjectToWorld(object){
