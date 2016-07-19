@@ -1,21 +1,14 @@
 "use strict";
 var io = require("socket.io-client");
-var PlayerSnap = require("./syncStrategies/PlayerSnap");
 
 class ClientEngine {
 
     constructor(gameEngine, inputOptions){
         var that = this;
 
-        this.options = Object.assign({
-            syncStrategy: new PlayerSnap(this) //default sync strategy
-        }, inputOptions);
-
         this.socket = io();
         this.gameEngine = gameEngine;
 
-
-        this.worldBuffer=[]; // buffer for server world updates
         this.inboundMessages = [];
         this.outboundMessages = [];
 
@@ -40,18 +33,20 @@ class ClientEngine {
     }
 
     step(){
+        this.gameEngine.emit("client:preStep");
         while(this.inboundMessages.length>0){
             this.handleInboundMessage(this.inboundMessages.pop());
         }
 
         this.handleOutboundInput();
-        this.gameEngine.emit("prestep",this.gameEngine.world.stepCount);
+        this.gameEngine.emit("preStep",this.gameEngine.world.stepCount);
         this.gameEngine.step();
-        this.gameEngine.emit("poststep",this.gameEngine.world.stepCount);
+        this.gameEngine.emit("postStep",this.gameEngine.world.stepCount);
 
         if (this.gameEngine.renderer) {
             this.gameEngine.renderer.draw();
         }
+        this.gameEngine.emit("client:postStep");
     }
 
     sendInput(input){
@@ -76,28 +71,10 @@ class ClientEngine {
         // console.log(world.stepCount - this.gameEngine.world.stepCount);
         // console.log("last handled input", world.lastHandledInput);
 
-        this.worldBuffer.push(worldSnapshot);
-        if (this.worldBuffer.length >= 5) { //pick a proper buffer length, make it configurable
-            this.worldBuffer.shift();
-        }
+        // emit that a snapshot has been received
+        this.gameEngine.emit('client.snapshotReceived', { snapshot: worldSnapshot });
 
-        for (var objId in worldSnapshot.objects) {
-            if (worldSnapshot.objects.hasOwnProperty(objId)) {
-                this.options.syncStrategy.handleObject(worldSnapshot, objId);
-            }
-
-            //todo refactor into the other player controlled sync strategy
-            var isPlayerControlled = this.playerId == worldSnapshot.objects[objId].playerId;
-            if (isPlayerControlled == false){
-                let localObj = this.gameEngine.world.objects[objId];
-                //copy the most recent object data
-                if(localObj && localObj.hasOwnProperty('copyFrom')){
-                    localObj.copyFrom(worldSnapshot.objects[objId]);
-                }
-            }
-        }
-
-        //finally update the stepCount
+        // finally update the stepCount
         this.gameEngine.world.stepCount = worldSnapshot.stepCount;
     };
 

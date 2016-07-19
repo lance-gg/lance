@@ -37,9 +37,9 @@ class ServerEngine{
 
         this.serverTime = (new Date().getTime());
 
-        that.gameEngine.emit("prestep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("preStep",that.gameEngine.world.stepCount);
         this.gameEngine.step();
-        that.gameEngine.emit("poststep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("postStep",that.gameEngine.world.stepCount);
 
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
             for (let socketId in this.connectedPlayers) {
