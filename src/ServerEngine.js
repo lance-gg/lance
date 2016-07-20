@@ -1,7 +1,7 @@
 "use strict";
 
 const Gameloop = require('node-gameloop');
-const Serializable= require('./composables/Serializable');
+const Serializer= require('./serialize/Serializer');
 
 class ServerEngine{
 
@@ -16,9 +16,12 @@ class ServerEngine{
 
         this.io = io;
         this.gameEngine = gameEngine;
+        this.serializer = new Serializer();
+
+
 
         this.connectedPlayers = {};
-
+        this.pendingAtomicEvents = [];
 
         io.on('connection', this.onPlayerConnected.bind(this));
     }
@@ -41,22 +44,23 @@ class ServerEngine{
         this.gameEngine.step();
         that.gameEngine.emit("poststep",that.gameEngine.world.stepCount);
 
+        //update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
-                    let playerMessage =  this.serializeWorld(socketId);
+                    let payload =  this.serializeUpdate(socketId);
 
                     //simulate server send lag
                     if (this.options.debug.serverSendLag !== false){
                         setTimeout(function(){
                             //verify again that the player exists
                             if (that.connectedPlayers[socketId]) {
-                                that.connectedPlayers[socketId].emit('worldUpdate', playerMessage);
+                                that.connectedPlayers[socketId].emit('worldUpdate', payload);
                             }
                         }, that.options.debug.serverSendLag)
                     }
                     else{
-                        this.connectedPlayers[socketId].emit('worldUpdate',playerMessage);
+                        this.connectedPlayers[socketId].emit('worldUpdate',payload);
                     }
 
                 }
@@ -66,19 +70,24 @@ class ServerEngine{
         }
     };
 
-    serializeWorld(socketId){
+    /**
+     * Prepares an update of the game world and all pending atomic events in binary format
+     * @param socketId
+     * @returns {ArrayBuffer} //TODO document payload format
+     */
+    serializeUpdate(socketId){
         var bufferSize = 0;
         var bufferOffset = 0;
         var world = this.gameEngine.world;
 
-        //count the object byte size to determine what buffer size do we need
+        //count the object byte size to determine what buffer size do we need for game world
         for (let objId in world.objects) {
             if (world.objects.hasOwnProperty(objId)) {
                 let obj = world.objects[objId];
                 let objClass = obj.class;
 
                 //reminder - object is made from its class id (Uint8) and its payload
-                let netSchemeBufferSize = Serializable.getNetSchemeBufferSize(obj.class);
+                let netSchemeBufferSize = this.serializer.getNetSchemeBufferSize(obj.class);
                 bufferSize += netSchemeBufferSize;
             }
         }
@@ -99,9 +108,9 @@ class ServerEngine{
         for (let objId in world.objects) {
             if (world.objects.hasOwnProperty(objId)) {
                 let obj = world.objects[objId];
-                let netSchemeBufferSize = Serializable.getNetSchemeBufferSize(obj.class);
+                let netSchemeBufferSize = this.serializer.getNetSchemeBufferSize(obj.class);
 
-                var serializedObj = obj.serialize();
+                var serializedObj = obj.serialize(this.serializer);
                 let serializedObjDV = new DataView(serializedObj);
 
                 //go over the serialized object, writing it byte by byte to the world buffer

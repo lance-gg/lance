@@ -1,6 +1,6 @@
 "use strict";
 
-const Serializable = require('./Serializable');
+const Serializable = require('../serialize/Serializable');
 
 
 class PhysicalObject extends Serializable {
