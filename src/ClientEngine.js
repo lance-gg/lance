@@ -33,7 +33,7 @@ class ClientEngine {
     }
 
     step(){
-        this.gameEngine.emit("client:preStep");
+        this.gameEngine.emit("client.preStep");
         while(this.inboundMessages.length>0){
             this.handleInboundMessage(this.inboundMessages.pop());
         }
@@ -46,7 +46,7 @@ class ClientEngine {
         if (this.gameEngine.renderer) {
             this.gameEngine.renderer.draw();
         }
-        this.gameEngine.emit("client:postStep");
+        this.gameEngine.emit("client.postStep");
     }
 
     sendInput(input){
