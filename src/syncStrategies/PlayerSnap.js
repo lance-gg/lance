@@ -7,28 +7,39 @@ var SyncStrategy = require("./SyncStrategy");
  */
 class PlayerSnap extends SyncStrategy{
 
-    constructor(clientEngine, inputOptions){
+    constructor(clientEngine, inputOptions) {
         super(clientEngine, inputOptions);
+
+        this.clientEngine.gameEngine.on('client.snapshotReceived', this.handleSnapshot.bind(this));
     }
 
-    handleObject(worldSnapshot, objId){
-        //update player character
+    handleSnapshot(e) {
+
+        // update player character
         var world = this.clientEngine.gameEngine.world;
-        var snapshotObj = worldSnapshot.objects[objId];
-        snapshotObj.isPlayerControlled = this.clientEngine.playerId == snapshotObj.playerId;
 
-        //we only care about player controlled objects
-        if (snapshotObj.isPlayerControlled){
+        for (var objId in e.snapshot.objects) {
+            var snapshotObj = e.snapshot.objects[objId];
+            snapshotObj.isPlayerControlled = (this.clientEngine.playerId == snapshotObj.playerId);
 
-            //object doesn't exist yet - create it
-            if (! (objId in world.objects)){
-                world.objects[objId] = worldSnapshot.objects[objId].class.newFrom(snapshotObj);
+            // TODO: the logic below can be simplified, with the copyFrom()
+            //       being called in both if-section and else-section
+            if (snapshotObj.isPlayerControlled) {
 
+                // object doesn't exist yet - create it
+                if (! (objId in world.objects)) {
+                    world.objects[objId] = snapshotObj.class.newFrom(snapshotObj);
+                } else {
+                    world.objects[objId].copyFrom(worldSnapshot.objects[objId]);
+                }
+
+            } else {
+                let localObj = this.gameEngine.world.objects[objId];
+                // copy the most recent object data
+                if (localObj && localObj.hasOwnProperty('copyFrom')) {
+                    localObj.copyFrom(e.snapshot.objects[objId]);
+                }
             }
-            else{
-                world.objects[objId].copyFrom(worldSnapshot.objects[objId]);
-            }
-
         }
 
     }

@@ -40,9 +40,9 @@ class ServerEngine{
 
         this.serverTime = (new Date().getTime());
 
-        that.gameEngine.emit("prestep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("preStep",that.gameEngine.world.stepCount);
         this.gameEngine.step();
-        that.gameEngine.emit("poststep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("postStep",that.gameEngine.world.stepCount);
 
         //update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0){

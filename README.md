@@ -32,6 +32,8 @@ Caveats:
 
 * Due to websocket limitations, only TCP and no UDP :(
 
+**Architecture**
+
 **The Step Sequence**
 
 The fundamental sequence of each (client-side) step is organized as follows:
@@ -43,3 +45,14 @@ The fundamental sequence of each (client-side) step is organized as follows:
 5. [clientEngine:gameEngine] physicsEngine.step
 6. [clientEngine:gameEngine] updateGameWorld: for each object->step
 7. [clientEngine] render.draw
+
+**Event List**
+
+* preStep
+* postStep
+* objectAdded
+* server.playerJoined
+* server.playerDisconnected
+* server.inputReceived
+* client.preStep
+* client.postStep
