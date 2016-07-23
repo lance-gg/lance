@@ -1,13 +1,13 @@
 "use strict";
 
-const Serializable = require('./Serializable');
+const Serializable = require('../serialize/Serializable');
 
 
 class PhysicalObject extends Serializable {
 
     static get properties() {
         return {
-            id: 7, // class id
+            id: 7, // class id  //TODO this should hashed from the class name
             name: "PhysicalObject"
         };
     }

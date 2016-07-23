@@ -5,9 +5,12 @@ var Incheon = {
     GameWorld: require("./src/GameWorld"),
     Point: require("./src/Point"),
     composables: {
-        Serializable: require("./src/composables/Serializable"),
         PhysicalObject: require("./src/composables/PhysicalObject"),
         THREEPhysicalObject: require("./src/composables/THREEPhysicalObject")
+    },
+    serialize: {
+        Serializer: require("./src/serialize/Serializer"),
+        Serializable: require("./src/serialize/Serializable"),
     },
     physics: {
         PhysicsEngine: require("./src/physics/PhysicsEngine"),

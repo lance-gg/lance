@@ -7,7 +7,7 @@ class THREEPhysicalObject extends PhysicalObject {
 
     static get properties() {
         return {
-            id: 9, // class id
+            id: 9, // class id //TODO this should hashed from the class name
             name: "THREEPhysicalObject"
         }
     }
