@@ -19,7 +19,8 @@ var Incheon = {
     },
     syncStrategies:{
         playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap"),
-        InterpolateStrategy: require("./src/syncStrategies/InterpolateStrategy")
+        InterpolateStrategy: require("./src/syncStrategies/InterpolateStrategy"),
+        FrameSyncStrategy: require("./src/syncStrategies/FrameSyncStrategy")
     }
 
 };

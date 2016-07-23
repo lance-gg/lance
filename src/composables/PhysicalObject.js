@@ -53,13 +53,8 @@ class PhysicalObject extends Serializable {
 
     constructor(id, x, y, z, rx, ry, rz) {
         super();
-        this.id = id; //instance id
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.rx = rx;
-        this.ry = ry;
-        this.rz = rz;
+        this.id = id; // instance id
+        this.copy(x, y, z, rx, ry, rz);
         this.velX = 0;
         this.velY = 0;
         this.velZ = 0;
@@ -68,6 +63,15 @@ class PhysicalObject extends Serializable {
         this.physicsEngine = null;
         this.physicalObject = null;
         this.class = PhysicalObject;
+    }
+
+    copy(x, y, z, rx, ry, rz) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.rx = rx;
+        this.ry = ry;
+        this.rz = rz;
     }
 
     // for debugging purposes mostly

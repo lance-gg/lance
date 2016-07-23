@@ -1,14 +1,20 @@
 "use strict";
 
-var SyncStrategy = require("./SyncStrategy");
+const SyncStrategy = require("./SyncStrategy");
+
+const defaults = {
+    worldBufferLength: 5,
+    clientStepLag: 6
+}
 
 class InterpolateStrategy extends SyncStrategy {
 
     constructor(clientEngine, inputOptions){
 
-        super(clientEngine, inputOptions);
+        const options = Object.assign({}, defaults, inputOptions);
+        super(clientEngine, options);
 
-        this.worldBuffer=[]; // buffer for server world updates
+        this.worldBuffer = []; // buffer for server world updates
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('postStep', this.interpolate.bind(this));
         this.gameEngine.on('client.snapshotReceived', this.updateWorldBuffer.bind(this));
@@ -16,7 +22,7 @@ class InterpolateStrategy extends SyncStrategy {
 
     updateWorldBuffer(e) {
         this.worldBuffer.push(e.snapshot);
-        if (this.worldBuffer.length >= 5) { //pick a proper buffer length, make it configurable
+        if (this.worldBuffer.length >= this.options.worldBufferLength) {
             this.worldBuffer.shift();
         }
     }
@@ -28,7 +34,7 @@ class InterpolateStrategy extends SyncStrategy {
 
         // TODO: alter step count based on lag
         let world = this.gameEngine.world;
-        let stepToPlay = world.stepCount - 6;
+        let stepToPlay = world.stepCount - this.options.clientStepLag;
         let previousWorldIndex;
         let nextWorldIndex;
         let previousWorld = null;
