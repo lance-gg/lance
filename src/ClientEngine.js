@@ -1,5 +1,6 @@
 "use strict";
 var io = require("socket.io-client");
+const Serializer= require('./serialize/Serializer');
 
 class ClientEngine {
 
@@ -7,6 +8,8 @@ class ClientEngine {
         var that = this;
 
         this.socket = io();
+        this.serializer = new Serializer();
+
         this.gameEngine = gameEngine;
 
         this.inboundMessages = [];
@@ -67,7 +70,7 @@ class ClientEngine {
     };
 
     handleInboundMessage(worldData) {
-        var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(this.gameEngine, worldData);
+        var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(this.gameEngine, this.serializer,  worldData);
         // console.log(world.stepCount - this.gameEngine.world.stepCount);
         // console.log("last handled input", world.lastHandledInput);
 

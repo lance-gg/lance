@@ -10,7 +10,7 @@ class GameWorld{
         this.idCount = 0;
     }
 
-    static deserialize(gameEngine, worldData){
+    static deserialize(gameEngine, serializer, worldData){
 
         var world = new GameWorld();
 
@@ -30,9 +30,9 @@ class GameWorld{
                 console.warn(`Object with class id ${objectClassId} not found! Did you forget to register it with the game engine?`);
             }
 
-            var objectByteSize = objectClass.getNetSchemeBufferSize(objectClass);
+            var objectByteSize = serializer.getNetSchemeBufferSize(objectClass);
 
-            var object = Serializable.deserialize(objectClass, worldData.slice(byteOffset, byteOffset + objectByteSize));
+            var object = serializer.deserialize(objectClass, worldData.slice(byteOffset, byteOffset + objectByteSize));
             world.objects[object.id] = object;
             byteOffset += objectByteSize;
 
