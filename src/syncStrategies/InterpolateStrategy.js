@@ -59,7 +59,6 @@ class InterpolateStrategy extends SyncStrategy {
         if (!previousWorld || !nextWorld)
             return;
 
-
         // calculate play percentage
         let playPercentage = (stepToPlay - previousWorld.stepCount) / (nextWorld.stepCount - previousWorld.stepCount);
 
@@ -80,6 +79,17 @@ class InterpolateStrategy extends SyncStrategy {
             }
         }
 
+        // destroy unneeded objects
+        for (let objId in world.objects) {
+            if (nextWorld.objects.hasOwnProperty(objId)) {
+                if (!nextWorld.objects.hasOwnProperty(objId)) {
+                    delete this.gameEngine.world.objects[objId];
+                    world.objects[objId].destroy();
+
+                }
+            }
+        }
+
     }
 
     interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
@@ -93,15 +103,12 @@ class InterpolateStrategy extends SyncStrategy {
 
             curObj = world.objects[objId] = nextObj.class.newFrom(nextObj);
             curObj.init({
-                velX: nextObj.velX,
-                velY: nextObj.velY,
-                velZ: nextObj.velZ,
-
                 // TODO: the comparison below cannot be '===' because:
                 //       curObj.id = "1"
                 //       nextObj.id = 1
                 isPlayerControlled: (this.playerId == nextObj.id)
             });
+            this.gameEngine.addObjectToWorld(curObj);
             curObj.initRenderObject(this.gameEngine.renderer);
 
             // if this game keeps a physics engine on the client side,
@@ -130,6 +137,8 @@ class InterpolateStrategy extends SyncStrategy {
                 }
             }
         }
+
+
     }
 }
 
