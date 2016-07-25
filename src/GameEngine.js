@@ -41,7 +41,7 @@ class GameEngine{
         this.timer = new Timer();
         this.timer.play();
 
-        this.on("poststep", function(){
+        this.on("postStep", function(){
             that.timer.tick();
         });
     };
