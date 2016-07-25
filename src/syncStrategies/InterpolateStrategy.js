@@ -1,14 +1,20 @@
 "use strict";
 
-var SyncStrategy = require("./SyncStrategy");
+const SyncStrategy = require("./SyncStrategy");
+
+const defaults = {
+    worldBufferLength: 5,
+    clientStepLag: 6
+}
 
 class InterpolateStrategy extends SyncStrategy {
 
     constructor(clientEngine, inputOptions){
 
-        super(clientEngine, inputOptions);
+        const options = Object.assign({}, defaults, inputOptions);
+        super(clientEngine, options);
 
-        this.worldBuffer=[]; // buffer for server world updates
+        this.worldBuffer = []; // buffer for server world updates
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('postStep', this.interpolate.bind(this));
         this.gameEngine.on('client.snapshotReceived', this.updateWorldBuffer.bind(this));
@@ -16,7 +22,7 @@ class InterpolateStrategy extends SyncStrategy {
 
     updateWorldBuffer(e) {
         this.worldBuffer.push(e.snapshot);
-        if (this.worldBuffer.length >= 5) { //pick a proper buffer length, make it configurable
+        if (this.worldBuffer.length >= this.options.worldBufferLength) {
             this.worldBuffer.shift();
         }
     }
@@ -28,7 +34,7 @@ class InterpolateStrategy extends SyncStrategy {
 
         // TODO: alter step count based on lag
         let world = this.gameEngine.world;
-        let stepToPlay = world.stepCount - 6;
+        let stepToPlay = world.stepCount - this.options.clientStepLag;
         let previousWorldIndex;
         let nextWorldIndex;
         let previousWorld = null;
@@ -53,7 +59,6 @@ class InterpolateStrategy extends SyncStrategy {
         if (!previousWorld || !nextWorld)
             return;
 
-
         // calculate play percentage
         let playPercentage = (stepToPlay - previousWorld.stepCount) / (nextWorld.stepCount - previousWorld.stepCount);
 
@@ -74,6 +79,17 @@ class InterpolateStrategy extends SyncStrategy {
             }
         }
 
+        // destroy unneeded objects
+        for (let objId in world.objects) {
+            if (nextWorld.objects.hasOwnProperty(objId)) {
+                if (!nextWorld.objects.hasOwnProperty(objId)) {
+                    delete this.gameEngine.world.objects[objId];
+                    world.objects[objId].destroy();
+
+                }
+            }
+        }
+
     }
 
     interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
@@ -87,15 +103,12 @@ class InterpolateStrategy extends SyncStrategy {
 
             curObj = world.objects[objId] = nextObj.class.newFrom(nextObj);
             curObj.init({
-                velX: nextObj.velX,
-                velY: nextObj.velY,
-                velZ: nextObj.velZ,
-
                 // TODO: the comparison below cannot be '===' because:
                 //       curObj.id = "1"
                 //       nextObj.id = 1
                 isPlayerControlled: (this.playerId == nextObj.id)
             });
+            this.gameEngine.addObjectToWorld(curObj);
             curObj.initRenderObject(this.gameEngine.renderer);
 
             // if this game keeps a physics engine on the client side,
@@ -124,6 +137,8 @@ class InterpolateStrategy extends SyncStrategy {
                 }
             }
         }
+
+
     }
 }
 
