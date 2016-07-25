@@ -83,9 +83,8 @@ class InterpolateStrategy extends SyncStrategy {
         for (let objId in world.objects) {
             if (nextWorld.objects.hasOwnProperty(objId)) {
                 if (!nextWorld.objects.hasOwnProperty(objId)) {
-                    delete this.gameEngine.world.objects[objId];
                     world.objects[objId].destroy();
-
+                    delete this.gameEngine.world.objects[objId];
                 }
             }
         }
