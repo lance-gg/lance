@@ -31,7 +31,7 @@ class ClientPredictionStrategy extends SyncStrategy {
                     continue;
                 }
                 if (!localObj.renderObject) {
-                    this.gameEngine.renderer.addObject(localObj);
+                    localObj.initRenderObject(this.gameEngine.renderer);
                 }
                 localObj.updateRenderObject();
             }
