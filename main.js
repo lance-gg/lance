@@ -4,13 +4,11 @@ var Incheon = {
     ClientEngine: require("./src/ClientEngine"),
     GameWorld: require("./src/GameWorld"),
     Point: require("./src/Point"),
-    composables: {
-        PhysicalObject: require("./src/composables/PhysicalObject"),
-        THREEPhysicalObject: require("./src/composables/THREEPhysicalObject")
-    },
     serialize: {
         Serializer: require("./src/serialize/Serializer"),
         Serializable: require("./src/serialize/Serializable"),
+        PhysicalObject: require("./src/serialize/PhysicalObject"),
+        THREEPhysicalObject: require("./src/serialize/THREEPhysicalObject")
     },
     physics: {
         PhysicsEngine: require("./src/physics/PhysicsEngine"),
