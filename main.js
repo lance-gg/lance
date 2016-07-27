@@ -23,7 +23,8 @@ var Incheon = {
     syncStrategies:{
         playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap"),
         InterpolateStrategy: require("./src/syncStrategies/InterpolateStrategy"),
-        FrameSyncStrategy: require("./src/syncStrategies/FrameSyncStrategy")
+        FrameSyncStrategy: require("./src/syncStrategies/FrameSyncStrategy"),
+        ClientPredictionStrategy: require("./src/syncStrategies/ClientPredictionStrategy")
     }
 
 };
