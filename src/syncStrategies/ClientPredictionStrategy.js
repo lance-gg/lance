@@ -30,10 +30,10 @@ class ClientPredictionStrategy extends SyncStrategy {
                 if (!localObj.isPlayerControlled) {
                     continue;
                 }
-                let renderObject = localObj.renderObject || this.gameEngine.renderer.addObject(localObj);
-                renderObject.x = localObj.x;
-                renderObject.y = localObj.y;
-                renderObject.angle = localObj.angle;
+                if (!localObj.renderObject) {
+                    this.gameEngine.renderer.addObject(localObj);
+                }
+                localObj.updateRenderObject();
             }
         }
     }
