@@ -101,12 +101,6 @@ class InterpolateStrategy extends SyncStrategy {
             console.log(`adding new object ${objId} at (${nextObj.x},${nextObj.y},${nextObj.z}) velocity (${nextObj.velX},${nextObj.velY},${nextObj.velZ})`);
 
             curObj = world.objects[objId] = nextObj.class.newFrom(nextObj);
-            curObj.init({
-                // TODO: the comparison below cannot be '===' because:
-                //       curObj.id = "1"
-                //       nextObj.id = 1
-                isPlayerControlled: (this.playerId == nextObj.id)
-            });
             this.gameEngine.addObjectToWorld(curObj);
             curObj.initRenderObject(this.gameEngine.renderer);
 

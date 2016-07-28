@@ -4,13 +4,12 @@ var Incheon = {
     ClientEngine: require("./src/ClientEngine"),
     GameWorld: require("./src/GameWorld"),
     Point: require("./src/Point"),
-    composables: {
-        PhysicalObject: require("./src/composables/PhysicalObject"),
-        THREEPhysicalObject: require("./src/composables/THREEPhysicalObject")
-    },
     serialize: {
         Serializer: require("./src/serialize/Serializer"),
         Serializable: require("./src/serialize/Serializable"),
+        PhysicalObject: require("./src/serialize/PhysicalObject"),
+        THREEPhysicalObject: require("./src/serialize/THREEPhysicalObject"),
+        DynamicObject: require("./src/serialize/DynamicObject")
     },
     physics: {
         PhysicsEngine: require("./src/physics/PhysicsEngine"),
@@ -23,7 +22,8 @@ var Incheon = {
     syncStrategies:{
         playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap"),
         InterpolateStrategy: require("./src/syncStrategies/InterpolateStrategy"),
-        FrameSyncStrategy: require("./src/syncStrategies/FrameSyncStrategy")
+        FrameSyncStrategy: require("./src/syncStrategies/FrameSyncStrategy"),
+        ClientPredictionStrategy: require("./src/syncStrategies/ClientPredictionStrategy")
     }
 
 };
