@@ -76,6 +76,12 @@ class GameEngine{
         this.emit("objectAdded", object);
     }
 
+    removeObjectFromWorld(id){
+        this.emit("objectDestroyed", this.world.objects[id]);
+        this.world.objects[id].destroy();
+        delete this.world.objects[id];
+    }
+
     registerClass(classObj){
         this.registeredClasses[classObj.properties.id] = classObj;
     };
