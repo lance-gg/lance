@@ -30,11 +30,19 @@ class GameWorld{
                 console.warn(`Object with class id ${objectClassId} not found! Did you forget to register it with the game engine?`);
             }
 
-            var objectByteSize = serializer.getNetSchemeBufferSize(objectClass);
 
-            var object = serializer.deserialize(objectClass, worldData.slice(byteOffset, byteOffset + objectByteSize));
-            world.objects[object.id] = object;
-            byteOffset += objectByteSize;
+            //static class size
+            if (true) {
+                var objectByteSize = serializer.getNetSchemeBufferSizeByClass(objectClass);
+
+                var object = serializer.deserialize(objectClass, worldData.slice(byteOffset, byteOffset + objectByteSize));
+                world.objects[object.id] = object;
+                byteOffset += objectByteSize;
+            }
+            //dynamic class size
+            else{
+
+            }
 
         }
 

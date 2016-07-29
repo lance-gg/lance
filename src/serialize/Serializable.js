@@ -1,30 +1,68 @@
 "use strict";
 
 class Serializable{
+    /*
+        Class can be serialized using either:
+            - a class based netScheme
+            - an instance based netScheme
+            - completely dynamically (not implemented yet
+     */
+    serialize(serializer, dataBuffer, dataByteOffset){
+        let netScheme;
+        let netSchemeBufferSize;
+        let classId;
 
-    serialize(serializer){
-        //todo define behaviour when a netScheme is undefined
-        if (typeof this.class.netScheme == "undefined"){
+        //instance classId
+        if (this.classId){
+            classId = this.classId;
+        }
+        else if (this.class.properties && this.class.properties.id){
+            classId = this.class.properties.id;
+        }
+        else {
+            //todo define behaviour for dynamic classes
+            console.warn("no classId defined!");
+        }
+
+
+        //instance netScheme
+        if (this.netScheme){
+            netScheme = this.netScheme;
+        }
+        else if (this.class.netScheme){
+            netScheme = this.class.netScheme;
+        }
+        else {
+            //todo define behaviour when a netScheme is undefined
             console.warn("no netScheme defined! This will result in awful performance");
         }
 
+        //instance bufferSize for netScheme
+        if (this.netSchemeBufferSize){
+            netSchemeBufferSize = this.netSchemeBufferSize;
+        }
+        else{
+            netSchemeBufferSize = serializer.getNetSchemeBufferSizeByClass(this.class);
+        }
+
         //buffer has one Uint8Array for class id, then payload
-        var dataBuffer = new ArrayBuffer(serializer.getNetSchemeBufferSize(this.class));
+        if (dataBuffer == null) {
+            dataBuffer = new ArrayBuffer(netSchemeBufferSize);
+        }
         var dataView = new DataView(dataBuffer);
 
         //first set the id of the class, so that the deserializer can fetch information about it
-        dataView.setUint8(0, this.class.properties.id);
+        dataView.setUint8(0, classId);
+
         //advance the offset counter
-        var dataByteOffset = Uint8Array.BYTES_PER_ELEMENT;
+        dataByteOffset = dataByteOffset ? dataByteOffset : 0;
+        dataByteOffset += Uint8Array.BYTES_PER_ELEMENT;
 
-        for (var property in this.class.netScheme) {
-            if (this.class.netScheme.hasOwnProperty(property)) {
-
-                //write the property to buffer
-                serializer.writeDataView(dataView, this[property], dataByteOffset, this.class.netScheme[property]);
-                //advance offset
-                dataByteOffset += serializer.getTypeByteSize(this.class.netScheme[property]);
-            }
+        for (let property of Object.keys(netScheme)) {
+            //write the property to buffer
+            serializer.writeDataView(dataView, this[property], dataByteOffset, netScheme[property]);
+            //advance offset
+            dataByteOffset += serializer.getTypeByteSize(netScheme[property]);
         }
 
         return dataBuffer;

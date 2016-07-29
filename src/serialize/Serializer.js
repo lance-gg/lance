@@ -27,16 +27,20 @@ class Serializer {
         return obj;
     };
 
-    getNetSchemeBufferSize(objClass){
+    getNetSchemeBufferSize(netScheme){
+        let netSchemeBufferSize = 0;
+        for (let property of Object.keys(netScheme)) {
+            //count the bytesize required for the netScheme buffer
+            netSchemeBufferSize += this.getTypeByteSize(netScheme[property]);
+        }
 
+        return netSchemeBufferSize;
+    };
+
+    getNetSchemeBufferSizeByClass(objClass){
         if (typeof objClass.netSchemeBufferSize=="undefined"){
-            objClass.netSchemeBufferSize = Uint8Array.BYTES_PER_ELEMENT; //every scheme starts with the class id
-            for (var property in objClass.netScheme) {
-                if (objClass.netScheme.hasOwnProperty(property)) {
-                    //count the bytesize required for the netScheme buffer
-                    objClass.netSchemeBufferSize += this.getTypeByteSize(objClass.netScheme[property]);
-                }
-            }
+            objClass.netSchemeBufferSize = Uint8Array.BYTES_PER_ELEMENT; //every class netscheme starts with the class id
+            objClass.netSchemeBufferSize += this.getNetSchemeBufferSize(objClass.netScheme);
         }
 
         return objClass.netSchemeBufferSize;

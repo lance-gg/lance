@@ -1,7 +1,8 @@
 "use strict";
 
 const Gameloop = require('node-gameloop');
-const Serializer= require('./serialize/Serializer');
+const Serializer = require('./serialize/Serializer');
+const NetworkTransmitter = require('./network/NetworkTransmitter');
 
 class ServerEngine{
 
@@ -17,6 +18,7 @@ class ServerEngine{
         this.io = io;
         this.gameEngine = gameEngine;
         this.serializer = new Serializer();
+        this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
 
 
@@ -70,6 +72,19 @@ class ServerEngine{
         }
     };
 
+    newSerializeUpdate(socketId){
+        let bufferSize = 0;
+        let bufferOffset = 0;
+        let world = this.gameEngine.world;
+
+        let networkedEvents = [];
+
+        for (let obj in world.objects) {
+            networkTransmitter.addNetworkedEvent("objectUpdate", obj);
+        }
+
+    }
+
     /**
      * Prepares an update of the game world and all pending atomic events in binary format
      * @param socketId
@@ -87,7 +102,7 @@ class ServerEngine{
                 let objClass = obj.class;
 
                 //reminder - object is made from its class id (Uint8) and its payload
-                let netSchemeBufferSize = this.serializer.getNetSchemeBufferSize(obj.class);
+                let netSchemeBufferSize = this.serializer.getNetSchemeBufferSizeByClass(obj.class);
                 bufferSize += netSchemeBufferSize;
             }
         }
@@ -108,7 +123,7 @@ class ServerEngine{
         for (let objId in world.objects) {
             if (world.objects.hasOwnProperty(objId)) {
                 let obj = world.objects[objId];
-                let netSchemeBufferSize = this.serializer.getNetSchemeBufferSize(obj.class);
+                let netSchemeBufferSize = this.serializer.getNetSchemeBufferSizeByClass(obj.class);
 
                 var serializedObj = obj.serialize(this.serializer);
                 let serializedObjDV = new DataView(serializedObj);
