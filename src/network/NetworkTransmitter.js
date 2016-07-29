@@ -19,6 +19,8 @@ class NetworkTransmitter{
 
         this.registerNetworkedEventFactory("objectCreated",{
             id: { type: Serializer.TYPES.UINT8 },
+            x: { type: Serializer.TYPES.INT16 },
+            y: { type: Serializer.TYPES.INT16 }
         });
     }
 
