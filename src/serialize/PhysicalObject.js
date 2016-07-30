@@ -1,7 +1,7 @@
 "use strict";
 
 const Serializable = require('./Serializable');
-
+const Serializer= require('./Serializer');
 
 class PhysicalObject extends Serializable {
 
@@ -15,40 +15,36 @@ class PhysicalObject extends Serializable {
     static get netScheme() {
         return {
             id: {
-                type: Serializable.TYPES.UINT8
+                type: Serializer.TYPES.UINT8
             },
             x: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             y: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             z: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             rx: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             ry: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             rz: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             velX: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             velY: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             },
             velZ: {
-                type: Serializable.TYPES.FLOAT32
+                type: Serializer.TYPES.FLOAT32
             }
         }
-    }
-
-    serialize() {
-        return super.serialize(arguments);
     }
 
     constructor(id, x, y, z, rx, ry, rz) {
