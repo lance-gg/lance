@@ -19,7 +19,7 @@ var Incheon = {
         Renderer: require("./src/render/Renderer"),
         ThreeRenderer: require("./src/render/ThreeRenderer")
     },
-    syncStrategies:{
+    syncStrategies: {
         playerGradualSnap: require("./src/syncStrategies/PlayerGradualSnap"),
         InterpolateStrategy: require("./src/syncStrategies/InterpolateStrategy"),
         FrameSyncStrategy: require("./src/syncStrategies/FrameSyncStrategy"),
