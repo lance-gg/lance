@@ -15,18 +15,24 @@ class NetworkTransmitter{
 
         this.payload = [];
 
-        this.registerNetworkedEventFactory("objectUpdate");
+        this.registerNetworkedEventFactory("objectUpdate", {
+            objectPayload: true
+        });
 
-        this.registerNetworkedEventFactory("objectCreated",{
-            id: { type: Serializer.TYPES.UINT8 },
-            x: { type: Serializer.TYPES.INT16 },
-            y: { type: Serializer.TYPES.INT16 }
+        this.registerNetworkedEventFactory("objectCreate", {
+            netScheme: {
+                id: { type: Serializer.TYPES.UINT8 },
+                x: { type: Serializer.TYPES.INT16 },
+                y: { type: Serializer.TYPES.INT16 }
+            }
         });
     }
 
 
-    registerNetworkedEventFactory(eventName, netScheme){
-        this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, netScheme);
+    registerNetworkedEventFactory(eventName, options){
+        options = Object.assign({}, options);
+
+        this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);
     }
 
     addNetworkedEvent(eventName, payload){

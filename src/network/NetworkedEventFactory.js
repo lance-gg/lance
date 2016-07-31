@@ -6,11 +6,19 @@ const Utils= require('./../Utils');
 
 class NetworkedEventFactory extends Serializable {
 
-    constructor(serializer, eventName, netScheme){
+    constructor(serializer, eventName, options){
+        options = Object.assign({}, options);
+
         this.seriazlier = serializer;
+        this.options = options;
+
         this.eventName = eventName;
-        this.netScheme = netScheme;
-        this.netSchemeBufferSize = this.seriazlier.getNetSchemeBufferSize(this.netScheme);
+        this.netScheme = options.netScheme;
+
+        if (this.netScheme) {
+            this.netSchemeBufferSize = this.seriazlier.getNetSchemeBufferSize(this.netScheme);
+        }
+
     }
 
     create(payload){

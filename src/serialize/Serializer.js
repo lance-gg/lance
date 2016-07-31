@@ -1,5 +1,6 @@
 "use strict";
 
+
 class Serializer {
 
     constructor(){
@@ -10,18 +11,18 @@ class Serializer {
         this.customTypes[customType.type] = customType;
     }
 
-    deserialize(classObj, dataBuffer){
-        var dataBufferIndex = Uint8Array.BYTES_PER_ELEMENT; //object starts with classId
+    deserialize(classObj, dataBuffer, byteOffset){
+        byteOffset += Uint8Array.BYTES_PER_ELEMENT; //object starts with classId
         var dataView = new DataView(dataBuffer);
 
         var obj = new classObj();
         for (var property in classObj.netScheme) {
             if (classObj.netScheme.hasOwnProperty(property)) {
 
-                let read = this.readDataView(dataView, dataBufferIndex, classObj.netScheme[property]);
+                let read = this.readDataView(dataView, byteOffset, classObj.netScheme[property]);
                 obj[property] = read.data;
 
-                dataBufferIndex += read.bufferSize;
+                byteOffset += read.bufferSize;
             }
         }
         return obj;
@@ -60,6 +61,9 @@ class Serializer {
         else if (netSchemProp.type == Serializer.TYPES.UINT8){
             dataView.setUint8(bufferOffset, value);
         }
+        else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
+            setClassInstance(dataView, bufferOffset, value);
+        }
         //this is a custom data property which needs to define its own write method
         else if(this.customTypes[netSchemProp.type] != null){
             this.customTypes[netSchemProp.type].writeDataView(dataView, value, bufferOffset);
@@ -85,6 +89,9 @@ class Serializer {
         }
         else if (netSchemProp.type == Serializer.TYPES.UINT8){
             data = dataView.getUint8(bufferOffset);
+        }
+        else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
+            data = getClassInstance(bufferOffset)
         }
         //this is a custom data property which needs to define its own read method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -135,11 +142,38 @@ class Serializer {
     }
 }
 
+function setClassInstance(dataView, bufferOffset, value){
+
+}
+
+function getClassInstance(dataView, bufferOffset){
+
+
+    // deserialize(classObj, dataBuffer, byteOffset){
+    //     byteOffset += Uint8Array.BYTES_PER_ELEMENT; //object starts with classId
+    //     var dataView = new DataView(dataBuffer);
+    //
+    //     var obj = new classObj();
+    //     for (var property in classObj.netScheme) {
+    //         if (classObj.netScheme.hasOwnProperty(property)) {
+    //
+    //             let read = this.readDataView(dataView, byteOffset, classObj.netScheme[property]);
+    //             obj[property] = read.data;
+    //
+    //             byteOffset += read.bufferSize;
+    //         }
+    //     }
+    //     return obj;
+    // };
+
+}
+
 Serializer.TYPES = {
     FLOAT32: "FLOAT32",
     INT16: "INT16",
     INT8: "INT8",
-    UINT8: "UINT8"
+    UINT8: "UINT8",
+    CLASSINSTANCE: "CLASSINSTANCE"
 };
 
 module.exports = Serializer;

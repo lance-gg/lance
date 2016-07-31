@@ -35,7 +35,7 @@ class GameWorld{
             if (true) {
                 var objectByteSize = serializer.getNetSchemeBufferSizeByClass(objectClass);
 
-                var object = serializer.deserialize(objectClass, worldData.slice(byteOffset, byteOffset + objectByteSize));
+                var object = serializer.deserializeClassObject(objectClass, worldData, byteOffset);
                 world.objects[object.id] = object;
                 byteOffset += objectByteSize;
             }

@@ -73,16 +73,13 @@ class ServerEngine{
     };
 
     newSerializeUpdate(socketId){
-        let bufferSize = 0;
-        let bufferOffset = 0;
         let world = this.gameEngine.world;
 
-        let networkedEvents = [];
-
-        for (let obj in world.objects) {
-            networkTransmitter.addNetworkedEvent("objectUpdate", obj);
+        for (let obj of world.objects){
+            this.networkTransmitter.addNetworkedEvent("objectUpdate", obj);
         }
 
+        return this.networkTransmitter.serializePayload();
     }
 
     /**
