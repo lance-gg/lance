@@ -10,8 +10,6 @@ class GameEngine{
             GameWorld: GameWorld
         }, inputOptions);
 
-        this.registeredClasses = {}; //todo be refactored into the serializer
-
         // get the physics engine and initialize it
         if (this.options.physicsEngine) {
             this.physicsEngine = this.options.physicsEngine;
@@ -81,10 +79,6 @@ class GameEngine{
         this.world.objects[id].destroy();
         delete this.world.objects[id];
     }
-
-    registerClass(classObj){
-        this.registeredClasses[classObj.properties.id] = classObj;
-    };
 
 }
 

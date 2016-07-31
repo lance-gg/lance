@@ -68,4 +68,4 @@ class NetworkTransmitter{
 
 }
 
-modules.exports = NetworkTransmitter;
+module.exports = NetworkTransmitter;

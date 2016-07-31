@@ -1,5 +1,7 @@
 "use strict";
 
+const Utils = require('./../Utils');
+
 class Serializable{
     /*
         Class can be serialized using either:
@@ -16,13 +18,11 @@ class Serializable{
         if (this.classId){
             classId = this.classId;
         }
-        else if (this.class.properties && this.class.properties.id){
-            classId = this.class.properties.id;
-        }
         else {
-            //todo define behaviour for dynamic classes
-            console.warn("no classId defined!");
+            classId = Utils.hashStr(this.class.name);
         }
+
+        //todo define behaviour for dynamic classes
 
 
         //instance netScheme

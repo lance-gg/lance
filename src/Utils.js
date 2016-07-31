@@ -2,10 +2,10 @@
 
 class Utils {
 
-    hashStr(str, bits) {
+    static hashStr(str, bits) {
         var hash = 5381,
             i = str.length,
-            bits = bits?bits:32;
+            bits = bits?bits:8;
 
             while (i) {
                 hash = (hash * 33) ^ str.charCodeAt(--i);

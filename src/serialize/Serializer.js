@@ -1,23 +1,52 @@
 "use strict";
 
+const Utils = require('./../Utils');
 
 class Serializer {
 
     constructor(){
+        this.registeredClasses = {};
         this.customTypes = {};
     }
 
+    /**
+     * Adds a custom primitive to the serializer instance.
+     * This will enable you to use it in an object's netScheme
+     * @param customType
+     */
     addCustomType(customType){
         this.customTypes[customType.type] = customType;
     }
 
-    deserialize(classObj, dataBuffer, byteOffset){
-        byteOffset += Uint8Array.BYTES_PER_ELEMENT; //object starts with classId
-        var dataView = new DataView(dataBuffer);
 
-        var obj = new classObj();
-        for (let property of Object.keys(classObj.netScheme)) {
-            let read = this.readDataView(dataView, byteOffset, classObj.netScheme[property]);
+    /**
+     * Registers a new class with the serializer, so it may be deserialized later
+     * @param classObj reference to the class (not an instance!)
+     * @param [classId] Unit specifying a class ID
+     */
+    registerClass(classObj, classId){
+        //if no classId is specified, hash one from the class name
+        classId = classId ? classId : Utils.hashStr(classObj.name);
+        this.registeredClasses[classId] = classObj;
+    };
+
+
+    deserialize(dataBuffer, byteOffset){
+        byteOffset = byteOffset ? byteOffset : 0;
+
+        let dataView = new DataView(dataBuffer);
+
+        let objectClassId = dataView.getUint8(byteOffset);
+        //todo if classId is 0 - take care of dynamic serialization.
+        let objectClass = this.registeredClasses[objectClassId];
+        // console.log(objectClassId, objectClass);
+
+        byteOffset += Uint8Array.BYTES_PER_ELEMENT; //advance the byteOffset after the classId
+
+
+        let obj = new objectClass();
+        for (let property of Object.keys(objectClass.netScheme)) {
+            let read = this.readDataView(dataView, byteOffset, objectClass.netScheme[property]);
             obj[property] = read.data;
 
             byteOffset += read.bufferSize;
@@ -89,7 +118,7 @@ class Serializer {
             data = dataView.getUint8(bufferOffset);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            data = getClassInstance(bufferOffset)
+            data = this.deserialize(dataView, bufferOffset);
         }
         //this is a custom data property which needs to define its own read method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -116,6 +145,16 @@ class Serializer {
             case Serializer.TYPES.UINT8: {
                 return Uint8Array.BYTES_PER_ELEMENT
             }
+            case Serializer.TYPES.CLASSINSTANCE: {
+                if (netSchemeProp.classId = null){
+                    console.error(`received CLASSINSTANCE but no classId!`)
+                }
+
+                let netScheme = this.registeredClasses[netSchemeProp.classId].netScheme;
+                //netScheme + class id
+                let bufferSize = this.getNetSchemeBufferSize(netScheme) + Uint8Array.BYTES_PER_ELEMENT;
+                return bufferSize;
+            }
 
             //not one of the basic properties
             default: {
@@ -137,27 +176,6 @@ function setClassInstance(dataView, bufferOffset, value, netSchemeProp){
     value.serialize(this, dataView, bufferOffset);
 }
 
-function getClassInstance(dataView, bufferOffset){
-
-
-    // deserialize(classObj, dataBuffer, byteOffset){
-    //     byteOffset += Uint8Array.BYTES_PER_ELEMENT; //object starts with classId
-    //     var dataView = new DataView(dataBuffer);
-    //
-    //     var obj = new classObj();
-    //     for (var property in classObj.netScheme) {
-    //         if (classObj.netScheme.hasOwnProperty(property)) {
-    //
-    //             let read = this.readDataView(dataView, byteOffset, classObj.netScheme[property]);
-    //             obj[property] = read.data;
-    //
-    //             byteOffset += read.bufferSize;
-    //         }
-    //     }
-    //     return obj;
-    // };
-
-}
 
 Serializer.TYPES = {
     FLOAT32: "FLOAT32",

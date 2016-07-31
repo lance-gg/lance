@@ -1,10 +1,10 @@
 "use strict";
 
 
-const Serializable= require('./../serialize/Serializable');
-const Utils= require('./../Utils');
+const Serializable = require('./../serialize/Serializable');
+const Utils = require('./../Utils');
 
-class NetworkedEventFactory extends Serializable {
+class NetworkedEventFactory {
 
     constructor(serializer, eventName, options){
         options = Object.assign({}, options);
