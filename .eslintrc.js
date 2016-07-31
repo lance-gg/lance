@@ -5,13 +5,14 @@ module.exports = {
         "ecmaVersion": 6
     },
     "rules": {
-        "comma-dangle": 0,
+        "comma-dangle": "off",
         "indent": ["error", 4],
-        "linebreak-style": [2, "unix"],
+        "linebreak-style": ["error", "unix"],
         "max-len": ["error", {
             "code": 120
         } ],
-        "no-console": 0
+        "no-console": "off",
+        "padded-blocks": "off"
     }
 
 };

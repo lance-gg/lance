@@ -5,15 +5,14 @@ const SyncStrategy = require("./SyncStrategy");
 const defaults = {
     worldBufferLength: 60,
     clientStepLag: 0
-}
+};
 
 class FrameSyncStrategy extends SyncStrategy {
 
-    constructor(clientEngine, inputOptions){
-
-        this.options = Object.assign(defaults, inputOptions);
+    constructor(clientEngine, inputOptions) {
 
         super(clientEngine, inputOptions);
+        this.options = Object.assign(defaults, inputOptions);
 
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('postStep', this.frameSync.bind(this));
@@ -79,18 +78,6 @@ class FrameSyncStrategy extends SyncStrategy {
                 curObj.updateRenderObject();
             }
         }
-
-    }
-
-    interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
-
-
-        let world = this.gameEngine.world;
-
-
-
-
-
     }
 }
 
