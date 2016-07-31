@@ -16,14 +16,12 @@ class Serializer {
         var dataView = new DataView(dataBuffer);
 
         var obj = new classObj();
-        for (var property in classObj.netScheme) {
-            if (classObj.netScheme.hasOwnProperty(property)) {
+        for (let property of Object.keys(classObj.netScheme)) {
+            let read = this.readDataView(dataView, byteOffset, classObj.netScheme[property]);
+            obj[property] = read.data;
 
-                let read = this.readDataView(dataView, byteOffset, classObj.netScheme[property]);
-                obj[property] = read.data;
+            byteOffset += read.bufferSize;
 
-                byteOffset += read.bufferSize;
-            }
         }
         return obj;
     };
@@ -62,7 +60,7 @@ class Serializer {
             dataView.setUint8(bufferOffset, value);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            setClassInstance(dataView, bufferOffset, value);
+            setClassInstance(dataView, bufferOffset, value, netSchemProp);
         }
         //this is a custom data property which needs to define its own write method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -100,13 +98,6 @@ class Serializer {
         else{
             console.error(`No custom property ${netSchemProp.type} found!`)
         }
-        // else if (netSchemProp.type == Serializer.TYPES.POINT){
-        //     let readX = Serializable.readDataView(dataView,bufferOffset, {type: netSchemProp.valueType});
-        //     let readY = Serializable.readDataView(dataView, readX.bufferSize , {type: netSchemProp.valueType});
-        //
-        //     data = new Point(readX.value, readY.value);
-        //     bufferSize = readX.bufferSize*2;
-        // }
 
         return {data: data, bufferSize: bufferSize}
     }
@@ -142,8 +133,8 @@ class Serializer {
     }
 }
 
-function setClassInstance(dataView, bufferOffset, value){
-
+function setClassInstance(dataView, bufferOffset, value, netSchemeProp){
+    value.serialize(this, dataView, bufferOffset);
 }
 
 function getClassInstance(dataView, bufferOffset){

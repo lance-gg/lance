@@ -10,7 +10,7 @@ class Serializable{
     serialize(serializer, dataBuffer, dataByteOffset){
         let netScheme;
         let netSchemeBufferSize;
-        let classId;
+        let classId = 0;
 
         //instance classId
         if (this.classId){
@@ -42,6 +42,7 @@ class Serializable{
             netSchemeBufferSize = this.netSchemeBufferSize;
         }
         else{
+            //todo extra case?
             netSchemeBufferSize = serializer.getNetSchemeBufferSizeByClass(this.class);
         }
 
@@ -55,14 +56,20 @@ class Serializable{
         dataView.setUint8(0, classId);
 
         //advance the offset counter
-        dataByteOffset = dataByteOffset ? dataByteOffset : 0;
+        dataByteOffset = dataByteOffset ? dataByteOffset : 0; // might be writing into an existing buffer
         dataByteOffset += Uint8Array.BYTES_PER_ELEMENT;
 
-        for (let property of Object.keys(netScheme)) {
-            //write the property to buffer
-            serializer.writeDataView(dataView, this[property], dataByteOffset, netScheme[property]);
-            //advance offset
-            dataByteOffset += serializer.getTypeByteSize(netScheme[property]);
+
+        if (netScheme) {
+            for (let property of Object.keys(netScheme)) {
+                //write the property to buffer
+                serializer.writeDataView(dataView, this[property], dataByteOffset, netScheme[property]);
+                //advance offset
+                dataByteOffset += serializer.getTypeByteSize(netScheme[property]);
+            }
+        }
+        else{
+            //TODO no netScheme, dynamic class
         }
 
         return dataBuffer;
