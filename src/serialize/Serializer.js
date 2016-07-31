@@ -27,6 +27,10 @@ class Serializer {
     registerClass(classObj, classId){
         //if no classId is specified, hash one from the class name
         classId = classId ? classId : Utils.hashStr(classObj.name);
+        if (this.registeredClasses[classId]){
+            console.error(`Serializer: accidental override of classId ${classId} when registering class`,classObj);
+        }
+
         this.registeredClasses[classId] = classObj;
     };
 
@@ -43,6 +47,7 @@ class Serializer {
 
         byteOffset += Uint8Array.BYTES_PER_ELEMENT; //advance the byteOffset after the classId
 
+        // console.log(objectClass);
 
         let obj = new objectClass();
         for (let property of Object.keys(objectClass.netScheme)) {

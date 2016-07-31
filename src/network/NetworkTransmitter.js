@@ -1,6 +1,5 @@
 "use strict";
 
-const Serializable= require('./../serialize/Serializable');
 const Serializer= require('./../serialize/Serializer');
 
 const NetworkedEventFactory = require('./NetworkedEventFactory');
@@ -32,14 +31,25 @@ class NetworkTransmitter{
     registerNetworkedEventFactory(eventName, options){
         options = Object.assign({}, options);
 
-        this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);
+        let networkedEventPrototype = function(){};
+        networkedEventPrototype.netScheme = options.netScheme;
+
+        this.serializer.registerClass(networkedEventPrototype, Utils.hashStr(eventName));
+
+        this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);;
     }
 
     addNetworkedEvent(eventName, payload){
-        let stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
-        this.payload.push(stagedNetworkedEvent);
+        if (this.registeredEvents[eventName]) {
 
-        //todo increment payload buffer size?
+            let stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
+            this.payload.push(stagedNetworkedEvent);
+
+            return stagedNetworkedEvent;
+        }
+        else{
+            console.error(`NetworkTransmitter: no such event ${eventName}`);
+        }
     }
 
     serializePayload(){

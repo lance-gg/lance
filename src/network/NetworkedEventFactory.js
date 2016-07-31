@@ -16,13 +16,14 @@ class NetworkedEventFactory {
         this.netScheme = options.netScheme;
 
         if (this.netScheme) {
-            this.netSchemeBufferSize = this.seriazlier.getNetSchemeBufferSize(this.netScheme);
+            this.netSchemeBufferSize = Uint8Array.BYTES_PER_ELEMENT + this.seriazlier.getNetSchemeBufferSize(this.netScheme);
         }
 
     }
 
     create(payload){
         let networkedEvent = new Serializable();
+        networkedEvent.classId = Utils.hashStr(this.eventName);
         networkedEvent.netScheme = this.netScheme;
         networkedEvent.netSchemeBufferSize = this.netSchemeBufferSize;
 
@@ -30,14 +31,9 @@ class NetworkedEventFactory {
             networkedEvent[property] = payload[property];
         }
 
-        networkedEvent.classId = Utils.hashString(this.eventName);
-
         //todo take care of the event where no netScheme is defined
+        return networkedEvent;
     };
-
-    deserialize(){
-
-    }
 
 
 }
