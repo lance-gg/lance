@@ -108,7 +108,7 @@ class Serializer {
             dataView.setUint8(bufferOffset, value);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            setClassInstance.call(this, dataView, bufferOffset, value, netSchemProp);
+            value.serialize(this, dataView.buffer, bufferOffset);
         }
         //this is a custom data property which needs to define its own write method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -140,7 +140,7 @@ class Serializer {
             data = dataView.getUint8(bufferOffset);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            data = this.deserialize(dataView, bufferOffset);
+            data = this.deserialize(dataView.buffer, bufferOffset);
         }
         //this is a custom data property which needs to define its own read method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -197,11 +197,6 @@ class Serializer {
 
     }
 }
-
-function setClassInstance(dataView, bufferOffset, value, netSchemeProp){
-    value.serialize(this, dataView, bufferOffset);
-}
-
 
 Serializer.TYPES = {
     FLOAT32: "FLOAT32",

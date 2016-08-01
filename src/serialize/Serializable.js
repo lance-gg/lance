@@ -24,7 +24,6 @@ class Serializable{
 
         //todo define behaviour for dynamic classes
 
-
         //instance netScheme
         if (this.netScheme){
             netScheme = this.netScheme;
@@ -53,7 +52,7 @@ class Serializable{
         var dataView = new DataView(dataBuffer);
 
         //first set the id of the class, so that the deserializer can fetch information about it
-        dataView.setUint8(0, classId);
+        dataView.setUint8(dataByteOffset, classId);
 
         //advance the offset counter
         dataByteOffset = dataByteOffset ? dataByteOffset : 0; // might be writing into an existing buffer
@@ -63,6 +62,7 @@ class Serializable{
         if (netScheme) {
             for (let property of Object.keys(netScheme)) {
                 //write the property to buffer
+
                 serializer.writeDataView(dataView, this[property], dataByteOffset, netScheme[property]);
                 //advance offset
                 dataByteOffset += serializer.getTypeByteSize(netScheme[property]);
