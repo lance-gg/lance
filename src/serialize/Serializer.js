@@ -7,6 +7,8 @@ class Serializer {
     constructor(){
         this.registeredClasses = {};
         this.customTypes = {};
+
+        this.netSchemeSizeCache = {}; //used to cache calculated netSchemes sizes
     }
 
     /**
@@ -61,13 +63,22 @@ class Serializer {
     };
 
     getNetSchemeBufferSize(netScheme){
-        let netSchemeBufferSize = 0;
-        for (let property of Object.keys(netScheme)) {
-            //count the bytesize required for the netScheme buffer
-            netSchemeBufferSize += this.getTypeByteSize(netScheme[property]);
+        let netSchemeHash = Utils.hash(netScheme);
+        //check if this netScheme size is already in the cache
+        if (this.netSchemeSizeCache[netSchemeHash]){
+            return this.netSchemeSizeCache[netSchemeHash];
         }
+        else{
+            let netSchemeBufferSize = 0;
+            for (let property of Object.keys(netScheme)) {
+                //count the bytesize required for the netScheme buffer
+                netSchemeBufferSize += this.getTypeByteSize(netScheme[property]);
+            }
 
-        return netSchemeBufferSize;
+            this.netSchemeSizeCache[netSchemeHash] = netSchemeBufferSize;
+
+            return netSchemeBufferSize;
+        }
     };
 
     getNetSchemeBufferSizeByClass(objClass){
@@ -97,7 +108,7 @@ class Serializer {
             dataView.setUint8(bufferOffset, value);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            setClassInstance(dataView, bufferOffset, value, netSchemProp);
+            setClassInstance.call(this, dataView, bufferOffset, value, netSchemProp);
         }
         //this is a custom data property which needs to define its own write method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -143,6 +154,7 @@ class Serializer {
     }
 
     getTypeByteSize(netSchemeProp){
+
         switch (netSchemeProp.type){
             case Serializer.TYPES.FLOAT32: {
                 return Float32Array.BYTES_PER_ELEMENT
@@ -160,7 +172,7 @@ class Serializer {
                 return Uint8Array.BYTES_PER_ELEMENT
             }
             case Serializer.TYPES.CLASSINSTANCE: {
-                if (netSchemeProp.classId = null){
+                if (netSchemeProp.classId == null){
                     console.error(`received CLASSINSTANCE but no classId!`)
                 }
 

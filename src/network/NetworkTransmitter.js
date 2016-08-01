@@ -15,7 +15,10 @@ class NetworkTransmitter{
         this.payload = [];
 
         this.registerNetworkedEventFactory("objectUpdate", {
-            objectPayload: true
+            netScheme: {
+                stepCount: { type: Serializer.TYPES.INT32 },
+                objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
+            }
         });
 
         this.registerNetworkedEventFactory("objectCreate", {
