@@ -23,26 +23,12 @@ class GameWorld{
 
         //go ever the buffer and deserialize items
         while (byteOffset < worldData.byteLength) {
-            var objectClassId = worldDataDV.getUint8(byteOffset);
-            var objectClass = gameEngine.registeredClasses[objectClassId];
+            let object = serializer.deserialize(worldData, byteOffset);
+            var objectByteSize = serializer.getNetSchemeBufferSizeByClass(object.class);
 
-            if (objectClass == null){
-                console.warn(`Object with class id ${objectClassId} not found! Did you forget to register it with the game engine?`);
-            }
+            world.objects[object.id] = object;
+            byteOffset += objectByteSize;
 
-
-            //static class size
-            if (true) {
-                var objectByteSize = serializer.getNetSchemeBufferSizeByClass(objectClass);
-
-                var object = serializer.deserializeClassObject(objectClass, worldData, byteOffset);
-                world.objects[object.id] = object;
-                byteOffset += objectByteSize;
-            }
-            //dynamic class size
-            else{
-
-            }
 
         }
 
