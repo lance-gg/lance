@@ -84,6 +84,9 @@ class Serializer {
         if (netSchemProp.type == Serializer.TYPES.FLOAT32){
             dataView.setFloat32(bufferOffset, value);
         }
+        else if (netSchemProp.type == Serializer.TYPES.INT32){
+            dataView.setInt32(bufferOffset, value);
+        }
         else if (netSchemProp.type == Serializer.TYPES.INT16){
             dataView.setInt16(bufferOffset, value);
         }
