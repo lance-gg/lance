@@ -113,6 +113,9 @@ class Serializer {
         if (netSchemProp.type == Serializer.TYPES.FLOAT32){
             data = dataView.getFloat32(bufferOffset);
         }
+        else if (netSchemProp.type == Serializer.TYPES.INT32){
+            data = dataView.getInt32(bufferOffset);
+        }
         else if (netSchemProp.type == Serializer.TYPES.INT16){
             data = dataView.getInt16(bufferOffset);
         }
@@ -140,6 +143,9 @@ class Serializer {
         switch (netSchemeProp.type){
             case Serializer.TYPES.FLOAT32: {
                 return Float32Array.BYTES_PER_ELEMENT
+            }
+            case Serializer.TYPES.INT32: {
+                return Int32Array.BYTES_PER_ELEMENT
             }
             case Serializer.TYPES.INT16: {
                 return Int16Array.BYTES_PER_ELEMENT
@@ -184,6 +190,7 @@ function setClassInstance(dataView, bufferOffset, value, netSchemeProp){
 
 Serializer.TYPES = {
     FLOAT32: "FLOAT32",
+    INT32: "INT32",
     INT16: "INT16",
     INT8: "INT8",
     UINT8: "UINT8",
