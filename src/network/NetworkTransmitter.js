@@ -69,7 +69,7 @@ class NetworkTransmitter{
 
         //count the size of the required dataBuffer for the payload
         for (let stagedNetworkedEvent of this.payload){
-            bufferSize += stagedNetworkedEvent.getBufferSize();
+            bufferSize += stagedNetworkedEvent.netSchemeBufferSize;
         }
 
         //write to dataBuffer
@@ -77,7 +77,7 @@ class NetworkTransmitter{
         for (let stagedNetworkedEvent of this.payload) {
             stagedNetworkedEvent.serialize(this.serializer, dataBuffer, bufferOffset);
 
-            bufferOffset += stagedNetworkedEvent.getBufferSize();
+            bufferOffset += stagedNetworkedEvent.netSchemeBufferSize;
         }
 
         return dataBuffer;

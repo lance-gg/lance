@@ -75,10 +75,12 @@ class ServerEngine{
     newSerializeUpdate(socketId){
         let world = this.gameEngine.world;
 
-        for (let obj of world.objects){
-            this.networkTransmitter.addNetworkedEvent("objectUpdate", obj);
+        for (let objId of Object.keys(world.objects)){
+            this.networkTransmitter.addNetworkedEvent("objectUpdate", {
+                stepCount: world.stepCount,
+                objectInstance: world.objects[objId]
+            });
         }
-
         return this.networkTransmitter.serializePayload();
     }
 
@@ -96,7 +98,6 @@ class ServerEngine{
         for (let objId in world.objects) {
             if (world.objects.hasOwnProperty(objId)) {
                 let obj = world.objects[objId];
-                let objClass = obj.class;
 
                 //reminder - object is made from its class id (Uint8) and its payload
                 let netSchemeBufferSize = this.serializer.getNetSchemeBufferSizeByClass(obj.class);
