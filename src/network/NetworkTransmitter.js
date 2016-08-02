@@ -23,9 +23,17 @@ class NetworkTransmitter{
 
         this.registerNetworkedEventFactory("objectCreate", {
             netScheme: {
+                stepCount: { type: Serializer.TYPES.INT32 },
                 id: { type: Serializer.TYPES.UINT8 },
                 x: { type: Serializer.TYPES.INT16 },
                 y: { type: Serializer.TYPES.INT16 }
+            }
+        });
+
+        this.registerNetworkedEventFactory("objectDestroy", {
+            netScheme: {
+                stepCount: { type: Serializer.TYPES.INT32 },
+                id: { type: Serializer.TYPES.UINT8 }
             }
         });
     }
