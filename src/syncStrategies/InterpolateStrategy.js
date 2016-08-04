@@ -5,11 +5,11 @@ const SyncStrategy = require("./SyncStrategy");
 const defaults = {
     worldBufferLength: 5,
     clientStepLag: 6
-}
+};
 
 class InterpolateStrategy extends SyncStrategy {
 
-    constructor(clientEngine, inputOptions){
+    constructor(clientEngine, inputOptions) {
 
         const options = Object.assign({}, defaults, inputOptions);
         super(clientEngine, options);
@@ -35,8 +35,6 @@ class InterpolateStrategy extends SyncStrategy {
         // TODO: alter step count based on lag
         let world = this.gameEngine.world;
         let stepToPlay = world.stepCount - this.options.clientStepLag;
-        let previousWorldIndex;
-        let nextWorldIndex;
         let previousWorld = null;
         let nextWorld = null;
 
@@ -45,11 +43,9 @@ class InterpolateStrategy extends SyncStrategy {
         for (let x = 0; x < this.worldBuffer.length; x++) {
             if (this.worldBuffer[x].stepCount < stepToPlay) {
                 previousWorld = this.worldBuffer[x];
-                previousWorldIndex = x;
             }
             if (this.worldBuffer[x].stepCount >= stepToPlay) {
                 nextWorld = this.worldBuffer[x];
-                nextWorldIndex = x;
                 break;
             }
         }
@@ -63,6 +59,8 @@ class InterpolateStrategy extends SyncStrategy {
         let playPercentage = (stepToPlay - previousWorld.stepCount) / (nextWorld.stepCount - previousWorld.stepCount);
 
         // create new objects, interpolate existing objects
+        // TODO: use this.forEachSyncObject instead of for-loop
+        //       you will need to loop over prevObj instead of nextObj
         for (let objId in nextWorld.objects) {
             if (nextWorld.objects.hasOwnProperty(objId)) {
 
@@ -80,6 +78,8 @@ class InterpolateStrategy extends SyncStrategy {
         }
 
         // destroy unneeded objects
+        // TODO: use this.forEachSyncObject instead of for-loop
+        //       you will need to loop over prevObj instead of nextObj
         for (let objId in world.objects) {
             if (nextWorld.objects.hasOwnProperty(objId)) {
                 if (!nextWorld.objects.hasOwnProperty(objId)) {
@@ -117,21 +117,18 @@ class InterpolateStrategy extends SyncStrategy {
 
             // if the object is the self, update render position/rotation from physics
             curObj.updateRenderObject();
-        } else {
+
+        } else if (typeof curObj.interpolate === 'function') {
 
             // update positions with interpolation
-            if (typeof curObj.interpolate === 'function') {
-                curObj.interpolate(prevObj, nextObj, playPercentage);
+            curObj.interpolate(prevObj, nextObj, playPercentage);
 
-                // if this object has a physics sub-object, it must inherit
-                // the position now.
-                if (curObj.physicalObject && typeof curObj.updatePhysicsObject === 'function') {
-                    curObj.updatePhysicsObject();
-                }
+            // if this object has a physics sub-object, it must inherit
+            // the position now.
+            if (curObj.physicalObject && typeof curObj.updatePhysicsObject === 'function') {
+                curObj.updatePhysicsObject();
             }
         }
-
-
     }
 }
 

@@ -5,7 +5,7 @@ var SyncStrategy = require("./SyncStrategy");
 /**
  * Snaps every object to its updated position from the server. Might cause rubber-banding on lagged connections
  */
-class PlayerSnap extends SyncStrategy{
+class PlayerSnap extends SyncStrategy {
 
     constructor(clientEngine, inputOptions) {
         super(clientEngine, inputOptions);

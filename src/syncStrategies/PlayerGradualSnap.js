@@ -2,7 +2,7 @@
 
 var SyncStrategy = require("./SyncStrategy");
 
-class PlayerGradualSnap extends SyncStrategy{
+class PlayerGradualSnap extends SyncStrategy {
 
 }
 
