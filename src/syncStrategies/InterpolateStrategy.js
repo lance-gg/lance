@@ -21,6 +21,18 @@ class InterpolateStrategy extends SyncStrategy {
     }
 
     updatesyncsBuffer(e) {
+
+        // keep a reference of events by object id
+        e.syncObjects = {};
+        e.syncEvents.forEach((sEvent) => {
+            let o = sEvent.objectInstance;
+            if (!e.syncObjects[o.id]) {
+                e.syncObjects[o.id] = [];
+            }
+            e.syncObjects[o.id].push(sEvent);
+        });
+
+        // add the sync to the buffer
         this.syncsBuffer.push(e);
         if (this.syncsBuffer.length >= this.options.syncsBufferLength) {
             this.syncsBuffer.shift();
@@ -35,57 +47,52 @@ class InterpolateStrategy extends SyncStrategy {
         // TODO: alter step count based on lag
         let world = this.gameEngine.world;
         let stepToPlay = world.stepCount - this.options.clientStepLag;
-        let previousWorld = null;
-        let nextWorld = null;
+        let prevSync = null;
+        let nextSync = null;
 
-        // get two world snapshots that occur, one before current step,
+        // get two syncs that occur, one before current step,
         // and one equal to or immediately greater than current step
         for (let x = 0; x < this.syncsBuffer.length; x++) {
             if (this.syncsBuffer[x].stepCount < stepToPlay) {
-                previousWorld = this.syncsBuffer[x];
+                prevSync = this.syncsBuffer[x];
             }
             if (this.syncsBuffer[x].stepCount >= stepToPlay) {
-                nextWorld = this.syncsBuffer[x];
+                nextSync = this.syncsBuffer[x];
                 break;
             }
         }
 
-        // between the two worlds
-        // we need two snapshots to interpolate
-        if (!previousWorld || !nextWorld)
+        // we requires two syncs before we proceed
+        if (!prevSync || !nextSync)
             return;
 
         // calculate play percentage
-        let playPercentage = (stepToPlay - previousWorld.stepCount) / (nextWorld.stepCount - previousWorld.stepCount);
+        let playPercentage = (stepToPlay - prevSync.stepCount) / (nextSync.stepCount - prevSync.stepCount);
 
         // create new objects, interpolate existing objects
         // TODO: use this.forEachSyncObject instead of for-loop
         //       you will need to loop over prevObj instead of nextObj
-        for (let objId in nextWorld.objects) {
-            if (nextWorld.objects.hasOwnProperty(objId)) {
+        // TODO: currently assume degenerate case of one event per object
+        nextSync.syncEvents.forEach((ev) => {
+            let nextObj = ev.objectInstance;
+            let prevObj = null;
 
-                // get old version and next version
-                let prevObj = previousWorld.objects[objId];
-                let nextObj = nextWorld.objects[objId];
-
-                // TODO: refactor
-                if (prevObj == null) {
-                    prevObj = nextObj;
-                }
-
-                this.interpolateOneObject(prevObj, nextObj, objId, playPercentage);
+            if (prevSync.syncObjects.hasOwnProperty(nextObj.id)) {
+                prevObj = prevSync.syncObjects[nextObj.id][0].objectInstance;
+            } else {
+                prevObj = nextObj;
             }
-        }
+
+            this.interpolateOneObject(prevObj, nextObj, nextObj.id, playPercentage);
+        });
 
         // destroy unneeded objects
         // TODO: use this.forEachSyncObject instead of for-loop
         //       you will need to loop over prevObj instead of nextObj
         for (let objId in world.objects) {
-            if (nextWorld.objects.hasOwnProperty(objId)) {
-                if (!nextWorld.objects.hasOwnProperty(objId)) {
-                    world.objects[objId].destroy();
-                    delete this.gameEngine.world.objects[objId];
-                }
+            if (!nextSync.syncObjects.hasOwnProperty(objId)) {
+                world.objects[objId].destroy();
+                delete this.gameEngine.world.objects[objId];
             }
         }
 

@@ -79,7 +79,7 @@ class ServerEngine{
             });
         }
 
-        return this.networkTransmitter.serializePayload();
+        return this.networkTransmitter.serializePayload({resetPayload: true});
     }
 
     /**

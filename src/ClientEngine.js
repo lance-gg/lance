@@ -97,7 +97,7 @@ class ClientEngine {
 
         // emit that a snapshot has been received
         this.gameEngine.emit('client.syncReceived', {
-            sync: syncEvents,
+            syncEvents: syncEvents,
             stepCount: maxStepCount
         });
 

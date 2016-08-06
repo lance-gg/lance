@@ -63,7 +63,7 @@ class NetworkTransmitter{
         }
     }
 
-    serializePayload(){
+    serializePayload(options){
         let bufferSize = 0;
         let bufferOffset = 0;
 
@@ -78,6 +78,11 @@ class NetworkTransmitter{
             stagedNetworkedEvent.serialize(this.serializer, dataBuffer, bufferOffset);
 
             bufferOffset += stagedNetworkedEvent.netSchemeBufferSize;
+        }
+
+        // reset payload
+        if (options.resetPayload) {
+            this.payload = [];
         }
 
         return dataBuffer;
