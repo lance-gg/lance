@@ -3,7 +3,7 @@
 const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
-    worldBufferLength: 5,
+    syncsBufferLength: 5,
     clientStepLag: 6
 };
 
@@ -14,16 +14,16 @@ class InterpolateStrategy extends SyncStrategy {
         const options = Object.assign({}, defaults, inputOptions);
         super(clientEngine, options);
 
-        this.worldBuffer = []; // buffer for server world updates
+        this.syncsBuffer = []; // buffer for server world updates
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('postStep', this.interpolate.bind(this));
-        this.gameEngine.on('client.snapshotReceived', this.updateWorldBuffer.bind(this));
+        this.gameEngine.on('client.syncReceived', this.updatesyncsBuffer.bind(this));
     }
 
-    updateWorldBuffer(e) {
-        this.worldBuffer.push(e.snapshot);
-        if (this.worldBuffer.length >= this.options.worldBufferLength) {
-            this.worldBuffer.shift();
+    updatesyncsBuffer(e) {
+        this.syncsBuffer.push(e);
+        if (this.syncsBuffer.length >= this.options.syncsBufferLength) {
+            this.syncsBuffer.shift();
         }
     }
 
@@ -40,12 +40,12 @@ class InterpolateStrategy extends SyncStrategy {
 
         // get two world snapshots that occur, one before current step,
         // and one equal to or immediately greater than current step
-        for (let x = 0; x < this.worldBuffer.length; x++) {
-            if (this.worldBuffer[x].stepCount < stepToPlay) {
-                previousWorld = this.worldBuffer[x];
+        for (let x = 0; x < this.syncsBuffer.length; x++) {
+            if (this.syncsBuffer[x].stepCount < stepToPlay) {
+                previousWorld = this.syncsBuffer[x];
             }
-            if (this.worldBuffer[x].stepCount >= stepToPlay) {
-                nextWorld = this.worldBuffer[x];
+            if (this.syncsBuffer[x].stepCount >= stepToPlay) {
+                nextWorld = this.syncsBuffer[x];
                 break;
             }
         }

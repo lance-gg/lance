@@ -10,6 +10,7 @@ class GameWorld{
         this.idCount = 0;
     }
 
+    // TODO: remove this function
     static deserialize(gameEngine, serializer, worldData){
 
         var world = new GameWorld();

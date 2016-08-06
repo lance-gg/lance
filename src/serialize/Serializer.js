@@ -59,7 +59,7 @@ class Serializer {
             byteOffset += read.bufferSize;
 
         }
-        return obj;
+        return {obj, byteOffset};
     };
 
     getNetSchemeBufferSize(netScheme){
@@ -122,7 +122,6 @@ class Serializer {
 
     readDataView(dataView, bufferOffset, netSchemProp){
         let data, bufferSize;
-        bufferSize = this.getTypeByteSize(netSchemProp);
 
         if (netSchemProp.type == Serializer.TYPES.FLOAT32){
             data = dataView.getFloat32(bufferOffset);
@@ -140,7 +139,9 @@ class Serializer {
             data = dataView.getUint8(bufferOffset);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            data = this.deserialize(dataView.buffer, bufferOffset);
+            netSchemProp.classId = dataView.getUint8(bufferOffset);
+            var deserializeData = this.deserialize(dataView.buffer, bufferOffset);
+            data = deserializeData.obj;
         }
         //this is a custom data property which needs to define its own read method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -149,6 +150,8 @@ class Serializer {
         else{
             console.error(`No custom property ${netSchemProp.type} found!`)
         }
+
+        bufferSize = this.getTypeByteSize(netSchemProp);
 
         return {data: data, bufferSize: bufferSize}
     }

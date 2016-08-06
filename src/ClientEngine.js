@@ -1,32 +1,33 @@
 "use strict";
 var io = require("socket.io-client");
-const Serializer= require('./serialize/Serializer');
+const Serializer = require('./serialize/Serializer');
+const NetworkTransmitter = require('./network/NetworkTransmitter');
 
 class ClientEngine {
 
-    constructor(gameEngine, inputOptions){
+    constructor(gameEngine, inputOptions) {
         var that = this;
 
         this.socket = io();
         this.serializer = new Serializer();
 
         this.gameEngine = gameEngine;
+        this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
         this.inboundMessages = [];
         this.outboundMessages = [];
-
 
         this.socket.on('playerJoined', function(playerData) {
             that.playerId = playerData.playerId;
         });
 
-        //when objects get added, tag them as playerControlled if necessary
-        this.gameEngine.on('objectAdded', function(object){
-            object.isPlayerControlled = that.playerId == object.playerId;
+        // when objects get added, tag them as playerControlled if necessary
+        this.gameEngine.on('objectAdded', function(object) {
+            object.isPlayerControlled = (that.playerId == object.playerId);
         });
     }
 
-    start(){
+    start() {
         var that = this;
         this.socket.on('worldUpdate', function(worldData) {
             that.inboundMessages.push(worldData);
@@ -35,16 +36,16 @@ class ClientEngine {
         this.gameEngine.start();
     }
 
-    step(){
+    step() {
         this.gameEngine.emit("client.preStep");
-        while(this.inboundMessages.length>0){
+        while (this.inboundMessages.length > 0) {
             this.handleInboundMessage(this.inboundMessages.pop());
         }
 
         this.handleOutboundInput();
-        this.gameEngine.emit("preStep",this.gameEngine.world.stepCount);
+        this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
         this.gameEngine.step();
-        this.gameEngine.emit("postStep",this.gameEngine.world.stepCount);
+        this.gameEngine.emit("postStep", this.gameEngine.world.stepCount);
 
         if (this.gameEngine.renderer) {
             this.gameEngine.renderer.draw();
@@ -52,7 +53,7 @@ class ClientEngine {
         this.gameEngine.emit("client.postStep");
     }
 
-    sendInput(input){
+    sendInput(input) {
         var message = {
             command: 'move',
             data: {
@@ -67,27 +68,51 @@ class ClientEngine {
         this.outboundMessages.push(message);
 
         this.messageIndex++;
-    };
+    }
 
-    handleInboundMessage(worldData) {
-        var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(this.gameEngine, this.serializer,  worldData);
+    deserializeUpdate(worldData) {
+        let byteOffset = 0;
+        let eventsArray = [];
+        while (byteOffset < worldData.byteLength) {
+            let deserialized = this.serializer.deserialize(worldData, byteOffset);
+            byteOffset = deserialized.byteOffset;
+            eventsArray.push(deserialized.obj);
+        }
+
+        return eventsArray;
+    }
+
+    handleInboundMessage(syncData) {
+        let syncEvents = this.deserializeUpdate(syncData);
+        // var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(
+        // this.gameEngine, this.serializer, worldData);
         // console.log(world.stepCount - this.gameEngine.world.stepCount);
         // console.log("last handled input", world.lastHandledInput);
 
+        // TODO: this should be done in a better way.
+        // derive stepCount by taking the max of all events
+        let maxStepCount = syncEvents.reduce((max, el) => {
+            return el.stepCount ? Math.max(max, el.stepCount) : max;
+        }, 0);
+
         // emit that a snapshot has been received
-        this.gameEngine.emit('client.snapshotReceived', { snapshot: worldSnapshot });
+        this.gameEngine.emit('client.syncReceived', {
+            sync: syncEvents,
+            stepCount: maxStepCount
+        });
 
         // finally update the stepCount
-        this.gameEngine.world.stepCount = worldSnapshot.stepCount;
-    };
+        this.gameEngine.world.stepCount = maxStepCount;
+    }
 
-    handleOutboundInput (){
-        for (var x=0; x<this.outboundMessages.length; x++){
-            // console.log("sent", this.outboundMessages[x].data.messageIndex, "step", this.outboundMessages[x].data.step);
+    handleOutboundInput() {
+        for (var x = 0; x < this.outboundMessages.length; x++) {
+            // console.log("sent", this.outboundMessages[x].data.messageIndex,
+            // "step", this.outboundMessages[x].data.step);
             this.socket.emit(this.outboundMessages[x].command, this.outboundMessages[x].data);
         }
         this.outboundMessages = [];
-    };
+    }
 
 }
 
