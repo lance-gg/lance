@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/OpherV/incheon/issues"
   },
-  "homepage": "https://github.com/OpherV/incheon#readme"
+  "homepage": "https://github.com/OpherV/incheon#readme",
+  "devDependencies": {
+    "eslint": "^3.2.2",
+    "eslint-config-google": "^0.6.0"
+  }
 }
