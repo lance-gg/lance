@@ -75,7 +75,10 @@ class NetworkTransmitter{
         //write to dataBuffer
         let dataBuffer = new ArrayBuffer(bufferSize);
         for (let stagedNetworkedEvent of this.payload) {
-            stagedNetworkedEvent.serialize(this.serializer, dataBuffer, bufferOffset);
+            stagedNetworkedEvent.serialize(this.serializer, {
+                dataBuffer: dataBuffer,
+                bufferOffset :bufferOffset
+            });
 
             bufferOffset += stagedNetworkedEvent.netSchemeBufferSize;
         }

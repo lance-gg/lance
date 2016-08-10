@@ -27,7 +27,6 @@ class NetworkedEventFactory {
         let networkedEvent = new Serializable();
         networkedEvent.classId = Utils.hashStr(this.eventName);
 
-
         if (this.netScheme) {
             networkedEvent.netScheme = Object.assign({}, this.netScheme);
 
@@ -36,14 +35,6 @@ class NetworkedEventFactory {
                 networkedEvent[property] = payload[property];
             }
 
-            //assign classIds to the netScheme, discover netSchemeBuffersize (since the event is dynamic)
-            for(let property of Object.keys(this.netScheme)){
-                if (this.netScheme[property].type == Serializer.TYPES.CLASSINSTANCE){
-                    //assign the proper classId to the netScheme
-                    networkedEvent.netScheme[property].classId = Utils.hashStr(networkedEvent[property].class.name);
-                }
-            }
-            networkedEvent.netSchemeBufferSize = Uint8Array.BYTES_PER_ELEMENT + this.seriazlier.getNetSchemeBufferSize(this.netScheme);
         }
         else{
             //todo take care of the event where no netScheme is defined

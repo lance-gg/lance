@@ -39,59 +39,30 @@ class Serializer {
 
     deserialize(dataBuffer, byteOffset){
         byteOffset = byteOffset ? byteOffset : 0;
+        let localByteOffset = 0;
 
         let dataView = new DataView(dataBuffer);
 
-        let objectClassId = dataView.getUint8(byteOffset);
+        let objectClassId = dataView.getUint8(byteOffset + localByteOffset);
         //todo if classId is 0 - take care of dynamic serialization.
         let objectClass = this.registeredClasses[objectClassId];
         // console.log(objectClassId, objectClass);
 
-        byteOffset += Uint8Array.BYTES_PER_ELEMENT; //advance the byteOffset after the classId
+        localByteOffset += Uint8Array.BYTES_PER_ELEMENT; //advance the byteOffset after the classId
 
         // console.log(objectClass);
 
         let obj = new objectClass();
-        for (let property of Object.keys(objectClass.netScheme)) {
-            let read = this.readDataView(dataView, byteOffset, objectClass.netScheme[property]);
+        for (let property of Object.keys(objectClass.netScheme).sort()) {
+            let read = this.readDataView(dataView, byteOffset + localByteOffset, objectClass.netScheme[property]);
             obj[property] = read.data;
-
-            byteOffset += read.bufferSize;
-
-        }
-        return {obj, byteOffset};
-    };
-
-    getNetSchemeBufferSize(netScheme){
-        let netSchemeHash = Utils.hash(netScheme);
-        //check if this netScheme size is already in the cache
-        if (this.netSchemeSizeCache[netSchemeHash]){
-            return this.netSchemeSizeCache[netSchemeHash];
-        }
-        else{
-            let netSchemeBufferSize = 0;
-            for (let property of Object.keys(netScheme)) {
-                //count the bytesize required for the netScheme buffer
-                netSchemeBufferSize += this.getTypeByteSize(netScheme[property]);
-            }
-
-            this.netSchemeSizeCache[netSchemeHash] = netSchemeBufferSize;
-
-            return netSchemeBufferSize;
-        }
-    };
-
-    getNetSchemeBufferSizeByClass(objClass){
-        if (typeof objClass.netSchemeBufferSize=="undefined"){
-            objClass.netSchemeBufferSize = Uint8Array.BYTES_PER_ELEMENT; //every class netscheme starts with the class id
-            objClass.netSchemeBufferSize += this.getNetSchemeBufferSize(objClass.netScheme);
+            localByteOffset += read.bufferSize;
         }
 
-        return objClass.netSchemeBufferSize;
+        return {obj, byteOffset: localByteOffset};
     };
 
     writeDataView(dataView, value, bufferOffset, netSchemProp){
-
         if (netSchemProp.type == Serializer.TYPES.FLOAT32){
             dataView.setFloat32(bufferOffset, value);
         }
@@ -108,7 +79,10 @@ class Serializer {
             dataView.setUint8(bufferOffset, value);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            value.serialize(this, dataView.buffer, bufferOffset);
+            value.serialize(this, {
+                dataBuffer: dataView.buffer,
+                bufferOffset: bufferOffset
+            });
         }
         //this is a custom data property which needs to define its own write method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -125,23 +99,28 @@ class Serializer {
 
         if (netSchemProp.type == Serializer.TYPES.FLOAT32){
             data = dataView.getFloat32(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp);
         }
         else if (netSchemProp.type == Serializer.TYPES.INT32){
             data = dataView.getInt32(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp);
         }
         else if (netSchemProp.type == Serializer.TYPES.INT16){
             data = dataView.getInt16(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp);
         }
         else if (netSchemProp.type == Serializer.TYPES.INT8){
             data = dataView.getInt8(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp);
         }
         else if (netSchemProp.type == Serializer.TYPES.UINT8){
             data = dataView.getUint8(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
-            netSchemProp.classId = dataView.getUint8(bufferOffset);
             var deserializeData = this.deserialize(dataView.buffer, bufferOffset);
             data = deserializeData.obj;
+            bufferSize = deserializeData.byteOffset;
         }
         //this is a custom data property which needs to define its own read method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -151,7 +130,6 @@ class Serializer {
             console.error(`No custom property ${netSchemProp.type} found!`)
         }
 
-        bufferSize = this.getTypeByteSize(netSchemProp);
 
         return {data: data, bufferSize: bufferSize}
     }
@@ -173,16 +151,6 @@ class Serializer {
             }
             case Serializer.TYPES.UINT8: {
                 return Uint8Array.BYTES_PER_ELEMENT
-            }
-            case Serializer.TYPES.CLASSINSTANCE: {
-                if (netSchemeProp.classId == null){
-                    console.error(`received CLASSINSTANCE but no classId!`)
-                }
-
-                let netScheme = this.registeredClasses[netSchemeProp.classId].netScheme;
-                //netScheme + class id
-                let bufferSize = this.getNetSchemeBufferSize(netScheme) + Uint8Array.BYTES_PER_ELEMENT;
-                return bufferSize;
             }
 
             //not one of the basic properties
