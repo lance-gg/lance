@@ -18,6 +18,8 @@
   "homepage": "https://github.com/OpherV/incheon#readme",
   "devDependencies": {
     "eslint": "^3.2.2",
-    "eslint-config-google": "^0.6.0"
+    "eslint-config-google": "^0.6.0",
+    "mocha": "^3.0.2",
+    "should": "^11.0.0"
   }
 }
