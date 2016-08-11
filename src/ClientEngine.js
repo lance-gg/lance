@@ -70,20 +70,12 @@ class ClientEngine {
         this.messageIndex++;
     }
 
-    deserializeUpdate(worldData) {
-        let byteOffset = 0;
-        let eventsArray = [];
-        while (byteOffset < worldData.byteLength) {
-            let deserialized = this.serializer.deserialize(worldData, byteOffset);
-            byteOffset = deserialized.byteOffset;
-            eventsArray.push(deserialized.obj);
-        }
-
-        return eventsArray;
-    }
-
     handleInboundMessage(syncData) {
-        let syncEvents = this.deserializeUpdate(syncData);
+        let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
+
+        //example: getting the event name
+        // console.log(syncEvents[0].eventName);
+
         // var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(
         // this.gameEngine, this.serializer, worldData);
         // console.log(world.stepCount - this.gameEngine.world.stepCount);

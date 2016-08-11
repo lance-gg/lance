@@ -11,6 +11,7 @@ class Serializable{
          - completely dynamically (not implemented yet)
 
      * @param {Object} serializer
+     * @param {Object} [options] - Options object
      * @param {Object} options.dataBuffer [optional] - Data buffer to write to. If null a new data buffer will be created
      * @param {Number} options.bufferOffset [optional] - The buffer data offset to start writing at. Default: 0
      * @param {String} options.dry [optional] - Does not actually write to the buffer (useful to gather serializeable size)
@@ -30,15 +31,15 @@ class Serializable{
             classId = this.classId;
         }
         else {
-            classId = Utils.hashStr(this.class.name);
+            classId = Utils.hashStr(this.constructor.name);
         }
 
         //instance netScheme
         if (this.netScheme){
             netScheme = this.netScheme;
         }
-        else if (this.class.netScheme){
-            netScheme = this.class.netScheme;
+        else if (this.constructor.netScheme){
+            netScheme = this.constructor.netScheme;
         }
         else {
             //todo define behaviour when a netScheme is undefined

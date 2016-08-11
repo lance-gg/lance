@@ -44,13 +44,15 @@ class Serializer {
         let dataView = new DataView(dataBuffer);
 
         let objectClassId = dataView.getUint8(byteOffset + localByteOffset);
+
         //todo if classId is 0 - take care of dynamic serialization.
         let objectClass = this.registeredClasses[objectClassId];
-        // console.log(objectClassId, objectClass);
+        if (objectClass == null){
+            console.error(`Serializer: unable to find class with objectClassId ${objectClassId}`);
+        }
 
         localByteOffset += Uint8Array.BYTES_PER_ELEMENT; //advance the byteOffset after the classId
 
-        // console.log(objectClass);
 
         let obj = new objectClass();
         for (let property of Object.keys(objectClass.netScheme).sort()) {

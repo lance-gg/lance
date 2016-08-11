@@ -3,6 +3,7 @@
 const Serializer= require('./../serialize/Serializer');
 
 const NetworkedEventFactory = require('./NetworkedEventFactory');
+const NetworkedEventCollection = require('./NetworkedEventCollection');
 const Utils = require('./../Utils');
 
 class NetworkTransmitter{
@@ -13,6 +14,8 @@ class NetworkTransmitter{
         this.registeredEvents=[];
 
         this.payload = [];
+
+        this.serializer.registerClass(NetworkedEventCollection);
 
         this.registerNetworkedEventFactory("objectUpdate", {
             netScheme: {
@@ -42,12 +45,16 @@ class NetworkTransmitter{
     registerNetworkedEventFactory(eventName, options){
         options = Object.assign({}, options);
 
+        let classHash = Utils.hashStr(eventName);
+
         let networkedEventPrototype = function(){};
+        networkedEventPrototype.prototype.classId = classHash;
+        networkedEventPrototype.prototype.eventName = eventName;
         networkedEventPrototype.netScheme = options.netScheme;
 
-        this.serializer.registerClass(networkedEventPrototype, Utils.hashStr(eventName));
+        this.serializer.registerClass(networkedEventPrototype, classHash);
 
-        this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);;
+        this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);
     }
 
     addNetworkedEvent(eventName, payload){
@@ -64,24 +71,8 @@ class NetworkTransmitter{
     }
 
     serializePayload(options){
-        let bufferSize = 0;
-        let bufferOffset = 0;
-
-        //count the size of the required dataBuffer for the payload
-        for (let stagedNetworkedEvent of this.payload){
-            bufferSize += stagedNetworkedEvent.netSchemeBufferSize;
-        }
-
-        //write to dataBuffer
-        let dataBuffer = new ArrayBuffer(bufferSize);
-        for (let stagedNetworkedEvent of this.payload) {
-            stagedNetworkedEvent.serialize(this.serializer, {
-                dataBuffer: dataBuffer,
-                bufferOffset :bufferOffset
-            });
-
-            bufferOffset += stagedNetworkedEvent.netSchemeBufferSize;
-        }
+        let networkedEventCollection = new NetworkedEventCollection(this.payload);
+        let dataBuffer = networkedEventCollection.serialize(this.serializer);
 
         // reset payload
         if (options.resetPayload) {
@@ -89,6 +80,10 @@ class NetworkTransmitter{
         }
 
         return dataBuffer;
+    }
+
+    deserializePayload(payload){
+        return this.serializer.deserialize(payload.dataBuffer).obj;
     }
 
     clearPayload(){

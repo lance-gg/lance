@@ -50,7 +50,7 @@ class ServerEngine{
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
-                    let payload =  this.newSerializeUpdate(socketId);
+                    let payload =  this.serializeUpdate(socketId);
 
                     //simulate server send lag
                     if (this.options.debug.serverSendLag !== false){
@@ -69,7 +69,7 @@ class ServerEngine{
         }
     };
 
-    newSerializeUpdate(socketId){
+    serializeUpdate(socketId){
         let world = this.gameEngine.world;
 
         for (let objId of Object.keys(world.objects)){
