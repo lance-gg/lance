@@ -78,9 +78,25 @@ class Serializable{
                     let objectInstanceBufferOffset = this[property].serialize(serializer, {dry: true}).bufferOffset;
                     bufferOffset += objectInstanceBufferOffset;
                 }
+                //derive the size of the list
+                else if (netScheme[property].type == Serializer.TYPES.LIST){
+                    //list starts with number of elements
+                    bufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+
+                    for (let item of this[property]){
+                        //todo inelegant, currently doesn't support list of lists
+                        if (netScheme[property].itemType == Serializer.TYPES.CLASSINSTANCE){
+                            let listBufferOffset = item.serialize(serializer, {dry: true}).bufferOffset;
+                            bufferOffset += listBufferOffset;
+                        }
+                        else{
+                            bufferOffset += serializer.getTypeByteSize(netScheme[property].itemType);
+                        }
+                    }
+                }
                 else{
                     //advance offset
-                    bufferOffset += serializer.getTypeByteSize(netScheme[property]);
+                    bufferOffset += serializer.getTypeByteSize(netScheme[property].type);
                 }
 
             }

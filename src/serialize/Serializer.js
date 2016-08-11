@@ -84,6 +84,33 @@ class Serializer {
                 bufferOffset: bufferOffset
             });
         }
+        else if (netSchemProp.type == Serializer.TYPES.LIST){
+            let localBufferOffset = bufferOffset;
+
+            //a list is comprised of the number of items followed by the items
+            dataView.setUint16(localBufferOffset , value.length);
+            localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+
+            for (let item of value){
+
+                //todo inelegant, currently doesn't support list of lists
+                if(netSchemProp.itemType == Serializer.TYPES.CLASSINSTANCE){
+                    let serializedObj = item.serialize(this,{
+                        dataBuffer: dataView.buffer,
+                        bufferOffset: localBufferOffset
+                    });
+                    localBufferOffset += serializedObj.bufferOffset;
+
+                }
+                else{
+                    this.writeDataView(dataView, item, localBufferOffset, {type: netSchemProp.itemType});
+                    localBufferOffset += this.getTypeByteSize(netSchemProp.itemType);
+                }
+
+
+
+            }
+        }
         //this is a custom data property which needs to define its own write method
         else if(this.customTypes[netSchemProp.type] != null){
             this.customTypes[netSchemProp.type].writeDataView(dataView, value, bufferOffset);
@@ -99,28 +126,44 @@ class Serializer {
 
         if (netSchemProp.type == Serializer.TYPES.FLOAT32){
             data = dataView.getFloat32(bufferOffset);
-            bufferSize = this.getTypeByteSize(netSchemProp);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
         }
         else if (netSchemProp.type == Serializer.TYPES.INT32){
             data = dataView.getInt32(bufferOffset);
-            bufferSize = this.getTypeByteSize(netSchemProp);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
         }
         else if (netSchemProp.type == Serializer.TYPES.INT16){
             data = dataView.getInt16(bufferOffset);
-            bufferSize = this.getTypeByteSize(netSchemProp);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
         }
         else if (netSchemProp.type == Serializer.TYPES.INT8){
             data = dataView.getInt8(bufferOffset);
-            bufferSize = this.getTypeByteSize(netSchemProp);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
         }
         else if (netSchemProp.type == Serializer.TYPES.UINT8){
             data = dataView.getUint8(bufferOffset);
-            bufferSize = this.getTypeByteSize(netSchemProp);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
         }
         else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE){
             var deserializeData = this.deserialize(dataView.buffer, bufferOffset);
             data = deserializeData.obj;
             bufferSize = deserializeData.byteOffset;
+        }
+        else if (netSchemProp.type == Serializer.TYPES.LIST){
+            let localBufferOffset  = 0;
+
+            let items = [];
+            let itemCount = dataView.getUint16(bufferOffset + localBufferOffset);
+            localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+
+            for (let x=0; x<itemCount; x++){
+                let read = this.readDataView(dataView, bufferOffset + localBufferOffset, {type: netSchemProp.itemType});
+                items.push(read.data);
+                localBufferOffset += read.bufferSize;
+            }
+
+            data = items;
+            bufferSize = localBufferOffset;
         }
         //this is a custom data property which needs to define its own read method
         else if(this.customTypes[netSchemProp.type] != null){
@@ -134,9 +177,9 @@ class Serializer {
         return {data: data, bufferSize: bufferSize}
     }
 
-    getTypeByteSize(netSchemeProp){
+    getTypeByteSize(type){
 
-        switch (netSchemeProp.type){
+        switch (type){
             case Serializer.TYPES.FLOAT32: {
                 return Float32Array.BYTES_PER_ELEMENT
             }
@@ -155,12 +198,12 @@ class Serializer {
 
             //not one of the basic properties
             default: {
-                if (this.customTypes[netSchemeProp.type] == null){
-                    console.error(`netScheme property ${netSchemeProp.type} undefined! Did you forget to add it to the serializer?`);
+                if (this.customTypes[type] == null){
+                    console.error(`netScheme property ${type} undefined! Did you forget to add it to the serializer?`);
                     break;
                 }
                 else{
-                    return this.customTypes[netSchemeProp.type].BYTES_PER_ELEMENT;
+                    return this.customTypes[type].BYTES_PER_ELEMENT;
                 }
             }
 
@@ -175,7 +218,8 @@ Serializer.TYPES = {
     INT16: "INT16",
     INT8: "INT8",
     UINT8: "UINT8",
-    CLASSINSTANCE: "CLASSINSTANCE"
+    CLASSINSTANCE: "CLASSINSTANCE",
+    LIST: "LIST"
 };
 
 module.exports = Serializer;
