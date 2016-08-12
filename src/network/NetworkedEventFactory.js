@@ -1,6 +1,5 @@
 "use strict";
 
-
 const Serializer = require('./../serialize/Serializer');
 const Serializable = require('./../serialize/Serializable');
 const Utils = require('./../Utils');

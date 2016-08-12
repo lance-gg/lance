@@ -8,10 +8,10 @@ module.exports = {
         "comma-dangle": "off",
         "indent": ["error", 4],
         "linebreak-style": ["error", "unix"],
-        "max-len": ["error", {
-            "code": 120
-        } ],
+        "max-len": "off",
         "no-console": "off",
+        "no-warning-comments": "off",
+        "object-curly-spacing": ["error", "always"],
         "padded-blocks": "off"
     }
 

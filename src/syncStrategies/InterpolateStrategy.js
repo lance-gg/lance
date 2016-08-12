@@ -24,7 +24,7 @@ class InterpolateStrategy extends SyncStrategy {
 
         // keep a reference of events by object id
         e.syncObjects = {};
-        e.syncEvents.forEach((sEvent) => {
+        e.syncEvents.forEach(sEvent => {
             let o = sEvent.objectInstance;
             if (!e.syncObjects[o.id]) {
                 e.syncObjects[o.id] = [];
@@ -32,11 +32,53 @@ class InterpolateStrategy extends SyncStrategy {
             e.syncObjects[o.id].push(sEvent);
         });
 
+        // keep a reference of events by step
+        e.syncSteps = {};
+        e.syncEvents.forEach(sEvent => {
+
+            // add an entry for this step
+            if (!e.syncSteps[sEvent.stepCount]) {
+                e.syncSteps[sEvent.stepCount] = {
+                    creates: [],
+                    destroys: []
+                };
+            }
+
+            // record create event for this step
+            if (sEvent.eventName === 'objectCreate') {
+                e.syncSteps[sEvent.stepCount].creates.push(sEvent);
+            }
+
+            // record destroy event for this step
+            if (sEvent.eventName === 'objectDestroy') {
+                e.syncSteps[sEvent.stepCount].destroys.push(sEvent);
+            }
+        });
+
         // add the sync to the buffer
         this.syncsBuffer.push(e);
         if (this.syncsBuffer.length >= this.options.syncsBufferLength) {
             this.syncsBuffer.shift();
         }
+    }
+
+    // add an object to our world
+    addNewObject(objId, newObj) {
+
+        console.log(`adding new object ${objId} at (${newObj.x},${newObj.y},${newObj.z}) velocity (${newObj.velX},${newObj.velY},${newObj.velZ})`);
+
+        let world = this.gameEngine.world;
+        let curObj = world.objects[objId] = newObj.class.newFrom(newObj);
+        this.gameEngine.addObjectToWorld(curObj);
+        curObj.initRenderObject(this.gameEngine.renderer);
+
+        // if this game keeps a physics engine on the client side,
+        // we need to update it as well
+        if (this.gameEngine.physicsEngine) {
+            curObj.initPhysicsObject(this.gameEngine.physicsEngine);
+        }
+
+        return curObj;
     }
 
     /**
@@ -66,25 +108,55 @@ class InterpolateStrategy extends SyncStrategy {
         if (!prevSync || !nextSync)
             return;
 
-        // calculate play percentage
-        let playPercentage = (stepToPlay - prevSync.stepCount) / (nextSync.stepCount - prevSync.stepCount);
+        // create objects which are created at this step
+        let stepEvents = nextSync.syncSteps[stepToPlay];
+        if (stepEvents && stepEvents.creates) {
+            stepEvents.creates.forEach(ev => {
+                this.addNewObject(ev.id, ev.objectInstance);
+            });
+        }
 
+        // remove objects which are removed at this step
+        if (stepEvents && stepEvents.destroys) {
+            stepEvents.destroys.forEach(ev => {
+                world.objects[ev.id].destroy();
+                delete this.gameEngine.world.objects[ev.id];
+            });
+        }
+
+        // calculate play percentage
+        // let playPercentage = (stepToPlay - prevSync.stepCount) /
+        // (nextSync.stepCount - prevSync.stepCount);
+
+        // interpolate values for all objects in this world
+        for (let id of Object.keys(world.objects)) {
+            let ob = world.objects[id];
+            let nextObj = null;
+            nextSync.syncObjects[id].forEach(ev => {
+                if (!nextObj && ev.eventName !== "objectCreate" && ev.stepCount >= stepToPlay) {
+                    nextObj = ev.objectInstance;
+                }
+            });
+
+            let playPercentage = 1 / (nextObj.stepCount - stepToPlay);
+            this.interpolateOneObject(ob, nextObj, id, playPercentage);
+        }
         // create new objects, interpolate existing objects
         // TODO: use this.forEachSyncObject instead of for-loop
         //       you will need to loop over prevObj instead of nextObj
         // TODO: currently assume degenerate case of one event per object
-        nextSync.syncEvents.forEach((ev) => {
-            let nextObj = ev.objectInstance;
-            let prevObj = null;
-
-            if (prevSync.syncObjects.hasOwnProperty(nextObj.id)) {
-                prevObj = prevSync.syncObjects[nextObj.id][0].objectInstance;
-            } else {
-                prevObj = nextObj;
-            }
-
-            this.interpolateOneObject(prevObj, nextObj, nextObj.id, playPercentage);
-        });
+        // nextSync.syncEvents.forEach(ev => {
+        //     let nextObj = ev.objectInstance;
+        //     let prevObj = null;
+        //
+        //     if (prevSync.syncObjects.hasOwnProperty(nextObj.id)) {
+        //         prevObj = prevSync.syncObjects[nextObj.id][0].objectInstance;
+        //     } else {
+        //         prevObj = nextObj;
+        //     }
+        //
+        //     this.interpolateOneObject(prevObj, nextObj, nextObj.id, playPercentage);
+        // });
 
         // destroy unneeded objects
         // TODO: use this.forEachSyncObject instead of for-loop
@@ -98,28 +170,22 @@ class InterpolateStrategy extends SyncStrategy {
 
     }
 
+    // TODO: prevObj is now just curObj
+    //       and playPercentage is 1/(nextObj.step - now)
+    //       so the code below should be easy to simplify now
     interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
 
-        let curObj = null;
-        let world = this.gameEngine.world;
-
         // if the object is new, add it
+        // TODO: once "objectCreate" events are used throughout,
+        //       we will no longer need to create them inside interpolateOneObject
+        //       i.e. it will always already be in the world when we reach this point.
+        let world = this.gameEngine.world;
         if (!world.objects.hasOwnProperty(objId)) {
-            console.log(`adding new object ${objId} at (${nextObj.x},${nextObj.y},${nextObj.z}) velocity (${nextObj.velX},${nextObj.velY},${nextObj.velZ})`);
-
-            curObj = world.objects[objId] = nextObj.class.newFrom(nextObj);
-            this.gameEngine.addObjectToWorld(curObj);
-            curObj.initRenderObject(this.gameEngine.renderer);
-
-            // if this game keeps a physics engine on the client side,
-            // we need to update it as well
-            if (this.gameEngine.physicsEngine) {
-                curObj.initPhysicsObject(this.gameEngine.physicsEngine);
-            }
+            this.addNewObject(objId, nextObj);
         }
 
         // handle step for this object
-        curObj = world.objects[objId];
+        let curObj = world.objects[objId];
         if (curObj.isPlayerControlled && curObj.physicalObject) {
 
             // if the object is the self, update render position/rotation from physics

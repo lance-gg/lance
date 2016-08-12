@@ -26,6 +26,7 @@ class ServerEngine{
         this.pendingAtomicEvents = [];
 
         io.on('connection', this.onPlayerConnected.bind(this));
+        this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
     }
 
     start(){
@@ -80,6 +81,14 @@ class ServerEngine{
         }
 
         return this.networkTransmitter.serializePayload({resetPayload: true});
+    }
+
+    onObjectAdded(obj) {
+        console.log('object created event');
+        this.networkTransmitter.addNetworkedEvent("objectCreate", {
+            stepCount: this.gameEngine.world.stepCount,
+            objectInstance: obj
+        });
     }
 
     onPlayerConnected(socket){
