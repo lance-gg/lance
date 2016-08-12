@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/OpherV/Incheon.svg?branch=master)](https://travis-ci.org/OpherV/Incheon)
+
 ***Incheon is a general purpose low latency game server based on Node.JS and Socket.IO***
 
 Still in early development. Check back with us soon :P
@@ -24,8 +26,8 @@ Things to do:
     * Only dirty items get sent, with periodic sync
     * Option to specify incremental updates
     * client to server should also be binary
-* Recording and replaying sessions
-* tests tests tests
+* Implement more tests
+* * Recording and replaying sessions
 
 
 Caveats:
