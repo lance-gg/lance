@@ -40,9 +40,13 @@ class InterpolateStrategy extends SyncStrategy {
             if (!e.syncSteps[sEvent.stepCount]) {
                 e.syncSteps[sEvent.stepCount] = {
                     creates: [],
-                    destroys: []
+                    destroys: [],
+                    updates: []
                 };
             }
+
+            // TODO: refactor the below code so that the eventName
+            // becomes the key in the dictionary, then one if is enough
 
             // record create event for this step
             if (sEvent.eventName === 'objectCreate') {
@@ -52,6 +56,11 @@ class InterpolateStrategy extends SyncStrategy {
             // record destroy event for this step
             if (sEvent.eventName === 'objectDestroy') {
                 e.syncSteps[sEvent.stepCount].destroys.push(sEvent);
+            }
+
+            // record update event for this step
+            if (sEvent.eventName === 'objectUpdate') {
+                e.syncSteps[sEvent.stepCount].updates.push(sEvent);
             }
         });
 
@@ -112,7 +121,16 @@ class InterpolateStrategy extends SyncStrategy {
         let stepEvents = nextSync.syncSteps[stepToPlay];
         if (stepEvents && stepEvents.creates) {
             stepEvents.creates.forEach(ev => {
-                this.addNewObject(ev.id, ev.objectInstance);
+                this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+            });
+        }
+
+        // create objects for events that imply a create-object
+        if (stepEvents && stepEvents.updates) {
+            stepEvents.updates.forEach(ev => {
+                if (!world.objects.hasOwnProperty(ev.objectInstance.id)) {
+                    this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                }
             });
         }
 
@@ -132,14 +150,22 @@ class InterpolateStrategy extends SyncStrategy {
         for (let id of Object.keys(world.objects)) {
             let ob = world.objects[id];
             let nextObj = null;
+            let nextStep = null;
+
+            // get the nearest object we can interpolate to
+            if (!nextSync.syncObjects.hasOwnProperty(id)) {
+                continue;
+            }
             nextSync.syncObjects[id].forEach(ev => {
                 if (!nextObj && ev.eventName !== "objectCreate" && ev.stepCount >= stepToPlay) {
                     nextObj = ev.objectInstance;
+                    nextStep = ev.stepCount;
                 }
             });
-
-            let playPercentage = 1 / (nextObj.stepCount - stepToPlay);
-            this.interpolateOneObject(ob, nextObj, id, playPercentage);
+            if (nextObj) {
+                let playPercentage = 1 / (nextStep + 1 - stepToPlay);
+                this.interpolateOneObject(ob, nextObj, id, playPercentage);
+            }
         }
         // create new objects, interpolate existing objects
         // TODO: use this.forEachSyncObject instead of for-loop
@@ -162,7 +188,7 @@ class InterpolateStrategy extends SyncStrategy {
         // TODO: use this.forEachSyncObject instead of for-loop
         //       you will need to loop over prevObj instead of nextObj
         for (let objId in world.objects) {
-            if (!nextSync.syncObjects.hasOwnProperty(objId)) {
+            if (objId < this.gameEngine.options.clientIDSpace && !nextSync.syncObjects.hasOwnProperty(objId)) {
                 world.objects[objId].destroy();
                 delete this.gameEngine.world.objects[objId];
             }
@@ -176,9 +202,7 @@ class InterpolateStrategy extends SyncStrategy {
     interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
 
         // if the object is new, add it
-        // TODO: once "objectCreate" events are used throughout,
-        //       we will no longer need to create them inside interpolateOneObject
-        //       i.e. it will always already be in the world when we reach this point.
+        // TODO: this code should no longer be necessary
         let world = this.gameEngine.world;
         if (!world.objects.hasOwnProperty(objId)) {
             this.addNewObject(objId, nextObj);
