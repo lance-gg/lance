@@ -36,32 +36,10 @@ class InterpolateStrategy extends SyncStrategy {
         e.syncSteps = {};
         e.syncEvents.forEach(sEvent => {
 
-            // add an entry for this step
-            if (!e.syncSteps[sEvent.stepCount]) {
-                e.syncSteps[sEvent.stepCount] = {
-                    creates: [],
-                    destroys: [],
-                    updates: []
-                };
-            }
-
-            // TODO: refactor the below code so that the eventName
-            // becomes the key in the dictionary, then one "if" is enough
-
-            // record create event for this step
-            if (sEvent.eventName === 'objectCreate') {
-                e.syncSteps[sEvent.stepCount].creates.push(sEvent);
-            }
-
-            // record destroy event for this step
-            if (sEvent.eventName === 'objectDestroy') {
-                e.syncSteps[sEvent.stepCount].destroys.push(sEvent);
-            }
-
-            // record update event for this step
-            if (sEvent.eventName === 'objectUpdate') {
-                e.syncSteps[sEvent.stepCount].updates.push(sEvent);
-            }
+            // add an entry for this step and event-name
+            if (!e.syncSteps[sEvent.stepCount]) e.syncSteps[sEvent.stepCount] = {};
+            if (!e.syncSteps[sEvent.stepCount][sEvent.eventName]) e.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
+            e.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
         });
 
         // add the sync to the buffer
@@ -117,15 +95,15 @@ class InterpolateStrategy extends SyncStrategy {
 
         // create objects which are created at this step
         let stepEvents = nextSync.syncSteps[stepToPlay];
-        if (stepEvents && stepEvents.creates) {
-            stepEvents.creates.forEach(ev => {
+        if (stepEvents && stepEvents.objectCreate) {
+            stepEvents.objectCreate.forEach(ev => {
                 this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
             });
         }
 
         // create objects for events that imply a create-object
-        if (stepEvents && stepEvents.updates) {
-            stepEvents.updates.forEach(ev => {
+        if (stepEvents && stepEvents.objectUpdate) {
+            stepEvents.objectUpdate.forEach(ev => {
                 let curObj = world.objects[ev.objectInstance.id];
                 if (curObj) {
                     if (!curObj.isPlayerControlled) {
@@ -138,8 +116,8 @@ class InterpolateStrategy extends SyncStrategy {
         }
 
         // remove objects which are removed at this step
-        if (stepEvents && stepEvents.destroys) {
-            stepEvents.destroys.forEach(ev => {
+        if (stepEvents && stepEvents.objectDestroy) {
+            stepEvents.objectDestroy.forEach(ev => {
                 world.objects[ev.id].destroy();
                 delete this.gameEngine.world.objects[ev.id];
             });
