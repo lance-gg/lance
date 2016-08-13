@@ -140,22 +140,26 @@ class DynamicObject extends Serializable {
         // update other objects with interpolation
         // TODO refactor into general interpolation class
         // TODO: this interpolate function should not care about worldSettings.
-        if (this.isPlayerControlled != true){
+        if (this.isPlayerControlled != true) {
 
-            if (Math.abs(nextObj.x - prevObj.x) > this.renderer.worldSettings.height /2){ //fix for world wraparound
-                this.renderObject.x = nextObj.x;
-            } else{
-                this.renderObject.x = (nextObj.x - prevObj.x) * playPercentage + prevObj.x;
+            if (Math.abs(nextObj.x - prevObj.x) > this.renderer.worldSettings.height / 2) { // fix for world wraparound
+                this.x = nextObj.x;
+            } else {
+                this.x = (nextObj.x - prevObj.x) * playPercentage + prevObj.x;
             }
 
-            if (Math.abs(nextObj.y - prevObj.y) > this.renderer.worldSettings.height/2) { //fix for world wraparound
-                this.renderObject.y = nextObj.y;
-            } else{
-                this.renderObject.y = (nextObj.y - prevObj.y) * playPercentage + prevObj.y;
+            if (Math.abs(nextObj.y - prevObj.y) > this.renderer.worldSettings.height / 2) { // fix for world wraparound
+                this.y = nextObj.y;
+            } else {
+                this.y = (nextObj.y - prevObj.y) * playPercentage + prevObj.y;
             }
 
-            var shortest_angle=((((nextObj.angle - prevObj.angle) % 360) + 540) % 360) - 180; //todo wrap this in a util
-            this.renderObject.angle = prevObj.angle + shortest_angle *  playPercentage;
+            var shortestAngle = ((((nextObj.angle - prevObj.angle) % 360) + 540) % 360) - 180; // todo wrap this in a util
+            this.angle = prevObj.angle + shortestAngle * playPercentage;
+
+            if (this.renderObject) {
+                this.updateRenderObject();
+            }
         }
     }
 
@@ -168,9 +172,6 @@ class DynamicObject extends Serializable {
             this.renderer.removeObject(this.renderObject);
         }
     }
-
-
 }
-
 
 module.exports = DynamicObject;
