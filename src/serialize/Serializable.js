@@ -25,6 +25,7 @@ class Serializable{
         let netScheme, dataBuffer, dataView;
         let classId = 0;
         let bufferOffset = options.bufferOffset;
+        let localBufferOffset = 0; //used for counting the bufferOffset
 
         //instance classId
         if (this.classId){
@@ -59,11 +60,11 @@ class Serializable{
         if (options.dry != true) {
             dataView = new DataView(dataBuffer);
             //first set the id of the class, so that the deserializer can fetch information about it
-            dataView.setUint8(bufferOffset, classId);
+            dataView.setUint8(bufferOffset + localBufferOffset, classId);
         }
 
         //advance the offset counter
-        bufferOffset += Uint8Array.BYTES_PER_ELEMENT;
+        localBufferOffset += Uint8Array.BYTES_PER_ELEMENT;
 
 
         if (netScheme) {
@@ -71,33 +72,33 @@ class Serializable{
                 //write the property to buffer
 
                 if (options.dry != true) {
-                    serializer.writeDataView(dataView, this[property], bufferOffset, netScheme[property]);
+                    serializer.writeDataView(dataView, this[property], bufferOffset + localBufferOffset, netScheme[property]);
                 }
 
                 //derive the size of the included class
                 if (netScheme[property].type == Serializer.TYPES.CLASSINSTANCE){
                     let objectInstanceBufferOffset = this[property].serialize(serializer, {dry: true}).bufferOffset;
-                    bufferOffset += objectInstanceBufferOffset;
+                    localBufferOffset += objectInstanceBufferOffset;
                 }
                 //derive the size of the list
                 else if (netScheme[property].type == Serializer.TYPES.LIST){
                     //list starts with number of elements
-                    bufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
                     for (let item of this[property]){
                         //todo inelegant, currently doesn't support list of lists
                         if (netScheme[property].itemType == Serializer.TYPES.CLASSINSTANCE){
                             let listBufferOffset = item.serialize(serializer, {dry: true}).bufferOffset;
-                            bufferOffset += listBufferOffset;
+                            localBufferOffset += listBufferOffset;
                         }
                         else{
-                            bufferOffset += serializer.getTypeByteSize(netScheme[property].itemType);
+                            localBufferOffset += serializer.getTypeByteSize(netScheme[property].itemType);
                         }
                     }
                 }
                 else{
                     //advance offset
-                    bufferOffset += serializer.getTypeByteSize(netScheme[property].type);
+                    localBufferOffset += serializer.getTypeByteSize(netScheme[property].type);
                 }
 
             }
@@ -106,7 +107,7 @@ class Serializable{
             //TODO no netScheme, dynamic class
         }
 
-        return {dataBuffer, bufferOffset};
+        return {dataBuffer, bufferOffset: localBufferOffset};
     };
 };
 
