@@ -101,23 +101,18 @@ class InterpolateStrategy extends SyncStrategy {
         // TODO: alter step count based on lag
         let world = this.gameEngine.world;
         let stepToPlay = world.stepCount - this.options.clientStepLag;
-        let prevSync = null;
         let nextSync = null;
 
-        // get two syncs that occur, one before current step,
-        // and one equal to or immediately greater than current step
+        // get the closest sync to our next step
         for (let x = 0; x < this.syncsBuffer.length; x++) {
-            if (this.syncsBuffer[x].stepCount < stepToPlay) {
-                prevSync = this.syncsBuffer[x];
-            }
             if (this.syncsBuffer[x].stepCount >= stepToPlay) {
                 nextSync = this.syncsBuffer[x];
                 break;
             }
         }
 
-        // we requires two syncs before we proceed
-        if (!prevSync || !nextSync)
+        // we requires a sync before we proceed
+        if (!nextSync)
             return;
 
         // create objects which are created at this step
