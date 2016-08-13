@@ -123,6 +123,12 @@ class DynamicObject extends Serializable {
         this.renderObject = this.renderer.addObject(this);
     }
 
+    syncTo(other, step) {
+        ['x', 'y', 'velX', 'velY', 'angle']
+            .forEach(attr => { this[attr] = other[attr];});
+        this.lastUpdateStep = step;
+    }
+
     updateRenderObject() {
         this.renderObject.x = this.x;
         this.renderObject.y = this.y;

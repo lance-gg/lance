@@ -46,7 +46,7 @@ class InterpolateStrategy extends SyncStrategy {
             }
 
             // TODO: refactor the below code so that the eventName
-            // becomes the key in the dictionary, then one if is enough
+            // becomes the key in the dictionary, then one "if" is enough
 
             // record create event for this step
             if (sEvent.eventName === 'objectCreate') {
@@ -72,12 +72,11 @@ class InterpolateStrategy extends SyncStrategy {
     }
 
     // add an object to our world
-    addNewObject(objId, newObj) {
+    addNewObject(objId, newObj, stepCount) {
 
         console.log(`adding new object ${objId} at (${newObj.x},${newObj.y},${newObj.z}) velocity (${newObj.velX},${newObj.velY},${newObj.velZ})`);
 
-        let world = this.gameEngine.world;
-        let curObj = world.objects[objId] = newObj.class.newFrom(newObj);
+        let curObj = newObj.class.newFrom(newObj);
         this.gameEngine.addObjectToWorld(curObj);
         curObj.initRenderObject(this.gameEngine.renderer);
 
@@ -85,6 +84,10 @@ class InterpolateStrategy extends SyncStrategy {
         // we need to update it as well
         if (this.gameEngine.physicsEngine) {
             curObj.initPhysicsObject(this.gameEngine.physicsEngine);
+        }
+
+        if (stepCount) {
+            curObj.lastUpdateStep = stepCount;
         }
 
         return curObj;
@@ -121,15 +124,20 @@ class InterpolateStrategy extends SyncStrategy {
         let stepEvents = nextSync.syncSteps[stepToPlay];
         if (stepEvents && stepEvents.creates) {
             stepEvents.creates.forEach(ev => {
-                this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
             });
         }
 
         // create objects for events that imply a create-object
         if (stepEvents && stepEvents.updates) {
             stepEvents.updates.forEach(ev => {
-                if (!world.objects.hasOwnProperty(ev.objectInstance.id)) {
-                    this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                let curObj = world.objects[ev.objectInstance.id];
+                if (curObj) {
+                    if (!curObj.isPlayerControlled) {
+                        curObj.syncTo(ev.objectInstance, stepToPlay);
+                    }
+                } else {
+                    this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
                 }
             });
         }
@@ -142,22 +150,23 @@ class InterpolateStrategy extends SyncStrategy {
             });
         }
 
-        // calculate play percentage
-        // let playPercentage = (stepToPlay - prevSync.stepCount) /
-        // (nextSync.stepCount - prevSync.stepCount);
-
         // interpolate values for all objects in this world
         for (let id of Object.keys(world.objects)) {
             let ob = world.objects[id];
             let nextObj = null;
             let nextStep = null;
 
+            // if we already handled this object, continue
+            if (ob.lastUpdateStep === stepToPlay) {
+                continue;
+            }
+
             // get the nearest object we can interpolate to
             if (!nextSync.syncObjects.hasOwnProperty(id)) {
                 continue;
             }
             nextSync.syncObjects[id].forEach(ev => {
-                if (!nextObj && ev.eventName !== "objectCreate" && ev.stepCount >= stepToPlay) {
+                if (!nextObj && ev.stepCount >= stepToPlay) {
                     nextObj = ev.objectInstance;
                     nextStep = ev.stepCount;
                 }
@@ -167,22 +176,6 @@ class InterpolateStrategy extends SyncStrategy {
                 this.interpolateOneObject(ob, nextObj, id, playPercentage);
             }
         }
-        // create new objects, interpolate existing objects
-        // TODO: use this.forEachSyncObject instead of for-loop
-        //       you will need to loop over prevObj instead of nextObj
-        // TODO: currently assume degenerate case of one event per object
-        // nextSync.syncEvents.forEach(ev => {
-        //     let nextObj = ev.objectInstance;
-        //     let prevObj = null;
-        //
-        //     if (prevSync.syncObjects.hasOwnProperty(nextObj.id)) {
-        //         prevObj = prevSync.syncObjects[nextObj.id][0].objectInstance;
-        //     } else {
-        //         prevObj = nextObj;
-        //     }
-        //
-        //     this.interpolateOneObject(prevObj, nextObj, nextObj.id, playPercentage);
-        // });
 
         // destroy unneeded objects
         // TODO: use this.forEachSyncObject instead of for-loop
