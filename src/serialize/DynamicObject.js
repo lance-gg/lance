@@ -124,6 +124,8 @@ class DynamicObject extends Serializable {
     }
 
     syncTo(other, step) {
+        //TODO params should be taken from the netScheme
+        //maybe use object.assign
         ['x', 'y', 'velX', 'velY', 'angle']
             .forEach(attr => { this[attr] = other[attr];});
         this.lastUpdateStep = step;

@@ -21,6 +21,7 @@ class InterpolateStrategy extends SyncStrategy {
     }
 
     updatesyncsBuffer(e) {
+        // TODO avoid editing the input event
 
         // keep a reference of events by object id
         e.syncObjects = {};
@@ -97,6 +98,7 @@ class InterpolateStrategy extends SyncStrategy {
         let stepEvents = nextSync.syncSteps[stepToPlay];
         if (stepEvents && stepEvents.objectCreate) {
             stepEvents.objectCreate.forEach(ev => {
+                //TODO maybe separate addNewObject into two generate/add methods
                 this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
             });
         }
@@ -106,6 +108,7 @@ class InterpolateStrategy extends SyncStrategy {
             stepEvents.objectUpdate.forEach(ev => {
                 let curObj = world.objects[ev.objectInstance.id];
                 if (curObj) {
+                    //TODO should use the syncStrategy filter function
                     if (!curObj.isPlayerControlled) {
                         curObj.syncTo(ev.objectInstance, stepToPlay);
                     }
@@ -130,6 +133,7 @@ class InterpolateStrategy extends SyncStrategy {
             let nextStep = null;
 
             // if we already handled this object, continue
+            //TODO maybe call it lastUpdatedStep
             if (ob.lastUpdateStep === stepToPlay) {
                 continue;
             }
