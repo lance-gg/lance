@@ -87,25 +87,23 @@ class Serializer {
             });
         }
         else if (netSchemProp.type == Serializer.TYPES.LIST){
-            let localBufferOffset = bufferOffset;
+            let localBufferOffset = 0;
 
             //a list is comprised of the number of items followed by the items
-            dataView.setUint16(localBufferOffset , value.length);
+            dataView.setUint16(bufferOffset + localBufferOffset , value.length);
             localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
             for (let item of value){
-
                 //todo inelegant, currently doesn't support list of lists
                 if(netSchemProp.itemType == Serializer.TYPES.CLASSINSTANCE){
                     let serializedObj = item.serialize(this,{
                         dataBuffer: dataView.buffer,
-                        bufferOffset: localBufferOffset
+                        bufferOffset: bufferOffset + localBufferOffset
                     });
                     localBufferOffset += serializedObj.bufferOffset;
-
                 }
                 else{
-                    this.writeDataView(dataView, item, localBufferOffset, {type: netSchemProp.itemType});
+                    this.writeDataView(dataView, item, bufferOffset + localBufferOffset, {type: netSchemProp.itemType});
                     localBufferOffset += this.getTypeByteSize(netSchemProp.itemType);
                 }
 

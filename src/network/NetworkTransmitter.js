@@ -1,17 +1,17 @@
 "use strict";
 
-const Serializer= require('./../serialize/Serializer');
+const Serializer = require('./../serialize/Serializer');
 
 const NetworkedEventFactory = require('./NetworkedEventFactory');
 const NetworkedEventCollection = require('./NetworkedEventCollection');
 const Utils = require('./../Utils');
 
-class NetworkTransmitter{
+class NetworkTransmitter {
 
-    constructor(serializer){
+    constructor(serializer) {
         this.serializer = serializer;
 
-        this.registeredEvents=[];
+        this.registeredEvents = [];
 
         this.payload = [];
 
@@ -27,9 +27,7 @@ class NetworkTransmitter{
         this.registerNetworkedEventFactory("objectCreate", {
             netScheme: {
                 stepCount: { type: Serializer.TYPES.INT32 },
-                id: { type: Serializer.TYPES.UINT8 },
-                x: { type: Serializer.TYPES.INT16 },
-                y: { type: Serializer.TYPES.INT16 }
+                objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
             }
         });
 
@@ -41,13 +39,12 @@ class NetworkTransmitter{
         });
     }
 
-
-    registerNetworkedEventFactory(eventName, options){
+    registerNetworkedEventFactory(eventName, options) {
         options = Object.assign({}, options);
 
         let classHash = Utils.hashStr(eventName);
 
-        let networkedEventPrototype = function(){};
+        let networkedEventPrototype = function() {};
         networkedEventPrototype.prototype.classId = classHash;
         networkedEventPrototype.prototype.eventName = eventName;
         networkedEventPrototype.netScheme = options.netScheme;
@@ -57,20 +54,19 @@ class NetworkTransmitter{
         this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);
     }
 
-    addNetworkedEvent(eventName, payload){
-        if (this.registeredEvents[eventName]) {
-
-            let stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
-            this.payload.push(stagedNetworkedEvent);
-
-            return stagedNetworkedEvent;
-        }
-        else{
+    addNetworkedEvent(eventName, payload) {
+        if (!this.registeredEvents[eventName]) {
             console.error(`NetworkTransmitter: no such event ${eventName}`);
+            return null;
         }
+
+        let stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
+        this.payload.push(stagedNetworkedEvent);
+
+        return stagedNetworkedEvent;
     }
 
-    serializePayload(options){
+    serializePayload(options) {
         let networkedEventCollection = new NetworkedEventCollection(this.payload);
         let dataBuffer = networkedEventCollection.serialize(this.serializer);
 
@@ -82,11 +78,11 @@ class NetworkTransmitter{
         return dataBuffer;
     }
 
-    deserializePayload(payload){
+    deserializePayload(payload) {
         return this.serializer.deserialize(payload.dataBuffer).obj;
     }
 
-    clearPayload(){
+    clearPayload() {
         this.payload = [];
     }
 

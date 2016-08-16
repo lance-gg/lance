@@ -3,8 +3,8 @@ const GameWorld = require('./GameWorld');
 const Timer = require('./Timer');
 const EventEmitter = require('eventemitter3');
 
-class GameEngine{
-    constructor(inputOptions){
+class GameEngine {
+    constructor(inputOptions) {
         //if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld
@@ -34,6 +34,11 @@ class GameEngine{
 
         this.world = new GameWorld();
 
+        // on the client we have a different ID space
+        if (this.options.clientIDSpace && this.renderer) {
+            this.world.idCount = this.options.clientIDSpace;
+        }
+
         this.worldSettings = {};
 
         this.timer = new Timer();
@@ -42,11 +47,11 @@ class GameEngine{
         this.on("postStep", function(){
             that.timer.tick();
         });
-    };
+    }
 
     start(){
         this.initWorld();
-    };
+    }
 
     step(){
         this.world.stepCount++;
@@ -67,7 +72,7 @@ class GameEngine{
                 this.world.objects[objId].step(this.worldSettings);
             }
         }
-    };
+    }
 
     addObjectToWorld(object){
         this.world.objects[object.id] = object;
