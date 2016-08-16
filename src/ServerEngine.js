@@ -6,7 +6,7 @@ const NetworkTransmitter = require('./network/NetworkTransmitter');
 
 class ServerEngine{
 
-    constructor(io, gameEngine, inputOptions){
+    constructor(io, gameEngine, inputOptions) {
         this.options = Object.assign({
             updateRate: 6,
             frameRate: 60,
@@ -29,16 +29,16 @@ class ServerEngine{
         this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
     }
 
-    start(){
+    start() {
         var that=this;
         this.gameEngine.start();
 
-        this.gameLoopId = Gameloop.setGameLoop(function(){
+        this.gameLoopId = Gameloop.setGameLoop(function() {
             that.step();
         }, 1000 / this.options.frameRate);
     }
 
-    step(){
+    step() {
         var that = this;
 
         this.serverTime = (new Date().getTime());
@@ -48,39 +48,38 @@ class ServerEngine{
         that.gameEngine.emit("postStep",that.gameEngine.world.stepCount);
 
         //update clients only at the specified step interval, as defined in options
-        if (this.gameEngine.world.stepCount % this.options.updateRate == 0){
+        if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
                     let payload =  this.serializeUpdate(socketId);
 
                     //simulate server send lag
-                    if (this.options.debug.serverSendLag !== false){
-                        setTimeout(function(){
+                    if (this.options.debug.serverSendLag !== false) {
+                        setTimeout(function() {
                             //verify again that the player exists
                             if (that.connectedPlayers[socketId]) {
                                 that.connectedPlayers[socketId].emit('worldUpdate', payload);
                             }
-                        }, that.options.debug.serverSendLag)
-                    }
-                    else{
-                        this.connectedPlayers[socketId].emit('worldUpdate',payload);
+                        }, that.options.debug.serverSendLag);
+                    } else {
+                        this.connectedPlayers[socketId].emit('worldUpdate', payload);
                     }
                 }
             }
         }
-    };
+    }
 
-    serializeUpdate(socketId){
+    serializeUpdate(socketId) {
         let world = this.gameEngine.world;
 
-        for (let objId of Object.keys(world.objects)){
+        for (let objId of Object.keys(world.objects)) {
             this.networkTransmitter.addNetworkedEvent("objectUpdate", {
                 stepCount: world.stepCount,
                 objectInstance: world.objects[objId]
             });
         }
 
-        return this.networkTransmitter.serializePayload({resetPayload: true});
+        return this.networkTransmitter.serializePayload({ resetPayload: true });
     }
 
     onObjectAdded(obj) {
@@ -91,12 +90,12 @@ class ServerEngine{
         });
     }
 
-    onPlayerConnected(socket){
-        var that=this;
+    onPlayerConnected(socket) {
+        var that = this;
 
         console.log('Client connected');
 
-        //save player
+        // save player
         this.connectedPlayers[socket.id] = socket;
         var playerId = socket.playerId = ++this.gameEngine.world.playerCount;
         socket.lastHandledInput = null;
@@ -107,11 +106,11 @@ class ServerEngine{
             playerId: playerId
         });
 
-        socket.emit('playerJoined',{
+        socket.emit('playerJoined', {
             playerId: playerId
         });
 
-        socket.on('disconnect', function(){
+        socket.on('disconnect', function() {
             that.onPlayerDisconnected(socket.id, playerId);
             that.gameEngine.emit('server.playerDisconnected', {
                 playerId: playerId
@@ -120,17 +119,17 @@ class ServerEngine{
 
 
         //todo rename, use number instead of name
-        socket.on('move', function(data){
+        socket.on('move', function(data) {
             that.onReceivedInput(data, socket)
         });
     };
 
-    onPlayerDisconnected(socketId, playerId){
+    onPlayerDisconnected(socketId, playerId) {
         delete this.connectedPlayers[socketId];
         console.log('Client disconnected')
     };
 
-    onReceivedInput(data, socket){
+    onReceivedInput(data, socket) {
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
         }

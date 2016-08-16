@@ -4,7 +4,9 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    clientStepLag: 6
+    clientStepHold: 6,
+    RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
+    extrapolate: 2        // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
 };
 
 class InterpolateStrategy extends SyncStrategy {
@@ -77,9 +79,9 @@ class InterpolateStrategy extends SyncStrategy {
      */
     interpolate() {
 
-        // TODO: alter step count based on lag
+        // TODO: alter step count based on hold
         let world = this.gameEngine.world;
-        let stepToPlay = world.stepCount - this.options.clientStepLag;
+        let stepToPlay = world.stepCount - this.options.clientStepHold;
         let nextSync = null;
 
         // get the closest sync to our next step
