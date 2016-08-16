@@ -29,7 +29,7 @@ class GameEngine {
         this.emit = eventEmitter.emit;
     }
 
-    initWorld(){
+    initWorld() {
         var that = this;
 
         this.world = new GameWorld();
@@ -44,18 +44,17 @@ class GameEngine {
         this.timer = new Timer();
         this.timer.play();
 
-        this.on("postStep", function(){
+        this.on("postStep", function() {
             that.timer.tick();
         });
     }
 
-    start(){
+    start() {
         this.initWorld();
     }
 
-    step(){
+    step() {
         this.world.stepCount++;
-
 
         // physics step
         if (this.physicsEngine) {
@@ -66,7 +65,7 @@ class GameEngine {
         this.updateGameWorld();
     }
 
-    updateGameWorld (){
+    updateGameWorld() {
         for (var objId in this.world.objects) {
             if (this.world.objects.hasOwnProperty(objId)) {
                 this.world.objects[objId].step(this.worldSettings);
@@ -74,12 +73,12 @@ class GameEngine {
         }
     }
 
-    addObjectToWorld(object){
+    addObjectToWorld(object) {
         this.world.objects[object.id] = object;
         this.emit("objectAdded", object);
     }
 
-    removeObjectFromWorld(id){
+    removeObjectFromWorld(id) {
         this.emit("objectDestroyed", this.world.objects[id]);
         this.world.objects[id].destroy();
         delete this.world.objects[id];

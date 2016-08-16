@@ -6,13 +6,15 @@ module.exports = {
     },
     "rules": {
         "comma-dangle": "off",
+        "guard-for-in": "off",
         "indent": ["error", 4],
         "linebreak-style": ["error", "unix"],
         "max-len": "off",
         "no-console": "off",
         "no-warning-comments": "off",
         "object-curly-spacing": ["error", "always"],
-        "padded-blocks": "off"
+        "padded-blocks": "off",
+        "require-jsdoc": "off"
     }
 
 };

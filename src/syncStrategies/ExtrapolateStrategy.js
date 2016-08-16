@@ -17,7 +17,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         this.newSync = null;
         this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.on('postStep', this.interpolate.bind(this));
+        this.gameEngine.on('postStep', this.extrapolate.bind(this));
         this.gameEngine.on('client.syncReceived', this.collectSync.bind(this));
     }
 
@@ -51,11 +51,10 @@ class ExtrapolateStrategy extends SyncStrategy {
     // add an object to our world
     addNewObject(objId, newObj) {
 
-        console.log(`adding new object ${objId} at (${newObj.x},${newObj.y},${newObj.z}) velocity (${newObj.velX},${newObj.velY},${newObj.velZ})`);
-
         let curObj = newObj.class.newFrom(newObj);
         this.gameEngine.addObjectToWorld(curObj);
         curObj.initRenderObject(this.gameEngine.renderer);
+        console.log(`adding new object ${curObj}`);
 
         // if this game keeps a physics engine on the client side,
         // we need to update it as well
@@ -73,31 +72,28 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // create objects which are created at this step
         let world = this.gameEngine.world;
-        for (let ids in Object.keys(this.newSync.syncObjects)) {
-            this.newSync.syncObjects.forEach(ev => {
+        for (let ids of Object.keys(this.newSync.syncObjects)) {
+            this.newSync.syncObjects[ids].forEach(ev => {
                 let curObj = world.objects[ev.objectInstance.id];
                 if (curObj) {
-                    // TODO should use the syncStrategy filter function
-                    if (!curObj.isPlayerControlled) {
-                        curObj.syncTo(ev.objectInstance, stepToPlay);
-                    }
+                    curObj.syncTo(ev.objectInstance);
                 } else {
                     this.addNewObject(ev.objectInstance.id, ev.objectInstance);
                 }
-            })
+            });
         }
 
         // apply the number of steps that we want to extrapolate forwards
-        for (var step=0; step<this.options.extrapolate) {
-            for (var objId in Object.keys(this.world.objects)) {
-                this.world.objects[objId].step(this.gameEngine.worldSettings);
+        for (let step = 0; step < this.options.extrapolate; step++) {
+            for (let objId of Object.keys(world.objects)) {
+                world.objects[objId].step(this.gameEngine.worldSettings);
             }
         }
 
         // destroy uneeded objects
         // TODO: use this.forEachSyncObject instead of for-loop
         //       you will need to loop over prevObj instead of nextObj
-        for (var objId in Object.keys(this.world.objects)) {
+        for (let objId of Object.keys(world.objects)) {
             if (objId < this.gameEngine.options.clientIDSpace && !this.newSync.syncObjects.hasOwnProperty(objId)) {
                 world.objects[objId].destroy();
                 delete this.gameEngine.world.objects[objId];
@@ -117,10 +113,10 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // get the step we will perform
         let world = this.gameEngine.world;
-        let stepToPlay = world.stepCount + this.options.extrapolate;
 
-        for (var objId in Object.keys(this.world.objects)) {
-            this.world.objects[objId].step(this.gameEngine.worldSettings);
+        for (var objId of Object.keys(world.objects)) {
+            world.objects[objId].step(this.gameEngine.worldSettings);
+            world.objects[objId].updateRenderObject();
         }
     }
 }

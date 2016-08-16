@@ -42,7 +42,14 @@ class DynamicObject extends Serializable {
             accelerationVector: new Point()
         };
 
-    };
+    }
+
+    // for debugging purposes mostly
+    toString() {
+        function round3(x) { return Math.round(x*1000)/1000; }
+        function showVec(x,y,z) { return `(${round3(x)},${round3(y)},${round3(z)})`; }
+        return `DynamicObject[${this.id}] position${showVec(this.x, this.y, this.z)} velocity${showVec(this.velX, this.velY, this.velZ)}`;
+    }
 
     copyFrom(sourceObj){
         this.id = sourceObj.id;
