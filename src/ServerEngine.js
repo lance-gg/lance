@@ -4,7 +4,7 @@ const Gameloop = require('node-gameloop');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 
-class ServerEngine{
+class ServerEngine {
 
     constructor(io, gameEngine, inputOptions) {
         this.options = Object.assign({
@@ -20,8 +20,6 @@ class ServerEngine{
         this.serializer = new Serializer();
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
-
-
         this.connectedPlayers = {};
         this.pendingAtomicEvents = [];
 
@@ -30,7 +28,7 @@ class ServerEngine{
     }
 
     start() {
-        var that=this;
+        var that = this;
         this.gameEngine.start();
 
         this.gameLoopId = Gameloop.setGameLoop(function() {
@@ -43,20 +41,20 @@ class ServerEngine{
 
         this.serverTime = (new Date().getTime());
 
-        that.gameEngine.emit("preStep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("preStep", that.gameEngine.world.stepCount);
         this.gameEngine.step();
-        that.gameEngine.emit("postStep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("postStep", that.gameEngine.world.stepCount);
 
-        //update clients only at the specified step interval, as defined in options
+        // update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
-                    let payload =  this.serializeUpdate(socketId);
+                    let payload = this.serializeUpdate(socketId);
 
-                    //simulate server send lag
+                    // simulate server send lag
                     if (this.options.debug.serverSendLag !== false) {
                         setTimeout(function() {
-                            //verify again that the player exists
+                            // verify again that the player exists
                             if (that.connectedPlayers[socketId]) {
                                 that.connectedPlayers[socketId].emit('worldUpdate', payload);
                             }
@@ -117,17 +115,16 @@ class ServerEngine{
             });
         });
 
-
-        //todo rename, use number instead of name
+        // todo rename, use number instead of name
         socket.on('move', function(data) {
-            that.onReceivedInput(data, socket)
+            that.onReceivedInput(data, socket);
         });
-    };
+    }
 
     onPlayerDisconnected(socketId, playerId) {
         delete this.connectedPlayers[socketId];
-        console.log('Client disconnected')
-    };
+        console.log('Client disconnected');
+    }
 
     onReceivedInput(data, socket) {
         if (this.connectedPlayers[socket.id]) {

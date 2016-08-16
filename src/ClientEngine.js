@@ -73,14 +73,6 @@ class ClientEngine {
     handleInboundMessage(syncData) {
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
 
-        //example: getting the event name
-        // console.log(syncEvents[0].eventName);
-
-        // var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(
-        // this.gameEngine, this.serializer, worldData);
-        // console.log(world.stepCount - this.gameEngine.world.stepCount);
-        // console.log("last handled input", world.lastHandledInput);
-
         // TODO: this should be done in a better way.
         // derive stepCount by taking the max of all events
         let maxStepCount = syncEvents.reduce((max, el) => {
