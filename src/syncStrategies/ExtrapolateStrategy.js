@@ -65,6 +65,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         return curObj;
     }
 
+    // apply a new sync
     applySync() {
         if (!this.newSync) {
             return;
@@ -110,14 +111,6 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // if there is a sync from the server, apply it now
         this.applySync();
-
-        // get the step we will perform
-        let world = this.gameEngine.world;
-
-        for (var objId of Object.keys(world.objects)) {
-            world.objects[objId].step(this.gameEngine.worldSettings);
-            world.objects[objId].updateRenderObject();
-        }
     }
 }
 

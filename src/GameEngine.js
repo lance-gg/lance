@@ -68,7 +68,11 @@ class GameEngine {
     updateGameWorld() {
         for (var objId in this.world.objects) {
             if (this.world.objects.hasOwnProperty(objId)) {
-                this.world.objects[objId].step(this.worldSettings);
+                let ob = this.world.objects[objId];
+                ob.step(this.worldSettings);
+                if (ob.renderObject) {
+                    ob.updateRenderObject();
+                }
             }
         }
     }
