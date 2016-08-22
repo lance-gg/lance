@@ -81,7 +81,7 @@ class ExtrapolateStrategy extends SyncStrategy {
     // clean up the input buffer
     cleanRecentInputs() {
         let firstReplayStep = this.gameEngine.world.stepCount - this.options.extrapolate;
-        for (let input in this.recentInputs) {
+        for (let input of Object.keys(this.recentInputs)) {
             if (this.recentInputs[input].step < firstReplayStep) {
                 delete this.recentInputs[input];
             }
@@ -111,7 +111,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.cleanRecentInputs();
         for (let step = world.stepCount - this.options.extrapolate; step < world.stepCount; step++) {
             if (this.recentInputs[step]) {
-                this.recentInputs[step].forEach( inputData => {
+                this.recentInputs[step].forEach(inputData => {
                     this.gameEngine.processInput(inputData, this.playerId);
                 });
             }
@@ -138,7 +138,6 @@ class ExtrapolateStrategy extends SyncStrategy {
      * Perform client-side extrapolation.
      */
     extrapolate() {
-
         // if there is a sync from the server, apply it now
         this.applySync();
     }

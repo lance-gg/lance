@@ -68,9 +68,9 @@ class DynamicObject extends Serializable {
         this.maxSpeed = sourceObj.maxSpeed;
     }
 
-    step(worldSettings){
-        if (this.isRotatingRight){ this.angle += this.rotationSpeed; }
-        if (this.isRotatingLeft){this.angle -= this.rotationSpeed; }
+    step(worldSettings) {
+        if (this.isRotatingRight) { this.angle += this.rotationSpeed; }
+        if (this.isRotatingLeft) { this.angle -= this.rotationSpeed; }
 
         if(this.angle>360){ this.angle -= 360; }
         if(this.angle<0){ this.angle += 360; }
@@ -99,7 +99,7 @@ class DynamicObject extends Serializable {
         else{
             //acceleration
             Point.add(this.velocity,this.temp.accelerationVector, this.velocity);
-            this.velocity.multiply(this.deceleration, this.deceleration);
+            //this.velocity.multiply(this.deceleration, this.deceleration);
             this.velocity.x = Math.round(this.velocity.x * 100)/100;
             this.velocity.y = Math.round(this.velocity.y * 100)/100;
         }
@@ -135,6 +135,12 @@ class DynamicObject extends Serializable {
         //maybe use object.assign
         ['x', 'y', 'velX', 'velY', 'angle']
             .forEach(attr => { this[attr] = other[attr];});
+
+        // TODO: these next two lines are a side-effect of the fact
+        // that velocity is stored both in attribute "velocity" and in velX/velY
+        // which is redundant now that we can set a Point instance over the network
+        this.velocity.x = this.velX;
+        this.velocity.y = this.velY;
         this.lastUpdateStep = step;
     }
 
