@@ -16,11 +16,24 @@ class ExtrapolateStrategy extends SyncStrategy {
         super(clientEngine, options);
 
         this.newSync = null;
+        this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('postStep', this.extrapolate.bind(this));
         this.gameEngine.on('client.syncReceived', this.collectSync.bind(this));
+        this.gameEngine.on('client.preInput', this.clientInputSave.bind(this));
     }
 
+    // keep a buffer of inputs so that we can replay them on extrapolation
+    clientInputSave(inputData) {
+
+        // if no inputs have been stored for this step, create an array
+        if (!this.recentInputs[inputData.step]) {
+            this.recentInputs[inputData.step] = [];
+        }
+        this.recentInputs[inputData.step].push(inputData);
+    }
+
+    // collect a sync and its events
     collectSync(e) {
         // TODO avoid editing the input event
 
@@ -65,6 +78,16 @@ class ExtrapolateStrategy extends SyncStrategy {
         return curObj;
     }
 
+    // clean up the input buffer
+    cleanRecentInputs() {
+        let firstReplayStep = this.gameEngine.world.stepCount - this.options.extrapolate;
+        for (let input in this.recentInputs) {
+            if (this.recentInputs[input].step < firstReplayStep) {
+                delete this.recentInputs[input];
+            }
+        }
+    }
+
     // apply a new sync
     applySync() {
         if (!this.newSync) {
@@ -84,8 +107,15 @@ class ExtrapolateStrategy extends SyncStrategy {
             });
         }
 
-        // apply the number of steps that we want to extrapolate forwards
-        for (let step = 0; step < this.options.extrapolate; step++) {
+        // re-apply the number of steps that we want to extrapolate forwards
+        this.cleanRecentInputs();
+        for (let step = world.stepCount - this.options.extrapolate; step < world.stepCount; step++) {
+            if (this.recentInputs[step]) {
+                this.recentInputs[step].forEach( inputData => {
+                    this.gameEngine.processInput(inputData, this.playerId);
+                });
+            }
+
             for (let objId of Object.keys(world.objects)) {
                 world.objects[objId].step(this.gameEngine.worldSettings);
             }

@@ -82,6 +82,11 @@ class GameEngine {
         this.emit("objectAdded", object);
     }
 
+    // the base input processing logic
+    // game must implement the actual input logic in this function,
+    // as it will be called on both client and server.
+    processInput(inputMsg, playerId) {}
+
     removeObjectFromWorld(id) {
         this.emit("objectDestroyed", this.world.objects[id]);
         this.world.objects[id].destroy();

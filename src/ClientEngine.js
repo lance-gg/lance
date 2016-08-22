@@ -53,6 +53,9 @@ class ClientEngine {
         this.gameEngine.emit("client.postStep");
     }
 
+    // this function should be called whenever an input is handled.
+    // this function will take care of raising the event and having it
+    // shipped to the server.
     sendInput(input) {
         var message = {
             command: 'move',
@@ -63,7 +66,9 @@ class ClientEngine {
             }
         };
 
+        this.gameEngine.emit('client.preInput', message.data);
         this.gameEngine.processInput(message.data, this.playerId);
+        this.gameEngine.emit('client.postInput', message.data);
 
         this.outboundMessages.push(message);
 
@@ -73,7 +78,7 @@ class ClientEngine {
     handleInboundMessage(syncData) {
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
 
-        //example: getting the event name
+        // example: getting the event name
         // console.log(syncEvents[0].eventName);
 
         // var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(

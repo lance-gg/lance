@@ -117,17 +117,16 @@ class ServerEngine{
             });
         });
 
-
-        //todo rename, use number instead of name
+        // todo rename, use number instead of name
         socket.on('move', function(data) {
-            that.onReceivedInput(data, socket)
+            that.onReceivedInput(data, socket);
         });
-    };
+    }
 
     onPlayerDisconnected(socketId, playerId) {
         delete this.connectedPlayers[socketId];
-        console.log('Client disconnected')
-    };
+        console.log('Client disconnected');
+    }
 
     onReceivedInput(data, socket) {
         if (this.connectedPlayers[socket.id]) {
