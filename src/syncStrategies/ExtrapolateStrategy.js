@@ -5,7 +5,8 @@ const SyncStrategy = require("./SyncStrategy");
 const defaults = {
     syncsBufferLength: 5,
     RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
-    extrapolate: 2        // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
+    extrapolate: 2,       // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
+    bending: 0.6          // amount of bending towards position of sync object
 };
 
 class ExtrapolateStrategy extends SyncStrategy {
@@ -100,7 +101,7 @@ class ExtrapolateStrategy extends SyncStrategy {
             this.newSync.syncObjects[ids].forEach(ev => {
                 let curObj = world.objects[ev.objectInstance.id];
                 if (curObj) {
-                    curObj.syncTo(ev.objectInstance);
+                    curObj.syncTo(ev.objectInstance, ev.stepCount, this.options.bending);
                 } else {
                     this.addNewObject(ev.objectInstance.id, ev.objectInstance);
                 }

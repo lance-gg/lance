@@ -130,11 +130,15 @@ class DynamicObject extends Serializable {
         this.renderObject = this.renderer.addObject(this);
     }
 
-    syncTo(other, step) {
-        //TODO params should be taken from the netScheme
-        //maybe use object.assign
-        ['x', 'y', 'velX', 'velY', 'angle']
-            .forEach(attr => { this[attr] = other[attr];});
+    syncTo(other, step, bending) {
+        // TODO params should be taken from the netScheme
+        // maybe use object.assign?
+        if (!bending) bending = 1.0;
+        ['x', 'y', 'velX', 'velY']
+            .forEach(attr => { this[attr] =  (other[attr] - this[attr]) * bending + this[attr]; });
+
+        // TODO: implement bending in angle with slerp
+        this.angle = other.angle;
 
         // TODO: these next two lines are a side-effect of the fact
         // that velocity is stored both in attribute "velocity" and in velX/velY
