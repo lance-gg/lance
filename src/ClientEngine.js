@@ -17,6 +17,13 @@ class ClientEngine {
         this.inboundMessages = [];
         this.outboundMessages = [];
 
+        // create a buffer of delayed inputs (fifo)
+        if (inputOptions && inputOptions.delayInputCount) {
+            this.delayedInputs = [];
+            for (let i = 0; i < inputOptions.delayInputCount; i++)
+                this.delayedInputs[i] = [];
+        }
+
         this.socket.on('playerJoined', function(playerData) {
             that.playerId = playerData.playerId;
         });
@@ -43,6 +50,7 @@ class ClientEngine {
         }
 
         this.handleOutboundInput();
+        this.applyDelayedInputs();
         this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
         this.gameEngine.step();
         this.gameEngine.emit("postStep", this.gameEngine.world.stepCount);
@@ -51,6 +59,23 @@ class ClientEngine {
             this.gameEngine.renderer.draw();
         }
         this.gameEngine.emit("client.postStep");
+    }
+
+    doInputLocal(message) {
+        this.gameEngine.emit('client.preInput', message.data);
+        this.gameEngine.processInput(message.data, this.playerId);
+        this.gameEngine.emit('client.postInput', message.data);
+    }
+
+    applyDelayedInputs() {
+        if (!this.delayedInputs) {
+            return;
+        }
+        let delayed = this.delayedInputs.shift();
+        if (delayed && delayed.length) {
+            delayed.map(this.doInputLocal.bind(this));
+        }
+        this.delayedInputs.push([]);
     }
 
     // this function should be called whenever an input is handled.
@@ -66,10 +91,13 @@ class ClientEngine {
             }
         };
 
-        this.gameEngine.emit('client.preInput', message.data);
-        this.gameEngine.processInput(message.data, this.playerId);
-        this.gameEngine.emit('client.postInput', message.data);
-
+        // if we delay input application on client, then queue it
+        // otherwise apply it now
+        if (this.delayedInputs) {
+            this.delayedInputs[this.delayedInputs.length - 1].push(message);
+        } else {
+            this.doInputLocal(message);
+        }
         this.outboundMessages.push(message);
 
         this.messageIndex++;
