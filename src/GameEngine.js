@@ -1,13 +1,15 @@
 "use strict";
 const GameWorld = require('./GameWorld');
-const Timer = require('./Timer');
+const Timer = require('./lib/Timer');
 const EventEmitter = require('eventemitter3');
+const Trace = require('./lib/Trace');
 
 class GameEngine {
     constructor(inputOptions) {
-        //if no GameWorld is specified, use the default one
+        // if no GameWorld is specified, use the default one
         this.options = Object.assign({
-            GameWorld: GameWorld
+            GameWorld: GameWorld,
+            traceLevel: Trace.TRACE_NONE
         }, inputOptions);
 
         // get the physics engine and initialize it
@@ -22,11 +24,14 @@ class GameEngine {
             this.renderer.init();
         }
 
-        //set up event emitting and interface
+        // set up event emitting and interface
         let eventEmitter = new EventEmitter();
         this.on = eventEmitter.on;
         this.once = eventEmitter.once;
         this.emit = eventEmitter.emit;
+
+        // set up trace
+        this.trace = new Trace({ traceLevel: this.options.traceLevel });
     }
 
     initWorld() {
@@ -55,6 +60,7 @@ class GameEngine {
 
     step() {
         this.world.stepCount++;
+        this.trace.info(`========== starting step ${this.world.stepCount}`);
 
         // physics step
         if (this.physicsEngine) {
@@ -69,6 +75,7 @@ class GameEngine {
         for (var objId in this.world.objects) {
             if (this.world.objects.hasOwnProperty(objId)) {
                 let ob = this.world.objects[objId];
+                this.trace.debug(ob.toString());
                 ob.step(this.worldSettings);
                 if (ob.renderObject) {
                     ob.updateRenderObject();

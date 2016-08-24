@@ -4,7 +4,7 @@ const Serializer = require('./../serialize/Serializer');
 
 const NetworkedEventFactory = require('./NetworkedEventFactory');
 const NetworkedEventCollection = require('./NetworkedEventCollection');
-const Utils = require('./../Utils');
+const Utils = require('./../lib/Utils');
 
 class NetworkTransmitter {
 

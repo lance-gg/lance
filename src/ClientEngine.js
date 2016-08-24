@@ -59,6 +59,10 @@ class ClientEngine {
             this.gameEngine.renderer.draw();
         }
         this.gameEngine.emit("client.postStep");
+
+        if (this.gameEngine.trace.length) {
+            this.socket.emit("trace", JSON.stringify(this.gameEngine.trace.rotate()));
+        }
     }
 
     doInputLocal(message) {

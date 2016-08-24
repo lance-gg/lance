@@ -1,10 +1,11 @@
 "use strict";
 
+const fs = require('fs');
 const Gameloop = require('node-gameloop');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 
-class ServerEngine{
+class ServerEngine {
 
     constructor(io, gameEngine, inputOptions) {
         this.options = Object.assign({
@@ -20,8 +21,6 @@ class ServerEngine{
         this.serializer = new Serializer();
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
-
-
         this.connectedPlayers = {};
         this.pendingAtomicEvents = [];
 
@@ -30,7 +29,7 @@ class ServerEngine{
     }
 
     start() {
-        var that=this;
+        var that = this;
         this.gameEngine.start();
 
         this.gameLoopId = Gameloop.setGameLoop(function() {
@@ -43,20 +42,20 @@ class ServerEngine{
 
         this.serverTime = (new Date().getTime());
 
-        that.gameEngine.emit("preStep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("preStep", that.gameEngine.world.stepCount);
         this.gameEngine.step();
-        that.gameEngine.emit("postStep",that.gameEngine.world.stepCount);
+        that.gameEngine.emit("postStep", that.gameEngine.world.stepCount);
 
-        //update clients only at the specified step interval, as defined in options
+        // update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
-                    let payload =  this.serializeUpdate(socketId);
+                    let payload = this.serializeUpdate(socketId);
 
-                    //simulate server send lag
+                    // simulate server send lag
                     if (this.options.debug.serverSendLag !== false) {
                         setTimeout(function() {
-                            //verify again that the player exists
+                            // verify again that the player exists
                             if (that.connectedPlayers[socketId]) {
                                 that.connectedPlayers[socketId].emit('worldUpdate', payload);
                             }
@@ -66,6 +65,13 @@ class ServerEngine{
                     }
                 }
             }
+        }
+
+        if (this.gameEngine.trace.length) {
+            let traceData = this.gameEngine.trace.rotate();
+            fs.appendFile('server.trace',
+                JSON.stringify(traceData, null, 2) + '\n',
+                err => { if (err) throw err; });
         }
     }
 
@@ -120,6 +126,13 @@ class ServerEngine{
         // todo rename, use number instead of name
         socket.on('move', function(data) {
             that.onReceivedInput(data, socket);
+        });
+
+        socket.on('trace', function(traceData) {
+            traceData = JSON.parse(traceData);
+            fs.appendFile('client.trace',
+                JSON.stringify(traceData, null, 2) + '\n',
+                err => { if (err) throw err; });
         });
     }
 

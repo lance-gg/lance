@@ -95,13 +95,18 @@ class ExtrapolateStrategy extends SyncStrategy {
             return;
         }
 
+        this.gameEngine.trace.debug('extrapolate applying sync');
+
         // create objects which are created at this step
         let world = this.gameEngine.world;
         for (let ids of Object.keys(this.newSync.syncObjects)) {
             this.newSync.syncObjects[ids].forEach(ev => {
                 let curObj = world.objects[ev.objectInstance.id];
+
                 if (curObj) {
+                    this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
                     curObj.syncTo(ev.objectInstance, ev.stepCount, this.options.bending);
+                    this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()}`);
                 } else {
                     this.addNewObject(ev.objectInstance.id, ev.objectInstance);
                 }
@@ -122,6 +127,11 @@ class ExtrapolateStrategy extends SyncStrategy {
             }
         }
 
+        // trace object state after sync
+        for (let objId of Object.keys(world.objects)) {
+            this.gameEngine.trace.trace(`object after extrapolate replay: ${world.objects[objId].toString()}`);
+        }
+
         // destroy uneeded objects
         // TODO: use this.forEachSyncObject instead of for-loop
         //       you will need to loop over prevObj instead of nextObj
@@ -139,6 +149,7 @@ class ExtrapolateStrategy extends SyncStrategy {
      * Perform client-side extrapolation.
      */
     extrapolate() {
+
         // if there is a sync from the server, apply it now
         this.applySync();
     }
