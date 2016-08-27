@@ -31,6 +31,7 @@ class GameEngine {
         this.emit = eventEmitter.emit;
 
         // set up trace
+        console.log('trace leve is ' + this.options.traceLevel);
         this.trace = new Trace({ traceLevel: this.options.traceLevel });
     }
 

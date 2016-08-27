@@ -128,11 +128,12 @@ class ServerEngine {
             that.onReceivedInput(data, socket);
         });
 
+        // we got a packet of trace data, write it out to a side-file
         socket.on('trace', function(traceData) {
             traceData = JSON.parse(traceData);
-            fs.appendFile('client.trace',
-                JSON.stringify(traceData, null, 2) + '\n',
-                err => { if (err) throw err; });
+            let traceString = '';
+            traceData.forEach(t => { traceString += `[${t.time}]:${t.data}\n`; });
+            fs.appendFile('client.trace', traceString, err => { if (err) throw err; });
         });
     }
 
