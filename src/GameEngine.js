@@ -31,7 +31,6 @@ class GameEngine {
         this.emit = eventEmitter.emit;
 
         // set up trace
-        console.log('trace leve is ' + this.options.traceLevel);
         this.trace = new Trace({ traceLevel: this.options.traceLevel });
     }
 
@@ -93,7 +92,9 @@ class GameEngine {
     // the base input processing logic
     // game must implement the actual input logic in this function,
     // as it will be called on both client and server.
-    processInput(inputMsg, playerId) {}
+    processInput(inputMsg, playerId) {
+        this.trace.info(`game engine processing input <${inputMsg.input}> from playerId ${playerId}`);
+    }
 
     removeObjectFromWorld(id) {
         this.emit("objectDestroyed", this.world.objects[id]);

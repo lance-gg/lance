@@ -95,6 +95,8 @@ class ClientEngine {
             }
         };
 
+        this.gameEngine.trace.info(`USER INPUT ${input}`);
+
         // if we delay input application on client, then queue it
         // otherwise apply it now
         if (this.delayedInputs) {
@@ -109,14 +111,6 @@ class ClientEngine {
 
     handleInboundMessage(syncData) {
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
-
-        // example: getting the event name
-        // console.log(syncEvents[0].eventName);
-
-        // var worldSnapshot = this.gameEngine.options.GameWorld.deserialize(
-        // this.gameEngine, this.serializer, worldData);
-        // console.log(world.stepCount - this.gameEngine.world.stepCount);
-        // console.log("last handled input", world.lastHandledInput);
 
         // TODO: this should be done in a better way.
         // derive stepCount by taking the max of all events
@@ -136,8 +130,6 @@ class ClientEngine {
 
     handleOutboundInput() {
         for (var x = 0; x < this.outboundMessages.length; x++) {
-            // console.log("sent", this.outboundMessages[x].data.messageIndex,
-            // "step", this.outboundMessages[x].data.step);
             this.socket.emit(this.outboundMessages[x].command, this.outboundMessages[x].data);
         }
         this.outboundMessages = [];

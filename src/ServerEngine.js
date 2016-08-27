@@ -69,9 +69,9 @@ class ServerEngine {
 
         if (this.gameEngine.trace.length) {
             let traceData = this.gameEngine.trace.rotate();
-            fs.appendFile('server.trace',
-                JSON.stringify(traceData, null, 2) + '\n',
-                err => { if (err) throw err; });
+            let traceString = '';
+            traceData.forEach(t => { traceString += `[${t.time.toISOString()}]:${t.data}\n`; });
+            fs.appendFile('server.trace', traceString, err => { if (err) throw err; });
         }
     }
 
