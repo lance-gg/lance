@@ -106,7 +106,7 @@ class ExtrapolateStrategy extends SyncStrategy {
                 if (curObj) {
                     this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
                     curObj.syncTo(ev.objectInstance, ev.stepCount, this.options.bending);
-                    this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()}`);
+                    this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
                 } else {
                     this.addNewObject(ev.objectInstance.id, ev.objectInstance);
                 }
@@ -115,14 +115,18 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // re-apply the number of steps that we want to extrapolate forwards
         this.cleanRecentInputs();
-        for (let step = world.stepCount - this.options.extrapolate; step < world.stepCount; step++) {
+        let step = world.stepCount - this.options.extrapolate;
+        this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${step}] to [${world.stepCount}]`);
+        for (; step < world.stepCount; step++) {
             if (this.recentInputs[step]) {
                 this.recentInputs[step].forEach(inputData => {
+                    this.gameEngine.trace.trace(`extrapolate re-enacting input [${inputData.input}]`);
                     this.gameEngine.processInput(inputData, this.playerId);
                 });
             }
 
             for (let objId of Object.keys(world.objects)) {
+                this.gameEngine.trace.trace(`extrapolate re-enacting step on obj[${objId}]`);
                 world.objects[objId].step(this.gameEngine.worldSettings);
             }
         }

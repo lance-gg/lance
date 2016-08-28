@@ -60,7 +60,7 @@ class GameEngine {
 
     step() {
         this.world.stepCount++;
-        this.trace.info(`========== starting step ${this.world.stepCount}`);
+        this.trace.info(`========== starting step ${this.world.stepCount} ==========`);
 
         // physics step
         if (this.physicsEngine) {
@@ -75,8 +75,8 @@ class GameEngine {
         for (var objId in this.world.objects) {
             if (this.world.objects.hasOwnProperty(objId)) {
                 let ob = this.world.objects[objId];
-                this.trace.debug(ob.toString());
                 ob.step(this.worldSettings);
+                this.trace.debug(`after object step: ${ob.toString()}`);
                 if (ob.renderObject) {
                     ob.updateRenderObject();
                 }
