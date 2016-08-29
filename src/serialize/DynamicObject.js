@@ -52,7 +52,7 @@ class DynamicObject extends Serializable {
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
         function showVec(x,y,z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }
-        return `DynamicObject[${this.id}] position${showVec(this.x, this.y, this.z)} velocity${showVec(this.velX, this.velY, this.velZ)}`;
+        return `DynamicObject[${this.id}] position${showVec(this.x, this.y, this.z)} velocity${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
     }
 
     copyFrom(sourceObj) {

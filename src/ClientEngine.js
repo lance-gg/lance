@@ -75,9 +75,10 @@ class ClientEngine {
         if (!this.delayedInputs) {
             return;
         }
+        let that = this;
         let delayed = this.delayedInputs.shift();
         if (delayed && delayed.length) {
-            delayed.map(this.doInputLocal.bind(this));
+            delayed.forEach(that.doInputLocal.bind(that));
         }
         this.delayedInputs.push([]);
     }
