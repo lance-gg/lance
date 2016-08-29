@@ -3,6 +3,7 @@
 const Gameloop = require('node-gameloop');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
+const NetworkMonitor = require('./network/NetworkMonitor');
 
 class ServerEngine {
 
@@ -19,6 +20,8 @@ class ServerEngine {
         this.gameEngine = gameEngine;
         this.serializer = new Serializer();
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
+
+        this.networkMonitor = new NetworkMonitor();
 
         this.connectedPlayers = {};
         this.pendingAtomicEvents = [];
@@ -119,6 +122,8 @@ class ServerEngine {
         socket.on('move', function(data) {
             that.onReceivedInput(data, socket);
         });
+
+        this.networkMonitor.registerPlayerOnServer(socket);
     }
 
     onPlayerDisconnected(socketId, playerId) {
