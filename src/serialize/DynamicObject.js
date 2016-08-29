@@ -7,7 +7,7 @@ const Serializer= require('./Serializer');
 
 
 // constants
-const MAX_BENDING_DISTANCE = 10;
+const MAX_BENDING_DISTANCE = 50;
 
 /**
  * Defines an objects which can move about in the game world
