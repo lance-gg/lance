@@ -118,12 +118,10 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // re-apply the number of steps that we want to extrapolate forwards
         this.cleanRecentInputs();
-        // let step = world.stepCount - this.options.extrapolate;
-        let step = serverStep;
-        this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${step}] to [${world.stepCount}]`);
-        for (; step < world.stepCount; step++) {
-            if (this.recentInputs[step]) {
-                this.recentInputs[step].forEach(inputData => {
+        this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
+        for (; serverStep < world.stepCount; serverStep++) {
+            if (this.recentInputs[serverStep]) {
+                this.recentInputs[serverStep].forEach(inputData => {
                     this.gameEngine.trace.trace(`extrapolate re-enacting input [${inputData.input}]`);
                     this.gameEngine.processInput(inputData, this.clientEngine.playerId);
                 });
