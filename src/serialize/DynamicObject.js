@@ -135,10 +135,30 @@ class DynamicObject extends Serializable {
         this.renderObject = this.renderer.addObject(this);
     }
 
-    syncTo(other, step, bending) {
+    saveState() {
+        this.savedCopy = (new this.constructor());
+        this.savedCopy.copyFrom(this);
+    }
+
+    bendToSavedState(bending) {
+        if (this.savedCopy) {
+            this.bendTo(this.savedCopy, bending);
+        }
+        this.savedCopy = null;
+    }
+
+    syncTo(other) {
+        ['x', 'y', 'velX', 'velY', 'angle']
+            .forEach(attr => {
+                this[attr] = other[attr];
+            });
+        this.velocity.x = this.velX;
+        this.velocity.y = this.velY;
+    }
+
+    bendTo(other, bending) {
         // TODO params should be taken from the netScheme
         // maybe use object.assign?
-        if (!bending) bending = 1.0;
         ['x', 'y', 'velX', 'velY', 'angle']
             .forEach(attr => {
                 if (Math.abs(other[attr] - this[attr]) > MAX_BENDING_DISTANCE) {
@@ -153,7 +173,6 @@ class DynamicObject extends Serializable {
         // which is redundant now that we can set a Point instance over the network
         this.velocity.x = this.velX;
         this.velocity.y = this.velY;
-        this.lastUpdateStep = step;
     }
 
     updateRenderObject() {

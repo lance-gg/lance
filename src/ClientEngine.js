@@ -126,7 +126,8 @@ class ClientEngine {
         });
 
         // finally update the stepCount
-        this.gameEngine.world.stepCount = maxStepCount;
+        if (maxStepCount > this.gameEngine.world.stepCount)
+            this.gameEngine.world.stepCount = maxStepCount;
     }
 
     handleOutboundInput() {

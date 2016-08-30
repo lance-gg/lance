@@ -6,7 +6,7 @@ const defaults = {
     syncsBufferLength: 5,
     RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
     extrapolate: 2,       // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
-    bending: 0.3          // amount of bending towards position of sync object
+    bending: 0.9          // amount of bending towards position of sync object
 };
 
 class ExtrapolateStrategy extends SyncStrategy {
@@ -107,7 +107,8 @@ class ExtrapolateStrategy extends SyncStrategy {
 
                 if (curObj) {
                     this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
-                    curObj.syncTo(ev.objectInstance, ev.stepCount, this.options.bending);
+                    curObj.saveState();
+                    curObj.syncTo(ev.objectInstance);
                     this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
                 } else {
                     this.addNewObject(ev.objectInstance.id, ev.objectInstance);
@@ -132,6 +133,12 @@ class ExtrapolateStrategy extends SyncStrategy {
                 this.gameEngine.trace.trace(`extrapolate re-enacting step on obj[${objId}]`);
                 world.objects[objId].step(this.gameEngine.worldSettings);
             }
+        }
+
+        // bend back to original state
+        for (let objId of Object.keys(world.objects)) {
+            this.gameEngine.trace.trace(`bending to original state on obj[${objId}]`);
+            world.objects[objId].bendToSavedState(this.options.bending);
         }
 
         // trace object state after sync
