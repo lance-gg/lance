@@ -6,7 +6,7 @@ const defaults = {
     syncsBufferLength: 5,
     RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
     extrapolate: 2,       // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
-    bending: 0.9          // amount of bending towards position of sync object
+    bending: 0.8          // amount of bending towards position of sync object
 };
 
 class ExtrapolateStrategy extends SyncStrategy {

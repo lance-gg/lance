@@ -1,13 +1,12 @@
 "use strict";
 
 
-const Point= require('../Point');
-const Serializable= require('./Serializable');
-const Serializer= require('./Serializer');
-
+const Point = require('../Point');
+const Serializable = require('./Serializable');
+const Serializer = require('./Serializer');
 
 // constants
-const MAX_BENDING_DISTANCE = 50;
+const MAX_BENDING_DISTANCE = 500;
 
 /**
  * Defines an objects which can move about in the game world
