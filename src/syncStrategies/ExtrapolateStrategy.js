@@ -121,7 +121,7 @@ class ExtrapolateStrategy extends SyncStrategy {
             if (this.recentInputs[step]) {
                 this.recentInputs[step].forEach(inputData => {
                     this.gameEngine.trace.trace(`extrapolate re-enacting input [${inputData.input}]`);
-                    this.gameEngine.processInput(inputData, this.playerId);
+                    this.gameEngine.processInput(inputData, this.clientEngine.playerId);
                 });
             }
 
