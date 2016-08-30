@@ -142,7 +142,7 @@ class ServerEngine {
             traceData = JSON.parse(traceData);
             let traceString = '';
             traceData.forEach(t => { traceString += `[${t.time}]:${t.data}\n`; });
-            fs.appendFile('client.trace', traceString, err => { if (err) throw err; });
+            fs.appendFile(`client.${playerId}.trace`, traceString, err => { if (err) throw err; });
         });
     }
 
