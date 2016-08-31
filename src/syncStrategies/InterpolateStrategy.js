@@ -4,9 +4,7 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    clientStepHold: 6,
-    RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
-    extrapolate: 2        // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
+    clientStepHold: 6
 };
 
 class InterpolateStrategy extends SyncStrategy {
@@ -79,7 +77,7 @@ class InterpolateStrategy extends SyncStrategy {
      */
     interpolate() {
 
-        // TODO: alter step count based on hold
+        // get the step we will perform
         let world = this.gameEngine.world;
         let stepToPlay = world.stepCount - this.options.clientStepHold;
         let nextSync = null;
@@ -100,7 +98,7 @@ class InterpolateStrategy extends SyncStrategy {
         let stepEvents = nextSync.syncSteps[stepToPlay];
         if (stepEvents && stepEvents.objectCreate) {
             stepEvents.objectCreate.forEach(ev => {
-                //TODO maybe separate addNewObject into two generate/add methods
+                // TODO maybe separate addNewObject into two generate/add methods
                 this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
             });
         }
@@ -110,7 +108,7 @@ class InterpolateStrategy extends SyncStrategy {
             stepEvents.objectUpdate.forEach(ev => {
                 let curObj = world.objects[ev.objectInstance.id];
                 if (curObj) {
-                    //TODO should use the syncStrategy filter function
+                    // TODO should use the syncStrategy filter function
                     if (!curObj.isPlayerControlled) {
                         curObj.syncTo(ev.objectInstance, stepToPlay);
                     }
@@ -135,7 +133,7 @@ class InterpolateStrategy extends SyncStrategy {
             let nextStep = null;
 
             // if we already handled this object, continue
-            //TODO maybe call it lastUpdatedStep
+            // TODO maybe call it lastUpdatedStep
             if (ob.lastUpdateStep === stepToPlay) {
                 continue;
             }

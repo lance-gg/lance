@@ -2,7 +2,7 @@
 
 const Serializer = require('./../serialize/Serializer');
 const Serializable = require('./../serialize/Serializable');
-const Utils = require('./../Utils');
+const Utils = require('./../lib/Utils');
 
 class NetworkedEventFactory {
 

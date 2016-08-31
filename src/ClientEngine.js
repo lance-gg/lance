@@ -17,6 +17,13 @@ class ClientEngine {
         this.inboundMessages = [];
         this.outboundMessages = [];
 
+        // create a buffer of delayed inputs (fifo)
+        if (inputOptions && inputOptions.delayInputCount) {
+            this.delayedInputs = [];
+            for (let i = 0; i < inputOptions.delayInputCount; i++)
+                this.delayedInputs[i] = [];
+        }
+
         this.socket.on('playerJoined', function(playerData) {
             that.playerId = playerData.playerId;
         });
@@ -43,6 +50,7 @@ class ClientEngine {
         }
 
         this.handleOutboundInput();
+        this.applyDelayedInputs();
         this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
         this.gameEngine.step();
         this.gameEngine.emit("postStep", this.gameEngine.world.stepCount);
@@ -51,8 +59,33 @@ class ClientEngine {
             this.gameEngine.renderer.draw();
         }
         this.gameEngine.emit("client.postStep");
+
+        if (this.gameEngine.trace.length) {
+            this.socket.emit("trace", JSON.stringify(this.gameEngine.trace.rotate()));
+        }
     }
 
+    doInputLocal(message) {
+        this.gameEngine.emit('client.preInput', message.data);
+        this.gameEngine.processInput(message.data, this.playerId);
+        this.gameEngine.emit('client.postInput', message.data);
+    }
+
+    applyDelayedInputs() {
+        if (!this.delayedInputs) {
+            return;
+        }
+        let that = this;
+        let delayed = this.delayedInputs.shift();
+        if (delayed && delayed.length) {
+            delayed.forEach(that.doInputLocal.bind(that));
+        }
+        this.delayedInputs.push([]);
+    }
+
+    // this function should be called whenever an input is handled.
+    // this function will take care of raising the event and having it
+    // shipped to the server.
     sendInput(input) {
         var message = {
             command: 'move',
@@ -63,8 +96,15 @@ class ClientEngine {
             }
         };
 
-        this.gameEngine.processInput(message.data, this.playerId);
+        this.gameEngine.trace.info(`USER INPUT ${input}`);
 
+        // if we delay input application on client, then queue it
+        // otherwise apply it now
+        if (this.delayedInputs) {
+            this.delayedInputs[this.delayedInputs.length - 1].push(message);
+        } else {
+            this.doInputLocal(message);
+        }
         this.outboundMessages.push(message);
 
         this.messageIndex++;
@@ -86,13 +126,12 @@ class ClientEngine {
         });
 
         // finally update the stepCount
-        this.gameEngine.world.stepCount = maxStepCount;
+        if (maxStepCount > this.gameEngine.world.stepCount)
+            this.gameEngine.world.stepCount = maxStepCount;
     }
 
     handleOutboundInput() {
         for (var x = 0; x < this.outboundMessages.length; x++) {
-            // console.log("sent", this.outboundMessages[x].data.messageIndex,
-            // "step", this.outboundMessages[x].data.step);
             this.socket.emit(this.outboundMessages[x].command, this.outboundMessages[x].data);
         }
         this.outboundMessages = [];

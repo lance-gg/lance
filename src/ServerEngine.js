@@ -1,5 +1,6 @@
 "use strict";
 
+const fs = require('fs');
 const Gameloop = require('node-gameloop');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
@@ -21,6 +22,7 @@ class ServerEngine {
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
         this.connectedPlayers = {};
+        this.playerInputQueues = {};
         this.pendingAtomicEvents = [];
 
         io.on('connection', this.onPlayerConnected.bind(this));
@@ -41,6 +43,14 @@ class ServerEngine {
 
         this.serverTime = (new Date().getTime());
 
+        // replay one input per player
+        for (let playerId of Object.keys(this.playerInputQueues)) {
+            let inputQueue = this.playerInputQueues[playerId];
+            if (inputQueue.length > 0)
+                this.gameEngine.processInput(inputQueue.shift(), playerId);
+        }
+
+        // run the game engine step
         that.gameEngine.emit("preStep", that.gameEngine.world.stepCount);
         this.gameEngine.step();
         that.gameEngine.emit("postStep", that.gameEngine.world.stepCount);
@@ -64,6 +74,13 @@ class ServerEngine {
                     }
                 }
             }
+        }
+
+        if (this.gameEngine.trace.length) {
+            let traceData = this.gameEngine.trace.rotate();
+            let traceString = '';
+            traceData.forEach(t => { traceString += `[${t.time.toISOString()}]:${t.data}\n`; });
+            fs.appendFile('server.trace', traceString, err => { if (err) throw err; });
         }
     }
 
@@ -119,6 +136,14 @@ class ServerEngine {
         socket.on('move', function(data) {
             that.onReceivedInput(data, socket);
         });
+
+        // we got a packet of trace data, write it out to a side-file
+        socket.on('trace', function(traceData) {
+            traceData = JSON.parse(traceData);
+            let traceString = '';
+            traceData.forEach(t => { traceString += `[${t.time}]:${t.data}\n`; });
+            fs.appendFile(`client.${playerId}.trace`, traceString, err => { if (err) throw err; });
+        });
     }
 
     onPlayerDisconnected(socketId, playerId) {
@@ -126,6 +151,14 @@ class ServerEngine {
         console.log('Client disconnected');
     }
 
+    queueInputForPlayer(data, playerId) {
+        if (!this.playerInputQueues.hasOwnProperty(playerId))
+            this.playerInputQueues[playerId] = [];
+
+        this.playerInputQueues[playerId].push(data);
+    }
+
+    // an input has been received from a client, queue it for next step
     onReceivedInput(data, socket) {
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
@@ -134,7 +167,8 @@ class ServerEngine {
             input: data,
             playerId: socket.playerId
         });
-        // console.log("last handled input", this.connectedPlayers[socket.id].lastHandledInput);
+
+        this.queueInputForPlayer(data, socket.playerId);
     }
 }
 

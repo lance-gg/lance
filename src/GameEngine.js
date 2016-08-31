@@ -1,13 +1,15 @@
 "use strict";
 const GameWorld = require('./GameWorld');
-const Timer = require('./Timer');
+const Timer = require('./lib/Timer');
 const EventEmitter = require('eventemitter3');
+const Trace = require('./lib/Trace');
 
 class GameEngine {
     constructor(inputOptions) {
-        //if no GameWorld is specified, use the default one
+        // if no GameWorld is specified, use the default one
         this.options = Object.assign({
-            GameWorld: GameWorld
+            GameWorld: GameWorld,
+            traceLevel: Trace.TRACE_NONE
         }, inputOptions);
 
         // get the physics engine and initialize it
@@ -22,14 +24,17 @@ class GameEngine {
             this.renderer.init();
         }
 
-        //set up event emitting and interface
+        // set up event emitting and interface
         let eventEmitter = new EventEmitter();
         this.on = eventEmitter.on;
         this.once = eventEmitter.once;
         this.emit = eventEmitter.emit;
+
+        // set up trace
+        this.trace = new Trace({ traceLevel: this.options.traceLevel });
     }
 
-    initWorld(){
+    initWorld() {
         var that = this;
 
         this.world = new GameWorld();
@@ -44,18 +49,18 @@ class GameEngine {
         this.timer = new Timer();
         this.timer.play();
 
-        this.on("postStep", function(){
+        this.on("postStep", function() {
             that.timer.tick();
         });
     }
 
-    start(){
+    start() {
         this.initWorld();
     }
 
-    step(){
+    step() {
         this.world.stepCount++;
-
+        this.trace.info(`========== starting step ${this.world.stepCount} ==========`);
 
         // physics step
         if (this.physicsEngine) {
@@ -66,20 +71,32 @@ class GameEngine {
         this.updateGameWorld();
     }
 
-    updateGameWorld (){
+    updateGameWorld() {
         for (var objId in this.world.objects) {
             if (this.world.objects.hasOwnProperty(objId)) {
-                this.world.objects[objId].step(this.worldSettings);
+                let ob = this.world.objects[objId];
+                ob.step(this.worldSettings);
+                this.trace.debug(`after object step: ${ob.toString()}`);
+                if (ob.renderObject) {
+                    ob.updateRenderObject();
+                }
             }
         }
     }
 
-    addObjectToWorld(object){
+    addObjectToWorld(object) {
         this.world.objects[object.id] = object;
         this.emit("objectAdded", object);
     }
 
-    removeObjectFromWorld(id){
+    // the base input processing logic
+    // game must implement the actual input logic in this function,
+    // as it will be called on both client and server.
+    processInput(inputMsg, playerId) {
+        this.trace.info(`game engine processing input <${inputMsg.input}> from playerId ${playerId}`);
+    }
+
+    removeObjectFromWorld(id) {
         this.emit("objectDestroyed", this.world.objects[id]);
         this.world.objects[id].destroy();
         delete this.world.objects[id];

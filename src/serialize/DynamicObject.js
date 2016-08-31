@@ -1,16 +1,16 @@
 "use strict";
 
 
-const Point= require('../Point');
-const Serializable= require('./Serializable');
-const Serializer= require('./Serializer');
+const Point = require('../Point');
+const Serializable = require('./Serializable');
+const Serializer = require('./Serializer');
 
 /**
  * Defines an objects which can move about in the game world
  */
 class DynamicObject extends Serializable {
 
-    static get netScheme(){
+    static get netScheme() {
         return {
             id: { type: Serializer.TYPES.UINT8 },
             playerId: { type: Serializer.TYPES.UINT8 },
@@ -19,12 +19,12 @@ class DynamicObject extends Serializable {
             velX: { type: Serializer.TYPES.FLOAT32 },
             velY: { type: Serializer.TYPES.FLOAT32 },
             angle: { type: Serializer.TYPES.INT16 }
-        }
+        };
     }
 
-    constructor(id, x, y){
+    constructor(id, x, y) {
         super();
-        this.id = id; //instance id
+        this.id = id; // instance id
         this.playerId = 0;
         this.x = x;
         this.y = y;
@@ -36,15 +36,22 @@ class DynamicObject extends Serializable {
         this.deceleration = 0.99;
         this.maxSpeed = 2;
 
-        //todo deal with what goes over the wire
+        // todo deal with what goes over the wire
         this.velocity = new Point();
-        this.temp={
+        this.temp = {
             accelerationVector: new Point()
         };
 
-    };
+    }
 
-    copyFrom(sourceObj){
+    // for debugging purposes mostly
+    toString() {
+        function round3(x) { return Math.round(x * 1000) / 1000; }
+        function showVec(x, y, z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }
+        return `DynamicObject[${this.id}] position${showVec(this.x, this.y, this.z)} velocity${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
+    }
+
+    copyFrom(sourceObj) {
         this.id = sourceObj.id;
         this.playerId = sourceObj.playerId;
         this.isPlayerControlled = sourceObj.isPlayerControlled;
@@ -61,43 +68,39 @@ class DynamicObject extends Serializable {
         this.maxSpeed = sourceObj.maxSpeed;
     }
 
-    step(worldSettings){
-        if (this.isRotatingRight){ this.angle += this.rotationSpeed; }
-        if (this.isRotatingLeft){this.angle -= this.rotationSpeed; }
+    step(worldSettings) {
+        if (this.isRotatingRight) { this.angle += this.rotationSpeed; }
+        if (this.isRotatingLeft) { this.angle -= this.rotationSpeed; }
 
-        if(this.angle>360){ this.angle -= 360; }
-        if(this.angle<0){ this.angle += 360; }
+        if (this.angle > 360) { this.angle -= 360; }
+        if (this.angle < 0) { this.angle += 360; }
 
         if (this.isAccelerating) {
             this.temp.accelerationVector.set(
-                Math.cos( this.angle * (Math.PI / 180) ),
-                Math.sin( this.angle * (Math.PI / 180) )
+                Math.cos(this.angle * (Math.PI / 180)),
+                Math.sin(this.angle * (Math.PI / 180))
             ).setMagnitude(this.acceleration);
-        }
-        else{
-            this.temp.accelerationVector.set(0,0);
+        } else {
+            this.temp.accelerationVector.set(0, 0);
         }
 
         // console.log(this.temp.accelerationVector.x,this.temp.accelerationVector.y);
         // console.log(this.temp.accelerationVector.x, this.temp.accelerationVector.y);
         // console.log(this.temp.accelerationVector.x, this.temp.accelerationVector.y);
 
-        //constant velocity, like a missile
-        if (this.constantVelocity){
+        // constant velocity, like a missile
+        if (this.constantVelocity) {
             this.velocity.set(
-                Math.cos( this.angle * (Math.PI / 180) ),
-                Math.sin( this.angle * (Math.PI / 180) )
+                Math.cos(this.angle * (Math.PI / 180)),
+                Math.sin(this.angle * (Math.PI / 180))
             ).setMagnitude(this.constantVelocity);
+        } else {
+            // acceleration
+            Point.add(this.velocity, this.temp.accelerationVector, this.velocity);
+            // this.velocity.multiply(this.deceleration, this.deceleration);
+            this.velocity.x = Math.round(this.velocity.x * 100) / 100;
+            this.velocity.y = Math.round(this.velocity.y * 100) / 100;
         }
-        else{
-            //acceleration
-            Point.add(this.velocity,this.temp.accelerationVector, this.velocity);
-            this.velocity.multiply(this.deceleration, this.deceleration);
-            this.velocity.x = Math.round(this.velocity.x * 100)/100;
-            this.velocity.y = Math.round(this.velocity.y * 100)/100;
-        }
-
-
 
         this.velX = this.velocity.x;
         this.velY = this.velocity.y;
@@ -108,11 +111,16 @@ class DynamicObject extends Serializable {
         this.x = this.x + this.velocity.x;
         this.y = this.y + this.velocity.y;
 
-        if (this.x>=worldSettings.width){ this.x = worldSettings.width - this.x;}
-        else if (this.y>=worldSettings.height){ this.y = worldSettings.height - this.y;}
-        else if (this.x < 0){ this.x = worldSettings.width + this.x;}
-        else if (this.y<0){ this.y = worldSettings.width + this.y;}
-    };
+        if (this.x >= worldSettings.width) {
+            this.x = worldSettings.width - this.x;
+        } else if (this.y >= worldSettings.height) {
+            this.y = worldSettings.height - this.y;
+        } else if (this.x < 0) {
+            this.x = worldSettings.width + this.x;
+        } else if (this.y < 0) {
+            this.y = worldSettings.width + this.y;
+        }
+    }
 
     init(options) {
         Object.assign(this, options);
@@ -123,12 +131,48 @@ class DynamicObject extends Serializable {
         this.renderObject = this.renderer.addObject(this);
     }
 
-    syncTo(other, step) {
-        //TODO params should be taken from the netScheme
-        //maybe use object.assign
+    saveState() {
+        this.savedCopy = (new this.constructor());
+        this.savedCopy.copyFrom(this);
+    }
+
+    bendToSavedState(bending) {
+        if (this.savedCopy) {
+            this.bendTo(this.savedCopy, bending);
+        }
+        this.savedCopy = null;
+    }
+
+    syncTo(other) {
         ['x', 'y', 'velX', 'velY', 'angle']
-            .forEach(attr => { this[attr] = other[attr];});
-        this.lastUpdateStep = step;
+            .forEach(attr => {
+                this[attr] = other[attr];
+            });
+        this.velocity.x = this.velX;
+        this.velocity.y = this.velY;
+    }
+
+    bendTo(other, bending) {
+
+        // bend to simple attribute
+        ['x', 'y', 'velX', 'velY']
+            .forEach(attr => {
+                this[attr] = (other[attr] - this[attr]) * bending + this[attr];
+            });
+
+        // bend to angle
+        let otherAngle = other.angle;
+        let thisAngle = this.angle;
+        if (thisAngle - otherAngle > 180) otherAngle += 360;
+        else if (otherAngle - thisAngle > 180) thisAngle += 360;
+        this.angle = (otherAngle - thisAngle) * bending + thisAngle;
+        if (this.angle > 360) this.angle -= 360;
+
+        // TODO: these next two lines are a side-effect of the fact
+        // that velocity is stored both in attribute "velocity" and in velX/velY
+        // which is redundant now that we can set a Point instance over the network
+        this.velocity.x = this.velX;
+        this.velocity.y = this.velY;
     }
 
     updateRenderObject() {

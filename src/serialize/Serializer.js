@@ -1,6 +1,6 @@
 "use strict";
 
-const Utils = require('./../Utils');
+const Utils = require('./../lib/Utils');
 
 class Serializer {
 
