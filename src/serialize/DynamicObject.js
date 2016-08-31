@@ -5,9 +5,6 @@ const Point = require('../Point');
 const Serializable = require('./Serializable');
 const Serializer = require('./Serializer');
 
-// constants
-const MAX_BENDING_DISTANCE = 500;
-
 /**
  * Defines an objects which can move about in the game world
  */
@@ -50,7 +47,7 @@ class DynamicObject extends Serializable {
     // for debugging purposes mostly
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
-        function showVec(x,y,z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }
+        function showVec(x, y, z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }
         return `DynamicObject[${this.id}] position${showVec(this.x, this.y, this.z)} velocity${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
     }
 
@@ -156,16 +153,20 @@ class DynamicObject extends Serializable {
     }
 
     bendTo(other, bending) {
-        // TODO params should be taken from the netScheme
-        // maybe use object.assign?
-        ['x', 'y', 'velX', 'velY', 'angle']
+
+        // bend to simple attribute
+        ['x', 'y', 'velX', 'velY']
             .forEach(attr => {
-                if (Math.abs(other[attr] - this[attr]) > MAX_BENDING_DISTANCE) {
-                    this[attr] = other[attr];
-                    return;
-                }
                 this[attr] = (other[attr] - this[attr]) * bending + this[attr];
             });
+
+        // bend to angle
+        let otherAngle = other.angle;
+        let thisAngle = this.angle;
+        if (thisAngle - otherAngle > 180) otherAngle += 360;
+        else if (otherAngle - thisAngle > 180) thisAngle += 360;
+        this.angle = (otherAngle - thisAngle) * bending + thisAngle;
+        if (this.angle > 360) this.angle -= 360;
 
         // TODO: these next two lines are a side-effect of the fact
         // that velocity is stored both in attribute "velocity" and in velX/velY
