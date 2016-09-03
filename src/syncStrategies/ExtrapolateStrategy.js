@@ -136,7 +136,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         // bend back to original state
         for (let objId of Object.keys(world.objects)) {
             this.gameEngine.trace.trace(`bending to original state on obj[${objId}]`);
-            world.objects[objId].bendToSavedState(this.options.bending);
+            world.objects[objId].bendToSavedState(this.options.bending, this.gameEngine.worldSettings);
         }
 
         // trace object state after sync

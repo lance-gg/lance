@@ -4,6 +4,7 @@
 const Point = require('../Point');
 const Serializable = require('./Serializable');
 const Serializer = require('./Serializer');
+const MathUtils = require('../lib/MathUtils');
 
 /**
  * Defines an objects which can move about in the game world
@@ -136,9 +137,12 @@ class DynamicObject extends Serializable {
         this.savedCopy.copyFrom(this);
     }
 
-    bendToSavedState(bending) {
+    // TODO:
+    // rather than pass worldSettings on each bend, they could
+    // be passed in on the constructor just once.
+    bendToSavedState(bending, worldSettings) {
         if (this.savedCopy) {
-            this.bendTo(this.savedCopy, bending);
+            this.bendTo(this.savedCopy, bending, worldSettings);
         }
         this.savedCopy = null;
     }
@@ -152,21 +156,18 @@ class DynamicObject extends Serializable {
         this.velocity.y = this.velY;
     }
 
-    bendTo(other, bending) {
+    bendTo(other, bending, worldSettings) {
 
-        // bend to simple attribute
-        ['x', 'y', 'velX', 'velY']
-            .forEach(attr => {
-                this[attr] = (other[attr] - this[attr]) * bending + this[attr];
-            });
+        // TODO: wrap-around should not be the default behaviour of DynamicObject.
+        // it should either be enabled by some option, or be transplanted into
+        // another class called WrapAroundDynamicObject
 
-        // bend to angle
-        let otherAngle = other.angle;
-        let thisAngle = this.angle;
-        if (thisAngle - otherAngle > 180) otherAngle += 360;
-        else if (otherAngle - thisAngle > 180) thisAngle += 360;
-        this.angle = (otherAngle - thisAngle) * bending + thisAngle;
-        if (this.angle > 360) this.angle -= 360;
+        // bend to position, velocity, and angle gradually
+        this.x = MathUtils.interpolateWithWrapping(this.x, other.x, bending, 0, worldSettings.width);
+        this.y = MathUtils.interpolateWithWrapping(this.y, other.y, bending, 0, worldSettings.height);
+        this.velX = MathUtils.interpolate(this.velX, other.velX, bending);
+        this.velY = MathUtils.interpolate(this.velY, other.velY, bending);
+        this.angle = MathUtils.interpolateWithWrapping(this.angle, other.angle, bending, 0, 360);
 
         // TODO: these next two lines are a side-effect of the fact
         // that velocity is stored both in attribute "velocity" and in velX/velY
