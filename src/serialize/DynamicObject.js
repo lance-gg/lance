@@ -113,13 +113,16 @@ class DynamicObject extends Serializable {
         this.y = this.y + this.velocity.y;
 
         if (this.x >= worldSettings.width) {
-            this.x = worldSettings.width - this.x;
-        } else if (this.y >= worldSettings.height) {
-            this.y = worldSettings.height - this.y;
-        } else if (this.x < 0) {
-            this.x = worldSettings.width + this.x;
-        } else if (this.y < 0) {
-            this.y = worldSettings.width + this.y;
+            this.x -= worldSettings.width;
+        }
+        if (this.y >= worldSettings.height) {
+            this.y -= worldSettings.height;
+        }
+        if (this.x < 0) {
+            this.x += worldSettings.width;
+        }
+        if (this.y < 0) {
+            this.y += worldSettings.height;
         }
     }
 
