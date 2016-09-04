@@ -31,8 +31,11 @@ class DynamicObject extends Serializable {
         this.y = y;
         this.velX = 0;
         this.velY = 0;
+        this.bendingX = 0;
+        this.bendingY = 0;
         this.angle = 90;
-        this.rotationSpeed = 3;
+        this.bendingAngle = 0;
+        this.rotationSpeed = 2.5;
         this.acceleration = 0.1;
         this.deceleration = 0.99;
         this.maxSpeed = 2;
@@ -61,6 +64,9 @@ class DynamicObject extends Serializable {
         this.y = sourceObj.y;
         this.velX = sourceObj.velX;
         this.velY = sourceObj.velY;
+        this.bendingX = sourceObj.bendingX;
+        this.bendingY = sourceObj.bendingY;
+        this.bendingAngle = sourceObj.bendingAngle;
         this.velocity.set(sourceObj.velX, sourceObj.velY);
         this.angle = sourceObj.angle;
         this.rotationSpeed = sourceObj.rotationSpeed;
@@ -72,8 +78,9 @@ class DynamicObject extends Serializable {
     step(worldSettings) {
         if (this.isRotatingRight) { this.angle += this.rotationSpeed; }
         if (this.isRotatingLeft) { this.angle -= this.rotationSpeed; }
+        this.angle += this.bendingAngle;
 
-        if (this.angle > 360) { this.angle -= 360; }
+        if (this.angle >= 360) { this.angle -= 360; }
         if (this.angle < 0) { this.angle += 360; }
 
         if (this.isAccelerating) {
@@ -84,10 +91,6 @@ class DynamicObject extends Serializable {
         } else {
             this.temp.accelerationVector.set(0, 0);
         }
-
-        // console.log(this.temp.accelerationVector.x,this.temp.accelerationVector.y);
-        // console.log(this.temp.accelerationVector.x, this.temp.accelerationVector.y);
-        // console.log(this.temp.accelerationVector.x, this.temp.accelerationVector.y);
 
         // constant velocity, like a missile
         if (this.constantVelocity) {
@@ -109,21 +112,13 @@ class DynamicObject extends Serializable {
         this.isAccelerating = false;
         this.isRotatingLeft = false;
         this.isRotatingRight = false;
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
+        this.x = this.x + this.velocity.x + this.bendingX;
+        this.y = this.y + this.velocity.y + this.bendingY;
 
-        if (this.x >= worldSettings.width) {
-            this.x -= worldSettings.width;
-        }
-        if (this.y >= worldSettings.height) {
-            this.y -= worldSettings.height;
-        }
-        if (this.x < 0) {
-            this.x += worldSettings.width;
-        }
-        if (this.y < 0) {
-            this.y += worldSettings.height;
-        }
+        if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
+        if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
+        if (this.x < 0) { this.x += worldSettings.width; }
+        if (this.y < 0) { this.y += worldSettings.height; }
     }
 
     init(options) {
@@ -159,18 +154,26 @@ class DynamicObject extends Serializable {
         this.velocity.y = this.velY;
     }
 
-    bendTo(other, bending, worldSettings) {
+    bendTo(original, bending, worldSettings) {
 
         // TODO: wrap-around should not be the default behaviour of DynamicObject.
         // it should either be enabled by some option, or be transplanted into
         // another class called WrapAroundDynamicObject
 
+        // TODO: turn this function inside out.  "this" should be the original,
+        // and the function should receive an object called "other"
+
         // bend to position, velocity, and angle gradually
-        this.x = MathUtils.interpolateWithWrapping(this.x, other.x, bending, 0, worldSettings.width);
-        this.y = MathUtils.interpolateWithWrapping(this.y, other.y, bending, 0, worldSettings.height);
-        this.velX = MathUtils.interpolate(this.velX, other.velX, bending);
-        this.velY = MathUtils.interpolate(this.velY, other.velY, bending);
-        this.angle = MathUtils.interpolateWithWrapping(this.angle, other.angle, bending, 0, 360);
+        this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / 10;
+        this.bendingY = MathUtils.interpolateDeltaWithWrapping(original.y, this.y, bending, 0, worldSettings.height) / 10;
+        this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, bending, 0, 360) / 10;
+        this.velX = MathUtils.interpolate(original.velX, this.velX, bending);
+        this.velY = MathUtils.interpolate(original.velY, this.velY, bending);
+
+        // revert to original
+        this.x = original.x;
+        this.y = original.y;
+        this.angle = original.angle;
 
         // TODO: these next two lines are a side-effect of the fact
         // that velocity is stored both in attribute "velocity" and in velX/velY
