@@ -93,7 +93,7 @@ class GameEngine {
     // game must implement the actual input logic in this function,
     // as it will be called on both client and server.
     processInput(inputMsg, playerId) {
-        this.trace.info(`game engine processing input <${inputMsg.input}> from playerId ${playerId}`);
+        this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 
     removeObjectFromWorld(id) {

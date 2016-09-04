@@ -119,6 +119,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         // re-apply the number of steps that we want to extrapolate forwards
         this.cleanRecentInputs();
         this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
+        this.gameEngine.serverStep = serverStep;
         for (; serverStep < world.stepCount; serverStep++) {
             if (this.recentInputs[serverStep]) {
                 this.recentInputs[serverStep].forEach(inputData => {
@@ -126,14 +127,14 @@ class ExtrapolateStrategy extends SyncStrategy {
                     // TODO: HACK: remove next line
                     if (inputData.input === 'space') return;
 
-                    this.gameEngine.trace.trace(`extrapolate re-enacting input [${inputData.input}]`);
+                    this.gameEngine.trace.trace(`extrapolate re-enacting input[${inputData.messageIndex}]: ${inputData.input}`);
                     this.gameEngine.processInput(inputData, this.clientEngine.playerId);
                 });
             }
 
             for (let objId of Object.keys(world.objects)) {
-                this.gameEngine.trace.trace(`extrapolate re-enacting step on obj[${objId}]`);
                 world.objects[objId].step(this.gameEngine.worldSettings);
+                this.gameEngine.trace.trace(`extrapolate re-enacting step[${serverStep}] on obj[${objId}]`);
             }
         }
 

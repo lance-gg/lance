@@ -152,6 +152,11 @@ class DynamicObject extends Serializable {
             });
         this.velocity.x = this.velX;
         this.velocity.y = this.velY;
+
+        // resent bending
+        this.bendingX = 0;
+        this.bendingY = 0;
+        this.bendingAngle = 0;
     }
 
     bendTo(original, bending, worldSettings) {

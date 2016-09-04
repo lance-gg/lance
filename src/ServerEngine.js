@@ -46,7 +46,10 @@ class ServerEngine {
         // replay one input per player
         for (let playerId of Object.keys(this.playerInputQueues)) {
             let inputQueue = this.playerInputQueues[playerId];
-            if (inputQueue.length > 0)
+
+            // if there is an input in the queue, and we have reached/passed this step,
+            // then process this input
+            if (inputQueue.length > 0 && inputQueue[0].step <= this.gameEngine.world.stepCount)
                 this.gameEngine.processInput(inputQueue.shift(), playerId);
         }
 

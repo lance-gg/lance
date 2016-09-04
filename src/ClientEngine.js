@@ -3,6 +3,10 @@ var io = require("socket.io-client");
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 
+
+const STEP_DRIFT_THRESHOLD = 20;
+const SKIP_ONE_STEP_COUNTDOWN = 10;
+
 class ClientEngine {
 
     constructor(gameEngine, inputOptions) {
@@ -26,6 +30,7 @@ class ClientEngine {
 
         this.socket.on('playerJoined', function(playerData) {
             that.playerId = playerData.playerId;
+            that.messageIndex = +that.playerId * 10000;
         });
 
         // when objects get added, tag them as playerControlled if necessary
@@ -44,11 +49,31 @@ class ClientEngine {
     }
 
     step() {
+
+        // skip one step if requested
+        // then count down before checking again
+        if (typeof this.skipOneStep === 'number') this.skipOneStep--;
+        if (this.skipOneStep === true) {
+            this.skipOneStep = SKIP_ONE_STEP_COUNTDOWN;
+            return;
+        }
+
         this.gameEngine.emit("client.preStep");
         while (this.inboundMessages.length > 0) {
             this.handleInboundMessage(this.inboundMessages.pop());
         }
 
+        // check for server/client step drift
+        if (this.gameEngine.serverStep) {
+            if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
+                this.gameEngine.trace.warn(`step drift.  server is behind client.  client will skip a step`);
+                this.skipOneStep = true;
+            } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount +  STEP_DRIFT_THRESHOLD) {
+                this.gameEngine.trace.warn(`step drift.  client is behind server`);
+            }
+        }
+
+        // perform game engine step
         this.handleOutboundInput();
         this.applyDelayedInputs();
         this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
@@ -96,7 +121,7 @@ class ClientEngine {
             }
         };
 
-        this.gameEngine.trace.info(`USER INPUT ${input}`);
+        this.gameEngine.trace.info(`USER INPUT[${this.messageIndex}]: ${input}`);
 
         // if we delay input application on client, then queue it
         // otherwise apply it now
