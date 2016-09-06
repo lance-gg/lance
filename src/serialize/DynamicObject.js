@@ -38,7 +38,7 @@ class DynamicObject extends Serializable {
         this.rotationSpeed = 2.5;
         this.acceleration = 0.1;
         this.deceleration = 0.99;
-        this.maxSpeed = 2;
+        this.maxSpeed = 5;
 
         // todo deal with what goes over the wire
         this.velocity = new Point();
