@@ -1,20 +1,16 @@
 "use strict";
 
-// TODO:
-//    require of "nodejs-physijs" here is a disaster, because it adds ammojs and
-//    THREEjs to Incheon - specifically to the browserified bundle which will run
-//    on the client side.  Thing is - the client typically does not use this
-//    huge piece of baggage!
 const NodePhysijs = require('nodejs-physijs');
 const PhysicsEngine = require('./PhysicsEngine');
 const THREE = NodePhysijs.THREE;
 const Ammo = NodePhysijs.Ammo;
-const Physijs = NodePhysijs.Physijs(THREE, Ammo);
+let Physijs;
 
 class PhysijsPhysicsEngine extends PhysicsEngine {
 
     constructor() {
         super();
+        Physijs = NodePhysijs.Physijs(THREE, Ammo); // eslint-disable-line
         this.scene = null;
     }
 

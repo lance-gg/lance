@@ -67,6 +67,7 @@ class ServerEngine {
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
                     let payload = this.serializeUpdate(socketId);
+                    this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} ==========`);
 
                     // simulate server send lag
                     if (this.options.debug.serverSendLag !== false) {

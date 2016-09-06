@@ -55,6 +55,7 @@ class GameEngine {
     }
 
     start() {
+        this.trace.info(`========== game engine started ==========`);
         this.initWorld();
     }
 
@@ -87,6 +88,7 @@ class GameEngine {
     addObjectToWorld(object) {
         this.world.objects[object.id] = object;
         this.emit("objectAdded", object);
+        this.trace.info(`========== object added ${object.toString()} ==========`);
     }
 
     // the base input processing logic
@@ -97,8 +99,10 @@ class GameEngine {
     }
 
     removeObjectFromWorld(id) {
-        this.emit("objectDestroyed", this.world.objects[id]);
-        this.world.objects[id].destroy();
+        let ob = this.world.objects[id];
+        this.trace.info(`========== destroying object ${ob.toString()} ==========`);
+        this.emit("objectDestroyed", ob);
+        ob.destroy();
         delete this.world.objects[id];
     }
 

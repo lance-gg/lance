@@ -136,6 +136,7 @@ class ClientEngine {
     }
 
     handleInboundMessage(syncData) {
+
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
 
         // TODO: this should be done in a better way.
@@ -150,9 +151,13 @@ class ClientEngine {
             stepCount: maxStepCount
         });
 
+        this.gameEngine.trace.info(`========== inbound world update ${this.gameEngine.world.stepCount} ==========`);
+
         // finally update the stepCount
-        if (maxStepCount > this.gameEngine.world.stepCount)
+        if (maxStepCount > this.gameEngine.world.stepCount) {
             this.gameEngine.world.stepCount = maxStepCount;
+            this.gameEngine.trace.info(`========== world step count updated to  ${maxStepCount} ==========`);
+        }
     }
 
     handleOutboundInput() {

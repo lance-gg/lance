@@ -3,12 +3,6 @@
 class Trace {
 
     constructor(options) {
-        // this.TRACE_ALL = 0;
-        // this.TRACE_DEBUG = 1;
-        // this.TRACE_INFO = 2;
-        // this.TRACE_WARN = 3;
-        // this.TRACE_ERROR = 4;
-        // this.TRACE_NONE = 1000;
 
         this.options = Object.assign({
             traceLevel: this.TRACE_DEBUG
