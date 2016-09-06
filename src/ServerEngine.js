@@ -43,14 +43,18 @@ class ServerEngine {
 
         this.serverTime = (new Date().getTime());
 
-        // replay one input per player
+        // for each player, replay all the inputs in the oldest step
         for (let playerId of Object.keys(this.playerInputQueues)) {
             let inputQueue = this.playerInputQueues[playerId];
+            let queueSteps = Object.keys(inputQueue);
+            let minStep = Math.min.apply(null, queueSteps);
 
-            // if there is an input in the queue, and we have reached/passed this step,
-            // then process this input
-            if (inputQueue.length > 0 && inputQueue[0].step <= this.gameEngine.world.stepCount)
-                this.gameEngine.processInput(inputQueue.shift(), playerId);
+            // check that there are inputs for this step,
+            // and that we have reached/passed this step
+            if (queueSteps.length > 0 && minStep <= this.gameEngine.world.stepCount) {
+                inputQueue[minStep].forEach(i => { this.gameEngine.processInput(i, playerId); });
+                delete inputQueue[minStep];
+            }
         }
 
         // run the game engine step
@@ -154,11 +158,21 @@ class ServerEngine {
         console.log('Client disconnected');
     }
 
+    // add an input to the input-queue for the specific player
+    // each queue is key'd by step, because there may be multiple inputs
+    // per step
     queueInputForPlayer(data, playerId) {
-        if (!this.playerInputQueues.hasOwnProperty(playerId))
-            this.playerInputQueues[playerId] = [];
 
-        this.playerInputQueues[playerId].push(data);
+        // create an input queue for this player, if one doesn't already exist
+        if (!this.playerInputQueues.hasOwnProperty(playerId))
+            this.playerInputQueues[playerId] = {};
+        let queue = this.playerInputQueues[playerId];
+
+        // create an array of inputs for this step, if one doesn't already exist
+        if (!queue[data.step]) queue[data.step] = [];
+
+        // add the input to the player's queue
+        queue[data.step].push(data);
     }
 
     // an input has been received from a client, queue it for next step
