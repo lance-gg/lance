@@ -131,9 +131,9 @@ class DynamicObject extends Serializable {
         this.renderObject = this.renderer.addObject(this);
     }
 
-    saveState() {
+    saveState(other) {
         this.savedCopy = (new this.constructor());
-        this.savedCopy.copyFrom(this);
+        this.savedCopy.copyFrom(other ? other : this);
     }
 
     // TODO:

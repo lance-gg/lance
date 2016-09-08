@@ -68,12 +68,12 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         let curObj = newObj.class.newFrom(newObj);
         this.gameEngine.addObjectToWorld(curObj);
-        curObj.initRenderObject(this.gameEngine.renderer);
         console.log(`adding new object ${curObj}`);
 
         // if this game keeps a physics engine on the client side,
         // we need to update it as well
-        if (this.gameEngine.physicsEngine) {
+        // TODO: why not have this call inside (gameEngine.addObjectToWorld() above?)
+        if (this.gameEngine.physicsEngine && curObj.hasOwnProperty('initPhysicsObject')) {
             curObj.initPhysicsObject(this.gameEngine.physicsEngine);
         }
 
@@ -106,12 +106,26 @@ class ExtrapolateStrategy extends SyncStrategy {
                 let curObj = world.objects[ev.objectInstance.id];
                 serverStep = Math.max(serverStep, ev.stepCount);
 
-                if (curObj) {
+                // check if this object has a local shadow object
+                let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
+                if (localShadowObj) {
+                    this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
+                    this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                    ev.objectInstance.saveState(localShadowObj);
+                    localShadowObj.destroy();
+                    delete this.gameEngine.world.objects[localShadowObj.id];
+
+                } else if (curObj) {
+
+                    // this object already exists locally
                     this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
                     curObj.saveState();
                     curObj.syncTo(ev.objectInstance);
                     this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
+
                 } else {
+
+                    // object does not exist.  create it now
                     this.addNewObject(ev.objectInstance.id, ev.objectInstance);
                 }
             });
@@ -125,10 +139,10 @@ class ExtrapolateStrategy extends SyncStrategy {
             if (this.recentInputs[serverStep]) {
                 this.recentInputs[serverStep].forEach(inputData => {
 
-                    // TODO: HACK: remove next line
-                    if (inputData.input === 'space') return;
+                    // only movement inputs are re-enacted
+                    if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
 
-                    this.gameEngine.trace.trace(`extrapolate re-enacting input[${inputData.messageIndex}]: ${inputData.input}`);
+                    this.gameEngine.trace.trace(`extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
                     this.gameEngine.processInput(inputData, this.clientEngine.playerId);
                 });
             }
@@ -166,9 +180,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.newSync = null;
     }
 
-    /**
-     * Perform client-side extrapolation.
-     */
+    // Perform client-side extrapolation.
     extrapolate() {
 
         // if there is a sync from the server, apply it now

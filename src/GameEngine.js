@@ -87,6 +87,12 @@ class GameEngine {
 
     addObjectToWorld(object) {
         this.world.objects[object.id] = object;
+
+        // it may need a renderer sub-object
+        if (this.renderer) {
+            object.initRenderObject(this.renderer);
+        }
+
         this.emit("objectAdded", object);
         this.trace.info(`========== object added ${object.toString()} ==========`);
     }

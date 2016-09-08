@@ -111,17 +111,18 @@ class ClientEngine {
     // this function should be called whenever an input is handled.
     // this function will take care of raising the event and having it
     // shipped to the server.
-    sendInput(input) {
+    sendInput(input, inputOptions) {
         var message = {
             command: 'move',
             data: {
                 messageIndex: this.messageIndex,
                 step: this.gameEngine.world.stepCount,
-                input: input
+                input: input,
+                options: inputOptions
             }
         };
 
-        this.gameEngine.trace.info(`USER INPUT[${this.messageIndex}]: ${input}`);
+        this.gameEngine.trace.info(`USER INPUT[${this.messageIndex}]: ${input} ${inputOptions ? JSON.stringify(inputOptions) : '{}'}`);
 
         // if we delay input application on client, then queue it
         // otherwise apply it now
