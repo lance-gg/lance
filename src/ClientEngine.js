@@ -2,6 +2,7 @@
 var io = require("socket.io-client");
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
+const NetworkMonitor = require('./network/NetworkMonitor');
 
 
 const STEP_DRIFT_THRESHOLD = 20;
@@ -17,6 +18,9 @@ class ClientEngine {
 
         this.gameEngine = gameEngine;
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
+
+        this.networkMonitor = new NetworkMonitor();
+        this.networkMonitor.registerClient(this);
 
         this.inboundMessages = [];
         this.outboundMessages = [];
