@@ -34,6 +34,17 @@ class GameEngine {
         this.trace = new Trace({ traceLevel: this.options.traceLevel });
     }
 
+    findLocalShadow(serverObj) {
+
+        for (let localId of Object.keys(this.world.objects)) {
+            let localObj = this.world.objects[localId];
+            if (localObj.hasOwnProperty('inputId') && localObj.inputId === serverObj.inputId)
+                return localObj;
+        }
+
+        return null;
+    }
+
     initWorld() {
         var that = this;
 
@@ -73,7 +84,9 @@ class GameEngine {
     }
 
     updateGameWorld() {
-        for (var objId in this.world.objects) {
+
+        // TODO: use for ... of Object.keys()
+        for (let objId in this.world.objects) {
             if (this.world.objects.hasOwnProperty(objId)) {
                 let ob = this.world.objects[objId];
                 ob.step(this.worldSettings);
