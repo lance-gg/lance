@@ -113,34 +113,37 @@ class ExtrapolateStrategy extends SyncStrategy {
         let world = this.gameEngine.world;
         let serverStep = -1;
         for (let ids of Object.keys(this.newSync.syncObjects)) {
-            this.newSync.syncObjects[ids].forEach(ev => {
-                let curObj = world.objects[ev.objectInstance.id];
-                serverStep = Math.max(serverStep, ev.stepCount);
 
-                let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
-                if (localShadowObj) {
+            // TODO: we are currently taking only the first event out of
+            // the events that may have arrived for this object
+            let ev = this.newSync.syncObjects[ids][0];
 
-                    // case 1: this object as a local shadow object on the client
-                    this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
-                    let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance);
-                    newObj.saveState(localShadowObj);
-                    localShadowObj.destroy();
-                    delete this.gameEngine.world.objects[localShadowObj.id];
+            let curObj = world.objects[ev.objectInstance.id];
+            serverStep = Math.max(serverStep, ev.stepCount);
 
-                } else if (curObj) {
+            let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
+            if (localShadowObj) {
 
-                    // case 2: this object already exists locally
-                    this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
-                    curObj.saveState();
-                    curObj.syncTo(ev.objectInstance);
-                    this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
+                // case 1: this object as a local shadow object on the client
+                this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
+                let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                newObj.saveState(localShadowObj);
+                localShadowObj.destroy();
+                delete this.gameEngine.world.objects[localShadowObj.id];
 
-                } else {
+            } else if (curObj) {
 
-                    // case 3: object does not exist.  create it now
-                    this.addNewObject(ev.objectInstance.id, ev.objectInstance);
-                }
-            });
+                // case 2: this object already exists locally
+                this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
+                curObj.saveState();
+                curObj.syncTo(ev.objectInstance);
+                this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
+
+            } else {
+
+                // case 3: object does not exist.  create it now
+                this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+            }
         }
 
         //
