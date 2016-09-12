@@ -126,10 +126,22 @@ class ExtrapolateStrategy extends SyncStrategy {
 
                 // case 1: this object as a local shadow object on the client
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
-                let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance , { visible: false });
+                let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
                 newObj.saveState(localShadowObj);
                 localShadowObj.destroy();
                 delete this.gameEngine.world.objects[localShadowObj.id];
+
+                // TODO:
+                // refactor, so that instead of saving the old state, progressing
+                // the current object, and then bending back to the old state, we should create a
+                // side-object, progress that side-object, and then bend the current
+                // object to the side-object by X percent.
+                // that approach will clean up a lot of code.
+
+                // TODO:
+                // if we do the change above (refactor), then there is no need
+                // to set the render object to "visible: false" because at no point
+                // in time it will be pointing to wrong values.
 
             } else if (curObj) {
 
@@ -189,6 +201,7 @@ class ExtrapolateStrategy extends SyncStrategy {
             let bending = (objId == this.clientEngine.playerId) ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToSavedState(bending, this.gameEngine.worldSettings);
             if (obj.renderObject && obj.renderObject.visible === false) {
+                obj.updateRenderObject();
                 obj.renderObject.visible = true;
             }
             this.gameEngine.trace.trace(`object[${objId}] bending=${bending} values (dx, dy, dphi) = (${obj.bendingX},${obj.bendingY},${obj.bendingAngle})`);
