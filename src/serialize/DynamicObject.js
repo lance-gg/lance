@@ -126,9 +126,9 @@ class DynamicObject extends Serializable {
         Object.assign(this, options);
     }
 
-    initRenderObject(renderer) {
+    initRenderObject(renderer, options) {
         this.renderer = renderer;
-        this.renderObject = this.renderer.addObject(this);
+        this.renderObject = this.renderer.addObject(this, options);
     }
 
     saveState(other) {

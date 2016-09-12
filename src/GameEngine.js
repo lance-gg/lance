@@ -98,12 +98,12 @@ class GameEngine {
         }
     }
 
-    addObjectToWorld(object) {
+    addObjectToWorld(object, options) {
         this.world.objects[object.id] = object;
 
         // it may need a renderer sub-object
         if (this.renderer) {
-            object.initRenderObject(this.renderer);
+            object.initRenderObject(this.renderer, options);
         }
 
         this.emit("objectAdded", object);

@@ -64,10 +64,10 @@ class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // add an object to our world
-    addNewObject(objId, newObj) {
+    addNewObject(objId, newObj, options) {
 
         let curObj = newObj.class.newFrom(newObj);
-        this.gameEngine.addObjectToWorld(curObj);
+        this.gameEngine.addObjectToWorld(curObj, options);
         console.log(`adding new object ${curObj}`);
 
         // if this game keeps a physics engine on the client side,
@@ -126,7 +126,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
                 // case 1: this object as a local shadow object on the client
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
-                let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance , { visible: false });
                 newObj.saveState(localShadowObj);
                 localShadowObj.destroy();
                 delete this.gameEngine.world.objects[localShadowObj.id];
@@ -188,6 +188,9 @@ class ExtrapolateStrategy extends SyncStrategy {
             // TODO: using == instead of === because of string/number mismatch
             let bending = (objId == this.clientEngine.playerId) ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToSavedState(bending, this.gameEngine.worldSettings);
+            if (obj.renderObject && obj.renderObject.visible === false) {
+                obj.renderObject.visible = true;
+            }
             this.gameEngine.trace.trace(`object[${objId}] bending=${bending} values (dx, dy, dphi) = (${obj.bendingX},${obj.bendingY},${obj.bendingAngle})`);
         }
 
