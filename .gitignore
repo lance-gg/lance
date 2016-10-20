@@ -38,3 +38,7 @@ jspm_packages
 
 #jetbrains project files
 .idea
+
+# jsdoc output
+docs
+

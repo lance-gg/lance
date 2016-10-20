@@ -4,7 +4,27 @@ const Timer = require('./lib/Timer');
 const EventEmitter = require('eventemitter3');
 const Trace = require('./lib/Trace');
 
+/**
+ * The GameEngine contains the game logic.  Extend this class
+ * to implement your game mechanics.  The GameEngine derived
+ * instance runs once on the server, where the final decisions
+ * are always taken, and one instance will run on each client as well,
+ * where the client emulates what it expects to have happening
+ * on the server.
+ *
+ * The game engine's logic must listen to user inputs and
+ * act on these inputs to change the game state.  For example,
+ * the game engine listens to controller/keyboard inputs to infer
+ * movement for the player/ship/first-person.  The game engine listens
+ * to clicks/button-presses to infer firing. etc..
+ *
+ * Note that the game engine runs on both the server and on the
+ * clients - but the server decisions are always the final say,
+ * and therefore clients must note that server updates may conflict
+ * with client-side predictions.
+ */
 class GameEngine {
+
     constructor(inputOptions) {
         // if no GameWorld is specified, use the default one
         this.options = Object.assign({

@@ -1,0 +1,15 @@
+{
+    "opts": {
+        "destination": "./docs/",
+        "encoding": "utf8",
+        "package": "package.json",
+        "readme": "README.md"
+    },
+    "source": {
+        "include": [
+            "src/ServerEngine.js",
+            "src/ClientEngine.js",
+            "src/GameEngine.js"
+        ]
+    }
+}

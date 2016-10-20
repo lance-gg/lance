@@ -5,8 +5,34 @@ const Gameloop = require('node-gameloop');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 
+/**
+ * ServerEngine is the main server-side singleton code.
+ * Extend this class with your own server-side logic, and
+ * start a single instance.
+ *
+ * This class should not be used to contain the actual
+ * game logic.  That belongs in the GameEngine class, where the mechanics
+ * of the gameplay are actually implemented.
+ *
+ * The ServerEngine singleton is typically a lightweight
+ * implementation, logging gameplay statistics and registering
+ * user activity and user data.
+ *
+ * The base class implementation is responsible for starting
+ * the server, initiating each game step, accepting new 
+ * connections and dis-connections, emitting periodic game-state
+ * updates, and capturing remote user inputs.
+ */
 class ServerEngine {
 
+    /**
+     * create a ServerEngine instance
+     *
+     * @param {SocketIO} io - the SocketIO server 
+     * @param {GameEngine} gameEngine - instance of GameEngine
+     * @param {Object} options - server options
+     * @return {ServerEngine} serverEngine - self
+     */
     constructor(io, gameEngine, inputOptions) {
         this.options = Object.assign({
             updateRate: 6,
@@ -27,8 +53,11 @@ class ServerEngine {
 
         io.on('connection', this.onPlayerConnected.bind(this));
         this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
+
+        return this;
     }
 
+    // start the ServerEngine
     start() {
         var that = this;
         this.gameEngine.start();
@@ -38,6 +67,7 @@ class ServerEngine {
         }, 1000 / this.options.frameRate);
     }
 
+    // every server step starts here
     step() {
         var that = this;
 
@@ -92,6 +122,7 @@ class ServerEngine {
         }
     }
 
+    // create a serialized package of the game world
     serializeUpdate(socketId) {
         let world = this.gameEngine.world;
 
@@ -105,6 +136,7 @@ class ServerEngine {
         return this.networkTransmitter.serializePayload({ resetPayload: true });
     }
 
+    // handle the object creation
     onObjectAdded(obj) {
         console.log('object created event');
         this.networkTransmitter.addNetworkedEvent("objectCreate", {
@@ -113,6 +145,7 @@ class ServerEngine {
         });
     }
 
+    // handle new player connection
     onPlayerConnected(socket) {
         var that = this;
 
@@ -154,6 +187,7 @@ class ServerEngine {
         });
     }
 
+    // handle player dis-connection
     onPlayerDisconnected(socketId, playerId) {
         delete this.connectedPlayers[socketId];
         console.log('Client disconnected');

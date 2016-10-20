@@ -7,6 +7,12 @@ const NetworkTransmitter = require('./network/NetworkTransmitter');
 const STEP_DRIFT_THRESHOLD = 20;
 const SKIP_ONE_STEP_COUNTDOWN = 10;
 
+/**
+ * The client engine is the singleton which manages the client-side
+ * process, starting the game engine, listening to network messages,
+ * starting client steps, handling world updates which arrive from
+ * the server.
+ */
 class ClientEngine {
 
     constructor(gameEngine, inputOptions) {
