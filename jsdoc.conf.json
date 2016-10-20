@@ -1,10 +1,11 @@
 {
     "opts": {
-        "destination": "./docs/",
+        "destination": "./docs-out/",
         "encoding": "utf8",
         "package": "package.json",
         "readme": "README.md",
-        "template": "./node_modules/ink-docstrap/template"
+        "template": "./node_modules/ink-docstrap/template",
+        "tutorials": "./docs/tutorials"
     },
     "source": {
         "include": [

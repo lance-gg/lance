@@ -40,5 +40,4 @@ jspm_packages
 .idea
 
 # jsdoc output
-docs
-
+docs-out
