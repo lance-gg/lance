@@ -19,7 +19,7 @@ const NetworkTransmitter = require('./network/NetworkTransmitter');
  * user activity and user data.
  *
  * The base class implementation is responsible for starting
- * the server, initiating each game step, accepting new 
+ * the server, initiating each game step, accepting new
  * connections and dis-connections, emitting periodic game-state
  * updates, and capturing remote user inputs.
  */
@@ -28,19 +28,19 @@ class ServerEngine {
     /**
      * create a ServerEngine instance
      *
-     * @param {SocketIO} io - the SocketIO server 
+     * @param {SocketIO} io - the SocketIO server
      * @param {GameEngine} gameEngine - instance of GameEngine
      * @param {Object} options - server options
      * @return {ServerEngine} serverEngine - self
      */
-    constructor(io, gameEngine, inputOptions) {
+    constructor(io, gameEngine, options) {
         this.options = Object.assign({
             updateRate: 6,
             frameRate: 60,
             debug: {
                 serverSendLag: false
             }
-        }, inputOptions);
+        }, options);
 
         this.io = io;
         this.gameEngine = gameEngine;

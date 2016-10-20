@@ -7,7 +7,12 @@ const Serializer = require('./Serializer');
 const MathUtils = require('../lib/MathUtils');
 
 /**
- * Defines an objects which can move about in the game world
+ * Defines an object which can move about in the game world.
+ * Game objects can extend this base object.  The sub-classes
+ * will then be synchronized from the server to every client.
+ * The dynamic objects have pseudo-physical properties, which
+ * allow the client-side prediction to extrapolate the position
+ * of dynamic objects in-between server updates.
  */
 class DynamicObject extends Serializable {
 
@@ -23,6 +28,13 @@ class DynamicObject extends Serializable {
         };
     }
 
+    /**
+    * Create an instance of a dynamic object.
+    * provide starting values for position, acceleration, etc.
+    * @param {String} id - the object id
+    * @param {Number} x - position x-value
+    * @param {Number} y - position y-value
+    */
     constructor(id, x, y) {
         super();
         this.id = id; // instance id
@@ -48,7 +60,11 @@ class DynamicObject extends Serializable {
 
     }
 
-    // for debugging purposes mostly
+    /**
+     * formatted description of the dynamic object, for debugging purposes mostly
+     *
+     * @return {String} description - a string describing the DynamicObject
+     */
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
         function showVec(x, y, z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }

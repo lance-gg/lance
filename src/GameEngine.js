@@ -130,9 +130,15 @@ class GameEngine {
         this.trace.info(`========== object added ${object.toString()} ==========`);
     }
 
-    // the base input processing logic
-    // game must implement the actual input logic in this function,
-    // as it will be called on both client and server.
+    /**
+     * Override this function and implement input handling.
+     * this function will be called on the client where the
+     * input was received, and will also be called on the server
+     * when the input reaches the server.
+     *
+     * @param {Object} inputMsg - must contain attributes input (a string describing the input) messageIndex (a counter)
+     * @param {String} playerId - the player number (as a string)
+     */
     processInput(inputMsg, playerId) {
         this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }

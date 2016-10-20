@@ -114,9 +114,18 @@ class ClientEngine {
         this.delayedInputs.push([]);
     }
 
-    // this function should be called whenever an input is handled.
-    // this function will take care of raising the event and having it
-    // shipped to the server.
+    /**
+     * This function should be called by the client whenever an input
+     * needs to be handled.  This function will emit the input event,
+     * forward the input to the game engine (with a delay if so configured)
+     * and will transmit the input to the server.
+     *
+     * This function can be called by the extended client engine class,
+     * at the beginning of client-side step processing (event client.preStep)
+     *
+     * @param {Object} input - string representing the input
+     * @param {Object} inputOptions - options for the input
+     */
     sendInput(input, inputOptions) {
         var message = {
             command: 'move',
