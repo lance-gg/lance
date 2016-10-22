@@ -88,6 +88,8 @@ class ServerEngine {
         }
 
         // run the game engine step
+        // TODO: shouldn't these be called server.preStep and server.postStep,
+        // reserving the shorter names for the gameEngine itself?
         that.gameEngine.emit("preStep", that.gameEngine.world.stepCount);
         this.gameEngine.step();
         that.gameEngine.emit("postStep", that.gameEngine.world.stepCount);
