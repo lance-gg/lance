@@ -66,6 +66,9 @@ class GameEngine {
     }
 
     initWorld() {
+
+        // TODO: with arrow functions, we no longer need that=this mechanism
+        // remove the usage here and in all places in the code
         var that = this;
 
         this.world = new GameWorld();
