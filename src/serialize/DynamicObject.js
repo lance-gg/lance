@@ -132,10 +132,13 @@ class DynamicObject extends Serializable {
         this.x = this.x + this.velocity.x + this.bendingX;
         this.y = this.y + this.velocity.y + this.bendingY;
 
-        if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
-        if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
-        if (this.x < 0) { this.x += worldSettings.width; }
-        if (this.y < 0) { this.y += worldSettings.height; }
+        // wrap around the world edges
+        if (worldSettings.worldWrap) {
+            if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
+            if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
+            if (this.x < 0) { this.x += worldSettings.width; }
+            if (this.y < 0) { this.y += worldSettings.height; }
+        }
     }
 
     init(options) {
@@ -178,16 +181,14 @@ class DynamicObject extends Serializable {
 
     bendTo(original, bending, worldSettings) {
 
-        // TODO: wrap-around should not be the default behaviour of DynamicObject.
-        // it should either be enabled by some option, or be transplanted into
-        // another class called WrapAroundDynamicObject
-
-        // TODO: turn this function inside out.  "this" should be the original,
-        // and the function should receive an object called "other"
-
         // bend to position, velocity, and angle gradually
-        this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / 10;
-        this.bendingY = MathUtils.interpolateDeltaWithWrapping(original.y, this.y, bending, 0, worldSettings.height) / 10;
+        if (worldSettings.worldWrap) {
+            this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / 10;
+            this.bendingY = MathUtils.interpolateDeltaWithWrapping(original.y, this.y, bending, 0, worldSettings.height) / 10;
+        } else {
+            this.bendingX = MathUtils.interpolateDelta(original.x, this.x, bending) / 10;
+            this.bendingY = MathUtils.interpolateDelta(original.y, this.y, bending) / 10;
+        }
         this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, bending, 0, 360) / 10;
         this.velX = MathUtils.interpolate(original.velX, this.velX, bending);
         this.velY = MathUtils.interpolate(original.velY, this.velY, bending);
@@ -214,22 +215,21 @@ class DynamicObject extends Serializable {
 
         // update other objects with interpolation
         // TODO refactor into general interpolation class
-        // TODO: this interpolate function should not care about worldSettings.
         if (this.isPlayerControlled != true) {
 
-            if (Math.abs(nextObj.x - prevObj.x) > this.renderer.worldSettings.height / 2) { // fix for world wraparound
+            if (Math.abs(nextObj.x - prevObj.x) > this.renderer.worldSettings.height / 2) {
                 this.x = nextObj.x;
             } else {
                 this.x = (nextObj.x - prevObj.x) * playPercentage + prevObj.x;
             }
 
-            if (Math.abs(nextObj.y - prevObj.y) > this.renderer.worldSettings.height / 2) { // fix for world wraparound
+            if (Math.abs(nextObj.y - prevObj.y) > this.renderer.worldSettings.height / 2) {
                 this.y = nextObj.y;
             } else {
                 this.y = (nextObj.y - prevObj.y) * playPercentage + prevObj.y;
             }
 
-            var shortestAngle = ((((nextObj.angle - prevObj.angle) % 360) + 540) % 360) - 180; // todo wrap this in a util
+            var shortestAngle = ((((nextObj.angle - prevObj.angle) % 360) + 540) % 360) - 180;
             this.angle = prevObj.angle + shortestAngle * playPercentage;
 
             if (this.renderObject) {
