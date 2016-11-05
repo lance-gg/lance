@@ -8,7 +8,16 @@ class MathUtils {
     }
 
     // interpolate from start to end, advancing "percent" of the way
+    //
+    // returns just the delta. i.e. the value that must be added to the start value
+    static interpolateDelta(start, end, percent) {
+        return (end - start) * percent;
+    }
+
+    // interpolate from start to end, advancing "percent" of the way
     // and noting that the dimension wraps around {x >= wrapMin, x < wrapMax}
+    //
+    // returns just the delta. i.e. the value that must be added to the start value
     static interpolateDeltaWithWrapping(start, end, percent, wrapMin, wrapMax) {
         let wrapTest = wrapMax - wrapMin;
         if (start - end > wrapTest / 2) end += wrapTest;

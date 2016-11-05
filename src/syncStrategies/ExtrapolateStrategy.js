@@ -64,16 +64,16 @@ class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // add an object to our world
-    addNewObject(objId, newObj) {
+    addNewObject(objId, newObj, options) {
 
         let curObj = newObj.class.newFrom(newObj);
-        this.gameEngine.addObjectToWorld(curObj);
-        curObj.initRenderObject(this.gameEngine.renderer);
+        this.gameEngine.addObjectToWorld(curObj, options);
         console.log(`adding new object ${curObj}`);
 
         // if this game keeps a physics engine on the client side,
         // we need to update it as well
-        if (this.gameEngine.physicsEngine) {
+        // TODO: why not have this call inside (gameEngine.addObjectToWorld() above?)
+        if (this.gameEngine.physicsEngine && curObj.hasOwnProperty('initPhysicsObject')) {
             curObj.initPhysicsObject(this.gameEngine.physicsEngine);
         }
 
@@ -98,26 +98,69 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         this.gameEngine.trace.debug('extrapolate applying sync');
 
-        // create objects which are created at this step
+        //
+        //    scan all the objects in the sync
+        //
+        // 1. if the object has a local shadow, adopt the server object,
+        //    and destroy the shadow
+        //
+        // 2. if the object exists locally, sync to the server object,
+        //    later we will re-enact the missing steps and then bend to
+        //    the current position
+        //
+        // 3. if the object is new, just create it
+        //
         let world = this.gameEngine.world;
         let serverStep = -1;
         for (let ids of Object.keys(this.newSync.syncObjects)) {
-            this.newSync.syncObjects[ids].forEach(ev => {
-                let curObj = world.objects[ev.objectInstance.id];
-                serverStep = Math.max(serverStep, ev.stepCount);
 
-                if (curObj) {
-                    this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
-                    curObj.saveState();
-                    curObj.syncTo(ev.objectInstance);
-                    this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
-                } else {
-                    this.addNewObject(ev.objectInstance.id, ev.objectInstance);
-                }
-            });
+            // TODO: we are currently taking only the first event out of
+            // the events that may have arrived for this object
+            let ev = this.newSync.syncObjects[ids][0];
+
+            let curObj = world.objects[ev.objectInstance.id];
+            serverStep = Math.max(serverStep, ev.stepCount);
+
+            let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
+            if (localShadowObj) {
+
+                // case 1: this object as a local shadow object on the client
+                this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
+                let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
+                newObj.saveState(localShadowObj);
+                localShadowObj.destroy();
+                delete this.gameEngine.world.objects[localShadowObj.id];
+
+                // TODO:
+                // refactor, so that instead of saving the old state, progressing
+                // the current object, and then bending back to the old state, we should create a
+                // side-object, progress that side-object, and then bend the current
+                // object to the side-object by X percent.
+                // that approach will clean up a lot of code.
+
+                // TODO:
+                // if we do the change above (refactor), then there is no need
+                // to set the render object to "visible: false" because at no point
+                // in time it will be pointing to wrong values.
+
+            } else if (curObj) {
+
+                // case 2: this object already exists locally
+                this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
+                curObj.saveState();
+                curObj.syncTo(ev.objectInstance);
+                this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
+
+            } else {
+
+                // case 3: object does not exist.  create it now
+                this.addNewObject(ev.objectInstance.id, ev.objectInstance);
+            }
         }
 
-        // re-apply the number of steps that we want to extrapolate forwards
+        //
+        // re-enact the steps that we want to extrapolate forwards
+        //
         this.cleanRecentInputs();
         this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
         this.gameEngine.serverStep = serverStep;
@@ -125,26 +168,42 @@ class ExtrapolateStrategy extends SyncStrategy {
             if (this.recentInputs[serverStep]) {
                 this.recentInputs[serverStep].forEach(inputData => {
 
-                    // TODO: HACK: remove next line
-                    if (inputData.input === 'space') return;
+                    // only movement inputs are re-enacted
+                    if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
 
-                    this.gameEngine.trace.trace(`extrapolate re-enacting input[${inputData.messageIndex}]: ${inputData.input}`);
+                    this.gameEngine.trace.trace(`extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
                     this.gameEngine.processInput(inputData, this.clientEngine.playerId);
                 });
             }
 
             for (let objId of Object.keys(world.objects)) {
+
+                // shadow objects are not re-enacted
+                if (objId >= this.gameEngine.options.clientIDSpace)
+                    continue;
+
                 world.objects[objId].step(this.gameEngine.worldSettings);
                 this.gameEngine.trace.trace(`extrapolate re-enacting step[${serverStep}] on obj[${objId}]`);
             }
         }
 
+        //
         // bend back to original state
+        //
         for (let objId of Object.keys(world.objects)) {
+
+            // shadow objects are not bent
+            if (objId >= this.gameEngine.options.clientIDSpace)
+                continue;
+
             let obj = world.objects[objId];
             // TODO: using == instead of === because of string/number mismatch
             let bending = (objId == this.clientEngine.playerId) ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToSavedState(bending, this.gameEngine.worldSettings);
+            if (obj.renderObject && obj.renderObject.visible === false) {
+                obj.updateRenderObject();
+                obj.renderObject.visible = true;
+            }
             this.gameEngine.trace.trace(`object[${objId}] bending=${bending} values (dx, dy, dphi) = (${obj.bendingX},${obj.bendingY},${obj.bendingAngle})`);
         }
 
@@ -166,9 +225,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.newSync = null;
     }
 
-    /**
-     * Perform client-side extrapolation.
-     */
+    // Perform client-side extrapolation.
     extrapolate() {
 
         // if there is a sync from the server, apply it now

@@ -8,6 +8,12 @@ const NetworkMonitor = require('./network/NetworkMonitor');
 const STEP_DRIFT_THRESHOLD = 20;
 const SKIP_ONE_STEP_COUNTDOWN = 10;
 
+/**
+ * The client engine is the singleton which manages the client-side
+ * process, starting the game engine, listening to network messages,
+ * starting client steps, handling world updates which arrive from
+ * the server.
+ */
 class ClientEngine {
 
     constructor(gameEngine, inputOptions) {
@@ -112,20 +118,30 @@ class ClientEngine {
         this.delayedInputs.push([]);
     }
 
-    // this function should be called whenever an input is handled.
-    // this function will take care of raising the event and having it
-    // shipped to the server.
-    sendInput(input) {
+    /**
+     * This function should be called by the client whenever an input
+     * needs to be handled.  This function will emit the input event,
+     * forward the input to the game engine (with a delay if so configured)
+     * and will transmit the input to the server.
+     *
+     * This function can be called by the extended client engine class,
+     * at the beginning of client-side step processing (event client.preStep)
+     *
+     * @param {Object} input - string representing the input
+     * @param {Object} inputOptions - options for the input
+     */
+    sendInput(input, inputOptions) {
         var message = {
             command: 'move',
             data: {
                 messageIndex: this.messageIndex,
                 step: this.gameEngine.world.stepCount,
-                input: input
+                input: input,
+                options: inputOptions
             }
         };
 
-        this.gameEngine.trace.info(`USER INPUT[${this.messageIndex}]: ${input}`);
+        this.gameEngine.trace.info(`USER INPUT[${this.messageIndex}]: ${input} ${inputOptions ? JSON.stringify(inputOptions) : '{}'}`);
 
         // if we delay input application on client, then queue it
         // otherwise apply it now
