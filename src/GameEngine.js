@@ -181,7 +181,6 @@ class GameEngine {
 
     step() {
         this.world.stepCount++;
-        this.trace.info(`========== starting step ${this.world.stepCount} ==========`);
 
         // physics step
         if (this.physicsEngine) {

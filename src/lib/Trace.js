@@ -29,7 +29,7 @@ class Trace {
         if (level < this.options.traceLevel)
             return;
 
-        this.traceBuffer.push({ data, level, time: new Date() });
+        this.traceBuffer.push({ data, level, step: this.step, time: new Date() });
     }
 
     rotate() {
@@ -40,6 +40,10 @@ class Trace {
 
     get length() {
         return this.traceBuffer.length;
+    }
+
+    setStep(s) {
+        this.step = s;
     }
 }
 

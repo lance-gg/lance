@@ -4,6 +4,7 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
+    maxReEnactSteps: 60,  // maximum number of steps to re-enact
     RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
     extrapolate: 2,       // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
     localObjBending: 0.1, // amount of bending towards position of sync object
@@ -163,6 +164,10 @@ class ExtrapolateStrategy extends SyncStrategy {
         //
         this.cleanRecentInputs();
         this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
+        if (serverStep < world.stepCount - this.options.maxReEnactSteps) {
+            serverStep = world.stepCount - this.options.maxReEnactSteps;
+            this.gameEngine.trace.info(`too many steps to re-enact.  Starting from [${serverStep}] to [${world.stepCount}]`);
+        }
         this.gameEngine.serverStep = serverStep;
         for (; serverStep < world.stepCount; serverStep++) {
             if (this.recentInputs[serverStep]) {
