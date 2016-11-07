@@ -7,8 +7,18 @@ const ExtrapolateStrategy = require('./syncStrategies/ExtrapolateStrategy');
 
 class Synchronizer {
 
-    constructor(clientEngine) {
+    // create a synchronizer instance
+    //
+    // options have sub-options for each synchronization strategy
+    // options = {
+    //     interpolate: {},
+    //     clientPrediction: {},
+    //     frameSync: {},
+    //     extrapolate: {}
+    // };
+    constructor(clientEngine, options) {
         this.clientEngine = clientEngine;
+        this.options = options || {};
     }
 
     // TODO:
@@ -17,28 +27,28 @@ class Synchronizer {
 
     set interpolateObjectSelector(selector) {
         if (!this.interpolateStrategy) {
-            this.interpolateStrategy = new InterpolateStrategy(this.clientEngine);
+            this.interpolateStrategy = new InterpolateStrategy(this.clientEngine, this.options.interpolate);
         }
         this.interpolateStrategy.objectSelector = selector;
     }
 
     set clientPredictionSelector(selector) {
         if (!this.clientPredictionStrategy) {
-            this.clientPredictionStrategy = new ClientPredictionStrategy(this.clientEngine);
+            this.clientPredictionStrategy = new ClientPredictionStrategy(this.clientEngine, this.options.clientPrediction);
         }
         this.clientPredictionStrategy.objectSelector = selector;
     }
 
     set frameSyncSelector(selector) {
         if (!this.frameSyncStrategy) {
-            this.frameSyncStrategy = new FrameSyncStrategy(this.clientEngine);
+            this.frameSyncStrategy = new FrameSyncStrategy(this.clientEngine, this.options.frameSync);
         }
         this.frameSyncStrategy.objectSelector = selector;
     }
 
     set extrapolateObjectSelector(selector) {
         if (!this.extrapolateStrategy) {
-            this.extrapolateStrategy = new ExtrapolateStrategy(this.clientEngine);
+            this.extrapolateStrategy = new ExtrapolateStrategy(this.clientEngine, this.options.extrapolate);
         }
         this.extrapolateStrategy.objectSelector = selector;
     }
