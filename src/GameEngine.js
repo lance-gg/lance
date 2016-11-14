@@ -25,7 +25,71 @@ const Trace = require('./lib/Trace');
  */
 class GameEngine {
 
+    /**
+     * EVENTS
+     */
+
+    /**
+     * Marks the beginning of a new game step
+     *
+     * @event GameEngine#preStep
+     * @param {Number} stepNumber - the step number
+     */
+
+    /**
+     * Marks the end of a game step
+     *
+     * @event GameEngine#postStep
+     * @param {Number} stepNumber - the step number
+     */
+
+    /**
+     * An object has been added to the world
+     *
+     * @event GameEngine#objectAdded
+     * @param {Object} obj - the new object
+     */
+
+    /**
+     * An object has been removed from the world
+     *
+     * @event GameEngine#objectDestroyed
+     * @param {Object} obj - the object
+     */
+
+    /**
+     * A player has joined
+     *
+     * @event GameEngine#playerJoined
+     * @param {Object} playerDesc - player descriptor
+     * @param {String} playerDesc.playerId - the player ID
+     */
+
+    /**
+     * A player has left
+     *
+     * @event GameEngine#playerDisconnected
+     * @param {Object} playerDesc - player descriptor
+     * @param {String} playerDesc.playerId - the player ID
+     */
+
+    /**
+     * A synchronization update arrived from the server
+     *
+     * @event GameEngine#syncReceived
+     * @param {Object} sync - the synchronization object
+     */
+
+    /**
+      * Create a game engine instance.  This needs to happen
+      * once on the server, and once on each client.
+      *
+      * @param {Object} options - options object
+      * @param {Number} options.traceLevel - the trace level from 0 to 5
+      * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will delay  the input
+      */
     constructor(inputOptions) {
+
         // if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld,
@@ -46,8 +110,30 @@ class GameEngine {
 
         // set up event emitting and interface
         let eventEmitter = new EventEmitter();
+
+        /**
+         * Register a handler for an event
+         *
+         * @method on
+         * @memberof GameEngine
+         * @instance
+         * @param {String} eventName - name of the event
+         * @param {Function} eventHandler - handler function
+         */
         this.on = eventEmitter.on;
+
+        /**
+         * Register a handler for an event, called just once (if at all)
+         *
+         * @method once
+         * @memberof GameEngine
+         * @instance
+         * @param {String} eventName - name of the event
+         * @param {Function} eventHandler - handler function
+         */
         this.once = eventEmitter.once;
+
+
         this.emit = eventEmitter.emit;
 
         // set up trace
@@ -95,7 +181,6 @@ class GameEngine {
 
     step() {
         this.world.stepCount++;
-        this.trace.info(`========== starting step ${this.world.stepCount} ==========`);
 
         // physics step
         if (this.physicsEngine) {

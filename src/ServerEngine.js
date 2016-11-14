@@ -74,6 +74,9 @@ class ServerEngine {
     step() {
         var that = this;
 
+        // first update the trace state
+        this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
+
         this.serverTime = (new Date().getTime());
 
         // for each player, replay all the inputs in the oldest step
@@ -93,9 +96,9 @@ class ServerEngine {
         // run the game engine step
         // TODO: shouldn't these be called server.preStep and server.postStep,
         // reserving the shorter names for the gameEngine itself?
-        that.gameEngine.emit("preStep", that.gameEngine.world.stepCount);
+        this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
         this.gameEngine.step();
-        that.gameEngine.emit("postStep", that.gameEngine.world.stepCount);
+        this.gameEngine.emit("postStep", this.gameEngine.world.stepCount);
 
         // update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
@@ -122,7 +125,7 @@ class ServerEngine {
         if (this.gameEngine.trace.length) {
             let traceData = this.gameEngine.trace.rotate();
             let traceString = '';
-            traceData.forEach(t => { traceString += `[${t.time.toISOString()}]:${t.data}\n`; });
+            traceData.forEach(t => { traceString += `[${t.time.toISOString()}]${t.step}>${t.data}\n`; });
             fs.appendFile('server.trace', traceString, err => { if (err) throw err; });
         }
     }
@@ -187,7 +190,7 @@ class ServerEngine {
         socket.on('trace', function(traceData) {
             traceData = JSON.parse(traceData);
             let traceString = '';
-            traceData.forEach(t => { traceString += `[${t.time}]:${t.data}\n`; });
+            traceData.forEach(t => { traceString += `[${t.time}]${t.step}>${t.data}\n`; });
             fs.appendFile(`client.${playerId}.trace`, traceString, err => { if (err) throw err; });
         });
 

@@ -60,6 +60,9 @@ class ClientEngine {
 
     step() {
 
+        // first update the trace state
+        this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
+
         // skip one step if requested
         // then count down before checking again
         if (typeof this.skipOneStep === 'number') this.skipOneStep--;
