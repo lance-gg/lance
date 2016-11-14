@@ -40,7 +40,7 @@ class NetworkMonitor {
         }
         this.movingRTTAverage = this.movingRTTAverageFrame.reduce(sumArray)/this.movingRTTAverageFrame.length;
 
-        console.log(RTT, this.movingRTTAverage);
+        // console.log(RTT, this.movingRTTAverage);
     }
 
     //server
