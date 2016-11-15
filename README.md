@@ -58,3 +58,5 @@ The fundamental sequence of each (client-side) step is organized as follows:
 * server.inputReceived
 * client.preStep
 * client.postStep
+* server.preStep
+* server.postStep

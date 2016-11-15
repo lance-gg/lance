@@ -174,7 +174,7 @@ so that it is clear what each chunk of logic is handling.
 The full list of events is available in the API, so we will only list the most
 important events here.
 
-* `preStep` and `postStep` - emitted on server side only, just before and just after step execution.  The event handlers receive the step number as an argument.
+* `preStep` and `postStep` - emitted by game engine, just before and just after step execution.  The event handlers receive the step number and whether or not this step is a reenactment.
 * `objectAdded` and `objectDestroyed` - emitted on object addition/destruction, the handlers receive the object as an argument.
 * `syncReceived` - emitted on the client when a sync (e.g world update) is received.
 * `playerJoined` and `playerDisconnected` - emitted on player connect/disconnect.  The handlers receive an object describing the player.  The object contains attribute playerId.

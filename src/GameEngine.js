@@ -88,13 +88,13 @@ class GameEngine {
       * @param {Number} options.traceLevel - the trace level from 0 to 5
       * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will delay  the input
       */
-    constructor(inputOptions) {
+    constructor(options) {
 
         // if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld,
             traceLevel: Trace.TRACE_NONE
-        }, inputOptions);
+        }, options);
 
         // get the physics engine and initialize it
         if (this.options.physicsEngine) {
@@ -132,7 +132,6 @@ class GameEngine {
          * @param {Function} eventHandler - handler function
          */
         this.once = eventEmitter.once;
-
 
         this.emit = eventEmitter.emit;
 
@@ -179,8 +178,12 @@ class GameEngine {
         this.initWorld();
     }
 
-    step() {
-        this.world.stepCount++;
+    step(isReenact) {
+
+        // emit preStep event
+        isReenact = !!isReenact;
+        var step = ++this.world.stepCount;
+        this.emit("preStep", { step, isReenact });
 
         // physics step
         if (this.physicsEngine) {
@@ -188,20 +191,27 @@ class GameEngine {
         }
 
         // handle post-physics business logic
-        this.updateGameWorld();
+        this.updateGameWorld(isReenact);
+
+        // emit postStep event
+        this.emit("postStep", { step, isReenact });
     }
 
-    updateGameWorld() {
+    updateGameWorld(isReenact) {
 
-        // TODO: use for ... of Object.keys()
-        for (let objId in this.world.objects) {
-            if (this.world.objects.hasOwnProperty(objId)) {
-                let ob = this.world.objects[objId];
-                ob.step(this.worldSettings);
-                this.trace.debug(`after object step: ${ob.toString()}`);
-                if (ob.renderObject) {
-                    ob.updateRenderObject();
-                }
+        for (let objId of Object.keys(this.world.objects)) {
+
+            // shadow objects are not re-enacted
+            if (isReenact && objId >= this.options.clientIDSpace)
+                continue;
+
+            // run the object step
+            let ob = this.world.objects[objId];
+            ob.step(this.worldSettings);
+
+            this.trace.trace(`object[${objId}] after ${isReenact?"reenact":"step"} : ${ob.toString()}`);
+            if (ob.renderObject) {
+                ob.updateRenderObject();
             }
         }
     }

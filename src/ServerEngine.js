@@ -76,6 +76,7 @@ class ServerEngine {
 
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
+        this.gameEngine.emit("server.preStep", this.gameEngine.world.stepCount + 1);
 
         this.serverTime = (new Date().getTime());
 
@@ -94,11 +95,7 @@ class ServerEngine {
         }
 
         // run the game engine step
-        // TODO: shouldn't these be called server.preStep and server.postStep,
-        // reserving the shorter names for the gameEngine itself?
-        this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
         this.gameEngine.step();
-        this.gameEngine.emit("postStep", this.gameEngine.world.stepCount);
 
         // update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
@@ -121,6 +118,9 @@ class ServerEngine {
                 }
             }
         }
+
+        // step is done on the server side
+        this.gameEngine.emit("server.postStep", this.gameEngine.world.stepCount);
 
         if (this.gameEngine.trace.length) {
             let traceData = this.gameEngine.trace.rotate();

@@ -21,7 +21,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.newSync = null;
         this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.on('postStep', this.extrapolate.bind(this));
+        this.gameEngine.on('client.postStep', this.extrapolate.bind(this));
         this.gameEngine.on('client.syncReceived', this.collectSync.bind(this));
         this.gameEngine.on('client.preInput', this.clientInputSave.bind(this));
     }
@@ -132,18 +132,6 @@ class ExtrapolateStrategy extends SyncStrategy {
                 localShadowObj.destroy();
                 delete this.gameEngine.world.objects[localShadowObj.id];
 
-                // TODO:
-                // refactor, so that instead of saving the old state, progressing
-                // the current object, and then bending back to the old state, we should create a
-                // side-object, progress that side-object, and then bend the current
-                // object to the side-object by X percent.
-                // that approach will clean up a lot of code.
-
-                // TODO:
-                // if we do the change above (refactor), then there is no need
-                // to set the render object to "visible: false" because at no point
-                // in time it will be pointing to wrong values.
-
             } else if (curObj) {
 
                 // case 2: this object already exists locally
@@ -160,7 +148,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         }
 
         //
-        // re-enact the steps that we want to extrapolate forwards
+        // reenact the steps that we want to extrapolate forwards
         //
         this.cleanRecentInputs();
         this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
@@ -168,10 +156,12 @@ class ExtrapolateStrategy extends SyncStrategy {
             serverStep = world.stepCount - this.options.maxReEnactSteps;
             this.gameEngine.trace.info(`too many steps to re-enact.  Starting from [${serverStep}] to [${world.stepCount}]`);
         }
+
         this.gameEngine.serverStep = serverStep;
-        for (; serverStep < world.stepCount; serverStep++) {
-            if (this.recentInputs[serverStep]) {
-                this.recentInputs[serverStep].forEach(inputData => {
+        let clientStep = world.stepCount;
+        for (world.stepCount = serverStep; world.stepCount < clientStep;) {
+            if (this.recentInputs[world.stepCount]) {
+                this.recentInputs[world.stepCount].forEach(inputData => {
 
                     // only movement inputs are re-enacted
                     if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
@@ -181,15 +171,8 @@ class ExtrapolateStrategy extends SyncStrategy {
                 });
             }
 
-            for (let objId of Object.keys(world.objects)) {
-
-                // shadow objects are not re-enacted
-                if (objId >= this.gameEngine.options.clientIDSpace)
-                    continue;
-
-                world.objects[objId].step(this.gameEngine.worldSettings);
-                this.gameEngine.trace.trace(`extrapolate re-enacting step[${serverStep}] on obj[${objId}]`);
-            }
+            // run the game engine step in "reenact" mode
+            this.gameEngine.step(true);
         }
 
         //

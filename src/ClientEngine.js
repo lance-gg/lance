@@ -4,7 +4,6 @@ const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
 
-
 const STEP_DRIFT_THRESHOLD = 20;
 const SKIP_ONE_STEP_COUNTDOWN = 10;
 
@@ -89,9 +88,7 @@ class ClientEngine {
         // perform game engine step
         this.handleOutboundInput();
         this.applyDelayedInputs();
-        this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
         this.gameEngine.step();
-        this.gameEngine.emit("postStep", this.gameEngine.world.stepCount);
 
         if (this.gameEngine.renderer) {
             this.gameEngine.renderer.draw();
