@@ -4,7 +4,7 @@ const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
 
-const STEP_DRIFT_THRESHOLD = 20;
+const STEP_DRIFT_THRESHOLD = 10;
 const SKIP_ONE_STEP_COUNTDOWN = 10;
 
 /**

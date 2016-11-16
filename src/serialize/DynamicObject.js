@@ -1,6 +1,5 @@
 "use strict";
 
-
 const Point = require('../Point');
 const Serializable = require('./Serializable');
 const Serializer = require('./Serializer');
@@ -91,6 +90,11 @@ class DynamicObject extends Serializable {
         this.maxSpeed = sourceObj.maxSpeed;
     }
 
+    // default bending multiples are null,
+    // indicating that they are taken from Extrapolate options
+    get bendingMultiple() { return null; }
+    get velocityBendingMultiple() { return null; }
+
     step(worldSettings) {
         if (this.isRotatingRight) { this.angle += this.rotationSpeed; }
         if (this.isRotatingLeft) { this.angle -= this.rotationSpeed; }
@@ -174,6 +178,13 @@ class DynamicObject extends Serializable {
 
     bendTo(original, bending, worldSettings) {
 
+        // if the object has defined a bending multiples for this object, use them
+        if (this.bendingMultiple !== null)
+            bending = this.bendingMultiple;
+        let velocityBending = bending;
+        if (this.velocityBendingMultiple !== null)
+            velocityBending = this.velocityBendingMultiple;
+
         // bend to position, velocity, and angle gradually
         if (worldSettings.worldWrap) {
             this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / 10;
@@ -183,8 +194,8 @@ class DynamicObject extends Serializable {
             this.bendingY = MathUtils.interpolateDelta(original.y, this.y, bending) / 10;
         }
         this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, bending, 0, 360) / 10;
-        this.velX = MathUtils.interpolate(original.velX, this.velX, bending);
-        this.velY = MathUtils.interpolate(original.velY, this.velY, bending);
+        this.velX = MathUtils.interpolate(original.velX, this.velX, velocityBending);
+        this.velY = MathUtils.interpolate(original.velY, this.velY, velocityBending);
 
         // revert to original
         this.x = original.x;
