@@ -6,6 +6,7 @@ const NetworkMonitor = require('./network/NetworkMonitor');
 
 const STEP_DRIFT_THRESHOLD = 10;
 const SKIP_ONE_STEP_COUNTDOWN = 10;
+const GAME_UPS = 60;
 
 /**
  * The client engine is the singleton which manages the client-side
@@ -17,6 +18,8 @@ class ClientEngine {
 
     constructor(gameEngine, inputOptions) {
         var that = this;
+
+        this.options = Object.assign({}, inputOptions);
 
         this.socket = io();
         this.serializer = new Serializer();
@@ -39,7 +42,7 @@ class ClientEngine {
 
         this.socket.on('playerJoined', function(playerData) {
             that.playerId = playerData.playerId;
-            that.messageIndex = +that.playerId * 10000;
+            that.messageIndex = Number(that.playerId) * 10000;
         });
 
         // when objects get added, tag them as playerControlled if necessary
@@ -54,7 +57,36 @@ class ClientEngine {
             that.inboundMessages.push(worldData);
         });
 
+        // initialize the renderer
+        if (!this.renderer) {
+            alert('ERROR: game has not defined a renderer');
+        }
+        this.renderer.init();
+
+        // Simple JS game loop adapted from
+        // http://nokarma.org/2011/02/02/javascript-game-development-the-game-loop/
+        let skipTicks = 1000 / GAME_UPS;
+        let nextGameTick = (new Date()).getTime();
+
+        // the game loop ensures a fixed number of steps per second
+        let gameLoop = () => {
+            while ((new Date()).getTime() > nextGameTick) {
+                this.step();
+                nextGameTick += skipTicks;
+            }
+            window.requestAnimationFrame(gameLoop);
+        };
+
+        // the render loop waits for next animation frame
+        let renderLoop = () => {
+            this.renderer.draw();
+            window.requestAnimationFrame(renderLoop);
+        };
+
+        // start game, game loop, render loop
         this.gameEngine.start();
+        gameLoop();
+        renderLoop();
     }
 
     step() {
@@ -80,7 +112,7 @@ class ClientEngine {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  server is behind client.  client will skip a step`);
                 this.skipOneStep = true;
-            } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount +  STEP_DRIFT_THRESHOLD) {
+            } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  client is behind server`);
             }
         }
@@ -89,10 +121,6 @@ class ClientEngine {
         this.handleOutboundInput();
         this.applyDelayedInputs();
         this.gameEngine.step();
-
-        if (this.gameEngine.renderer) {
-            this.gameEngine.renderer.draw();
-        }
         this.gameEngine.emit("client.postStep");
 
         if (this.gameEngine.trace.length) {

@@ -142,11 +142,6 @@ class DynamicObject extends Serializable {
         Object.assign(this, options);
     }
 
-    initRenderObject(renderer, options) {
-        this.renderer = renderer;
-        this.renderObject = this.renderer.addObject(this, options);
-    }
-
     saveState(other) {
         this.savedCopy = (new this.constructor());
         this.savedCopy.copyFrom(other ? other : this);
@@ -209,25 +204,19 @@ class DynamicObject extends Serializable {
         this.velocity.y = this.velY;
     }
 
-    updateRenderObject() {
-        this.renderObject.x = this.x;
-        this.renderObject.y = this.y;
-        this.renderObject.angle = this.angle;
-    }
-
-    interpolate(prevObj, nextObj, playPercentage) {
+    interpolate(prevObj, nextObj, playPercentage, worldSettings) {
 
         // update other objects with interpolation
         // TODO refactor into general interpolation class
         if (this.isPlayerControlled != true) {
 
-            if (Math.abs(nextObj.x - prevObj.x) > this.renderer.worldSettings.height / 2) {
+            if (Math.abs(nextObj.x - prevObj.x) > worldSettings.height / 2) {
                 this.x = nextObj.x;
             } else {
                 this.x = (nextObj.x - prevObj.x) * playPercentage + prevObj.x;
             }
 
-            if (Math.abs(nextObj.y - prevObj.y) > this.renderer.worldSettings.height / 2) {
+            if (Math.abs(nextObj.y - prevObj.y) > worldSettings.height / 2) {
                 this.y = nextObj.y;
             } else {
                 this.y = (nextObj.y - prevObj.y) * playPercentage + prevObj.y;
@@ -235,21 +224,12 @@ class DynamicObject extends Serializable {
 
             var shortestAngle = ((((nextObj.angle - prevObj.angle) % 360) + 540) % 360) - 180;
             this.angle = prevObj.angle + shortestAngle * playPercentage;
-
-            if (this.renderObject) {
-                this.updateRenderObject();
-            }
         }
     }
 
     // release resources
     destroy() {
         console.log(`destroying object ${this.id}`);
-
-        // destroy the renderObject
-        if (this.renderObject) {
-            this.renderer.removeObject(this.renderObject);
-        }
     }
 }
 

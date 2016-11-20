@@ -102,10 +102,14 @@ class GameEngine {
             this.physicsEngine.init();
         }
 
-        // get the renderer and initialize it
-        if (this.options.renderer) {
-            this.renderer = this.options.renderer;
-            this.renderer.init();
+        // check isServer is defined
+        if (!this.options.hasOwnProperty('isServer')) {
+            const msg = 'ERROR: Game engine is neither server nor client.  Set option isServer.';
+            if (typeof window === 'undefined') {
+                console.log(msg);
+                process.exit(-1);
+            }
+            alert(msg);
         }
 
         // set up event emitting and interface
@@ -159,7 +163,7 @@ class GameEngine {
         this.world = new GameWorld();
 
         // on the client we have a different ID space
-        if (this.options.clientIDSpace && this.renderer) {
+        if (this.options.clientIDSpace && this.isClient) {
             this.world.idCount = this.options.clientIDSpace;
         }
 
@@ -210,19 +214,11 @@ class GameEngine {
             ob.step(this.worldSettings);
 
             this.trace.trace(`object[${objId}] after ${isReenact?"reenact":"step"} : ${ob.toString()}`);
-            if (ob.renderObject) {
-                ob.updateRenderObject();
-            }
         }
     }
 
     addObjectToWorld(object, options) {
         this.world.objects[object.id] = object;
-
-        // it may need a renderer sub-object
-        if (this.renderer) {
-            object.initRenderObject(this.renderer, options);
-        }
 
         this.emit("objectAdded", object);
         this.trace.info(`========== object added ${object.toString()} ==========`);

@@ -6,7 +6,11 @@
 class Renderer {
 
     // constructor
-    constructor() {}
+    constructor(gameEngine) {
+        this.gameEngine = gameEngine;
+        gameEngine.on('objectAdded', this.addObject.bind(this));
+        gameEngine.on('objectDestroyed', this.removeObject.bind(this));
+    }
 
     // setup the scene
     init() {
@@ -20,12 +24,12 @@ class Renderer {
 
     // add one object
     // return a reference to the object
-    addObject(id) {
-        return NULL;
+    addObject(obj) {
+        return null;
     }
 
     // remove an object from the scene
-    removeObject(o) {
+    removeObject(obj) {
     }
 }
 

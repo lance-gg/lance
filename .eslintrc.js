@@ -1,5 +1,9 @@
 module.exports = {
     "extends": "google",
+    "env": {
+        "browser": true,
+        "node": true
+    },
     "installedESLint": true,
     "parserOptions": {
         "ecmaVersion": 6
@@ -12,6 +16,7 @@ module.exports = {
         "linebreak-style": ["error", "unix"],
         "max-len": "off",
         "max-statements-per-line": ["error", { "max": 2 }],
+        "no-alert": "off",
         "no-console": "off",
         "no-warning-comments": "off",
         "object-curly-spacing": ["error", "always"],
