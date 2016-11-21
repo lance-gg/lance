@@ -1,11 +1,13 @@
 # Incheon Game Tutorial
 
 This tutorial will guide you in the building of a relatively simple
-javascript networked game.  It will start by introducing the basic concepts of a
+javascript networked game.  It is meant as a more advanced
+tutorial, a follow-up to [My First Incheon Game](https://incheon.gg/docs/tutorials/MyFirstIncheonGame.html).
+This tutorial repeats the environment setup, but goes further in-depth,
+introducing the concepts and basic components of a
 networked game,
-convering the basic sequence flows on the client and on the server.
-The tutorial then proceeds with the writing of the client code, the server
-code, and the game logic.
+and sequence flows on the server and the clients.
+
 
 All the code in this tutorial references the repository [spaaace](https://github.com/OpherV/spaaace) - so
 clone that repository to see the referenced files.
