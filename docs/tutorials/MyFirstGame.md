@@ -5,10 +5,9 @@ javascript networked game, [Pong](https://en.wikipedia.org/wiki/Pong).  It start
 then proceeds with the writing of client code, server
 code, and game logic.
 
-## Setting up the environment
+## Setting up the Environment
 
-The creation of a new game starts by cloning boilerplate code.
-Clone the boilerplate code:
+The creation of a new game starts by cloning boilerplate code:
 
 ```shell
 git clone https://github.com/namel/incheongame.git
@@ -19,240 +18,215 @@ npm install
 You now have the basic directory structure of a game.  Look around.
 The boilerplate includes an `index.html` file, which will be served
 to the clients, and a `main.js` file, which is the entry point of the node server.
-The game code is inside the `src` directory, sub-divided into
-directories `client`, `server`, and `common`.
+The game code is inside the `src` directory, divided into
+sub-directories `client`, `server`, and `common`.
 
-## Step 1: create the game objects classes
+## Step 1: Create the Game Object Classes
 
 We have two kinds of objects in Pong, the paddle and the ball.
-These files extend the DynamicObject class, but are quite simple.
+These files extend the `DynamicObject` class, but are quite simple.
+The boilerplate includes a sample game object class, in the file
+`src/common/Player.js`
 
-Inside the src/common directory, create these two files:
+Create the following two classes in the `src/common` directory:
 
 ### src/common/Paddle.js
-The Paddle class is a bear-bones object.
+The Paddle class is a bear-bones object.  It is an exact copy of
+the sample `Player.js` object, except that it is called `Paddle`.
 
+```javascript
+'use strict';
+
+const DynamicObject  = require('incheon').serialize.DynamicObject;
+
+class Paddle extends DynamicObject {
+
+    constructor(id, x, y) {
+        super(id, x, y);
+        this.class = Paddle;
+    };
+}
+module.exports = Paddle;
+```
+
+### src/common/Ball.js
+The Ball class is only slightly more complicated than the Paddle
+class.  It adds two getters, which define "bending" properties.
+The bending properties below indicate that the client object's position should
+gradually *bend* towards the server object's position at a rate of 0.1
+(10%) each time the server sends position updates.  The client object's
+velocity should not bend at all, because the ball's velocity can change
+suddenly as it hits a wall or a paddle.
+We also give the Ball an initial velocity when it is created.
 ```javascript
 'use strict';
 
 const DynamicObject = require('incheon').serialize.DynamicObject;
 
-class Paddle extends DynamicObject {
-
-    static get netScheme() {
-        return Object.assign({}, super.netScheme);
-    }
-
-    static newFrom(sourceObj) {
-        let newPaddle = new Paddle();
-        newPaddle.copyFrom(sourceObj);
-
-        return newPaddle;
-    }
-
-    constructor(id, x, y) {
-        super(id, x, y);
-
-        this.class = Paddle;
-    };
-
-}
-
-module.exports = Paddle;
-```
-
-### src/common/Ball.js
-The Ball class has two getters, which define "bending" properties.
-The bending properties below indicate that the client object should
-gradually *bend* towards the server object's position at a rate of 0.1
-(10%) per server sync.  The client object's velocity should not bend
-at all, because the ball's velocity can change suddenly as it hits a wall
-or a paddle.
-```javascript
-'use strict';
-
-const DynamicObject= require('incheon').serialize.DynamicObject;
-
 class Ball extends DynamicObject {
-
-    static get netScheme() {
-        return Object.assign({}, super.netScheme);
-    }
-
-    static newFrom(sourceObj) {
-        var newBall = new Ball();
-        newBall.copyFrom(sourceObj);
-
-        return newBall;
-    }
 
     get bendingMultiple() { return 0.1; }
     get velocityBendingMultiple() { return 0; }
 
     constructor(id, x, y) {
         super(id, x, y);
-
         this.class = Ball;
-
         this.velocity.set(2, 2);
     };
-
 }
-
 module.exports = Ball;
 ```
 
 ## Step 2: Implement the MyGameEngine class
 
+The game engine class runs on both the server and the client,
+and executes the game's logic.  The client runs the game engine to
+predict what will happen, but the server execution is the true
+game progress, overriding what the clients might have predicted.
+
+For Pong, we will need to bounce the ball around the board, and check if it
+hit a paddle.  We will also need to respond to the up/down inputs.
+
+### src/common/GameEngine.js
 The MyGameEngine class implements the actual logic of the game.
 It does the following:
 * **start**: define the "world" settings, and register the game logic to run as a post-step function.
+Modify the start function to match the following:
+```js
+start() {
+
+    super.start();
+
+    this.worldSettings = {
+        width: 400,
+        height: 400,
+        paddleWidth: 10,
+        paddleHeight: 50,
+        paddlePadding: 20
+    };
+
+    this.on('postStep', () => { this.postStepHandleBall(); });
+};
+```
 * **processInput**: handle user inputs by moving the paddle up or down.
+Modify the processInput function to match the following:
+```js
+processInput(inputData, playerId) {
+
+    super.processInput(inputData, playerId);
+
+    // get the player paddle tied to the player socket
+    var playerPaddle;
+
+    for (let objId in this.world.objects) {
+        if (this.world.objects[objId].playerId == playerId) {
+            playerPaddle = this.world.objects[objId];
+            break;
+        }
+    }
+    if (playerPaddle) {
+        if (inputData.input === 'up') {
+            playerPaddle.y -= 5;
+        } else if (inputData.input === 'down') {
+            playerPaddle.y += 5;
+        }
+    }
+};
+```
 * **initGame**: create two paddles, a ball, and add these objects to the game world.
-* **attachPaddle**: when the first player connects, it becomes the left paddle.  When a second player connects it becomes the right paddle.
-* **postStepHandleBall**: this function is executed after the ball has moved.  Check if the ball has hit a wall, or a paddle, and if a player has scored.
+Add the following initGame function:
+```js
+initGame() {
+    // create the paddle objects
+    this.player1Paddle = new Paddle(++this.world.idCount, this.worldSettings.paddlePadding, 0);
+    this.player2Paddle = new Paddle(++this.world.idCount, this.worldSettings.width - this.worldSettings.paddlePadding, 0);
+    this.ball = new Ball(++this.world.idCount, this.worldSettings.width / 2, this.worldSettings.height / 2);
 
-### src/common/GameEngine.js
-```javascript
-'use strict';
+    // associate paddels with the right players
+    this.player1Paddle.playerId = 0;
+    this.player2Paddle.playerId = 1;
 
-const GameEngine = require('incheon').GameEngine;
-const Paddle = require('./Paddle');
-const Ball = require('./Ball');
-
-class MyGameEngine extends GameEngine {
-
-    constructor(options) {
-        super(options);
-    }
-
-    start() {
-
-        super.start();
-
-        this.worldSettings = {
-            width: 400,
-            height: 400,
-            paddleWidth: 10,
-            paddleHeight: 50,
-            paddlePadding: 20
-        };
-
-        this.on('postStep', () => { this.postStepHandleBall(); });
-    };
-
-    processInput(inputData, playerId) {
-
-        super.processInput(inputData, playerId);
-
-        // get the player paddle tied to the player socket
-        var playerPaddle;
-
-        for (let objId in this.world.objects) {
-            if (this.world.objects[objId].playerId == playerId) {
-                playerPaddle = this.world.objects[objId];
-                break;
-            }
-        }
-        if (playerPaddle) {
-            if (inputData.input === 'up') {
-                playerPaddle.y -= 5;
-            } else if (inputData.input === 'down') {
-                playerPaddle.y += 5;
-            }
-        }
-    };
-
-    initGame() {
-        // create the paddle objects
-        this.player1Paddle = new Paddle(++this.world.idCount, this.worldSettings.paddlePadding, 0);
-        this.player2Paddle = new Paddle(++this.world.idCount, this.worldSettings.width - this.worldSettings.paddlePadding, 0);
-        this.ball = new Ball(++this.world.idCount, this.worldSettings.width / 2, this.worldSettings.height / 2);
-
-        // associate paddels with the right players
-        this.player1Paddle.playerId = 0;
-        this.player2Paddle.playerId = 1;
-
-        // add paddle objects to the game world
-        this.addObjectToWorld(this.player1Paddle);
-        this.addObjectToWorld(this.player2Paddle);
-        this.addObjectToWorld(this.ball);
-    }
-
-    attachPaddle(paddleId, playerId) {
-        // which player?
-        if (paddleId === 0) {
-            this.player1Paddle.playerId = playerId;
-        } else if (paddleId === 1) {
-            this.player2Paddle.playerId = playerId;
-        }
-    }
-
-    postStepHandleBall() {
-        if (this.ball) {
-
-            // LEFT EDGE:
-            if (this.ball.x <= this.worldSettings.paddlePadding + this.worldSettings.paddleWidth &&
-                    this.ball.y >= this.player1Paddle.y &&
-                    this.ball.y <= this.player1Paddle.y + this.worldSettings.paddleHeight &&
-                    this.ball.velocity.x < 0) {
-
-                // ball moving left hit player 1 paddle
-                this.ball.velocity.x *= -1;
-                this.ball.x = this.worldSettings.paddlePadding + this.worldSettings.paddleWidth + 1;
-            } else if (this.ball.x <= 0) {
-
-                // ball hit left wall
-                this.ball.velocity.x *= -1;
-                this.ball.x = 0;
-                this.player2Score();
-                console.log(`player 2 scored`);
-            }
-
-            // RIGHT EDGE:
-            if (this.ball.x >= this.worldSettings.width - this.worldSettings.paddlePadding - this.worldSettings.paddleWidth &&
-                this.ball.y >= this.player2Paddle.y &&
-                this.ball.y <= this.player2Paddle.y + this.worldSettings.paddleHeight &&
-                this.ball.velocity.x > 0) {
-
-                // ball moving right hits player 2 paddle
-                this.ball.velocity.x *= -1;
-                this.ball.x = this.worldSettings.width - this.worldSettings.paddlePadding - this.worldSettings.paddleWidth - 1;
-            } else if (this.ball.x >= this.worldSettings.width ) {
-
-                // ball hit right wall
-                this.ball.velocity.x *= -1;
-                this.ball.x = this.worldSettings.width - 1;
-                this.player1Score();
-                console.log(`player 1 scored`);
-            }
-
-            // ball hits top
-            if (this.ball.y <= 0) {
-                this.ball.y = 1;
-                this.ball.velocity.y *= -1;
-            } else if (this.ball.y >= this.worldSettings.height) {
-                // ball hits bottom
-                this.ball.y = this.worldSettings.height - 1;
-                this.ball.velocity.y *= -1;
-            }
-        }
-    };
-
-    player1Score() {
-    }
-
-    player2Score() {
+    // add paddle objects to the game world
+    this.addObjectToWorld(this.player1Paddle);
+    this.addObjectToWorld(this.player2Paddle);
+    this.addObjectToWorld(this.ball);
+}
+```
+* **attachPaddle**: when the first player connects, it becomes the left paddle.  When a second player connects it becomes the right paddle.  Add the following method:
+```js
+attachPaddle(paddleId, playerId) {
+    // which player?
+    if (paddleId === 0) {
+        this.player1Paddle.playerId = playerId;
+    } else if (paddleId === 1) {
+        this.player2Paddle.playerId = playerId;
     }
 }
+```
+* **postStepHandleBall**: this function is executed after the ball has moved.  Check if the ball has hit a wall, or a paddle, and if a player has scored.  First add the object constructors at the top of the file: `const Paddle = require('./Paddle');` `const Ball = require('./Ball'); ` Now add the following methods: 
+```js
+postStepHandleBall() {
+    if (this.ball) {
 
-module.exports = MyGameEngine;
+        // LEFT EDGE:
+        if (this.ball.x <= this.worldSettings.paddlePadding + this.worldSettings.paddleWidth &&
+                this.ball.y >= this.player1Paddle.y &&
+                this.ball.y <= this.player1Paddle.y + this.worldSettings.paddleHeight &&
+                this.ball.velocity.x < 0) {
+
+            // ball moving left hit player 1 paddle
+            this.ball.velocity.x *= -1;
+            this.ball.x = this.worldSettings.paddlePadding + this.worldSettings.paddleWidth + 1;
+        } else if (this.ball.x <= 0) {
+
+            // ball hit left wall
+            this.ball.velocity.x *= -1;
+            this.ball.x = 0;
+            this.player2Score();
+            console.log(`player 2 scored`);
+        }
+
+        // RIGHT EDGE:
+        if (this.ball.x >= this.worldSettings.width - this.worldSettings.paddlePadding - this.worldSettings.paddleWidth &&
+            this.ball.y >= this.player2Paddle.y &&
+            this.ball.y <= this.player2Paddle.y + this.worldSettings.paddleHeight &&
+            this.ball.velocity.x > 0) {
+
+            // ball moving right hits player 2 paddle
+            this.ball.velocity.x *= -1;
+            this.ball.x = this.worldSettings.width - this.worldSettings.paddlePadding - this.worldSettings.paddleWidth - 1;
+        } else if (this.ball.x >= this.worldSettings.width ) {
+
+            // ball hit right wall
+            this.ball.velocity.x *= -1;
+            this.ball.x = this.worldSettings.width - 1;
+            this.player1Score();
+            console.log(`player 1 scored`);
+        }
+
+        // ball hits top
+        if (this.ball.y <= 0) {
+            this.ball.y = 1;
+            this.ball.velocity.y *= -1;
+        } else if (this.ball.y >= this.worldSettings.height) {
+            // ball hits bottom
+            this.ball.y = this.worldSettings.height - 1;
+            this.ball.velocity.y *= -1;
+        }
+    }
+};
+
+player1Score() {}
+player2Score() {}
 ```
 
-## Step 3: Extend the MyServerEngine class
+The end result should be this [file](https://github.com/OpherV/netpong/blob/master/src/common/NetpongGameEngine.js).
 
-The server engine will need to register the classes (`Ball` and `Paddle`),
-this is done in the constructor.  It must initialize the game engine
+## Step 3: Extend the MyServerEngine Class
+
+The server engine will need to register the classes (`Ball` and `Paddle`)
+with the serializer, so that they can be sent over the network.
+This happens in the constructor.  It must initialize the game engine
 when the game is started, and handle player connections and disconnections.
 
 ### src/server/MyServerEngine.js
@@ -310,9 +284,9 @@ class MyServerEngine extends ServerEngine {
 module.exports = MyServerEngine;
 ```
 
-## Step 4: the Client Side code
+## Step 4: the Client Code
 
-The client side code must implement a renderer, and a client engine.
+The client-side code must implement a renderer, and a client engine.
 
 The renderer, in our case, will simply update HTML elements created for
 each paddle and the ball:
