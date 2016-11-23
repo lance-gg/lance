@@ -59,6 +59,7 @@ class DynamicObject extends Serializable {
 
     }
 
+
     /**
      * formatted description of the dynamic object, for debugging purposes mostly
      *

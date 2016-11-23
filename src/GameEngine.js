@@ -102,16 +102,6 @@ class GameEngine {
             this.physicsEngine.init();
         }
 
-        // check isServer is defined
-        if (!this.options.hasOwnProperty('isServer')) {
-            const msg = 'ERROR: Game engine is neither server nor client.  Set option isServer.';
-            if (typeof window === 'undefined') {
-                console.log(msg);
-                process.exit(-1);
-            }
-            alert(msg);
-        }
-
         // set up event emitting and interface
         let eventEmitter = new EventEmitter();
 
