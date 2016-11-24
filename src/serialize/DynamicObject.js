@@ -59,7 +59,6 @@ class DynamicObject extends Serializable {
 
     }
 
-
     /**
      * formatted description of the dynamic object, for debugging purposes mostly
      *
@@ -115,6 +114,7 @@ class DynamicObject extends Serializable {
 
         // acceleration
         Point.add(this.velocity, this.temp.accelerationVector, this.velocity);
+
         // this.velocity.multiply(this.deceleration, this.deceleration);
         this.velocity.x = Math.round(this.velocity.x * 100) / 100;
         this.velocity.y = Math.round(this.velocity.y * 100) / 100;
@@ -127,15 +127,18 @@ class DynamicObject extends Serializable {
         this.isAccelerating = false;
         this.isRotatingLeft = false;
         this.isRotatingRight = false;
-        this.x = this.x + this.velocity.x + this.bendingX;
-        this.y = this.y + this.velocity.y + this.bendingY;
 
-        // wrap around the world edges
-        if (worldSettings.worldWrap) {
-            if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
-            if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
-            if (this.x < 0) { this.x += worldSettings.width; }
-            if (this.y < 0) { this.y += worldSettings.height; }
+        if (!this.passive) {
+            this.x = this.x + this.velocity.x + this.bendingX;
+            this.y = this.y + this.velocity.y + this.bendingY;
+
+            // wrap around the world edges
+            if (worldSettings.worldWrap) {
+                if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
+                if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
+                if (this.x < 0) { this.x += worldSettings.width; }
+                if (this.y < 0) { this.y += worldSettings.height; }
+            }
         }
     }
 
@@ -205,26 +208,26 @@ class DynamicObject extends Serializable {
         this.velocity.y = this.velY;
     }
 
-    interpolate(prevObj, nextObj, playPercentage, worldSettings) {
+    interpolate(nextObj, playPercentage, worldSettings) {
 
         // update other objects with interpolation
         // TODO refactor into general interpolation class
-        if (this.isPlayerControlled != true) {
+        if (this.isPlayerControlled !== true) {
 
-            if (Math.abs(nextObj.x - prevObj.x) > worldSettings.height / 2) {
+            if (Math.abs(nextObj.x - this.x) > worldSettings.height / 2) {
                 this.x = nextObj.x;
             } else {
-                this.x = (nextObj.x - prevObj.x) * playPercentage + prevObj.x;
+                this.x = (nextObj.x - this.x) * playPercentage + this.x;
             }
 
-            if (Math.abs(nextObj.y - prevObj.y) > worldSettings.height / 2) {
+            if (Math.abs(nextObj.y - this.y) > worldSettings.height / 2) {
                 this.y = nextObj.y;
             } else {
-                this.y = (nextObj.y - prevObj.y) * playPercentage + prevObj.y;
+                this.y = (nextObj.y - this.y) * playPercentage + this.y;
             }
 
-            var shortestAngle = ((((nextObj.angle - prevObj.angle) % 360) + 540) % 360) - 180;
-            this.angle = prevObj.angle + shortestAngle * playPercentage;
+            var shortestAngle = ((((nextObj.angle - this.angle) % 360) + 540) % 360) - 180;
+            this.angle = this.angle + shortestAngle * playPercentage;
         }
     }
 

@@ -6,7 +6,6 @@ const NetworkMonitor = require('./network/NetworkMonitor');
 const Synchronizer = require('./Synchronizer');
 
 const STEP_DRIFT_THRESHOLD = 10;
-const SKIP_ONE_STEP_COUNTDOWN = 10;
 const GAME_UPS = 60;
 
 /**
@@ -18,7 +17,6 @@ const GAME_UPS = 60;
 class ClientEngine {
 
     constructor(gameEngine, inputOptions) {
-        var that = this;
 
         this.options = Object.assign({}, inputOptions);
 
@@ -43,14 +41,14 @@ class ClientEngine {
                 this.delayedInputs[i] = [];
         }
 
-        this.socket.on('playerJoined', function(playerData) {
-            that.playerId = playerData.playerId;
-            that.messageIndex = Number(that.playerId) * 10000;
+        this.socket.on('playerJoined', (playerData) => {
+            this.playerId = playerData.playerId;
+            this.messageIndex = Number(this.playerId) * 10000;
         });
 
         // when objects get added, tag them as playerControlled if necessary
-        this.gameEngine.on('objectAdded', function(object) {
-            object.isPlayerControlled = (that.playerId == object.playerId);
+        this.gameEngine.on('objectAdded', (object) => {
+            object.isPlayerControlled = (this.playerId == object.id);
         });
     }
 
@@ -114,14 +112,12 @@ class ClientEngine {
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
 
         // skip one step if requested
-        // then count down before checking again
-        if (typeof this.skipOneStep === 'number') this.skipOneStep--;
         if (this.skipOneStep === true) {
-            this.skipOneStep = SKIP_ONE_STEP_COUNTDOWN;
+            this.skipOneStep = false;
             return;
         }
 
-        this.gameEngine.emit("client.preStep");
+        this.gameEngine.emit('client.preStep');
         while (this.inboundMessages.length > 0) {
             this.handleInboundMessage(this.inboundMessages.pop());
         }

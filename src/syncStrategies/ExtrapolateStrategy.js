@@ -69,7 +69,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         let curObj = new newObj.constructor();
         curObj.copyFrom(newObj);
-        this.gameEngine.addObjectToWorld(curObj, options);
+        this.gameEngine.addObjectToWorld(curObj);
         console.log(`adding new object ${curObj}`);
 
         // if this game keeps a physics engine on the client side,
@@ -190,6 +190,9 @@ class ExtrapolateStrategy extends SyncStrategy {
             let bending = (objId == this.clientEngine.playerId) ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToSavedState(bending, this.gameEngine.worldSettings);
             if (obj.renderObject && obj.renderObject.visible === false) {
+                // TODO: visible is broken because renderObject is gone.
+                // visible should be a property of the object now, the Renderer
+                // can just look at it and understand.
                 obj.updateRenderObject();
                 obj.renderObject.visible = true;
             }

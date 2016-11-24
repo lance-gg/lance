@@ -207,7 +207,7 @@ class GameEngine {
         }
     }
 
-    addObjectToWorld(object, options) {
+    addObjectToWorld(object) {
         this.world.objects[object.id] = object;
 
         this.emit("objectAdded", object);
