@@ -3,6 +3,7 @@ var io = require("socket.io-client");
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
+const Synchronizer = require('./Synchronizer');
 
 const STEP_DRIFT_THRESHOLD = 10;
 const SKIP_ONE_STEP_COUNTDOWN = 10;
@@ -33,6 +34,8 @@ class ClientEngine {
         this.inboundMessages = [];
         this.outboundMessages = [];
 
+        this.configureSynchronization();
+
         // create a buffer of delayed inputs (fifo)
         if (inputOptions && inputOptions.delayInputCount) {
             this.delayedInputs = [];
@@ -49,6 +52,22 @@ class ClientEngine {
         this.gameEngine.on('objectAdded', function(object) {
             object.isPlayerControlled = (that.playerId == object.playerId);
         });
+    }
+
+    configureSynchronization() {
+
+        let syncOptions = this.options.syncOptions;
+        const synchronizer = new Synchronizer(this, syncOptions);
+
+        // TODO: mixing different strategies together doesn't
+        //     really make sense, so we need to refactor the code
+        //     below.
+        if (syncOptions.sync === 'extrapolate')
+            synchronizer.extrapolateObjectSelector = () => { return true; };
+        else if (syncOptions.sync === 'interpolate')
+            synchronizer.interpolateObjectSelector = () => { return true; };
+        else if (syncOptions.sync === 'frameSync')
+            synchronizer.frameSyncSelector = () => { return true; };
     }
 
     start() {

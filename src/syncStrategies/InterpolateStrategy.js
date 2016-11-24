@@ -55,7 +55,8 @@ class InterpolateStrategy extends SyncStrategy {
 
         console.log(`adding new object ${objId} at (${newObj.x},${newObj.y},${newObj.z}) velocity (${newObj.velX},${newObj.velY},${newObj.velZ})`);
 
-        let curObj = newObj.class.newFrom(newObj);
+        let curObj = new newObj.constructor();
+        curObj.copyFrom(newObj);
         this.gameEngine.addObjectToWorld(curObj);
         curObj.initRenderObject(this.gameEngine.renderer);
 
