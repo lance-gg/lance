@@ -2,6 +2,13 @@
 
 const Utils = require('./../lib/Utils');
 
+/**
+ * The Serializer is responsible for serializing the game world and its
+ * objects on the server, before they are sent to each client.  On the client side the
+ * Serializer deserializes these objects.
+ *
+ * The Serializer defines the data types which can be serialized.
+ */
 class Serializer {
 
     constructor(){
@@ -16,6 +23,8 @@ class Serializer {
      * This will enable you to use it in an object's netScheme
      * @param customType
      */
+    // TODO: the function below is not used, and it is not clear what that
+    // first argument is supposed to be
     addCustomType(customType){
         this.customTypes[customType.type] = customType;
     }
@@ -23,7 +32,7 @@ class Serializer {
 
     /**
      * Registers a new class with the serializer, so it may be deserialized later
-     * @param classObj reference to the class (not an instance!)
+     * @param {Function} classObj reference to the class (not an instance!)
      * @param [classId] Unit specifying a class ID
      */
     registerClass(classObj, classId){
@@ -212,6 +221,11 @@ class Serializer {
     }
 }
 
+/**
+* The TYPES object defines the supported serialization types,
+* FLOAT32, INT32, INT16, INT8, UINT8, CLASSINSTANCE and LIST.
+* @constant
+*/
 Serializer.TYPES = {
     FLOAT32: "FLOAT32",
     INT32: "INT32",

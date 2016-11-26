@@ -109,6 +109,7 @@ class Serializable{
 
         return {dataBuffer, bufferOffset: localBufferOffset};
     };
+
 };
 
 module.exports = Serializable;

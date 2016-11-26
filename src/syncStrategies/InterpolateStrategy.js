@@ -4,7 +4,7 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    clientStepHold: 6
+    clientStepHold: 10
 };
 
 class InterpolateStrategy extends SyncStrategy {
@@ -16,7 +16,7 @@ class InterpolateStrategy extends SyncStrategy {
 
         this.syncsBuffer = []; // buffer for server world updates
         this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.on('postStep', this.interpolate.bind(this));
+        this.gameEngine.on('client.postStep', this.interpolate.bind(this));
         this.gameEngine.on('client.syncReceived', this.updatesyncsBuffer.bind(this));
     }
 
@@ -53,11 +53,10 @@ class InterpolateStrategy extends SyncStrategy {
     // add an object to our world
     addNewObject(objId, newObj, stepCount) {
 
-        console.log(`adding new object ${objId} at (${newObj.x},${newObj.y},${newObj.z}) velocity (${newObj.velX},${newObj.velY},${newObj.velZ})`);
-
-        let curObj = newObj.class.newFrom(newObj);
+        let curObj = new newObj.constructor();
+        curObj.copyFrom(newObj);
+        curObj.passive = true;
         this.gameEngine.addObjectToWorld(curObj);
-        curObj.initRenderObject(this.gameEngine.renderer);
 
         // if this game keeps a physics engine on the client side,
         // we need to update it as well
@@ -91,9 +90,16 @@ class InterpolateStrategy extends SyncStrategy {
         }
 
         // we requires a sync before we proceed
-        if (!nextSync)
+        if (!nextSync) {
+            this.gameEngine.trace.debug('interpolate lacks future sync - requesting step skip');
+            this.clientEngine.skipOneStep = true;
             return;
+        }
 
+        this.gameEngine.trace.debug(`interpolate step ${stepToPlay} towards sync at step ${nextSync.stepCount}`);
+
+        // TODO: events of type objectCreate were never
+        //      implemented.  possibly for a good reason.
         // create objects which are created at this step
         let stepEvents = nextSync.syncSteps[stepToPlay];
         if (stepEvents && stepEvents.objectCreate) {
@@ -106,15 +112,8 @@ class InterpolateStrategy extends SyncStrategy {
         // create objects for events that imply a create-object
         if (stepEvents && stepEvents.objectUpdate) {
             stepEvents.objectUpdate.forEach(ev => {
-                let curObj = world.objects[ev.objectInstance.id];
-                if (curObj) {
-                    // TODO should use the syncStrategy filter function
-                    if (!curObj.isPlayerControlled) {
-                        curObj.syncTo(ev.objectInstance, stepToPlay);
-                    }
-                } else {
+                if (!world.objects[ev.objectInstance.id])
                     this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
-                }
             });
         }
 
@@ -171,24 +170,14 @@ class InterpolateStrategy extends SyncStrategy {
     //       so the code below should be easy to simplify now
     interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
 
-        // if the object is new, add it
-        // TODO: this code should no longer be necessary
-        let world = this.gameEngine.world;
-        if (!world.objects.hasOwnProperty(objId)) {
-            this.addNewObject(objId, nextObj);
-        }
-
         // handle step for this object
-        let curObj = world.objects[objId];
-        if (curObj.isPlayerControlled && curObj.physicalObject) {
-
-            // if the object is the self, update render position/rotation from physics
-            curObj.updateRenderObject();
-
-        } else if (typeof curObj.interpolate === 'function') {
+        let curObj = this.gameEngine.world.objects[objId];
+        if (typeof curObj.interpolate === 'function') {
 
             // update positions with interpolation
-            curObj.interpolate(prevObj, nextObj, playPercentage);
+            this.gameEngine.trace.trace(`object ${objId} before ${playPercentage} interpolate: ${curObj.toString()}`);
+            curObj.interpolate(nextObj, playPercentage, this.gameEngine.worldSettings);
+            this.gameEngine.trace.trace(`object ${objId} after interpolate: ${curObj.toString()}`);
 
             // if this object has a physics sub-object, it must inherit
             // the position now.

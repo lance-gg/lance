@@ -1,7 +1,7 @@
 "use strict";
 
 const Serializable = require('./Serializable');
-const Serializer= require('./Serializer');
+const Serializer = require('./Serializer');
 
 class PhysicalObject extends Serializable {
 
@@ -44,7 +44,7 @@ class PhysicalObject extends Serializable {
             velZ: {
                 type: Serializer.TYPES.FLOAT32
             }
-        }
+        };
     }
 
     constructor(id, x, y, z, rx, ry, rz) {
@@ -54,8 +54,6 @@ class PhysicalObject extends Serializable {
         this.velX = 0;
         this.velY = 0;
         this.velZ = 0;
-        this.renderer = null;
-        this.renderObject = null;
         this.physicsEngine = null;
         this.physicalObject = null;
         this.class = PhysicalObject;
@@ -85,30 +83,10 @@ class PhysicalObject extends Serializable {
         }
     }
 
-    // initialize rendering for this object
-    initRenderObject(renderer) {
-        if (!this.renderObject) {
-            this.renderer = renderer;
-            this.renderObject = renderer.addObject(this.id);
-        }
-    }
-
-
     // release resources
     destroy() {
         console.log(`destroying object ${this.id}`);
-
-        // destroy the physicalObject
-        if (this.physicalObject) {
-            this.physicsEngine.removeObject(this.physicalObject);
-        }
-
-        // destroy the renderObject
-        if (this.renderObject) {
-            this.renderer.removeObject(this.renderObject);
-        }
     }
-
 
 }
 

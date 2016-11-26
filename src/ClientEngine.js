@@ -2,15 +2,23 @@
 var io = require("socket.io-client");
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
+const NetworkMonitor = require('./network/NetworkMonitor');
+const Synchronizer = require('./Synchronizer');
 
+const STEP_DRIFT_THRESHOLD = 10;
+const GAME_UPS = 60;
 
-const STEP_DRIFT_THRESHOLD = 20;
-const SKIP_ONE_STEP_COUNTDOWN = 10;
-
+/**
+ * The client engine is the singleton which manages the client-side
+ * process, starting the game engine, listening to network messages,
+ * starting client steps, handling world updates which arrive from
+ * the server.
+ */
 class ClientEngine {
 
     constructor(gameEngine, inputOptions) {
-        var that = this;
+
+        this.options = Object.assign({}, inputOptions);
 
         this.socket = io();
         this.serializer = new Serializer();
@@ -18,8 +26,13 @@ class ClientEngine {
         this.gameEngine = gameEngine;
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
+        this.networkMonitor = new NetworkMonitor();
+        this.networkMonitor.registerClient(this);
+
         this.inboundMessages = [];
         this.outboundMessages = [];
+
+        this.configureSynchronization();
 
         // create a buffer of delayed inputs (fifo)
         if (inputOptions && inputOptions.delayInputCount) {
@@ -28,15 +41,31 @@ class ClientEngine {
                 this.delayedInputs[i] = [];
         }
 
-        this.socket.on('playerJoined', function(playerData) {
-            that.playerId = playerData.playerId;
-            that.messageIndex = +that.playerId * 10000;
+        this.socket.on('playerJoined', (playerData) => {
+            this.playerId = playerData.playerId;
+            this.messageIndex = Number(this.playerId) * 10000;
         });
 
         // when objects get added, tag them as playerControlled if necessary
-        this.gameEngine.on('objectAdded', function(object) {
-            object.isPlayerControlled = (that.playerId == object.playerId);
+        this.gameEngine.on('objectAdded', (object) => {
+            object.isPlayerControlled = (this.playerId == object.id);
         });
+    }
+
+    configureSynchronization() {
+
+        let syncOptions = this.options.syncOptions;
+        const synchronizer = new Synchronizer(this, syncOptions);
+
+        // TODO: mixing different strategies together doesn't
+        //     really make sense, so we need to refactor the code
+        //     below.
+        if (syncOptions.sync === 'extrapolate')
+            synchronizer.extrapolateObjectSelector = () => { return true; };
+        else if (syncOptions.sync === 'interpolate')
+            synchronizer.interpolateObjectSelector = () => { return true; };
+        else if (syncOptions.sync === 'frameSync')
+            synchronizer.frameSyncSelector = () => { return true; };
     }
 
     start() {
@@ -45,20 +74,50 @@ class ClientEngine {
             that.inboundMessages.push(worldData);
         });
 
+        // initialize the renderer
+        if (!this.renderer) {
+            alert('ERROR: game has not defined a renderer');
+        }
+        this.renderer.init();
+
+        // Simple JS game loop adapted from
+        // http://nokarma.org/2011/02/02/javascript-game-development-the-game-loop/
+        let skipTicks = 1000 / GAME_UPS;
+        let nextGameTick = (new Date()).getTime();
+
+        // the game loop ensures a fixed number of steps per second
+        let gameLoop = () => {
+            while ((new Date()).getTime() > nextGameTick) {
+                this.step();
+                nextGameTick += skipTicks;
+            }
+            window.requestAnimationFrame(gameLoop);
+        };
+
+        // the render loop waits for next animation frame
+        let renderLoop = () => {
+            this.renderer.draw();
+            window.requestAnimationFrame(renderLoop);
+        };
+
+        // start game, game loop, render loop
         this.gameEngine.start();
+        gameLoop();
+        renderLoop();
     }
 
     step() {
 
+        // first update the trace state
+        this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
+
         // skip one step if requested
-        // then count down before checking again
-        if (typeof this.skipOneStep === 'number') this.skipOneStep--;
         if (this.skipOneStep === true) {
-            this.skipOneStep = SKIP_ONE_STEP_COUNTDOWN;
+            this.skipOneStep = false;
             return;
         }
 
-        this.gameEngine.emit("client.preStep");
+        this.gameEngine.emit('client.preStep');
         while (this.inboundMessages.length > 0) {
             this.handleInboundMessage(this.inboundMessages.pop());
         }
@@ -68,7 +127,7 @@ class ClientEngine {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  server is behind client.  client will skip a step`);
                 this.skipOneStep = true;
-            } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount +  STEP_DRIFT_THRESHOLD) {
+            } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  client is behind server`);
             }
         }
@@ -76,13 +135,7 @@ class ClientEngine {
         // perform game engine step
         this.handleOutboundInput();
         this.applyDelayedInputs();
-        this.gameEngine.emit("preStep", this.gameEngine.world.stepCount);
         this.gameEngine.step();
-        this.gameEngine.emit("postStep", this.gameEngine.world.stepCount);
-
-        if (this.gameEngine.renderer) {
-            this.gameEngine.renderer.draw();
-        }
         this.gameEngine.emit("client.postStep");
 
         if (this.gameEngine.trace.length) {
@@ -108,9 +161,18 @@ class ClientEngine {
         this.delayedInputs.push([]);
     }
 
-    // this function should be called whenever an input is handled.
-    // this function will take care of raising the event and having it
-    // shipped to the server.
+    /**
+     * This function should be called by the client whenever an input
+     * needs to be handled.  This function will emit the input event,
+     * forward the input to the client's game engine (with a delay if
+     * configured) and will transmit the input to the server.
+     *
+     * This function can be called by the extended client engine class,
+     * at the beginning of client-side step processing (event client.preStep)
+     *
+     * @param {Object} input - string representing the input
+     * @param {Object} inputOptions - options for the input
+     */
     sendInput(input, inputOptions) {
         var message = {
             command: 'move',

@@ -17,11 +17,14 @@
   },
   "homepage": "https://github.com/OpherV/incheon#readme",
   "scripts": {
-     "test": "node ./node_modules/mocha/bin/mocha ./tests/**/*.js"
+    "docs": "jsdoc -c jsdoc.conf.json",
+    "test": "node ./node_modules/mocha/bin/mocha ./tests/**/*.js"
   },
   "devDependencies": {
-    "eslint": "^3.2.2",
+    "eslint": "^3.10.1",
     "eslint-config-google": "^0.6.0",
+    "ink-docstrap": "^1.3.0",
+    "jsdoc": "^3.4.2",
     "mocha": "^3.0.2",
     "should": "^11.0.0"
   }

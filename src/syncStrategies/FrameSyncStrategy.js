@@ -51,7 +51,9 @@ class FrameSyncStrategy extends SyncStrategy {
                 if (!world.objects.hasOwnProperty(objId)) {
                     console.log(`adding new object ${objId} at (${nextObj.x},${nextObj.y},${nextObj.z}) velocity (${nextObj.velX},${nextObj.velY},${nextObj.velZ})`);
 
-                    curObj = world.objects[objId] = nextObj.class.newFrom(nextObj);
+                    curObj = new nextObj.constructor();
+                    curObj.copyFrom(nextObj);
+                    world.objects[objId] = curObj;
                     curObj.init({
                         velX: nextObj.velX,
                         velY: nextObj.velY,
