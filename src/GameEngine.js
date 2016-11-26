@@ -157,6 +157,13 @@ class GameEngine {
             this.world.idCount = this.options.clientIDSpace;
         }
 
+        /**
+        * The worldSettings defines the game world constants, such
+        * as width, height, depth, etc. such that all other classes
+        * can reference these values.
+        * @member {Object} worldSettings
+        * @memberof GameEngine
+        */
         this.worldSettings = {};
 
         this.timer = new Timer();
@@ -167,6 +174,12 @@ class GameEngine {
         });
     }
 
+    /**
+      * Start the game. This method runs on both server
+      * and client. Extending the start method is useful
+      * for setting up the game's worldSettings attribute,
+      * and registering methods on the event handler.
+      */
     start() {
         this.trace.info(`========== game engine started ==========`);
         this.initWorld();
@@ -216,14 +229,18 @@ class GameEngine {
 
     /**
      * Override this function and implement input handling.
-     * this function will be called on the client where the
+     * This method will be called on the specific client where the
      * input was received, and will also be called on the server
      * when the input reaches the server.
      *
-     * @param {Object} inputMsg - must contain attributes input (a string describing the input) messageIndex (a counter)
+     * @param {Object} inputMsg - input descriptor object
+     * @param {String} inputMsg.input - describe the input (e.g. "up", "down", "fire")
+     * @param {Number} inputMsg.messageIndex - input identifier
      * @param {String} playerId - the player number (as a string)
      */
     processInput(inputMsg, playerId) {
+        // TODO - I don't think we need the playerId as an argument above.
+        //    it could be a class member.
         this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 

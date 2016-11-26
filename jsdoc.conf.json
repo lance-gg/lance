@@ -12,9 +12,14 @@
             "src/ServerEngine.js",
             "src/ClientEngine.js",
             "src/GameEngine.js",
-            "src/serialize/DynamicObject.js"
+            "src/serialize/DynamicObject.js",
+            "src/serialize/Serializer.js",
+            "src/render/Renderer.js"
         ]
     },
+    "plugins": [
+        "plugins/markdown"
+    ],
     "templates": {
         "systemName"            : "Incheon",
         "copyright"             : "Incheon Copyright © 2016 The contributors to the Incheon project.",

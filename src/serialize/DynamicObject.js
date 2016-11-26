@@ -6,15 +6,39 @@ const Serializer = require('./Serializer');
 const MathUtils = require('../lib/MathUtils');
 
 /**
- * Defines an object which can move about in the game world.
- * Game objects can extend this base object.  The sub-classes
- * will then be synchronized from the server to every client.
+ * DynamicObject is the base class of your game's objects.  It defines the
+ * base object which can move around in the game world.  The
+ * extensions of this object (the subclasses)
+ * will be periodically ynchronized from the server to every client.
+ *
  * The dynamic objects have pseudo-physical properties, which
- * allow the client-side prediction to extrapolate the position
+ * allow the client to extrapolate the position
  * of dynamic objects in-between server updates.
  */
 class DynamicObject extends Serializable {
 
+    /**
+    * The netScheme is a dictionary of attributes in this game
+    * object.  The attributes listed in the netScheme are those exact
+    * attributes which will be serialized and sent from the server
+    * to each client on every server update.
+    * The netScheme member is implemented as a getter.
+    *
+    * You may choose not to implement this method, in which
+    * case your object only transmits the default attributes
+    * which are already part of DynamicObject.
+    * But if you choose to add more attributes, make sure
+    * the return value includes the netScheme of the super class.
+    *
+    * @memberof DynamicObject
+    * @member {Object} netScheme
+    * @example
+    *     static get netScheme() {
+    *       return Object.assign({
+    *           mojo: { type: Serializer.TYPES.UINT8 },
+    *         }, super.netScheme);
+    *     }
+    */
     static get netScheme() {
         return {
             id: { type: Serializer.TYPES.UINT8 },
@@ -28,8 +52,8 @@ class DynamicObject extends Serializable {
     }
 
     /**
-    * Create an instance of a dynamic object.
-    * provide starting values for position, acceleration, etc.
+    * Creates an instance of a dynamic object.
+    * Provide starting values for position, acceleration, etc.
     * @param {String} id - the object id
     * @param {Number} x - position x-value
     * @param {Number} y - position y-value
@@ -60,7 +84,7 @@ class DynamicObject extends Serializable {
     }
 
     /**
-     * formatted description of the dynamic object, for debugging purposes mostly
+     * Formatted description of the dynamic object, for debugging purposes.
      *
      * @return {String} description - a string describing the DynamicObject
      */
@@ -71,6 +95,8 @@ class DynamicObject extends Serializable {
     }
 
     copyFrom(sourceObj) {
+
+        // TODO: copyFrom could just look at the netscheme?
         this.id = sourceObj.id;
         this.playerId = sourceObj.playerId;
         this.isPlayerControlled = sourceObj.isPlayerControlled;
@@ -90,9 +116,35 @@ class DynamicObject extends Serializable {
         this.maxSpeed = sourceObj.maxSpeed;
     }
 
-    // default bending multiples are null,
-    // indicating that they are taken from Extrapolate options
+    /**
+    * The bending multiple is a getter, which returns the
+    * amount of bending.
+    * For example, if this value is set to 0.2, then the object's position
+    * on the client side will slowly bend (by 20% on every server update) towards
+    * the definitive position as indicated by the server.
+    * When this value is 1, the object's position
+    * on the client will be set to the server's object's position exactly.
+    * When this value is zero, the client ignores the server object's position.
+    * When this value is null, the bending is taken from the synchronization
+    * defaults.  You will need to set this to zero for objects whose position
+    * jumps suddenly - because your game intended a jump, not a gradual bend.
+    * @memberof DynamicObject
+    * @member {Number} bendingMultiple
+    */
     get bendingMultiple() { return null; }
+
+    /**
+    * The velocity bending multiple is a getter, which returns the
+    * amount of velocity bending.
+    * For example, if this value is set to 0.2, then the object's velocity
+    * on the client side will slowly bend (by 20% on every server update) towards the
+    * definitive velocity as indicated by the server, on every server update.
+    * You will need to set this to zero for objects whose velocity jumps
+    * suddenly - because your game intended a jump in velocity, not a gradual
+    * bend.
+    * @memberof DynamicObject
+    * @member {Number} velocityBendingMultiple
+    */
     get velocityBendingMultiple() { return null; }
 
     step(worldSettings) {
@@ -142,6 +194,11 @@ class DynamicObject extends Serializable {
         }
     }
 
+    /**
+     * Initialize the object.
+     * Extend this method if you have object initialization logic.
+     * @param {Object} options Your object's options
+     */
     init(options) {
         Object.assign(this, options);
     }

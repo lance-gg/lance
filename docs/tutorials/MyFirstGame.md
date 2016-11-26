@@ -5,6 +5,8 @@ javascript networked game, [Pong](https://en.wikipedia.org/wiki/Pong).  It start
 then proceeds with the writing of client code, server
 code, and game logic.
 
+![Pong](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Pong.png/220px-Pong.png)
+
 ## Setting up the Environment
 
 The creation of a new game starts by cloning boilerplate code:
@@ -87,12 +89,13 @@ game progress, overriding what the clients might have predicted.
 For Pong, we will need to bounce the ball around the board, and check if it
 hit a paddle.  We will also need to respond to the up/down inputs.
 
-### src/common/GameEngine.js
+### src/common/MyGameEngine.js
 The MyGameEngine class implements the actual logic of the game.
 It does the following:
 * **start**: define the "world" settings, and register the game logic to run as a post-step function.
-Modify the start function to match the following:
-```js
+Modify the start method to match the following:
+
+```javascript
 start() {
 
     super.start();
@@ -108,9 +111,11 @@ start() {
     this.on('postStep', () => { this.postStepHandleBall(); });
 };
 ```
+
 * **processInput**: handle user inputs by moving the paddle up or down.
-Modify the processInput function to match the following:
-```js
+Modify the processInput method to match the following:
+
+```javascript
 processInput(inputData, playerId) {
 
     super.processInput(inputData, playerId);
@@ -133,9 +138,11 @@ processInput(inputData, playerId) {
     }
 };
 ```
+
 * **initGame**: create two paddles, a ball, and add these objects to the game world.
-Add the following initGame function:
-```js
+Add the following initGame method:
+
+```javascript
 initGame() {
     // create the paddle objects
     this.player1Paddle = new Paddle(++this.world.idCount, this.worldSettings.paddlePadding, 0);
@@ -152,8 +159,10 @@ initGame() {
     this.addObjectToWorld(this.ball);
 }
 ```
-* **attachPaddle**: when the first player connects, it becomes the left paddle.  When a second player connects it becomes the right paddle.  Add the following method:
-```js
+
+* **attachPaddle**: when the first player connects, he becomes the left paddle.  When a second player connects he becomes the right paddle.  Add the following method:
+
+```javascript
 attachPaddle(paddleId, playerId) {
     // which player?
     if (paddleId === 0) {
@@ -163,8 +172,17 @@ attachPaddle(paddleId, playerId) {
     }
 }
 ```
-* **postStepHandleBall**: this function is executed after the ball has moved.  Check if the ball has hit a wall, or a paddle, and if a player has scored.  First add the object constructors at the top of the file: `const Paddle = require('./Paddle');` `const Ball = require('./Ball'); ` Now add the following methods: 
-```js
+
+* **postStepHandleBall**: this method is executed after the ball has moved.  Check if the ball has hit a wall, or a paddle, and if a player has scored.  First add the object constructors at the top of the file:
+
+```javascript
+const Paddle = require('./Paddle');
+const Ball = require('./Ball');
+```
+
+Now add the following methods:
+
+```javascript
 postStepHandleBall() {
     if (this.ball) {
 

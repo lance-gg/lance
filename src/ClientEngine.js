@@ -164,8 +164,8 @@ class ClientEngine {
     /**
      * This function should be called by the client whenever an input
      * needs to be handled.  This function will emit the input event,
-     * forward the input to the game engine (with a delay if so configured)
-     * and will transmit the input to the server.
+     * forward the input to the client's game engine (with a delay if
+     * configured) and will transmit the input to the server.
      *
      * This function can be called by the extended client engine class,
      * at the beginning of client-side step processing (event client.preStep)
