@@ -4,8 +4,8 @@ var path = require('path');
 module.exports = {
     entry: "./js/main.js",
     output: {
-        path: __dirname+"/dist_bundles",
-        publicPath: "/dist_bundles",
+        path: __dirname+"/dist_bundles/",
+        publicPath: "/",
         filename: "bundle.js"
     },
     module: {
@@ -14,13 +14,6 @@ module.exports = {
             {
                 test: /\.scss$/,
                 loaders: ["style", "css", "sass"]
-            },
-            {
-                test: /.*\.(gif|png|jpe?g|svg)$/i,
-                loaders: [
-                    'file?hash=sha512&digest=hex&name=[hash].[ext]',
-                    'image-webpack'
-                ]
             }
         ]
     },
