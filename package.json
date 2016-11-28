@@ -1,0 +1,20 @@
+{
+  "name": "incheon-site",
+  "main": "webpack.config.js",
+  "dependencies": {},
+  "devDependencies": {
+    "breakpoint-sass": "^2.7.0",
+    "css-loader": "^0.26.0",
+    "image-webpack-loader": "^3.0.0",
+    "node-sass": "^3.13.0",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.3"
+  },
+  "scripts": {
+    "debug": "webpack-dev-server --hot --inline"
+  },
+  "author": "OpherV",
+  "license": "ISC",
+  "homepage": "http://incheon.gg"
+}
