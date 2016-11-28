@@ -1,2 +1,2 @@
 
-require("!style-loader!css-loader!sass-loader!./../sass/main.scss");
+require("!style-loader!raw-loader!sass-loader!./../sass/main.scss");
