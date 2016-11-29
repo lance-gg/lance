@@ -1,0 +1,40 @@
+#help{
+  @include breakpoint-mobile() {
+    display: none;
+  }
+
+  padding-bottom: 5rem;
+
+
+  .helpContainer{
+    width: span(6 of 12);
+    margin: 0 auto;
+    padding: 2rem 0;
+    @include clearfix;
+  }
+
+
+
+  a{
+    position: relative;
+    display: block;
+    height: 7rem;
+    @include span(2 of 6);
+    text-align: center;
+    color: #fff;
+    &:hover{
+      text-shadow: #68b2f8 0rem 0rem 1rem;
+    }
+
+    &:before{
+      position: absolute;
+      top: 2.5rem;
+      left: 4rem;
+      font-size: 5rem;
+    }
+  }
+
+  a:last-child{
+    @include span(2 of 6 last);
+  }
+}

@@ -2,12 +2,20 @@
   background: #751a62;
 
   .content{
+    box-sizing: border-box;
     width: span(8 of 12);
+    @include breakpoint-mobile() {
+      width: span(8 of 4);
+    }
     margin: 0 auto;
   }
 
   .featureContainer{
     padding-left: span(2 of 12);
+
+    @include breakpoint-mobile() {
+      padding: 0;
+    }
   }
 
   .feature{
@@ -16,6 +24,12 @@
     @include span (4 of 12);
     text-align: left;
     margin-bottom: 4rem;
+
+    @include breakpoint-mobile() {
+      @include span(3 of 4);
+      padding-left: span(1 of 4);
+      margin: 2rem 0rem;
+    }
   }
 
 
@@ -67,4 +81,20 @@
   .feature.opensource:before{
     background-image: url(images/icons/multiplayer.svg);
   }
+
+  .shot{
+    transform: translateZ(2px) scaleX(1) scaleY(1);
+    height: 20vw;
+    width: 10vw;
+    position: absolute;
+    top: 0;
+    left: 33%;
+    z-index: 20;
+
+    background-image: url(images/shot1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+
 }

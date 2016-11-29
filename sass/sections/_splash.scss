@@ -1,0 +1,175 @@
+#splash{
+  background-image: url(images/splash_bg.png), url(images/page_bg_black.png);
+  background-repeat: no-repeat, repeat;
+  background-position: center, center;
+  background-size: cover, auto;
+
+  @include breakpoint-desktop() {
+    padding-top: 10rem;
+  }
+
+  @include breakpoint-mobile() {
+    .content{
+      padding: 0;
+    }
+    padding-top: 0;
+  }
+
+  h1{
+    position: relative;
+    background-image: url(images/splash_incheonlogo.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    text-indent: -1000rem;
+    overflow: hidden;
+
+    height: 16rem;
+    width: span(12 of 12);
+    margin: 0 auto;
+
+    @include breakpoint-mobile() {
+      background-size: 150%;
+    }
+
+    z-index: 10;
+  }
+
+  .titleContainer{
+    clear: both;
+    position: relative;
+  }
+
+  h2{
+    position: absolute;
+    top: 4rem;
+    right: 10%;
+    z-index: 11;
+
+    @include breakpoint-mobile() {
+      top: 3rem;
+      right: 5%;
+    }
+
+    background-image: url(images/splash_beta.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    text-indent: -1000rem;
+    overflow: hidden;
+    width: span(3 of 12);
+    margin: 0;
+    height: 14rem;
+  }
+
+  h3{
+    font-weight: 100;
+    font-size: 2.5rem;
+    margin: -3rem auto 2rem auto;
+
+    @include breakpoint-mobile() {
+      font-size: 2rem;
+    }
+  }
+
+  .description{
+    width: span(7 of 12);
+
+    @include breakpoint-mobile() {
+      width: span(4 of 4);
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    margin: 1rem auto;
+    font-weight: 100;
+    font-size: 1.1rem;
+    line-height: 1.6rem;
+    text-align: justify;
+  }
+
+  .ship1{
+    transform: translateZ(-1px) scaleX(1) scaleY(1);
+    height: 13vw;
+    width: 13vw;
+    position: absolute;
+    top: -21vh;
+    left: 20%;
+    z-index: 1;
+
+    background-image: url(images/splash_ship1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+
+  .ship2{
+    transform: translateZ(1px) scaleX(0.5) scaleY(0.5);
+    height: 20vw;
+    width: 20vw;
+    position: absolute;
+    bottom: -10%;
+    right: 19%;
+    z-index: 20;
+
+    background-image: url(images/splash_ship2.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+
+  .ctaContainer{
+    position: relative;
+    background-color: rgba(#68b2f8, 0.2);
+    display: inline-block;
+    padding: 0.2rem 1.8rem 0.1rem 1.8rem;
+    margin: 2rem auto;
+    font-size: 1.2rem;
+    transition: all 0.1s ease-in;
+
+    &:before{
+      content: "";
+      position: absolute;
+      z-index: 10;
+      left: -3rem;
+      top: -2.4rem;
+      width: 6rem;
+      height: 7rem;
+      background-image: url(images/cta_glow_left.png);
+      background-repeat: no-repeat;
+      background-position: top;
+      background-size: auto;
+      pointer-events: none;
+    }
+
+    &:after{
+      content: "";
+      position: absolute;
+      z-index: 10;
+      right: -3rem;
+      top: -2.4rem;
+      width: 6rem;
+      height: 7rem;
+      background-image: url(images/cta_glow_left.png);
+      background-repeat: no-repeat;
+      background-position: top;
+      background-size: auto;
+      transform: scaleX(-1);
+      pointer-events: none;
+    }
+
+    a{
+      width: 100%;
+      padding: 0.2rem 0.5rem;
+      color: #fff;
+      transition: all 0.1s ease-in;
+    }
+
+    &:hover{
+      background: rgba(#68b2f8, 0.4);
+      a{
+        padding: 0.2rem 0.8rem;
+      }
+    }
+  }
+}

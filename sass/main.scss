@@ -1,5 +1,7 @@
 @import "./../node_modules/susy/sass/susy";
 @import "./../node_modules/breakpoint-sass/stylesheets/breakpoint";
+@import "./../node_modules/compass-mixins/lib/compass";
+
 @import "layout";
 @import "parallax";
 
@@ -12,16 +14,6 @@ html,body{
   font-family: "proxima-nova", sans-serif;
 }
 
-.centered{
-  margin-top: -10rem;
-  width: 20rem;
-  padding-top: 20rem;
-
-  background-image: url(images/incheon_splash.png);
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
 section{
 
   .container{
@@ -29,135 +21,7 @@ section{
   }
 }
 
-#splash{
-  background-image: url(images/splash_bg.png), url(images/page_bg_black.png);
-  background-repeat: no-repeat, repeat;
-  background-position: top, center;
-  background-size: cover, auto;
-
-  padding-top: 10rem;
-
-  h1{
-    position: relative;
-    background-image: url(images/splash_incheonlogo.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    text-indent: -1000rem;
-    overflow: hidden;
-
-    height: 16rem;
-    width: span(12 of 12);
-    margin: 0 auto;
-
-    z-index: 10;
-  }
-
-  .titleContainer{
-    clear: both;
-    position: relative;
-  }
-
-  h2{
-    position: absolute;
-    top: 4rem;
-    right: 10%;
-    z-index: 11;
-
-    background-image: url(images/splash_beta.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    text-indent: -1000rem;
-    overflow: hidden;
-    width: span(3 of 12);
-    margin: 0;
-    height: 14rem;
-  }
-
-  h3{
-    font-weight: 100;
-    font-size: 2.5rem;
-    margin: -3rem auto 2rem auto;
-  }
-
-  .description{
-    width: span(7 of 12);
-    margin: 1rem auto;
-    font-weight: 100;
-    font-size: 1.1rem;
-    line-height: 1.6rem;
-    text-align: justify;
-  }
-
-  .ship1{
-    height: 13vw;
-    width: 13vw;
-    position: absolute;
-    top: -5.5vw;
-    left: 20%;
-    z-index: 1;
-
-    background-image: url(images/splash_ship1.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-  }
-
-  .ctaContainer{
-    position: relative;
-    background-color: rgba(#68b2f8, 0.2);
-    display: inline-block;
-    padding: 0.2rem 1.8rem 0.1rem 1.8rem;
-    margin: 2rem auto;
-    font-size: 1.2rem;
-    transition: all 0.1s ease-in;
-
-    &:before{
-      content: "";
-      position: absolute;
-      z-index: 10;
-      left: -3rem;
-      top: -2.4rem;
-      width: 6rem;
-      height: 7rem;
-      background-image: url(images/cta_glow_left.png);
-      background-repeat: no-repeat;
-      background-position: top;
-      background-size: auto;
-      pointer-events: none;
-    }
-
-    &:after{
-      content: "";
-      position: absolute;
-      z-index: 10;
-      right: -3rem;
-      top: -2.4rem;
-      width: 6rem;
-      height: 7rem;
-      background-image: url(images/cta_glow_left.png);
-      background-repeat: no-repeat;
-      background-position: top;
-      background-size: auto;
-      transform: scaleX(-1);
-      pointer-events: none;
-    }
-
-    a{
-      width: 100%;
-      padding: 0.2rem 0.5rem;
-      transition: all 0.1s ease-in;
-    }
-
-    &:hover{
-      background: rgba(#68b2f8, 0.4);
-      a{
-        padding: 0.2rem 0.8rem;
-      }
-    }
-  }
-}
+@import "sections/_splash";
 
 a {
   color: #fff;
@@ -176,7 +40,7 @@ a {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    transform: translateZ(-1px) scaleX(2) scaleY(2) translateY(0) ;
+    transform: translateZ(-1px) scaleX(1.6) scaleY(1.6) translateY(0) ;
   }
 }
 
@@ -192,13 +56,25 @@ a {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    transform: translateZ(-1px) scaleX(2) scaleY(2) translateY(0vh) ;
+    transform: translateZ(-1px) scaleX(1.5) scaleY(1.5) translateY(0vh) ;
     z-index: 4;
   }
 }
 
-@import "features";
+@import "sections/features";
 
-#quickstart{
+.bottom{
   background-image: url(images/page_bg.png);
+}
+
+@import "sections/quickstart";
+@import "sections/help";
+@import "sections/about";
+
+#footer{
+  height: 60vw;
+  background-image: url(images/footer_bg.png);
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: cover;
 }

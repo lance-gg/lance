@@ -1,4 +1,4 @@
-$breakpoint-mobile: max-width 320px;
+$breakpoint-mobile: max-width 500px;
 $breakpoint-desktop: min-width 1224px;
 
 
@@ -14,25 +14,76 @@ $breakpoint-desktop: min-width 1224px;
   }
 }
 
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+  &:before {
+    display: block;
+    content: "";
+    width: 100%;
+    padding-top: ($height / $width) * 100%;
+  }
+  > .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
 
 @include breakpoint-desktop(){
 
   section{
-    position: relative;
-    width: 100%;
-    z-index: 5;
-
     .content{
       @include container;
       max-width: 1366px;
       padding: 1rem;
 
       h3{
-        font-size: 2.5rem;
-        font-weight: 100;
         @include span(12 of 12);
       }
+
+    }
+  }
+}
+
+@include breakpoint-mobile(){
+
+  section{
+    .content{
+      @include container;
+      padding: 1rem;
+
+      h3{
+        @include span(4 of 4);
+      }
+
     }
   }
 
+}
+
+
+section{
+  position: relative;
+  width: 100%;
+  z-index: 5;
+
+  .content{
+
+    h3{
+      font-size: 2.5rem;
+      font-weight: 100;
+    }
+
+    a{
+      transition: all 0.1s ease-in;
+      color: #68b2f8;
+
+      &:hover{
+        color: #506ee5;
+      }
+    }
+  }
 }

@@ -4,6 +4,7 @@
   "dependencies": {},
   "devDependencies": {
     "breakpoint-sass": "^2.7.0",
+    "compass-mixins": "^0.12.10",
     "css-loader": "^0.26.0",
     "image-webpack-loader": "^3.0.0",
     "node-sass": "^3.13.0",

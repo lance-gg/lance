@@ -1,0 +1,28 @@
+#quickstart{
+  @include breakpoint-mobile() {
+    display: none;
+  }
+
+  padding-bottom: 5rem;
+
+  .content{
+  }
+
+  .instructions{
+    clear: both;
+    width: span(6 of 12);
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  pre{
+    background: #1d0c20;
+    border: 0.2rem solid #68b2f8;
+    padding: 1rem;
+    font-family: monospace;
+  }
+
+  ol{
+    padding: 0;
+  }
+}

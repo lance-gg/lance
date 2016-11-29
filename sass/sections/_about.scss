@@ -1,0 +1,68 @@
+#about {
+
+  .aboutContainer {
+    width: span(8 of 12);
+    margin: 0 auto;
+    padding: 2rem 0;
+    @include clearfix;
+
+    @include breakpoint-mobile() {
+      width: span(4 of 4);
+    }
+
+    .person {
+      @include span(4 of 8);
+      @include aspect-ratio(394, 279);
+      position: relative;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+
+      @include breakpoint-mobile() {
+        @include span(4 of 4);
+      }
+
+
+      .name{
+        position: absolute;
+        left: 64%;
+        top: 16%;
+        font-size: 1.1rem;
+      }
+
+      .social{
+        position: absolute;
+        left: 65%;
+        top: 27%;
+        font-size: 2rem;
+
+      }
+
+      .social a{
+        color: #fff;
+      }
+
+      .social a:hover{
+        color: #fff;
+        text-shadow: #68b2f8 0rem 0rem 1rem;
+      }
+    }
+
+    .person:nth-child(even){
+      @include span(4 of 8 last);
+
+      @include breakpoint-mobile() {
+        @include span(4 of 4);
+      }
+    }
+
+    .person.opher{
+      background-image: url(images/opher.png);
+    }
+
+    .person.gary{
+      background-image: url(images/gary.png);
+    }
+  }
+
+}

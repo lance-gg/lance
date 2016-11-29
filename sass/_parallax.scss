@@ -1,5 +1,5 @@
 .parallax {
-  perspective: 1px;
+  perspective: 3px;
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
@@ -16,6 +16,7 @@
 .parallax__group {
   position: relative;
   transform-style: preserve-3d;
+  //transform: translate3d(700px, 0, -800px) rotateY(30deg);
 }
 .parallax__layer--base {
   transform: translateZ(0);

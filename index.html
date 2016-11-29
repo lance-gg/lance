@@ -3,11 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Incheon.gg - coming soon</title>
+        <title>Incheon - Online. Multiplayer. JS.</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <script src="https://use.typekit.net/lai1bbe.js"></script>
+        <link href="https://file.myfontastic.com/DeXq9523CzrFERZkXSzP7D/icons.css" rel="stylesheet">
+
         <script>try{Typekit.load({ async: true });}catch(e){}</script>
         <script src="dist_bundles/bundle.js"></script>
     </head>
@@ -25,6 +27,7 @@
                         Incheon is a node based game server. Created to enable game developers to build real time online javascript multiplayer games without worrying about implementing net synchronisation code. It strives to provide buttery smooth experience for both developer and player regardless of lag.
                     </div>
                     <div class="ctaContainer"><a href="#">Get Started</a></div>
+                    <div class="ship2"></div>
                 </div>
             </section>
             <section id="menu">
@@ -34,6 +37,7 @@
                 <div class="parallax__layer parallax__layer--back"></div>
             </section>
             <section id="features" class="parallax__group">
+                <div class="shot parallax__layer"></div>
                 <div class="content">
                     <h3>Features</h3>
                     <div class="featureContainer">
@@ -67,19 +71,67 @@
             <section id="par2" class="parallax__group">
                 <div class="parallax__layer parallax__layer--back"></div>
             </section>
-            <section id="quickstart" class="parallax__group">
-                <div class="content">
-                    <h3>QuickStart</h3>
-                    <p>1. From the command line run</p>
-                    <pre>>npm install netpong
-                        > npm run
-                    </pre>
-                    <p>2. Open two browser tabs, and point them to http://localhost:3000
-                    You now have a working multiplayer version of Pong to play with!</p>
+            <div class="bottom">
+                <section id="quickstart" class="parallax__group">
+                    <div class="content">
+                        <h3>QuickStart</h3>
+                        <div class="instructions">
+                            <ol>
+                                <li>
+                                    <p>From the command line run</p>
 
-                    <p>Wonder where to start to building such a project yourself? Check out the Getting Started guide</p>
-                </div>
-            </section>
+                                    <pre>> npm install netpong
+> npm run</pre>
+                                </li>
+                                <li>
+                                    <p>Open two browser tabs, and point them to http://localhost:3000
+                                    You now have a working multiplayer version of Pong to play with!</p>
+
+                                </li>
+                            </ol>
+                            <p>Wonder where to start to building such a project yourself? Check out the <a href="">Getting Started</a> guide</p>
+                        </div>
+                    </div>
+                </section>
+                <section id="help" class="parallax__group">
+                    <div class="content">
+                        <h3>Lost?</h3>
+                        <div class="helpContainer">
+                            <a href="https://github.com/OpherV/Incheon/issues" class="icon-github">Bug?</a>
+                            <a href="http://stackoverflow.com/questions/tagged/incheon" class="icon-stack-overflow">Question?</a>
+                            <a href="http://incheongg.slack.com" class="icon-slack">Say hi?</a>
+                        </div>
+                    </div>
+                </section>
+                <section id="about" class="parallax__group">
+                    <div class="content">
+                        <h3>Brought to you by</h3>
+                        <div class="aboutContainer">
+                            <div class="person opher">
+                                <div class="content">
+                                    <div class="name">Opher Vishnia</div>
+                                    <div class="social">
+                                        <a href="https://github.com/OpherV" class="icon-github"></a>
+                                        <a href="http://twitter.com/OpherV" class="icon-twitter"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="person gary">
+                                <div class="content">
+                                    <div class="name">Gary Weiss</div>
+                                    <div class="social">
+                                        <a href="https://github.com/namel" class="icon-github"></a>
+                                        <a href="http://twitter.com/gggweiss" class="icon-twitter"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section id="footer">
+                    <div class="content"></div>
+                </section>
+            </div>
         </div>
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
