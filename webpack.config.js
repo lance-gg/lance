@@ -5,7 +5,7 @@ module.exports = {
     entry: "./js/main.js",
     output: {
         path: __dirname+"/dist_bundles/",
-        publicPath: "/",
+        publicPath: "/dist_bundles",
         filename: "bundle.js"
     },
     module: {
@@ -24,7 +24,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({minimize: true})
+        // new webpack.optimize.UglifyJsPlugin({minimize: true})
     ],
 
     devtool: "source-map"

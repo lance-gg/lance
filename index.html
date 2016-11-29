@@ -7,18 +7,80 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
-
+        <script src="https://use.typekit.net/lai1bbe.js"></script>
+        <script>try{Typekit.load({ async: true });}catch(e){}</script>
         <script src="dist_bundles/bundle.js"></script>
     </head>
     <body>
+        <div class="siteContainer parallax">
+            <section id="splash" class="parallax__group">
+                <div class="content">
+                    <div class="titleContainer">
+                        <h1>Incheon</h1>
+                        <h2>beta</h2>
+                        <div class="ship1"></div>
+                    </div>
+                    <h3>Online. Multiplayer. JS.</h3>
+                    <div class="description">
+                        Incheon is a node based game server. Created to enable game developers to build real time online javascript multiplayer games without worrying about implementing net synchronisation code. It strives to provide buttery smooth experience for both developer and player regardless of lag.
+                    </div>
+                    <div class="ctaContainer"><a href="#">Get Started</a></div>
+                </div>
+            </section>
+            <section id="menu">
 
-        <div class="centered">
-            <h1>Incheon.gg</h1>
-            <h2>coming soon</h2>
+            </section>
+            <section id="par1" class="parallax__group">
+                <div class="parallax__layer parallax__layer--back"></div>
+            </section>
+            <section id="features" class="parallax__group">
+                <div class="content">
+                    <h3>Features</h3>
+                    <div class="featureContainer">
+                        <div class="feature gameAgnostic">
+                            <div class="title">Game-agnostic</div>
+                            <div class="text">Supports any genre: Arcade, RTS, Physics-based puzzlers, FPS or any</div>
+                        </div>
+                        <div class="feature lag">
+                            <div class="title">Intelligent lag handling</div>
+                            <div class="text">Synchronisation methods for different types of games (interpolation\extrapolation\lockstep)</div>
+                        </div>
+                        <div class="feature physics">
+                            <div class="title">Supports physics engines</div>
+                            <div class="text">PhysiJS/built in pseudo physics</div>
+                        </div>
+                        <div class="feature architecture">
+                            <div class="title">Future-centric architecture</div>
+                            <div class="text">ES6-focused, extendable</div>
+                        </div>
+                        <div class="feature binary">
+                            <div class="title">Smart Binary serialization</div>
+                            <div class="text">Minimize the data that goes over the wire</div>
+                        </div>
+                        <div class="feature opensource">
+                            <div class="title">Open source community driven</div>
+                            <div class="text">Run your own server!</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="par2" class="parallax__group">
+                <div class="parallax__layer parallax__layer--back"></div>
+            </section>
+            <section id="quickstart" class="parallax__group">
+                <div class="content">
+                    <h3>QuickStart</h3>
+                    <p>1. From the command line run</p>
+                    <pre>>npm install netpong
+                        > npm run
+                    </pre>
+                    <p>2. Open two browser tabs, and point them to http://localhost:3000
+                    You now have a working multiplayer version of Pong to play with!</p>
+
+                    <p>Wonder where to start to building such a project yourself? Check out the Getting Started guide</p>
+                </div>
+            </section>
         </div>
-
-
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
             (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
@@ -28,5 +90,6 @@
             r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
             ga('create','UA-XXXXX-X','auto');ga('send','pageview');
         </script>
+
     </body>
 </html>

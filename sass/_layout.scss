@@ -1,0 +1,38 @@
+$breakpoint-mobile: max-width 320px;
+$breakpoint-desktop: min-width 1224px;
+
+
+@mixin breakpoint-desktop(){
+  @include susy-breakpoint($breakpoint-desktop, 12) {
+    @content;
+  }
+}
+
+@mixin breakpoint-mobile(){
+  @include susy-breakpoint($breakpoint-mobile, 4) {
+    @content;
+  }
+}
+
+
+@include breakpoint-desktop(){
+
+  section{
+    position: relative;
+    width: 100%;
+    z-index: 5;
+
+    .content{
+      @include container;
+      max-width: 1366px;
+      padding: 1rem;
+
+      h3{
+        font-size: 2.5rem;
+        font-weight: 100;
+        @include span(12 of 12);
+      }
+    }
+  }
+
+}

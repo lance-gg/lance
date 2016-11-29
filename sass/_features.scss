@@ -1,0 +1,70 @@
+#features{
+  background: #751a62;
+
+  .content{
+    width: span(8 of 12);
+    margin: 0 auto;
+  }
+
+  .featureContainer{
+    padding-left: span(2 of 12);
+  }
+
+  .feature{
+    position: relative;
+    padding-left: span(1 of 12);
+    @include span (4 of 12);
+    text-align: left;
+    margin-bottom: 4rem;
+  }
+
+
+  .title{
+    font-weight: 700;
+    font-size: 1.3rem;
+    padding-bottom: 0.3rem;
+  }
+
+  .text{
+    font-size: 0.9rem;
+    text-align: j;
+  }
+
+  .feature:before{
+    content:"";
+    position: absolute;
+    left: 0;
+    top: 0.3rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+
+  .feature.gameAgnostic:before{
+    background-image: url(images/icons/phantom.svg);
+  }
+
+  .feature.physics:before{
+    background-image: url(images/icons/rpg-game.svg);
+    left: 0.4rem;
+  }
+
+  .feature.binary:before{
+    background-image: url(images/icons/logic-game.svg);
+    left: 0.2rem;
+  }
+
+  .feature.lag:before{
+    background-image: url(images/icons/online-game.svg);
+  }
+
+  .feature.architecture:before{
+    background-image: url(images/icons/arcade.svg);
+  }
+
+  .feature.opensource:before{
+    background-image: url(images/icons/multiplayer.svg);
+  }
+}
