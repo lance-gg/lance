@@ -7,11 +7,19 @@
     @include breakpoint-mobile() {
       width: span(8 of 4);
     }
+
+    @include breakpoint-tablet() {
+      width: span(8 of 8);
+    }
     margin: 0 auto;
   }
 
   .featureContainer{
     padding-left: span(2 of 12);
+
+    @include breakpoint-tablet() {
+      padding-top: 2rem;
+    }
 
     @include breakpoint-mobile() {
       padding: 0;
@@ -24,6 +32,7 @@
     @include span (4 of 12);
     text-align: left;
     margin-bottom: 4rem;
+    padding-right: 1rem;
 
     @include breakpoint-mobile() {
       @include span(3 of 4);

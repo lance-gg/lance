@@ -35,6 +35,11 @@
     z-index: 10;
   }
 
+  h3{
+    &:before{display: none;}
+    &:after{display: none;}
+  }
+
   .titleContainer{
     clear: both;
     position: relative;

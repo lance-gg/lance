@@ -1,5 +1,6 @@
 $breakpoint-mobile: max-width 500px;
-$breakpoint-desktop: min-width 1224px;
+$breakpoint-tablet: 501px 1280px;
+$breakpoint-desktop: min-width 1281px;
 
 
 @mixin breakpoint-desktop(){
@@ -10,6 +11,12 @@ $breakpoint-desktop: min-width 1224px;
 
 @mixin breakpoint-mobile(){
   @include susy-breakpoint($breakpoint-mobile, 4) {
+    @content;
+  }
+}
+
+@mixin breakpoint-tablet(){
+  @include susy-breakpoint($breakpoint-tablet, 8) {
     @content;
   }
 }
@@ -48,6 +55,24 @@ $breakpoint-desktop: min-width 1224px;
   }
 }
 
+@include breakpoint-tablet(){
+
+  section{
+    .content{
+      @include container;
+      padding: 1rem;
+
+      h3{
+        width: span(6 of 8);
+        margin: 0 auto;
+        padding: 2rem 0;
+      }
+
+    }
+  }
+
+}
+
 @include breakpoint-mobile(){
 
   section{
@@ -75,6 +100,28 @@ section{
     h3{
       font-size: 2.5rem;
       font-weight: 100;
+
+      text-align: center;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+
+      &:before,
+      &:after {
+        content: ' ';
+        display: inline-block;
+        //background: #eee;
+        flex: 1;
+        background-image:
+                url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox=%220 0 20 48%22%3E%0A %3Crect width=%2248%22 height=%2248%22 stroke=%22%23FFF%22 fill=%22none%22 x=%225%22 y=%220%22 %2F%3E%0A%3C%2Fsvg%3E%0A"),
+                url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width=%221000%22 viewBox=%220 0 1000 10%22%3E%0A %3Crect width=%221000%22 height=%221%22 fill=%22%23FFF%22 y=%224%22 %2F%3E%0A%3C%2Fsvg%3E%0A");
+        background-repeat: no-repeat, no-repeat;
+        background-position: center right, right 14px center;
+        background-size: auto, auto;
+        margin: 0 1rem;
+      }
+
+      &:after { transform: scale(-1,1); }
     }
 
     a{
