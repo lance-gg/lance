@@ -4,7 +4,7 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    clientStepHold: 10
+    clientStepHold: 20
 };
 
 class InterpolateStrategy extends SyncStrategy {

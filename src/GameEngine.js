@@ -188,7 +188,7 @@ class GameEngine {
     step(isReenact) {
 
         // emit preStep event
-        isReenact = !!isReenact;
+        isReenact = Boolean(isReenact);
         var step = ++this.world.stepCount;
         this.emit("preStep", { step, isReenact });
 

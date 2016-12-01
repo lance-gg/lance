@@ -125,10 +125,11 @@ class ClientEngine {
         // check for server/client step drift
         if (this.gameEngine.serverStep) {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  server is behind client.  client will skip a step`);
+                this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Client will skip a step.`);
                 this.skipOneStep = true;
             } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  client is behind server`);
+                this.gameEngine.trace.warn(`step drift.  Client is behind server.`);
+                this.doubleStep = true;
             }
         }
 
