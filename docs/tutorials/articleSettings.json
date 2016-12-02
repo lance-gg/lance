@@ -1,0 +1,10 @@
+{
+  "MyFirstGame": {
+    "title": "My First Game",
+    "children": {
+      "spaceships": {
+        "title": "Spaaace"
+      }
+    }
+  }
+}

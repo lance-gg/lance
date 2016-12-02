@@ -4,7 +4,7 @@
         "encoding": "utf8",
         "package": "package.json",
         "readme": "README.md",
-        "template": "./node_modules/ink-docstrap/template",
+        "template": "./node_modules/incheon-docs-template",
         "tutorials": "./docs/tutorials"
     },
     "source": {
