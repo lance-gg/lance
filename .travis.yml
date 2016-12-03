@@ -3,3 +3,8 @@ node_js:
   - "6"
   - "5"
   - "4"
+script: bash ./deploydocs.sh
+env:
+  global:
+  - ENCRYPTION_LABEL: "5f3e16537c5b"
+  - COMMIT_AUTHOR_EMAIL: "opherv@gmail.com"

@@ -2,9 +2,8 @@
     "opts": {
         "destination": "./docs-out/",
         "encoding": "utf8",
-        "package": "package.json",
         "readme": "README.md",
-        "template": "./node_modules/incheon-docs-template",
+        "template": "node_modules/incheon-docs-template",
         "tutorials": "./docs/tutorials"
     },
     "source": {

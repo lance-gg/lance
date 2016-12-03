@@ -41,3 +41,6 @@ jspm_packages
 
 # jsdoc output
 docs-out
+
+
+deploy_key
