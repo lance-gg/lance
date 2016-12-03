@@ -6,5 +6,5 @@ node_js:
 script: bash ./deploydocs.sh
 env:
   global:
-  - ENCRYPTION_LABEL: "5f3e16537c5b"
+  - ENCRYPTION_LABEL: "d436d79ac9c9"
   - COMMIT_AUTHOR_EMAIL: "opherv@gmail.com"
