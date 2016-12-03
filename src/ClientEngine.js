@@ -102,8 +102,8 @@ class ClientEngine {
 
         // start game, game loop, render loop
         this.gameEngine.start();
-        gameLoop();
-        renderLoop();
+        window.requestAnimationFrame(gameLoop);
+        window.requestAnimationFrame(renderLoop);
     }
 
     step() {
