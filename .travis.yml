@@ -3,8 +3,29 @@ node_js:
   - "6"
   - "5"
   - "4"
-script: bash ./deploydocs.sh
 env:
   global:
   - ENCRYPTION_LABEL: "d436d79ac9c9"
   - COMMIT_AUTHOR_EMAIL: "opherv@gmail.com"
+after_script:
+  - |
+
+      declare exitCode;
+
+
+      # -- [1] -------------------------------------------------------
+
+      $(npm bin)/travis-after-all
+      exitCode=$?
+
+
+      # -- [2] -------------------------------------------------------
+
+      if [ $exitCode -eq 0 ]; then
+        # Here goes the code that needs to be executed if the build succeeded
+        bash ./deploydocs.sh
+      fi
+
+      if [ $exitCode -eq 1 ]; then
+        # Here goes the code that needs to be executed if the build failed
+      fi
