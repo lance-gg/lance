@@ -4,7 +4,7 @@
         "encoding": "utf8",
         "readme": "README.md",
         "template": "node_modules/incheon-docs-template",
-        "tutorials": "./docs/tutorials"
+        "tutorials": "./docs"
     },
     "source": {
         "include": [

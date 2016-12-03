@@ -1,4 +1,7 @@
 {
+  "guide": {
+    "title": "docs"
+  },
   "MyFirstGame": {
     "title": "My First Game",
     "children": {
