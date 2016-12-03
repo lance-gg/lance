@@ -1,13 +1,26 @@
 {
-  "guide": {
-    "title": "docs"
+  "prologue": {
+    "title": "Prologue",
+    "order": 1
   },
-  "MyFirstGame": {
-    "title": "My First Game",
+  "guide": {
+    "title": "Guide",
+    "order": 2
+  },
+  "tutorials": {
+    "title": "Tutorials",
+    "order": 3,
     "children": {
+      "MyFirstGame":{
+        "title": "My First Game: pong"
+      },
       "spaceships": {
         "title": "Spaaace"
       }
     }
+  },
+  "furtherreading": {
+    "title": "Further Reading",
+    "order": 100
   }
 }
