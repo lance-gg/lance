@@ -216,7 +216,7 @@ class GameEngine {
             let ob = this.world.objects[objId];
             ob.step(this.worldSettings);
 
-            this.trace.trace(`object[${objId}] after ${isReenact?"reenact":"step"} : ${ob.toString()}`);
+            this.trace.trace(`object[${objId}] after ${isReenact ? "reenact" : "step"} : ${ob.toString()}`);
         }
     }
 

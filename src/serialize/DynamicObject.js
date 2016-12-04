@@ -148,6 +148,7 @@ class DynamicObject extends Serializable {
     get velocityBendingMultiple() { return null; }
 
     step(worldSettings) {
+
         if (this.isRotatingRight) { this.angle += this.rotationSpeed; }
         if (this.isRotatingLeft) { this.angle -= this.rotationSpeed; }
         this.angle += this.bendingAngle;
@@ -180,17 +181,15 @@ class DynamicObject extends Serializable {
         this.isRotatingLeft = false;
         this.isRotatingRight = false;
 
-        if (!this.passive) {
-            this.x = this.x + this.velocity.x + this.bendingX;
-            this.y = this.y + this.velocity.y + this.bendingY;
+        this.x = this.x + this.velocity.x + this.bendingX;
+        this.y = this.y + this.velocity.y + this.bendingY;
 
-            // wrap around the world edges
-            if (worldSettings.worldWrap) {
-                if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
-                if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
-                if (this.x < 0) { this.x += worldSettings.width; }
-                if (this.y < 0) { this.y += worldSettings.height; }
-            }
+        // wrap around the world edges
+        if (worldSettings.worldWrap) {
+            if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
+            if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
+            if (this.x < 0) { this.x += worldSettings.width; }
+            if (this.y < 0) { this.y += worldSettings.height; }
         }
     }
 
@@ -269,7 +268,7 @@ class DynamicObject extends Serializable {
 
         // update other objects with interpolation
         // TODO refactor into general interpolation class
-        if (this.isPlayerControlled !== true) {
+        //if (this.isPlayerControlled !== true) {
 
             if (Math.abs(nextObj.x - this.x) > worldSettings.height / 2) {
                 this.x = nextObj.x;
@@ -285,7 +284,7 @@ class DynamicObject extends Serializable {
 
             var shortestAngle = ((((nextObj.angle - this.angle) % 360) + 540) % 360) - 180;
             this.angle = this.angle + shortestAngle * playPercentage;
-        }
+        //}
     }
 
     // release resources

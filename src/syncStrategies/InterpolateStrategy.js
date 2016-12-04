@@ -4,7 +4,7 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    clientStepHold: 20
+    clientStepHold: 10
 };
 
 class InterpolateStrategy extends SyncStrategy {
@@ -16,6 +16,7 @@ class InterpolateStrategy extends SyncStrategy {
 
         this.syncsBuffer = []; // buffer for server world updates
         this.gameEngine = this.clientEngine.gameEngine;
+        this.gameEngine.passive = true; // client side engine ignores inputs
         this.gameEngine.on('client.postStep', this.interpolate.bind(this));
         this.gameEngine.on('client.syncReceived', this.updatesyncsBuffer.bind(this));
     }

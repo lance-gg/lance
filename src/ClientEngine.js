@@ -145,6 +145,10 @@ class ClientEngine {
     }
 
     doInputLocal(message) {
+        if (this.gameEngine.passive) {
+            return;
+        }
+
         this.gameEngine.emit('client.preInput', message.data);
         this.gameEngine.processInput(message.data, this.playerId);
         this.gameEngine.emit('client.postInput', message.data);
