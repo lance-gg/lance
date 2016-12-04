@@ -54,7 +54,13 @@ class ClientEngine {
 
     configureSynchronization() {
 
+        // the reflect syncronizer is just interpolate strategy,
+        // configured to show server syncs
         let syncOptions = this.options.syncOptions;
+        if (syncOptions.sync === 'reflect') {
+            syncOptions.sync = 'interpolate';
+            syncOptions.reflect = true;
+        }
         const synchronizer = new Synchronizer(this, syncOptions);
 
         // TODO: mixing different strategies together doesn't

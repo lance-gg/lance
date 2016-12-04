@@ -30,6 +30,9 @@
       },
       "guide_syncextrapolation": {
           "title": "Synchronization Methods: Extrapolation"
+      },
+      "guide_tuningdebugging": {
+          "title": "Fine Tuning and Debugging"
       }
     }
   },
