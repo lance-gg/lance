@@ -5,7 +5,33 @@
   },
   "guide": {
     "title": "Guide",
-    "order": 2
+    "order": 2,
+    "children": {
+      "guide_gameengine":{
+        "title": "The Game Engine"
+      },
+      "guide_serverengine": {
+        "title": "The Server Engine"
+      },
+      "guide_clientengine": {
+          "title": "The Client Engine"
+      },
+      "guide_renderer": {
+          "title": "The Renderer"
+      },
+      "guide_gameworld": {
+          "title": "The Game World and Game Objects"
+      },
+      "guide_serialization": {
+          "title": "Serialization and Communication"
+      },
+      "guide_syncinterpolation": {
+          "title": "Synchronization Methods: Interpolation"
+      },
+      "guide_syncextrapolation": {
+          "title": "Synchronization Methods: Extrapolation"
+      }
+    }
   },
   "tutorials": {
     "title": "Tutorials",
