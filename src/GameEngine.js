@@ -153,7 +153,7 @@ class GameEngine {
         this.world = new GameWorld();
 
         // on the client we have a different ID space
-        if (this.options.clientIDSpace && this.isClient) {
+        if (this.options.clientIDSpace) {
             this.world.idCount = this.options.clientIDSpace;
         }
 
