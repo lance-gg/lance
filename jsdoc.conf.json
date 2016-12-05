@@ -1,6 +1,6 @@
 {
     "opts": {
-        "destination": "./docs-out/",
+        "destination": "./docs_out/",
         "encoding": "utf8",
         "readme": "README.md",
         "template": "node_modules/incheon-docs-template",
