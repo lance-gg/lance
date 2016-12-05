@@ -24,7 +24,7 @@
     "eslint": "^3.10.1",
     "eslint-config-google": "^0.6.0",
     "incheon-docs-template": "OpherV/incheon-docs-template",
-    "docsmeta": "OpherV/docsmeta",
+    "docmeta": "OpherV/docmeta",
     "ink-docstrap": "^1.3.0",
     "jsdoc": "dkniffin/jsdoc#tutorial-ordering",
     "mocha": "^3.0.2",
