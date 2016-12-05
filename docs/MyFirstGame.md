@@ -1,5 +1,3 @@
-# Build a Simple Incheon Game
-
 This tutorial will guide you in building the simplest
 javascript networked game, [Pong](https://en.wikipedia.org/wiki/Pong).  It starts with a walk-through of environment setup,
 then proceeds with the writing of client code, server

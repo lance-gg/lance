@@ -1,8 +1,3 @@
-
-
-# Game World and Game Objects
-
-
 The Game Engine includes a reference to the Game World, which consists of the game state, and a list of Game Objects.  The Game World is essentially the data which is liable to change from one game step to the next, and must be sent on every sync to every client.
 
 The game objects, as implemented in Incheon, are instances of game object classes, which are subclasses of the base DynamicObject class.  This base object is a serializable.  So for example, in a game of breakout, the implementation will have three game object classes: the Paddle, the Ball, and the Brick.  The game objects will include one instance of the Paddle class, one instance of a Ball class, and multiple instances of the Brick class.  (That much is true anyways of the simple version of the game, where there is only a single ball, and a single paddle, and no shooting). The Paddle, the Ball, and the Brick are subclasses of DynamicObject.

@@ -1,8 +1,3 @@
-
-
-# Synchronization Methods: Extrapolation
-
-
 A different approach to synchronization is to extrapolate the game’s progress on the client, in the absence of sync data from the server.  Once sync data does arrive from the server, a client must reconcile between the game state predicted on the client, and the game state that actually occurred on the server.
 
 In the diagram above, while the server is playing out step 1026, the clients are simultaneously rendering step 1030, which didn’t happen yet on the server.  This implies that the clients used extrapolation to predict the future.

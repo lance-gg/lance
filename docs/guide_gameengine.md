@@ -1,5 +1,3 @@
-# Game Engine
-
 The Game Engine contains the core game logic.  It understands user inputs, and applies them to the game.  It will fire missiles, hit aliens, boost spaceships, and apply magic spells.  The primary game engine method is the step method, which progresses the game from step N to step N+1, given the inputs that arrived since step N-1.
 
 When the game engine step has completed, each game object must have it’s new current position updated, along with health, power, and any other game attributes your game derives.

@@ -4,41 +4,44 @@
     "order": 1
   },
   "guide": {
-    "title": "Guide",
+    "title": "Architecture of a Multiplayer Game",
     "order": 2,
     "children": {
       "guide_gameengine":{
-        "title": "The Game Engine"
+        "title": "Game Engine"
       },
       "guide_serverengine": {
-        "title": "The Server Engine"
+        "title": "Server Engine"
       },
       "guide_clientengine": {
-          "title": "The Client Engine"
+          "title": "Client Engine"
       },
       "guide_renderer": {
-          "title": "The Renderer"
+          "title": "Renderer"
       },
       "guide_gameworld": {
-          "title": "The Game World and Game Objects"
+          "title": "Game World and Game Objects"
       },
       "guide_serialization": {
           "title": "Serialization and Communication"
-      },
+      }
+    }
+  },
+  "guide_synchronization_methods":{
+    "title": "Synchronization Methods",
+    "order": 30,
+    "children": {
       "guide_syncinterpolation": {
-          "title": "Synchronization Methods: Interpolation"
+        "title": "Interpolation"
       },
       "guide_syncextrapolation": {
-          "title": "Synchronization Methods: Extrapolation"
-      },
-      "guide_tuningdebugging": {
-          "title": "Fine Tuning and Debugging"
+        "title": "Extrapolation"
       }
     }
   },
   "tutorials": {
     "title": "Tutorials",
-    "order": 3,
+    "order": 50,
     "children": {
       "MyFirstGame":{
         "title": "My First Game: pong"
@@ -47,6 +50,10 @@
         "title": "Spaaace"
       }
     }
+  },
+  "guide_tuningdebugging": {
+    "title": "Fine Tuning and Debugging",
+    "order": 80
   },
   "furtherreading": {
     "title": "Further Reading",

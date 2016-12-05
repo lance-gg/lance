@@ -1,5 +1,3 @@
-# Fine-Tuning and Debugging
-
 In the prologue of this documentation, the complexity of multiplayer network games becomes evident.  But that
 is small potatoes compared to debugging multiplayer network games.  The debugging of a multiplayer game
 is made difficult by the following reasons:

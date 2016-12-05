@@ -1,7 +1,3 @@
-# Architecture of a Multiplayer Game
-
-
-
 # Overview
 
 The architecture of a multiplayer game must meet the requirements and challenges presented in the prologue "Why is making a multiplayer game so hard".  The architecture cannot wish away these facts: that network delays exist, the delay durations are not consistent or predictable, that players can suddenly disconnect, or that client code cannot be trusted.

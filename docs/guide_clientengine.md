@@ -1,6 +1,3 @@
-# Client Engine
-
-
 The Client Engine must run the game loop, just like the server engine.  However it also needs to handle game syncs which arrive from the server, and execute a render loop.
 
 A deeper exploration of the game synchronization methods is addressed in a separate chapter.  The client will let the synchronization method take care of updating the game world in a way which appears visually smooth to the player.
