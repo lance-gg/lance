@@ -24,6 +24,7 @@ after_script:
       if [ $exitCode -eq 0 ]; then
         # Here goes the code that needs to be executed if the build succeeded
         bash ./addSSHKey.sh
+        env | grep -i ssh
         docmeta --deploy
       fi
 
