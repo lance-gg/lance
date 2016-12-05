@@ -4,7 +4,8 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    clientStepHold: 10
+    clientStepHold: 10,
+    reflect: false
 };
 
 class InterpolateStrategy extends SyncStrategy {
@@ -23,6 +24,9 @@ class InterpolateStrategy extends SyncStrategy {
 
     updatesyncsBuffer(e) {
         // TODO avoid editing the input event
+        // TODO the event sorting code below is used in one way or another
+        //    by interpolate, extrapolate and reflect.  Consider placing
+        //    it in the base class.
 
         // keep a reference of events by object id
         e.syncObjects = {};
@@ -150,6 +154,8 @@ class InterpolateStrategy extends SyncStrategy {
             });
             if (nextObj) {
                 let playPercentage = 1 / (nextStep + 1 - stepToPlay);
+                if (this.options.reflect)
+                    playPercentage = 1.0;
                 this.interpolateOneObject(ob, nextObj, id, playPercentage);
             }
         }

@@ -77,10 +77,3 @@ The client is more complicated than the server, for two reasons.  First it must 
 * ClientEngine - *start of a single render step*
 
     * Renderer - draw
-
-
-
-# Fine-Tuning and Debugging
-
-
-<<< User must understand how to debug and investigate.  Seeing that the game objects are behaving in an unusual way can be very frustrating for the game developer, because the developer does not even know how to start the investigation.  The process involves narrowing down the problem to server-side or client-side, to a bug in the user’s code, to a mis-use of configuration, or network conditions. >>>

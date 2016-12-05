@@ -37,7 +37,7 @@ class ServerEngine {
     constructor(io, gameEngine, options) {
         this.options = Object.assign({
             updateRate: 6,
-            frameRate: 60,
+            frameRate: 60,  // TODO: this is no longer a frame rate, this is a stepRate
             debug: {
                 serverSendLag: false
             }
