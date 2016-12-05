@@ -40,7 +40,9 @@ jspm_packages
 .idea
 
 # jsdoc output
-docs-out
+docs_out
 
 
 deploy_key
+docmeta_temp
+docmeta_temp_deploy
