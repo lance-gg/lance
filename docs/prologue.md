@@ -1,4 +1,4 @@
-## Prologue; or why making multiplayer games is so hard
+# Prologue; or why making multiplayer games is so hard
 
  If you've ever made a single-player video game, you already know that regardless of the platform, genre or mechanic - developing a game is a huge undertaking. There are so many challenges to overcome including narrative, game design, graphics, sound, AI, performance and many others. Even if you get all of those right - the game might still not be fun. A well-executed game that's no fun is not even worth playing, despite all the effort put into it.
 
