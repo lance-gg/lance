@@ -28,9 +28,16 @@ As you develop  your game, you will need to implement your own extensions (sub-c
 
 The following diagram shows how these components connect in the overall architecture:
 
-## Basic Flow
+![architecture](https://cloud.githubusercontent.com/assets/3702763/20984514/421f44b4-bcc9-11e6-8346-037d15226216.PNG)
 
-The basic flow of a game can be seen as a sequence of *game steps*. Steps will be executed both on the server and the client. Each step is numbered, and depending on the synchronization strategy, clients may be executing a given step before the corresponding server information has arrived at the client (i.e. extrapolation) or after (i.e. interpolation). Ideally, a given step *N* represents the same point in game play on both the server and the client. But this is not always the case.
+## The Game as a Sequence of Steps
+
+The basic flow of a game can be seen as a sequence of *game steps*.  This is a basic concept which is true
+for game development and the concept works well for networked games as well.  During a single step, the
+game progresses from time *N* to time *N+1*.  The game engine will have to determine the state of the game
+at time *N+1* by applying physics, taking into account new user inputs, and applying the game mechanics logic.
+
+In the context of multi-player, networked games, the steps will be executed both on the server and the client. Each step is numbered, and depending on the synchronization strategy, clients may be executing a given step before the corresponding server information has arrived at the client (i.e. extrapolation) or after (i.e. interpolation). Ideally, a given step *N* represents the same point in game play on both the server and the client.
 
 The core game logic is implemented in the game engine, so a game step is simply a call to the game engine’s *step()* method.
 
