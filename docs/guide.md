@@ -16,7 +16,7 @@ The main components of a networked game are:
 
 * The **clients**. Represented in Incheon by multiple instances of the *ClientEngine* class.
 
-* The **game logic**. Represented in Incheon by the* **GameEngine* class.
+* The **game logic**. Represented in Incheon by the  **GameEngine** class.
 
 * The **game world**, which includes multiple **game objects**. The Incheon *DynamicObject* is the base class for all kinds of game objects.
 

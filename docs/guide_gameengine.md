@@ -9,3 +9,7 @@ It is important to take note of the following architectural requirements:
 2. On clients which use extrapolated synchronization, a given game step is often re-enacted following the arrival of a sync from the server.  These "re-enactment" steps are marked with a flag.
 
 Lastly, the game engine also provides a useful event emitter which reports on the progress of the game.  A typical game will use these events to trigger any required logic with specific timing. Events include pre-step, post-step, player-joined, object-added, etc.  Refer to the API for a complete list.
+
+See the {@link GameEngine} implementation in the API Reference.
+
+Next: {@tutorial guide_serverengine}
