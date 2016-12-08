@@ -3,3 +3,7 @@ The Server Engine is a relatively simple component.  As mentioned in the introdu
 The game developer will extend this logic, by adding functions that log gameplay statistics, registering user activity, wins, losses, achievements.
 
 Care must be taken on the following point: the server engine should not be used to contain game logic - that belongs in the game engine class.
+
+See the {@link ServerEngine} implementation in the API Reference.
+
+Next: {@tutorial guide_clientengine}

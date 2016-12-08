@@ -44,7 +44,7 @@
     "order": 50,
     "children": {
       "MyFirstGame":{
-        "title": "My First Game: pong"
+        "title": "My First Game: Pong"
       },
       "spaceships": {
         "title": "Spaaace"

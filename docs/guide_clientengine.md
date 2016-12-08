@@ -1,6 +1,6 @@
-The Client Engine must run the game loop, just like the server engine.  However it also needs to handle game syncs which arrive from the server, and execute a render loop.
+The Client Engine must run the game loop, just like the server engine.  However it also needs to handle game syncs which arrive from the server.  Also, the client engine execute a render loop, which can run at a different rate from the game loop.  The render loop frequency is determined by display hardware available, and so it may be faster or slower than the game loop frequency.
 
-A deeper exploration of the game synchronization methods is addressed in a separate chapter.  The client will let the synchronization method take care of updating the game world in a way which appears visually smooth to the player.
+A deeper exploration of the game world synchronization algorithms is addressed in separate chapters.  The client will let the synchronization method take care of updating the client's game world in a way which appears visually smooth to the player.
 
 Additionally, the client engine handles the following functions:
 
@@ -8,4 +8,9 @@ Additionally, the client engine handles the following functions:
 
 2. Transmit user inputs to server
 
-3. Handle changes in network delay, and step drift.  If the server is running faster (or slower) than the client, then the server is applying steps faster (or slower) than the client.  The client engine handles these situations by skipping steps or hurrying steps as required
+3. Handle changes in network delay, and step drift.  If the server runs faster (or slower) than the client, then the server is executing steps faster (or slower) than the
+ client.  The client engine handles these situations by skipping steps or hurrying steps as required.  Step adjustment is also necessary to recover from a spike in network traffic.
+
+See the {@link ClientEngine} implementation in the API Reference.
+
+Next: {@tutorial guide_renderer}

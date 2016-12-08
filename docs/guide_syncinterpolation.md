@@ -17,3 +17,5 @@ Notes for the game developer:
 3. The delay in input response may mean that a given game is not a good match for interpolated synchronization.  In that case, extrapolation should be considered.  However, there are techniques which can make interpolation work nonetheless.  Real-world input delay is about 200ms.  There may be visual tricks that make this delay acceptable.  For example if the input boosts a rocket, the game might show a visual boost light up before the rocket actually starts accelerating.
 
 4. The game engine may not need to run on the client at all, if all the information required for rendering is available in the server sync.
+
+Next: {@tutorial guide_syncextrapolation}

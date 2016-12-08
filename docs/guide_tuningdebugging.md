@@ -35,7 +35,9 @@ synchronization method which simply shows the server sync data as it arrives.
 
 To run a game in reflect mode, simply use the URL query string option:
 
+```
 http://127.0.0.1:3000/?sync=reflect
+```
 
 The problem can also occur in such a way that it usually happens in between syncs.
 In this case, one can configure the server to increase the update rate so that

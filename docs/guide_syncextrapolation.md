@@ -30,4 +30,6 @@ Notes for the game developer: Multiple complications arise from the extrapolatio
 
 2. **Bending**.  The client’s objects positions gradually bend towards the server’s positions.  Velocity can also bend.  The game designer must choose bending values carefully.  Objects whose position can change suddenly (teleporting objects) will not bend well.  Objects whose velocity can change suddenly (impulse) should not have velocity bending.
 
-3. **Shadow Objects.** The client may create an object which does not yet exist on the server.  For example, if a ship fires a missile, the client must render a missile, even though the missile object is yet to exist on the server.  Until the true missile object will be created on the server, the client will model the missile with a shadow object.
+3. **Shadow Objects**. The client may create an object which does not yet exist on the server.  For example, if a ship fires a missile, the client must render a missile, even though the missile object is yet to exist on the server.  Until the true missile object will be created on the server, the client will model the missile with a shadow object.
+
+Next: {@tutorial tutorials}

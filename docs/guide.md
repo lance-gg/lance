@@ -1,6 +1,5 @@
-# Overview
 
-The architecture of a multiplayer game must meet the requirements and challenges presented in the prologue "Why is making a multiplayer game so hard".  The architecture cannot wish away these facts: that network delays exist, the delay durations are not consistent or predictable, that players can suddenly disconnect, or that client code cannot be trusted.
+The architecture of a multiplayer game must meet the requirements and challenges presented in the {@tutorial prologue} "why is making a multiplayer game so hard".  The architecture cannot wish away these facts: that network delays exist, the delay durations are not consistent or predictable, that players can suddenly disconnect, or that client code cannot be trusted.
 
 These requirements lead to some basic architectural principles:
 
@@ -16,7 +15,7 @@ The main components of a networked game are:
 
 * The **clients**. Represented in Incheon by multiple instances of the *ClientEngine* class.
 
-* The **game logic**. Represented in Incheon by the  **GameEngine** class.
+* The **game logic**. Represented in Incheon by the  *GameEngine* class.
 
 * The **game world**, which includes multiple **game objects**. The Incheon *DynamicObject* is the base class for all kinds of game objects.
 
@@ -33,11 +32,11 @@ The following diagram shows how these components connect in the overall architec
 ## The Game as a Sequence of Steps
 
 The basic flow of a game can be seen as a sequence of *game steps*.  This is a basic concept which is true
-for game development and the concept works well for networked games as well.  During a single step, the
+for game development generally, and the concept works well for networked games as well.  During a single step, the
 game progresses from time *N* to time *N+1*.  The game engine will have to determine the state of the game
-at time *N+1* by applying physics, taking into account new user inputs, and applying the game mechanics logic.
+at time *N+1* by applying physics, taking account of new user inputs, and applying the game mechanics logic.
 
-In the context of multi-player, networked games, the steps will be executed both on the server and the client. Each step is numbered, and depending on the synchronization strategy, clients may be executing a given step before the corresponding server information has arrived at the client (i.e. extrapolation) or after (i.e. interpolation). Ideally, a given step *N* represents the same point in game play on both the server and the client.
+In the context of multilayer, networked games, the steps will be executed both on the server and the client. Each step is numbered, and depending on the synchronization strategy, clients may be executing a given step before the corresponding server information has arrived at the client (i.e. extrapolation) or after (i.e. interpolation). Ideally, a given step *N* represents the same point in game play on both the server and the client.
 
 The core game logic is implemented in the game engine, so a game step is simply a call to the game engine’s *step()* method.
 
@@ -57,21 +56,21 @@ The server engine schedules a step function to be called at a regular interval. 
 
     * If it is time to broadcast a new sync
 
-        * players.forEach(transmit a "world update")
+        * for each player: transmit a "world update"
 
 ## Client Flow
 
-The client is more complicated than the server, for two reasons.  First it must listen to syncs which have arrived from the server, and reconcile the data with its own game state.  Second, it must invoke the renderer to draw the game state.
+The client flow is more complicated than the server, for two reasons.  First it must listen to syncs which have arrived from the server, and reconcile the data with its own game state.  Second, it must invoke the renderer to draw the game state.
 
 * ClientEngine - *start of a single client step*
 
     * check inbound messages / syncs
 
-    * capture inputs that have occurred since previous step
+    * capture user inputs that have occurred since previous step
 
-    * transmit inputs to server
+    * transmit user inputs to server
 
-    * apply inputs locally
+    * apply user inputs locally
 
     * GameEngine - *start of a single game step*
 
@@ -80,3 +79,5 @@ The client is more complicated than the server, for two reasons.  First it must 
 * ClientEngine - *start of a single render step*
 
     * Renderer - draw
+
+Next: {@tutorial guide_gameengine}
