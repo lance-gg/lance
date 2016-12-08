@@ -3,9 +3,12 @@
   background-repeat: no-repeat, repeat;
   background-position: center, center;
   background-size: cover, auto;
+  z-index: 15;
+  padding-bottom: 72px;
 
   @include breakpoint-desktop() {
     padding-top: 10rem;
+
   }
 
   @include breakpoint-mobile() {
@@ -106,6 +109,10 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+
+    @include breakpoint-mobile() {
+      display: none
+    }
   }
 
   .ship2{
@@ -121,6 +128,11 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+
+    @include breakpoint-mobile() {
+      display: none
+    }
+
   }
 
   .ctaContainer{

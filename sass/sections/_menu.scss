@@ -1,0 +1,88 @@
+#innerMenu{
+  position: absolute;
+  @include background-image(linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,1) 100%));
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 50;
+}
+
+#innerMenu, #outerMenu{
+
+  border-bottom: 2px solid #68b2f8;
+  padding-bottom: 1rem;
+
+  z-index: 10;
+
+  ul{
+    padding-left: 0;
+
+    li{
+      position: relative;
+      display: inline-block;
+      margin-right: 40px;
+
+      &:after{
+        content: "";
+        position: absolute;
+        right: -57px;
+        top: -32px;
+        width: 71px;
+        height: 83px;
+        vertical-align: middle;
+        background-image: url(images/divider.png);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        transition: all 0.5s ease-in;
+      }
+    }
+
+    li:last-child{
+      margin-right: 0;
+      &:after{
+        opacity: 0;
+        top: -50px;
+        right: -130px;
+        background-image: url(images/splash_ship2.png);
+        width: 80px;
+        height: 80px;
+        transform: translateY(-150px);
+      }
+    }
+  }
+
+  a{
+    transition: all 0.1s ease-in;
+    color: #ffffff;
+
+    &:hover{
+      color: #68b2f8;
+    }
+  }
+}
+#outerMenu {
+  position: fixed;
+  width: calc(100% - 18px);
+  top: 0;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  background: black;
+  margin-top: 0px;
+  padding: 0.5rem 0;
+
+  @include breakpoint-mobile() {
+    display: none;
+  }
+}
+
+.fixedMenu #outerMenu{
+  opacity: 1;
+  pointer-events: all;
+
+  ul li:last-child:after{
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}

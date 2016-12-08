@@ -1,7 +1,9 @@
 {
   "name": "incheon-site",
   "main": "webpack.config.js",
-  "dependencies": {},
+  "dependencies": {
+    "waypoints": "^4.0.1"
+  },
   "devDependencies": {
     "breakpoint-sass": "^2.7.0",
     "compass-mixins": "^0.12.10",

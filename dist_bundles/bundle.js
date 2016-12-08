@@ -46,7 +46,31 @@
 
 	
 	__webpack_require__(1);
-
+	__webpack_require__(4);
+	
+	var innerWidth = window.innerWidth;
+	
+	document.addEventListener("resize",function(){
+	    innerWidth = window.innerWidth;
+	});
+	
+	document.addEventListener("DOMContentLoaded",function(){
+	    if (innerWidth>500) {
+	        var waypoint = new Waypoint({
+	            element: document.getElementById('par1'),
+	            context: document.querySelector('.siteContainer'),
+	            offset: 73,
+	            handler: function (direction) {
+	                if (direction == "down") {
+	                    document.body.classList.add("fixedMenu");
+	                }
+	                else {
+	                    document.body.classList.remove("fixedMenu");
+	                }
+	            }
+	        });
+	    }
+	});
 
 /***/ },
 /* 1 */
@@ -78,7 +102,7 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	module.exports = "@media (min-width: 1281px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    max-width: 1366px;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\n@media (min-width: 501px) and (max-width: 1280px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 74.35897%;\n      margin: 0 auto;\n      padding: 2rem 0; } }\n\n@media (max-width: 500px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\nsection {\n  position: relative;\n  width: 100%;\n  z-index: 5; }\n  section .content h3 {\n    font-size: 2.5rem;\n    font-weight: 100;\n    text-align: center;\n    display: flex;\n    align-items: stretch;\n    justify-content: center; }\n    section .content h3:before, section .content h3:after {\n      content: ' ';\n      display: inline-block;\n      flex: 1;\n      background-image: url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox=%220 0 20 48%22%3E%0A %3Crect width=%2248%22 height=%2248%22 stroke=%22%23FFF%22 fill=%22none%22 x=%225%22 y=%220%22 %2F%3E%0A%3C%2Fsvg%3E%0A\"), url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width=%221000%22 viewBox=%220 0 1000 10%22%3E%0A %3Crect width=%221000%22 height=%221%22 fill=%22%23FFF%22 y=%224%22 %2F%3E%0A%3C%2Fsvg%3E%0A\");\n      background-repeat: no-repeat, no-repeat;\n      background-position: center right, right 14px center;\n      background-size: auto, auto;\n      margin: 0 1rem; }\n    section .content h3:after {\n      transform: scale(-1, 1); }\n  section .content a {\n    transition: all 0.1s ease-in;\n    color: #68b2f8; }\n    section .content a:hover {\n      color: #506ee5; }\n\n.parallax {\n  perspective: 3px;\n  height: 100vh;\n  overflow-x: hidden;\n  overflow-y: auto;\n  perspective-origin-x: 100%; }\n\n.parallax__layer {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  transform-origin-x: 100%; }\n\n.parallax__group {\n  position: relative;\n  transform-style: preserve-3d; }\n\n.parallax__layer--base {\n  transform: translateZ(0); }\n\n.parallax__layer--back {\n  transform: translateZ(-1px); }\n\nhtml, body {\n  padding: 0;\n  margin: 0;\n  background: #1d0c24;\n  color: #fff;\n  text-align: center;\n  font-family: \"proxima-nova\", sans-serif; }\n\n#splash {\n  background-image: url(images/splash_bg.png), url(images/page_bg_black.png);\n  background-repeat: no-repeat, repeat;\n  background-position: center, center;\n  background-size: cover, auto; }\n  @media (min-width: 1281px) {\n    #splash {\n      padding-top: 10rem; } }\n  @media (max-width: 500px) {\n    #splash {\n      padding-top: 0; }\n      #splash .content {\n        padding: 0; } }\n  #splash h1 {\n    position: relative;\n    background-image: url(images/splash_incheonlogo.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    height: 16rem;\n    width: 100%;\n    margin: 0 auto;\n    z-index: 10; }\n    @media (max-width: 500px) {\n      #splash h1 {\n        background-size: 150%; } }\n  #splash h3:before {\n    display: none; }\n  #splash h3:after {\n    display: none; }\n  #splash .titleContainer {\n    clear: both;\n    position: relative; }\n  #splash h2 {\n    position: absolute;\n    top: 4rem;\n    right: 10%;\n    z-index: 11;\n    background-image: url(images/splash_beta.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    width: 23.72881%;\n    margin: 0;\n    height: 14rem; }\n    @media (max-width: 500px) {\n      #splash h2 {\n        top: 3rem;\n        right: 5%; } }\n  #splash h3 {\n    font-weight: 100;\n    font-size: 2.5rem;\n    margin: -3rem auto 2rem auto; }\n    @media (max-width: 500px) {\n      #splash h3 {\n        font-size: 2rem; } }\n  #splash .description {\n    width: 57.62712%;\n    margin: 1rem auto;\n    font-weight: 100;\n    font-size: 1.1rem;\n    line-height: 1.6rem;\n    text-align: justify; }\n    @media (max-width: 500px) {\n      #splash .description {\n        width: 100%;\n        padding: 1rem;\n        box-sizing: border-box; } }\n  #splash .ship1 {\n    transform: translateZ(-1px) scaleX(1) scaleY(1);\n    height: 13vw;\n    width: 13vw;\n    position: absolute;\n    top: -21vh;\n    left: 20%;\n    z-index: 1;\n    background-image: url(images/splash_ship1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n  #splash .ship2 {\n    transform: translateZ(1px) scaleX(0.5) scaleY(0.5);\n    height: 20vw;\n    width: 20vw;\n    position: absolute;\n    bottom: -10%;\n    right: 19%;\n    z-index: 20;\n    background-image: url(images/splash_ship2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n  #splash .ctaContainer {\n    position: relative;\n    background-color: rgba(104, 178, 248, 0.2);\n    display: inline-block;\n    padding: 0.2rem 1.8rem 0.1rem 1.8rem;\n    margin: 2rem auto;\n    font-size: 1.2rem;\n    transition: all 0.1s ease-in; }\n    #splash .ctaContainer:before {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      left: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      pointer-events: none; }\n    #splash .ctaContainer:after {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      right: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      transform: scaleX(-1);\n      pointer-events: none; }\n    #splash .ctaContainer a {\n      width: 100%;\n      padding: 0.2rem 0.5rem;\n      color: #fff;\n      transition: all 0.1s ease-in; }\n    #splash .ctaContainer:hover {\n      background: rgba(104, 178, 248, 0.4); }\n      #splash .ctaContainer:hover a {\n        padding: 0.2rem 0.8rem; }\n\na {\n  color: #fff;\n  text-decoration: none; }\n\n#par1 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1; }\n  #par1 .parallax__layer--back {\n    width: 100vw;\n    height: 90vh;\n    background-image: url(images/game1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.6) scaleY(1.6) translateY(0); }\n\n#par2 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1; }\n  #par2 .parallax__layer--back {\n    width: 100vw;\n    height: 70vh;\n    background-image: url(images/game2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.5) scaleY(1.5) translateY(0vh);\n    z-index: 4; }\n\n#features {\n  background: #751a62; }\n  #features .content {\n    box-sizing: border-box;\n    width: 66.10169%;\n    margin: 0 auto; }\n    @media (max-width: 500px) {\n      #features .content {\n        width: 205.26316%; } }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .content {\n        width: 100%; } }\n  #features .featureContainer {\n    padding-left: 15.25424%; }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .featureContainer {\n        padding-top: 2rem; } }\n    @media (max-width: 500px) {\n      #features .featureContainer {\n        padding: 0; } }\n  #features .feature {\n    position: relative;\n    padding-left: 6.77966%;\n    width: 32.20339%;\n    float: left;\n    margin-right: 1.69492%;\n    text-align: left;\n    margin-bottom: 4rem;\n    padding-right: 1rem; }\n    @media (max-width: 500px) {\n      #features .feature {\n        width: 73.68421%;\n        float: left;\n        margin-right: 5.26316%;\n        padding-left: 21.05263%;\n        margin: 2rem 0rem; } }\n  #features .title {\n    font-weight: 700;\n    font-size: 1.3rem;\n    padding-bottom: 0.3rem; }\n  #features .text {\n    font-size: 0.9rem;\n    text-align: j; }\n  #features .feature:before {\n    content: \"\";\n    position: absolute;\n    left: 0;\n    top: 0.3rem;\n    width: 3.5rem;\n    height: 3.5rem;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n  #features .feature.gameAgnostic:before {\n    background-image: url(images/icons/phantom.svg); }\n  #features .feature.physics:before {\n    background-image: url(images/icons/rpg-game.svg);\n    left: 0.4rem; }\n  #features .feature.binary:before {\n    background-image: url(images/icons/logic-game.svg);\n    left: 0.2rem; }\n  #features .feature.lag:before {\n    background-image: url(images/icons/online-game.svg); }\n  #features .feature.architecture:before {\n    background-image: url(images/icons/arcade.svg); }\n  #features .feature.opensource:before {\n    background-image: url(images/icons/multiplayer.svg); }\n  #features .shot {\n    transform: translateZ(2px) scaleX(1) scaleY(1);\n    height: 20vw;\n    width: 10vw;\n    position: absolute;\n    top: 0;\n    left: 33%;\n    z-index: 20;\n    background-image: url(images/shot1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n\n.bottom {\n  background-image: url(images/page_bg.png); }\n\n#quickstart {\n  padding-bottom: 5rem; }\n  @media (max-width: 500px) {\n    #quickstart {\n      display: none; } }\n  #quickstart .instructions {\n    clear: both;\n    width: 49.15254%;\n    margin: 0 auto;\n    text-align: left; }\n  #quickstart pre {\n    background: #1d0c20;\n    border: 0.2rem solid #68b2f8;\n    padding: 1rem;\n    font-family: monospace; }\n  #quickstart ol {\n    padding: 0; }\n\n#help {\n  padding-bottom: 5rem; }\n  @media (max-width: 500px) {\n    #help {\n      display: none; } }\n  #help .helpContainer {\n    width: 49.15254%;\n    margin: 0 auto;\n    padding: 2rem 0;\n    overflow: hidden;\n    *zoom: 1; }\n  #help a {\n    position: relative;\n    display: block;\n    height: 7rem;\n    width: 31.03448%;\n    float: left;\n    margin-right: 3.44828%;\n    text-align: center;\n    color: #fff; }\n    #help a:hover {\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n    #help a:before {\n      position: absolute;\n      top: 2.5rem;\n      left: 4rem;\n      font-size: 5rem; }\n  #help a:last-child {\n    width: 31.03448%;\n    float: right;\n    margin-right: 0; }\n\n#about .aboutContainer {\n  width: 66.10169%;\n  margin: 0 auto;\n  padding: 2rem 0;\n  overflow: hidden;\n  *zoom: 1; }\n  @media (max-width: 500px) {\n    #about .aboutContainer {\n      width: 100%; } }\n  #about .aboutContainer .person {\n    width: 48.71795%;\n    float: left;\n    margin-right: 2.5641%;\n    position: relative;\n    position: relative;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    #about .aboutContainer .person:before {\n      display: block;\n      content: \"\";\n      width: 100%;\n      padding-top: 70.81218%; }\n    #about .aboutContainer .person > .content {\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n    #about .aboutContainer .person .name {\n      position: absolute;\n      left: 64%;\n      top: 16%;\n      font-size: 1.1rem; }\n    #about .aboutContainer .person .social {\n      position: absolute;\n      left: 65%;\n      top: 27%;\n      font-size: 2rem; }\n    #about .aboutContainer .person .social a {\n      color: #fff; }\n    #about .aboutContainer .person .social a:hover {\n      color: #fff;\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n  #about .aboutContainer .person:nth-child(even) {\n    width: 48.71795%;\n    float: right;\n    margin-right: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person:nth-child(even) {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n  #about .aboutContainer .person.opher {\n    background-image: url(images/opher.png); }\n  #about .aboutContainer .person.gary {\n    background-image: url(images/gary.png); }\n\n#footer {\n  height: 60vw;\n  background-image: url(images/footer_bg.png);\n  background-repeat: no-repeat;\n  background-position: top;\n  background-size: cover; }\n"
+	module.exports = "@media (min-width: 1281px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    max-width: 1366px;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\n@media (min-width: 501px) and (max-width: 1280px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 74.35897%;\n      margin: 0 auto;\n      padding: 2rem 0; } }\n\n@media (max-width: 500px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\nsection {\n  position: relative;\n  width: 100%;\n  z-index: 5; }\n  section .content h3 {\n    font-size: 2.5rem;\n    font-weight: 100;\n    text-align: center;\n    display: flex;\n    align-items: stretch;\n    justify-content: center; }\n    section .content h3:before, section .content h3:after {\n      content: ' ';\n      display: inline-block;\n      flex: 1;\n      background-image: url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox=%220 0 20 48%22%3E%0A %3Crect width=%2248%22 height=%2248%22 stroke=%22%23FFF%22 fill=%22none%22 x=%225%22 y=%220%22 %2F%3E%0A%3C%2Fsvg%3E%0A\"), url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width=%221000%22 viewBox=%220 0 1000 10%22%3E%0A %3Crect width=%221000%22 height=%221%22 fill=%22%23FFF%22 y=%224%22 %2F%3E%0A%3C%2Fsvg%3E%0A\");\n      background-repeat: no-repeat, no-repeat;\n      background-position: center right, right 14px center;\n      background-size: auto, auto;\n      margin: 0 1rem; }\n    section .content h3:after {\n      transform: scale(-1, 1); }\n  section .content a {\n    transition: all 0.1s ease-in;\n    color: #68b2f8; }\n    section .content a:hover {\n      color: #506ee5; }\n\n.parallax {\n  perspective: 3px;\n  height: 100vh;\n  overflow-x: hidden;\n  overflow-y: auto;\n  perspective-origin-x: 100%; }\n\n.parallax__layer {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  transform-origin-x: 100%; }\n\n.parallax__group {\n  position: relative;\n  transform-style: preserve-3d; }\n\n.parallax__layer--base {\n  transform: translateZ(0); }\n\n.parallax__layer--back {\n  transform: translateZ(-1px); }\n\nhtml, body {\n  padding: 0;\n  margin: 0;\n  background: #1d0c24;\n  color: #fff;\n  text-align: center;\n  font-family: \"proxima-nova\", sans-serif; }\n\n#splash {\n  background-image: url(images/splash_bg.png), url(images/page_bg_black.png);\n  background-repeat: no-repeat, repeat;\n  background-position: center, center;\n  background-size: cover, auto;\n  z-index: 15;\n  padding-bottom: 72px; }\n  @media (min-width: 1281px) {\n    #splash {\n      padding-top: 10rem; } }\n  @media (max-width: 500px) {\n    #splash {\n      padding-top: 0; }\n      #splash .content {\n        padding: 0; } }\n  #splash h1 {\n    position: relative;\n    background-image: url(images/splash_incheonlogo.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    height: 16rem;\n    width: 100%;\n    margin: 0 auto;\n    z-index: 10; }\n    @media (max-width: 500px) {\n      #splash h1 {\n        background-size: 150%; } }\n  #splash h3:before {\n    display: none; }\n  #splash h3:after {\n    display: none; }\n  #splash .titleContainer {\n    clear: both;\n    position: relative; }\n  #splash h2 {\n    position: absolute;\n    top: 4rem;\n    right: 10%;\n    z-index: 11;\n    background-image: url(images/splash_beta.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    width: 23.72881%;\n    margin: 0;\n    height: 14rem; }\n    @media (max-width: 500px) {\n      #splash h2 {\n        top: 3rem;\n        right: 5%; } }\n  #splash h3 {\n    font-weight: 100;\n    font-size: 2.5rem;\n    margin: -3rem auto 2rem auto; }\n    @media (max-width: 500px) {\n      #splash h3 {\n        font-size: 2rem; } }\n  #splash .description {\n    width: 57.62712%;\n    margin: 1rem auto;\n    font-weight: 100;\n    font-size: 1.1rem;\n    line-height: 1.6rem;\n    text-align: justify; }\n    @media (max-width: 500px) {\n      #splash .description {\n        width: 100%;\n        padding: 1rem;\n        box-sizing: border-box; } }\n  #splash .ship1 {\n    transform: translateZ(-1px) scaleX(1) scaleY(1);\n    height: 13vw;\n    width: 13vw;\n    position: absolute;\n    top: -21vh;\n    left: 20%;\n    z-index: 1;\n    background-image: url(images/splash_ship1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    @media (max-width: 500px) {\n      #splash .ship1 {\n        display: none; } }\n  #splash .ship2 {\n    transform: translateZ(1px) scaleX(0.5) scaleY(0.5);\n    height: 20vw;\n    width: 20vw;\n    position: absolute;\n    bottom: -10%;\n    right: 19%;\n    z-index: 20;\n    background-image: url(images/splash_ship2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    @media (max-width: 500px) {\n      #splash .ship2 {\n        display: none; } }\n  #splash .ctaContainer {\n    position: relative;\n    background-color: rgba(104, 178, 248, 0.2);\n    display: inline-block;\n    padding: 0.2rem 1.8rem 0.1rem 1.8rem;\n    margin: 2rem auto;\n    font-size: 1.2rem;\n    transition: all 0.1s ease-in; }\n    #splash .ctaContainer:before {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      left: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      pointer-events: none; }\n    #splash .ctaContainer:after {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      right: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      transform: scaleX(-1);\n      pointer-events: none; }\n    #splash .ctaContainer a {\n      width: 100%;\n      padding: 0.2rem 0.5rem;\n      color: #fff;\n      transition: all 0.1s ease-in; }\n    #splash .ctaContainer:hover {\n      background: rgba(104, 178, 248, 0.4); }\n      #splash .ctaContainer:hover a {\n        padding: 0.2rem 0.8rem; }\n\n#innerMenu {\n  position: absolute;\n  background-image: -owg-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -webkit-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -moz-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -o-linear-gradient(top, transparent 0%, black 100%);\n  background-image: linear-gradient(top, transparent 0%, black 100%);\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  z-index: 50; }\n\n#innerMenu, #outerMenu {\n  border-bottom: 2px solid #68b2f8;\n  padding-bottom: 1rem;\n  z-index: 10; }\n  #innerMenu ul, #outerMenu ul {\n    padding-left: 0; }\n    #innerMenu ul li, #outerMenu ul li {\n      position: relative;\n      display: inline-block;\n      margin-right: 40px; }\n      #innerMenu ul li:after, #outerMenu ul li:after {\n        content: \"\";\n        position: absolute;\n        right: -57px;\n        top: -32px;\n        width: 71px;\n        height: 83px;\n        vertical-align: middle;\n        background-image: url(images/divider.png);\n        background-repeat: no-repeat;\n        background-position: center;\n        background-size: cover;\n        transition: all 0.5s ease-in; }\n    #innerMenu ul li:last-child, #outerMenu ul li:last-child {\n      margin-right: 0; }\n      #innerMenu ul li:last-child:after, #outerMenu ul li:last-child:after {\n        opacity: 0;\n        top: -50px;\n        right: -130px;\n        background-image: url(images/splash_ship2.png);\n        width: 80px;\n        height: 80px;\n        transform: translateY(-150px); }\n  #innerMenu a, #outerMenu a {\n    transition: all 0.1s ease-in;\n    color: #ffffff; }\n    #innerMenu a:hover, #outerMenu a:hover {\n      color: #68b2f8; }\n\n#outerMenu {\n  position: fixed;\n  width: calc(100% - 18px);\n  top: 0;\n  z-index: 100;\n  opacity: 0;\n  pointer-events: none;\n  background: black;\n  margin-top: 0px;\n  padding: 0.5rem 0; }\n  @media (max-width: 500px) {\n    #outerMenu {\n      display: none; } }\n\n.fixedMenu #outerMenu {\n  opacity: 1;\n  pointer-events: all; }\n  .fixedMenu #outerMenu ul li:last-child:after {\n    transform: translateY(0px);\n    opacity: 1; }\n\na {\n  color: #fff;\n  text-decoration: none; }\n\n#par1 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1; }\n  #par1 .parallax__layer--back {\n    width: 100vw;\n    height: 90vh;\n    background-image: url(images/game1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.6) scaleY(1.6) translateY(0); }\n\n#par2 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1; }\n  #par2 .parallax__layer--back {\n    width: 100vw;\n    height: 70vh;\n    background-image: url(images/game2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.5) scaleY(1.5) translateY(0vh);\n    z-index: 4; }\n\n#features {\n  background: #751a62; }\n  #features .content {\n    box-sizing: border-box;\n    width: 66.10169%;\n    margin: 0 auto; }\n    @media (max-width: 500px) {\n      #features .content {\n        width: 205.26316%; } }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .content {\n        width: 100%; } }\n  #features .featureContainer {\n    padding-left: 15.25424%; }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .featureContainer {\n        padding-top: 2rem; } }\n    @media (max-width: 500px) {\n      #features .featureContainer {\n        padding: 0; } }\n  #features .feature {\n    position: relative;\n    padding-left: 6.77966%;\n    width: 32.20339%;\n    float: left;\n    margin-right: 1.69492%;\n    text-align: left;\n    margin-bottom: 4rem;\n    padding-right: 1rem; }\n    @media (max-width: 500px) {\n      #features .feature {\n        width: 73.68421%;\n        float: left;\n        margin-right: 5.26316%;\n        padding-left: 21.05263%;\n        margin: 2rem 0rem; } }\n  #features .title {\n    font-weight: 700;\n    font-size: 1.3rem;\n    padding-bottom: 0.3rem; }\n  #features .text {\n    font-size: 0.9rem;\n    text-align: j; }\n  #features .feature:before {\n    content: \"\";\n    position: absolute;\n    left: 0;\n    top: 0.3rem;\n    width: 3.5rem;\n    height: 3.5rem;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n  #features .feature.gameAgnostic:before {\n    background-image: url(images/icons/phantom.svg); }\n  #features .feature.physics:before {\n    background-image: url(images/icons/rpg-game.svg);\n    left: 0.4rem; }\n  #features .feature.binary:before {\n    background-image: url(images/icons/logic-game.svg);\n    left: 0.2rem; }\n  #features .feature.lag:before {\n    background-image: url(images/icons/online-game.svg); }\n  #features .feature.architecture:before {\n    background-image: url(images/icons/arcade.svg); }\n  #features .feature.opensource:before {\n    background-image: url(images/icons/multiplayer.svg); }\n  #features .shot {\n    transform: translateZ(2px) scaleX(1) scaleY(1);\n    height: 20vw;\n    width: 10vw;\n    position: absolute;\n    top: 0;\n    left: 33%;\n    z-index: 20;\n    background-image: url(images/shot1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n\n.bottom {\n  background-image: url(images/page_bg.png); }\n\n#quickstart {\n  padding-bottom: 5rem; }\n  @media (max-width: 500px) {\n    #quickstart {\n      display: none; } }\n  #quickstart .instructions {\n    clear: both;\n    width: 49.15254%;\n    margin: 0 auto;\n    text-align: left; }\n  #quickstart pre {\n    background: #1d0c20;\n    border: 0.2rem solid #68b2f8;\n    padding: 1rem;\n    font-family: monospace; }\n  #quickstart ol {\n    padding: 0; }\n\n#help {\n  padding-bottom: 5rem; }\n  @media (max-width: 500px) {\n    #help {\n      display: none; } }\n  #help .helpContainer {\n    width: 49.15254%;\n    margin: 0 auto;\n    padding: 2rem 0;\n    overflow: hidden;\n    *zoom: 1; }\n  #help a {\n    position: relative;\n    display: block;\n    height: 7rem;\n    width: 31.03448%;\n    float: left;\n    margin-right: 3.44828%;\n    text-align: center;\n    color: #fff; }\n    #help a:hover {\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n    #help a:before {\n      position: absolute;\n      top: 2.5rem;\n      left: 4rem;\n      font-size: 5rem; }\n  #help a:last-child {\n    width: 31.03448%;\n    float: right;\n    margin-right: 0; }\n\n#about .aboutContainer {\n  width: 66.10169%;\n  margin: 0 auto;\n  padding: 2rem 0;\n  overflow: hidden;\n  *zoom: 1; }\n  @media (max-width: 500px) {\n    #about .aboutContainer {\n      width: 100%; } }\n  #about .aboutContainer .person {\n    width: 48.71795%;\n    float: left;\n    margin-right: 2.5641%;\n    position: relative;\n    position: relative;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    #about .aboutContainer .person:before {\n      display: block;\n      content: \"\";\n      width: 100%;\n      padding-top: 70.81218%; }\n    #about .aboutContainer .person > .content {\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n    #about .aboutContainer .person .name {\n      position: absolute;\n      left: 64%;\n      top: 16%;\n      font-size: 1.1rem; }\n    #about .aboutContainer .person .social {\n      position: absolute;\n      left: 65%;\n      top: 27%;\n      font-size: 2rem; }\n    #about .aboutContainer .person .social a {\n      color: #fff; }\n    #about .aboutContainer .person .social a:hover {\n      color: #fff;\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n  #about .aboutContainer .person:nth-child(even) {\n    width: 48.71795%;\n    float: right;\n    margin-right: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person:nth-child(even) {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n  #about .aboutContainer .person.opher {\n    background-image: url(images/opher.png); }\n  #about .aboutContainer .person.gary {\n    background-image: url(images/gary.png); }\n\n#footer {\n  height: 60vw;\n  background-image: url(images/footer_bg.png);\n  background-repeat: no-repeat;\n  background-position: top;\n  background-size: cover; }\n"
 
 /***/ },
 /* 3 */
@@ -331,6 +355,769 @@
 			URL.revokeObjectURL(oldSrc);
 	}
 
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	/*!
+	Waypoints - 4.0.1
+	Copyright © 2011-2016 Caleb Troughton
+	Licensed under the MIT license.
+	https://github.com/imakewebthings/waypoints/blob/master/licenses.txt
+	*/
+	(function() {
+	  'use strict'
+	
+	  var keyCounter = 0
+	  var allWaypoints = {}
+	
+	  /* http://imakewebthings.com/waypoints/api/waypoint */
+	  function Waypoint(options) {
+	    if (!options) {
+	      throw new Error('No options passed to Waypoint constructor')
+	    }
+	    if (!options.element) {
+	      throw new Error('No element option passed to Waypoint constructor')
+	    }
+	    if (!options.handler) {
+	      throw new Error('No handler option passed to Waypoint constructor')
+	    }
+	
+	    this.key = 'waypoint-' + keyCounter
+	    this.options = Waypoint.Adapter.extend({}, Waypoint.defaults, options)
+	    this.element = this.options.element
+	    this.adapter = new Waypoint.Adapter(this.element)
+	    this.callback = options.handler
+	    this.axis = this.options.horizontal ? 'horizontal' : 'vertical'
+	    this.enabled = this.options.enabled
+	    this.triggerPoint = null
+	    this.group = Waypoint.Group.findOrCreate({
+	      name: this.options.group,
+	      axis: this.axis
+	    })
+	    this.context = Waypoint.Context.findOrCreateByElement(this.options.context)
+	
+	    if (Waypoint.offsetAliases[this.options.offset]) {
+	      this.options.offset = Waypoint.offsetAliases[this.options.offset]
+	    }
+	    this.group.add(this)
+	    this.context.add(this)
+	    allWaypoints[this.key] = this
+	    keyCounter += 1
+	  }
+	
+	  /* Private */
+	  Waypoint.prototype.queueTrigger = function(direction) {
+	    this.group.queueTrigger(this, direction)
+	  }
+	
+	  /* Private */
+	  Waypoint.prototype.trigger = function(args) {
+	    if (!this.enabled) {
+	      return
+	    }
+	    if (this.callback) {
+	      this.callback.apply(this, args)
+	    }
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/destroy */
+	  Waypoint.prototype.destroy = function() {
+	    this.context.remove(this)
+	    this.group.remove(this)
+	    delete allWaypoints[this.key]
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/disable */
+	  Waypoint.prototype.disable = function() {
+	    this.enabled = false
+	    return this
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/enable */
+	  Waypoint.prototype.enable = function() {
+	    this.context.refresh()
+	    this.enabled = true
+	    return this
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/next */
+	  Waypoint.prototype.next = function() {
+	    return this.group.next(this)
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/previous */
+	  Waypoint.prototype.previous = function() {
+	    return this.group.previous(this)
+	  }
+	
+	  /* Private */
+	  Waypoint.invokeAll = function(method) {
+	    var allWaypointsArray = []
+	    for (var waypointKey in allWaypoints) {
+	      allWaypointsArray.push(allWaypoints[waypointKey])
+	    }
+	    for (var i = 0, end = allWaypointsArray.length; i < end; i++) {
+	      allWaypointsArray[i][method]()
+	    }
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/destroy-all */
+	  Waypoint.destroyAll = function() {
+	    Waypoint.invokeAll('destroy')
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/disable-all */
+	  Waypoint.disableAll = function() {
+	    Waypoint.invokeAll('disable')
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/enable-all */
+	  Waypoint.enableAll = function() {
+	    Waypoint.Context.refreshAll()
+	    for (var waypointKey in allWaypoints) {
+	      allWaypoints[waypointKey].enabled = true
+	    }
+	    return this
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/refresh-all */
+	  Waypoint.refreshAll = function() {
+	    Waypoint.Context.refreshAll()
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/viewport-height */
+	  Waypoint.viewportHeight = function() {
+	    return window.innerHeight || document.documentElement.clientHeight
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/viewport-width */
+	  Waypoint.viewportWidth = function() {
+	    return document.documentElement.clientWidth
+	  }
+	
+	  Waypoint.adapters = []
+	
+	  Waypoint.defaults = {
+	    context: window,
+	    continuous: true,
+	    enabled: true,
+	    group: 'default',
+	    horizontal: false,
+	    offset: 0
+	  }
+	
+	  Waypoint.offsetAliases = {
+	    'bottom-in-view': function() {
+	      return this.context.innerHeight() - this.adapter.outerHeight()
+	    },
+	    'right-in-view': function() {
+	      return this.context.innerWidth() - this.adapter.outerWidth()
+	    }
+	  }
+	
+	  window.Waypoint = Waypoint
+	}())
+	;(function() {
+	  'use strict'
+	
+	  function requestAnimationFrameShim(callback) {
+	    window.setTimeout(callback, 1000 / 60)
+	  }
+	
+	  var keyCounter = 0
+	  var contexts = {}
+	  var Waypoint = window.Waypoint
+	  var oldWindowLoad = window.onload
+	
+	  /* http://imakewebthings.com/waypoints/api/context */
+	  function Context(element) {
+	    this.element = element
+	    this.Adapter = Waypoint.Adapter
+	    this.adapter = new this.Adapter(element)
+	    this.key = 'waypoint-context-' + keyCounter
+	    this.didScroll = false
+	    this.didResize = false
+	    this.oldScroll = {
+	      x: this.adapter.scrollLeft(),
+	      y: this.adapter.scrollTop()
+	    }
+	    this.waypoints = {
+	      vertical: {},
+	      horizontal: {}
+	    }
+	
+	    element.waypointContextKey = this.key
+	    contexts[element.waypointContextKey] = this
+	    keyCounter += 1
+	    if (!Waypoint.windowContext) {
+	      Waypoint.windowContext = true
+	      Waypoint.windowContext = new Context(window)
+	    }
+	
+	    this.createThrottledScrollHandler()
+	    this.createThrottledResizeHandler()
+	  }
+	
+	  /* Private */
+	  Context.prototype.add = function(waypoint) {
+	    var axis = waypoint.options.horizontal ? 'horizontal' : 'vertical'
+	    this.waypoints[axis][waypoint.key] = waypoint
+	    this.refresh()
+	  }
+	
+	  /* Private */
+	  Context.prototype.checkEmpty = function() {
+	    var horizontalEmpty = this.Adapter.isEmptyObject(this.waypoints.horizontal)
+	    var verticalEmpty = this.Adapter.isEmptyObject(this.waypoints.vertical)
+	    var isWindow = this.element == this.element.window
+	    if (horizontalEmpty && verticalEmpty && !isWindow) {
+	      this.adapter.off('.waypoints')
+	      delete contexts[this.key]
+	    }
+	  }
+	
+	  /* Private */
+	  Context.prototype.createThrottledResizeHandler = function() {
+	    var self = this
+	
+	    function resizeHandler() {
+	      self.handleResize()
+	      self.didResize = false
+	    }
+	
+	    this.adapter.on('resize.waypoints', function() {
+	      if (!self.didResize) {
+	        self.didResize = true
+	        Waypoint.requestAnimationFrame(resizeHandler)
+	      }
+	    })
+	  }
+	
+	  /* Private */
+	  Context.prototype.createThrottledScrollHandler = function() {
+	    var self = this
+	    function scrollHandler() {
+	      self.handleScroll()
+	      self.didScroll = false
+	    }
+	
+	    this.adapter.on('scroll.waypoints', function() {
+	      if (!self.didScroll || Waypoint.isTouch) {
+	        self.didScroll = true
+	        Waypoint.requestAnimationFrame(scrollHandler)
+	      }
+	    })
+	  }
+	
+	  /* Private */
+	  Context.prototype.handleResize = function() {
+	    Waypoint.Context.refreshAll()
+	  }
+	
+	  /* Private */
+	  Context.prototype.handleScroll = function() {
+	    var triggeredGroups = {}
+	    var axes = {
+	      horizontal: {
+	        newScroll: this.adapter.scrollLeft(),
+	        oldScroll: this.oldScroll.x,
+	        forward: 'right',
+	        backward: 'left'
+	      },
+	      vertical: {
+	        newScroll: this.adapter.scrollTop(),
+	        oldScroll: this.oldScroll.y,
+	        forward: 'down',
+	        backward: 'up'
+	      }
+	    }
+	
+	    for (var axisKey in axes) {
+	      var axis = axes[axisKey]
+	      var isForward = axis.newScroll > axis.oldScroll
+	      var direction = isForward ? axis.forward : axis.backward
+	
+	      for (var waypointKey in this.waypoints[axisKey]) {
+	        var waypoint = this.waypoints[axisKey][waypointKey]
+	        if (waypoint.triggerPoint === null) {
+	          continue
+	        }
+	        var wasBeforeTriggerPoint = axis.oldScroll < waypoint.triggerPoint
+	        var nowAfterTriggerPoint = axis.newScroll >= waypoint.triggerPoint
+	        var crossedForward = wasBeforeTriggerPoint && nowAfterTriggerPoint
+	        var crossedBackward = !wasBeforeTriggerPoint && !nowAfterTriggerPoint
+	        if (crossedForward || crossedBackward) {
+	          waypoint.queueTrigger(direction)
+	          triggeredGroups[waypoint.group.id] = waypoint.group
+	        }
+	      }
+	    }
+	
+	    for (var groupKey in triggeredGroups) {
+	      triggeredGroups[groupKey].flushTriggers()
+	    }
+	
+	    this.oldScroll = {
+	      x: axes.horizontal.newScroll,
+	      y: axes.vertical.newScroll
+	    }
+	  }
+	
+	  /* Private */
+	  Context.prototype.innerHeight = function() {
+	    /*eslint-disable eqeqeq */
+	    if (this.element == this.element.window) {
+	      return Waypoint.viewportHeight()
+	    }
+	    /*eslint-enable eqeqeq */
+	    return this.adapter.innerHeight()
+	  }
+	
+	  /* Private */
+	  Context.prototype.remove = function(waypoint) {
+	    delete this.waypoints[waypoint.axis][waypoint.key]
+	    this.checkEmpty()
+	  }
+	
+	  /* Private */
+	  Context.prototype.innerWidth = function() {
+	    /*eslint-disable eqeqeq */
+	    if (this.element == this.element.window) {
+	      return Waypoint.viewportWidth()
+	    }
+	    /*eslint-enable eqeqeq */
+	    return this.adapter.innerWidth()
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/context-destroy */
+	  Context.prototype.destroy = function() {
+	    var allWaypoints = []
+	    for (var axis in this.waypoints) {
+	      for (var waypointKey in this.waypoints[axis]) {
+	        allWaypoints.push(this.waypoints[axis][waypointKey])
+	      }
+	    }
+	    for (var i = 0, end = allWaypoints.length; i < end; i++) {
+	      allWaypoints[i].destroy()
+	    }
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/context-refresh */
+	  Context.prototype.refresh = function() {
+	    /*eslint-disable eqeqeq */
+	    var isWindow = this.element == this.element.window
+	    /*eslint-enable eqeqeq */
+	    var contextOffset = isWindow ? undefined : this.adapter.offset()
+	    var triggeredGroups = {}
+	    var axes
+	
+	    this.handleScroll()
+	    axes = {
+	      horizontal: {
+	        contextOffset: isWindow ? 0 : contextOffset.left,
+	        contextScroll: isWindow ? 0 : this.oldScroll.x,
+	        contextDimension: this.innerWidth(),
+	        oldScroll: this.oldScroll.x,
+	        forward: 'right',
+	        backward: 'left',
+	        offsetProp: 'left'
+	      },
+	      vertical: {
+	        contextOffset: isWindow ? 0 : contextOffset.top,
+	        contextScroll: isWindow ? 0 : this.oldScroll.y,
+	        contextDimension: this.innerHeight(),
+	        oldScroll: this.oldScroll.y,
+	        forward: 'down',
+	        backward: 'up',
+	        offsetProp: 'top'
+	      }
+	    }
+	
+	    for (var axisKey in axes) {
+	      var axis = axes[axisKey]
+	      for (var waypointKey in this.waypoints[axisKey]) {
+	        var waypoint = this.waypoints[axisKey][waypointKey]
+	        var adjustment = waypoint.options.offset
+	        var oldTriggerPoint = waypoint.triggerPoint
+	        var elementOffset = 0
+	        var freshWaypoint = oldTriggerPoint == null
+	        var contextModifier, wasBeforeScroll, nowAfterScroll
+	        var triggeredBackward, triggeredForward
+	
+	        if (waypoint.element !== waypoint.element.window) {
+	          elementOffset = waypoint.adapter.offset()[axis.offsetProp]
+	        }
+	
+	        if (typeof adjustment === 'function') {
+	          adjustment = adjustment.apply(waypoint)
+	        }
+	        else if (typeof adjustment === 'string') {
+	          adjustment = parseFloat(adjustment)
+	          if (waypoint.options.offset.indexOf('%') > - 1) {
+	            adjustment = Math.ceil(axis.contextDimension * adjustment / 100)
+	          }
+	        }
+	
+	        contextModifier = axis.contextScroll - axis.contextOffset
+	        waypoint.triggerPoint = Math.floor(elementOffset + contextModifier - adjustment)
+	        wasBeforeScroll = oldTriggerPoint < axis.oldScroll
+	        nowAfterScroll = waypoint.triggerPoint >= axis.oldScroll
+	        triggeredBackward = wasBeforeScroll && nowAfterScroll
+	        triggeredForward = !wasBeforeScroll && !nowAfterScroll
+	
+	        if (!freshWaypoint && triggeredBackward) {
+	          waypoint.queueTrigger(axis.backward)
+	          triggeredGroups[waypoint.group.id] = waypoint.group
+	        }
+	        else if (!freshWaypoint && triggeredForward) {
+	          waypoint.queueTrigger(axis.forward)
+	          triggeredGroups[waypoint.group.id] = waypoint.group
+	        }
+	        else if (freshWaypoint && axis.oldScroll >= waypoint.triggerPoint) {
+	          waypoint.queueTrigger(axis.forward)
+	          triggeredGroups[waypoint.group.id] = waypoint.group
+	        }
+	      }
+	    }
+	
+	    Waypoint.requestAnimationFrame(function() {
+	      for (var groupKey in triggeredGroups) {
+	        triggeredGroups[groupKey].flushTriggers()
+	      }
+	    })
+	
+	    return this
+	  }
+	
+	  /* Private */
+	  Context.findOrCreateByElement = function(element) {
+	    return Context.findByElement(element) || new Context(element)
+	  }
+	
+	  /* Private */
+	  Context.refreshAll = function() {
+	    for (var contextId in contexts) {
+	      contexts[contextId].refresh()
+	    }
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/context-find-by-element */
+	  Context.findByElement = function(element) {
+	    return contexts[element.waypointContextKey]
+	  }
+	
+	  window.onload = function() {
+	    if (oldWindowLoad) {
+	      oldWindowLoad()
+	    }
+	    Context.refreshAll()
+	  }
+	
+	
+	  Waypoint.requestAnimationFrame = function(callback) {
+	    var requestFn = window.requestAnimationFrame ||
+	      window.mozRequestAnimationFrame ||
+	      window.webkitRequestAnimationFrame ||
+	      requestAnimationFrameShim
+	    requestFn.call(window, callback)
+	  }
+	  Waypoint.Context = Context
+	}())
+	;(function() {
+	  'use strict'
+	
+	  function byTriggerPoint(a, b) {
+	    return a.triggerPoint - b.triggerPoint
+	  }
+	
+	  function byReverseTriggerPoint(a, b) {
+	    return b.triggerPoint - a.triggerPoint
+	  }
+	
+	  var groups = {
+	    vertical: {},
+	    horizontal: {}
+	  }
+	  var Waypoint = window.Waypoint
+	
+	  /* http://imakewebthings.com/waypoints/api/group */
+	  function Group(options) {
+	    this.name = options.name
+	    this.axis = options.axis
+	    this.id = this.name + '-' + this.axis
+	    this.waypoints = []
+	    this.clearTriggerQueues()
+	    groups[this.axis][this.name] = this
+	  }
+	
+	  /* Private */
+	  Group.prototype.add = function(waypoint) {
+	    this.waypoints.push(waypoint)
+	  }
+	
+	  /* Private */
+	  Group.prototype.clearTriggerQueues = function() {
+	    this.triggerQueues = {
+	      up: [],
+	      down: [],
+	      left: [],
+	      right: []
+	    }
+	  }
+	
+	  /* Private */
+	  Group.prototype.flushTriggers = function() {
+	    for (var direction in this.triggerQueues) {
+	      var waypoints = this.triggerQueues[direction]
+	      var reverse = direction === 'up' || direction === 'left'
+	      waypoints.sort(reverse ? byReverseTriggerPoint : byTriggerPoint)
+	      for (var i = 0, end = waypoints.length; i < end; i += 1) {
+	        var waypoint = waypoints[i]
+	        if (waypoint.options.continuous || i === waypoints.length - 1) {
+	          waypoint.trigger([direction])
+	        }
+	      }
+	    }
+	    this.clearTriggerQueues()
+	  }
+	
+	  /* Private */
+	  Group.prototype.next = function(waypoint) {
+	    this.waypoints.sort(byTriggerPoint)
+	    var index = Waypoint.Adapter.inArray(waypoint, this.waypoints)
+	    var isLast = index === this.waypoints.length - 1
+	    return isLast ? null : this.waypoints[index + 1]
+	  }
+	
+	  /* Private */
+	  Group.prototype.previous = function(waypoint) {
+	    this.waypoints.sort(byTriggerPoint)
+	    var index = Waypoint.Adapter.inArray(waypoint, this.waypoints)
+	    return index ? this.waypoints[index - 1] : null
+	  }
+	
+	  /* Private */
+	  Group.prototype.queueTrigger = function(waypoint, direction) {
+	    this.triggerQueues[direction].push(waypoint)
+	  }
+	
+	  /* Private */
+	  Group.prototype.remove = function(waypoint) {
+	    var index = Waypoint.Adapter.inArray(waypoint, this.waypoints)
+	    if (index > -1) {
+	      this.waypoints.splice(index, 1)
+	    }
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/first */
+	  Group.prototype.first = function() {
+	    return this.waypoints[0]
+	  }
+	
+	  /* Public */
+	  /* http://imakewebthings.com/waypoints/api/last */
+	  Group.prototype.last = function() {
+	    return this.waypoints[this.waypoints.length - 1]
+	  }
+	
+	  /* Private */
+	  Group.findOrCreate = function(options) {
+	    return groups[options.axis][options.name] || new Group(options)
+	  }
+	
+	  Waypoint.Group = Group
+	}())
+	;(function() {
+	  'use strict'
+	
+	  var Waypoint = window.Waypoint
+	
+	  function isWindow(element) {
+	    return element === element.window
+	  }
+	
+	  function getWindow(element) {
+	    if (isWindow(element)) {
+	      return element
+	    }
+	    return element.defaultView
+	  }
+	
+	  function NoFrameworkAdapter(element) {
+	    this.element = element
+	    this.handlers = {}
+	  }
+	
+	  NoFrameworkAdapter.prototype.innerHeight = function() {
+	    var isWin = isWindow(this.element)
+	    return isWin ? this.element.innerHeight : this.element.clientHeight
+	  }
+	
+	  NoFrameworkAdapter.prototype.innerWidth = function() {
+	    var isWin = isWindow(this.element)
+	    return isWin ? this.element.innerWidth : this.element.clientWidth
+	  }
+	
+	  NoFrameworkAdapter.prototype.off = function(event, handler) {
+	    function removeListeners(element, listeners, handler) {
+	      for (var i = 0, end = listeners.length - 1; i < end; i++) {
+	        var listener = listeners[i]
+	        if (!handler || handler === listener) {
+	          element.removeEventListener(listener)
+	        }
+	      }
+	    }
+	
+	    var eventParts = event.split('.')
+	    var eventType = eventParts[0]
+	    var namespace = eventParts[1]
+	    var element = this.element
+	
+	    if (namespace && this.handlers[namespace] && eventType) {
+	      removeListeners(element, this.handlers[namespace][eventType], handler)
+	      this.handlers[namespace][eventType] = []
+	    }
+	    else if (eventType) {
+	      for (var ns in this.handlers) {
+	        removeListeners(element, this.handlers[ns][eventType] || [], handler)
+	        this.handlers[ns][eventType] = []
+	      }
+	    }
+	    else if (namespace && this.handlers[namespace]) {
+	      for (var type in this.handlers[namespace]) {
+	        removeListeners(element, this.handlers[namespace][type], handler)
+	      }
+	      this.handlers[namespace] = {}
+	    }
+	  }
+	
+	  /* Adapted from jQuery 1.x offset() */
+	  NoFrameworkAdapter.prototype.offset = function() {
+	    if (!this.element.ownerDocument) {
+	      return null
+	    }
+	
+	    var documentElement = this.element.ownerDocument.documentElement
+	    var win = getWindow(this.element.ownerDocument)
+	    var rect = {
+	      top: 0,
+	      left: 0
+	    }
+	
+	    if (this.element.getBoundingClientRect) {
+	      rect = this.element.getBoundingClientRect()
+	    }
+	
+	    return {
+	      top: rect.top + win.pageYOffset - documentElement.clientTop,
+	      left: rect.left + win.pageXOffset - documentElement.clientLeft
+	    }
+	  }
+	
+	  NoFrameworkAdapter.prototype.on = function(event, handler) {
+	    var eventParts = event.split('.')
+	    var eventType = eventParts[0]
+	    var namespace = eventParts[1] || '__default'
+	    var nsHandlers = this.handlers[namespace] = this.handlers[namespace] || {}
+	    var nsTypeList = nsHandlers[eventType] = nsHandlers[eventType] || []
+	
+	    nsTypeList.push(handler)
+	    this.element.addEventListener(eventType, handler)
+	  }
+	
+	  NoFrameworkAdapter.prototype.outerHeight = function(includeMargin) {
+	    var height = this.innerHeight()
+	    var computedStyle
+	
+	    if (includeMargin && !isWindow(this.element)) {
+	      computedStyle = window.getComputedStyle(this.element)
+	      height += parseInt(computedStyle.marginTop, 10)
+	      height += parseInt(computedStyle.marginBottom, 10)
+	    }
+	
+	    return height
+	  }
+	
+	  NoFrameworkAdapter.prototype.outerWidth = function(includeMargin) {
+	    var width = this.innerWidth()
+	    var computedStyle
+	
+	    if (includeMargin && !isWindow(this.element)) {
+	      computedStyle = window.getComputedStyle(this.element)
+	      width += parseInt(computedStyle.marginLeft, 10)
+	      width += parseInt(computedStyle.marginRight, 10)
+	    }
+	
+	    return width
+	  }
+	
+	  NoFrameworkAdapter.prototype.scrollLeft = function() {
+	    var win = getWindow(this.element)
+	    return win ? win.pageXOffset : this.element.scrollLeft
+	  }
+	
+	  NoFrameworkAdapter.prototype.scrollTop = function() {
+	    var win = getWindow(this.element)
+	    return win ? win.pageYOffset : this.element.scrollTop
+	  }
+	
+	  NoFrameworkAdapter.extend = function() {
+	    var args = Array.prototype.slice.call(arguments)
+	
+	    function merge(target, obj) {
+	      if (typeof target === 'object' && typeof obj === 'object') {
+	        for (var key in obj) {
+	          if (obj.hasOwnProperty(key)) {
+	            target[key] = obj[key]
+	          }
+	        }
+	      }
+	
+	      return target
+	    }
+	
+	    for (var i = 1, end = args.length; i < end; i++) {
+	      merge(args[0], args[i])
+	    }
+	    return args[0]
+	  }
+	
+	  NoFrameworkAdapter.inArray = function(element, array, i) {
+	    return array == null ? -1 : array.indexOf(element, i)
+	  }
+	
+	  NoFrameworkAdapter.isEmptyObject = function(obj) {
+	    /* eslint no-unused-vars: 0 */
+	    for (var name in obj) {
+	      return false
+	    }
+	    return true
+	  }
+	
+	  Waypoint.adapters.push({
+	    name: 'noframework',
+	    Adapter: NoFrameworkAdapter
+	  })
+	  Waypoint.Adapter = NoFrameworkAdapter
+	}())
+	;
 
 /***/ }
 /******/ ]);
