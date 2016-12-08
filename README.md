@@ -1,62 +1,37 @@
 [![Build Status](https://travis-ci.org/OpherV/Incheon.svg?branch=master)](https://travis-ci.org/OpherV/Incheon) [![Inline docs](http://inch-ci.org/github/opherv/incheon.svg?branch=develop)](http://inch-ci.org/github/opherv/incheon)
 
-***Incheon is a general purpose low latency game server based on Node.JS and Socket.IO***
+***Incheon is a real-time multiplayer game engine based on Node.JS***
 
-Still in early development. Check back with us soon :P
+Incheon makes it possible to write real-time, multiplayer games in javascript.
+
+It provides an extendible server, where the game runs, as well as a client-side library
+which synchronizes the client's game state with the server game state.  In order
+to provide a smooth visual experience for each connected client, Incheon implements
+efficient networking methods, position interpolation and extrapolation, user input
+coordination, shadow objects, physics and pseudo-physical movement, automatic
+handling of network spikes.
+
+Incheon aims to optimize the player's visual experience, while providing
+a simple development model which is highly configurable and easy to analyze
+and debug.
 
 **Features:**
 
-* Somewhat opinionated, letting you quickly develop your game without much hassle
-* Server to client communication:
-    * Communication is all binary
-    * A game engine can opt-in to which object properties are transported
-* Intelligent sync strategies for lag handling:
-    * Client side prediction for player-controlled objects (snap, gradual snap)
-    * Update interpolation for non-player objects
-* Provides API for dynamic game-world objects
+* Simple development model
+* Optimized networking
+    * Communication is packed, binary
+    * UDP is still in progress
+    * Automatic handling of network spikes with step correction
+* Intelligent sync strategies for lag handling
+    * Extrapolation with step re-enactment on the clients, or:
+    * Interpolation for optimal object motion
+* API for dynamic game-world objects
     * game worlds with physics engines (currently only physijs)
-    * game worlds with reduced-physics, which track position, velocity, orientation, momentum (linear and angular).
+    * game worlds with pseudo-physics, which track position, velocity, and orientation
+* Proper API documentation, user guide, tutorials, and samples
+* Custom tools for debugging and tracing
 
 Things to do:
 
-* Allow general messages (not just world updates)
-* Input validation (check player can control ship)
-* Implement more types of lag compensation
-* Optimize what goes over the wire:
-    * Only dirty items get sent, with periodic sync
-    * Option to specify incremental updates
-    * client to server should also be binary
-* Implement more tests
-* * Recording and replaying sessions
-
-
-Caveats:
-
-* Due to websocket limitations, only TCP and no UDP :(
-
-**Architecture**
-
-**The Step Sequence**
-
-The fundamental sequence of each (client-side) step is organized as follows:
-
-1. [clientEngine] process inputs
-2. [clientEngine] handle all inbound messages
-3. [clientEngine] handle outbound inputs
-4. [clientEngine:gameEngine] stepCount++
-5. [clientEngine:gameEngine] physicsEngine.step
-6. [clientEngine:gameEngine] updateGameWorld: for each object->step
-7. [clientEngine] render.draw
-
-**Event List**
-
-* preStep
-* postStep
-* objectAdded
-* server.playerJoined
-* server.playerDisconnected
-* server.inputReceived
-* client.preStep
-* client.postStep
-* server.preStep
-* server.postStep
+* UDP
+* Full-stack testing suite
