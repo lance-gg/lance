@@ -2,9 +2,9 @@
 
 ![Incheon Logo](https://cloud.githubusercontent.com/assets/3951311/21020499/6f125344-bd7d-11e6-86e4-a4bb16b32f2a.png)
 
-#[Incheon](http://incheon.gg) is a real-time multiplayer game server based on Node.JS#
+#[Incheon](http://incheon.gg) is a real-time multiplayer game server#
 
-It provides an extendible server, on which game logic runs, as well as a client-side library
+It provides an extendible Node.JS based server, on which game logic runs, as well as a client-side library
 which synchronizes the client's game state with the server game state.  In order
 to provide a smooth visual experience for each connected client, Incheon implements
 efficient networking methods, position interpolation and extrapolation, user input
@@ -20,8 +20,9 @@ An online demo is in the works! Stay tuned
 
 ##Features:##
 
-* Simple development model
+* Focus on writing your game. Incheon takes care of the netcode
 * Optimized networking
+    * TCP via websockets / UDP via WebRTC (soon)
     * Communication is packed and serialized into binary 
     * Automatic handling of network spikes with step correction
 * Intelligent sync strategies for lag handling
@@ -56,4 +57,4 @@ For discussing Incheon, multiplayer games or just hanging out you're invited to 
 
 ##Built something cool with Incheon?##
 
-Please [Let us know](team@incheon.gg)! We'd love to play it, and feature it on the [Incheon homepage](http://incheon.gg).
+Please [Let us know](http://www.twitter.com/opherv)! We'd love to play it, and feature it on the [Incheon homepage](http://incheon.gg).
