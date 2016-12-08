@@ -1,10 +1,10 @@
 [![Build Status](https://travis-ci.org/OpherV/Incheon.svg?branch=master)](https://travis-ci.org/OpherV/Incheon) [![Inline docs](http://inch-ci.org/github/opherv/incheon.svg?branch=develop)](http://inch-ci.org/github/opherv/incheon)
 
-***Incheon is a real-time multiplayer game engine based on Node.JS***
+![Incheon Logo](https://cloud.githubusercontent.com/assets/3951311/21020499/6f125344-bd7d-11e6-86e4-a4bb16b32f2a.png)
 
-Incheon makes it possible to write real-time, multiplayer games in javascript.
+#[Incheon](http://incheon.gg) is a real-time multiplayer game server based on Node.JS#
 
-It provides an extendible server, where the game runs, as well as a client-side library
+It provides an extendible server, on which game logic runs, as well as a client-side library
 which synchronizes the client's game state with the server game state.  In order
 to provide a smooth visual experience for each connected client, Incheon implements
 efficient networking methods, position interpolation and extrapolation, user input
@@ -15,12 +15,14 @@ Incheon aims to optimize the player's visual experience, while providing
 a simple development model which is highly configurable and easy to analyze
 and debug.
 
-**Features:**
+##See it in action##
+An online demo is in the works! Stay tuned
+
+##Features:##
 
 * Simple development model
 * Optimized networking
-    * Communication is packed, binary
-    * UDP is still in progress
+    * Communication is packed and serialized into binary 
     * Automatic handling of network spikes with step correction
 * Intelligent sync strategies for lag handling
     * Extrapolation with step re-enactment on the clients, or:
@@ -29,9 +31,29 @@ and debug.
     * game worlds with physics engines (currently only physijs)
     * game worlds with pseudo-physics, which track position, velocity, and orientation
 * Proper API documentation, user guide, tutorials, and samples
-* Custom tools for debugging and tracing
+* Tools for debugging and tracing
 
-Things to do:
+More features in the pipeline:
 
 * UDP
 * Full-stack testing suite
+
+##That's so neat! Where do I start?##
+
+The official [Incheon documentation](http://docs.incheon.gg) contains articles on theory and rational, as well as the structure and architecture of the project.
+
+If you feel like learning by doing you can start with first tutorial, [My first game: Pong](http://docs.incheon.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step on implementation of a networked version of this classic game.
+
+##Something went wrong! I need help!##
+
+If you're not exactly sure how to do something, [Stack Overflow](http://stackoverflow.com/questions/tagged/incheon) is your friend.
+
+If you've encountered a bug and it's not already in the [issues page](https://github.com/OpherV/Incheon/issues), open a new issue.
+
+##I'd like to join in##
+
+For discussing Incheon, multiplayer games or just hanging out you're invited to join us on [slack](http://incheongg.slack.com).
+
+##Built something cool with Incheon?##
+
+Please [Let us know](team@incheon.gg)! We'd love to play it, and feature it on the [Incheon homepage](http://incheon.gg).
