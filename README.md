@@ -21,6 +21,7 @@ An online demo is in the works! Stay tuned
 ##Features:##
 
 * Focus on writing your game. Incheon takes care of the netcode
+* Supports any type of game or genre  
 * Optimized networking
     * TCP via websockets / UDP via WebRTC (soon)
     * Communication is packed and serialized into binary 
