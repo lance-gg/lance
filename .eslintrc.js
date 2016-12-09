@@ -9,6 +9,7 @@ module.exports = {
         "ecmaVersion": 6
     },
     "rules": {
+        "arrow-parens": "off",
         "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
         "comma-dangle": "off",
         "guard-for-in": "off",

@@ -1,6 +1,7 @@
 'use strict';
 const Point = require('../Point');
 const PhysicsEngine = require('./PhysicsEngine');
+const CollisionDetection = require('./SimplePhysics/CollisionDetection');
 
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
@@ -8,6 +9,16 @@ const PhysicsEngine = require('./PhysicsEngine');
  */
 class SimplePhysicsEngine extends PhysicsEngine {
 
+    init(initOptions) {
+        super.init(initOptions);
+        this.collisionDetection = new CollisionDetection();
+        this.gameEngine = initOptions.gameEngine;
+        this.collisionDetection.init({ gameEngine: this.gameEngine });
+    }
+
+    // a single object advances, based on:
+    // isRotatingRight, isRotatingLeft, isAccelerating, current velocity, current bending
+    // wrap-around the world if necessary
     objectStep(o) {
         let worldSettings = this.gameEngine.worldSettings;
 
@@ -55,7 +66,10 @@ class SimplePhysicsEngine extends PhysicsEngine {
         }
     }
 
+    // entry point for a single step of the Simple Physics
     step(objectFilter) {
+
+        // each object should advance
         let objects = this.gameEngine.world.objects;
         for (let objId of Object.keys(objects)) {
 
@@ -67,6 +81,9 @@ class SimplePhysicsEngine extends PhysicsEngine {
             // run the object step
             this.objectStep(ob);
         }
+
+        // emit event on collision
+        this.collisionDetection.detect(this.gameEngine);
     }
 }
 
