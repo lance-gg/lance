@@ -24,7 +24,7 @@ An online demo is in the works! Stay tuned
 * Supports any type of game or genre  
 * Optimized networking
     * TCP via websockets / UDP via WebRTC (soon)
-    * Communication is packed and serialized into binary 
+    * Communication is packed and serialized into binary
     * Automatic handling of network spikes with step correction
 * Intelligent sync strategies for lag handling
     * Extrapolation with step re-enactment on the clients, or:
@@ -39,6 +39,7 @@ More features in the pipeline:
 
 * UDP
 * Full-stack testing suite
+* More physics engines
 
 ##That's so neat! Where do I start?##
 

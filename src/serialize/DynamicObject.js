@@ -147,52 +147,6 @@ class DynamicObject extends Serializable {
     */
     get velocityBendingMultiple() { return null; }
 
-    step(worldSettings) {
-
-        if (this.isRotatingRight) { this.angle += this.rotationSpeed; }
-        if (this.isRotatingLeft) { this.angle -= this.rotationSpeed; }
-        this.angle += this.bendingAngle;
-
-        if (this.angle >= 360) { this.angle -= 360; }
-        if (this.angle < 0) { this.angle += 360; }
-
-        if (this.isAccelerating) {
-            this.temp.accelerationVector.set(
-                Math.cos(this.angle * (Math.PI / 180)),
-                Math.sin(this.angle * (Math.PI / 180))
-            ).setMagnitude(this.acceleration);
-        } else {
-            this.temp.accelerationVector.set(0, 0);
-        }
-
-        // acceleration
-        Point.add(this.velocity, this.temp.accelerationVector, this.velocity);
-
-        // this.velocity.multiply(this.deceleration, this.deceleration);
-        this.velocity.x = Math.round(this.velocity.x * 100) / 100;
-        this.velocity.y = Math.round(this.velocity.y * 100) / 100;
-
-        if (this.velocity.getMagnitude() > this.maxSpeed) this.velocity.setMagnitude(this.maxSpeed);
-
-        this.velX = this.velocity.x;
-        this.velY = this.velocity.y;
-
-        this.isAccelerating = false;
-        this.isRotatingLeft = false;
-        this.isRotatingRight = false;
-
-        this.x = this.x + this.velocity.x + this.bendingX;
-        this.y = this.y + this.velocity.y + this.bendingY;
-
-        // wrap around the world edges
-        if (worldSettings.worldWrap) {
-            if (this.x >= worldSettings.width) { this.x -= worldSettings.width; }
-            if (this.y >= worldSettings.height) { this.y -= worldSettings.height; }
-            if (this.x < 0) { this.x += worldSettings.width; }
-            if (this.y < 0) { this.y += worldSettings.height; }
-        }
-    }
-
     /**
      * Initialize the object.
      * Extend this method if you have object initialization logic.

@@ -99,7 +99,7 @@ class GameEngine {
         // get the physics engine and initialize it
         if (this.options.physicsEngine) {
             this.physicsEngine = this.options.physicsEngine;
-            this.physicsEngine.init();
+            this.physicsEngine.init({ gameEngine: this });
         }
 
         // set up event emitting and interface
@@ -189,35 +189,26 @@ class GameEngine {
 
         // emit preStep event
         isReenact = Boolean(isReenact);
-        var step = ++this.world.stepCount;
+        let step = ++this.world.stepCount;
+        let clientIDSpace = this.options.clientIDSpace;
         this.emit("preStep", { step, isReenact });
 
-        // physics step
-        if (this.physicsEngine) {
-            this.physicsEngine.step();
+        // skip physics for shadow objects during re-enactment
+        function objectFilter(o) {
+            return !isReenact || o.id < clientIDSpace;
         }
 
-        // handle post-physics business logic
-        this.updateGameWorld(isReenact);
+        // physics step
+        if (this.physicsEngine)
+            this.physicsEngine.step(objectFilter);
+
+        // trace object positions after physics
+        for (let objId of Object.keys(this.world.objects)) {
+            this.trace.trace(`object[${objId}] after ${isReenact ? "reenact" : "step"} : ${this.world.objects[objId].toString()}`);
+        }
 
         // emit postStep event
         this.emit("postStep", { step, isReenact });
-    }
-
-    updateGameWorld(isReenact) {
-
-        for (let objId of Object.keys(this.world.objects)) {
-
-            // shadow objects are not re-enacted
-            if (isReenact && objId >= this.options.clientIDSpace)
-                continue;
-
-            // run the object step
-            let ob = this.world.objects[objId];
-            ob.step(this.worldSettings);
-
-            this.trace.trace(`object[${objId}] after ${isReenact ? "reenact" : "step"} : ${ob.toString()}`);
-        }
     }
 
     addObjectToWorld(object) {

@@ -65,7 +65,7 @@ class InterpolateStrategy extends SyncStrategy {
 
         // if this game keeps a physics engine on the client side,
         // we need to update it as well
-        if (this.gameEngine.physicsEngine) {
+        if (this.gameEngine.physicsEngine && typeof curObj.initPhysicsObject === 'function') {
             curObj.initPhysicsObject(this.gameEngine.physicsEngine);
         }
 
