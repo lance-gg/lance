@@ -14,7 +14,6 @@ const NetworkMonitor = require('./network/NetworkMonitor');
  * This class should not be used to contain the actual
  * game logic.  That belongs in the GameEngine class, where the mechanics
  * of the gameplay are actually implemented.
- *
  * The ServerEngine singleton is typically a lightweight
  * implementation, logging gameplay statistics and registering
  * user activity and user data.
@@ -32,6 +31,8 @@ class ServerEngine {
      * @param {SocketIO} io - the SocketIO server
      * @param {GameEngine} gameEngine - instance of GameEngine
      * @param {Object} options - server options
+     * @param {Number} options.frameRate - number of steps per second
+     * @param {Number} options.updateRate - number of steps in each update (sync)
      * @return {ServerEngine} serverEngine - self
      */
     constructor(io, gameEngine, options) {
@@ -44,6 +45,11 @@ class ServerEngine {
         }, options);
 
         this.io = io;
+
+        /**
+         * reference to game engine
+         * @member {GameEngine}
+         */
         this.gameEngine = gameEngine;
         this.serializer = new Serializer();
         this.networkTransmitter = new NetworkTransmitter(this.serializer);

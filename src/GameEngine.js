@@ -6,21 +6,21 @@ const Trace = require('./lib/Trace');
 
 /**
  * The GameEngine contains the game logic.  Extend this class
- * to implement your game mechanics.  The GameEngine derived
+ * to implement game mechanics.  The GameEngine derived
  * instance runs once on the server, where the final decisions
  * are always taken, and one instance will run on each client as well,
- * where the client emulates what it expects to have happening
+ * where the client emulates what it expects to be happening
  * on the server.
  *
  * The game engine's logic must listen to user inputs and
  * act on these inputs to change the game state.  For example,
  * the game engine listens to controller/keyboard inputs to infer
  * movement for the player/ship/first-person.  The game engine listens
- * to clicks/button-presses to infer firing. etc..
+ * to clicks, button-presses to infer firing, etc..
  *
  * Note that the game engine runs on both the server and on the
- * clients - but the server decisions are always the final say,
- * and therefore clients must note that server updates may conflict
+ * clients - but the server decisions always have the final say,
+ * and therefore clients must resolve server updates which conflict
  * with client-side predictions.
  */
 class GameEngine {
@@ -34,6 +34,7 @@ class GameEngine {
      *
      * @event GameEngine#preStep
      * @param {Number} stepNumber - the step number
+     * @param {Boolean} isReenact - is this step a re-enactment
      */
 
     /**
@@ -41,6 +42,7 @@ class GameEngine {
      *
      * @event GameEngine#postStep
      * @param {Number} stepNumber - the step number
+     * @param {Boolean} isReenact - is this step a re-enactment
      */
 
     /**
@@ -81,12 +83,70 @@ class GameEngine {
      */
 
     /**
+     * Marks the beginning of a game step on the client
+     *
+     * @event GameEngine#client.preStep
+     */
+
+    /**
+     * Marks the end of a game step on the client
+     *
+     * @event GameEngine#client.postStep
+     */
+
+    /**
+     * Client about to apply an input locally
+     *
+     * @event GameEngine#client.preInput
+     * @param {Object} inputData - input descriptor
+     */
+
+    /**
+     * Client finished applying an input locally
+     *
+     * @event GameEngine#client.postInput
+     * @param {Object} inputData - input descriptor
+     */
+
+    /**
+     * Client received a sync from the server
+     *
+     * @event GameEngine#client.syncReceived
+     * @param {Object} sync - sync from the server
+     * @param {Array} syncEvents - array of events in the sync
+     * @param {Number} maxStepCount - highest step in the sync
+     */
+
+    /**
+     * Marks the beginning of a game step on the server
+     *
+     * @event GameEngine#server.preStep
+     * @param {Number} stepNumber - the step number
+     */
+
+    /**
+     * Marks the end of a game step on the server
+     *
+     * @event GameEngine#server.postStep
+     * @param {Number} stepNumber - the step number
+     */
+
+    /**
+     * User input received on the server
+     *
+     * @event GameEngine#server.inputReceived
+     * @param {Object} input - input descriptor
+     * @param {Object} input.data - input descriptor
+     * @param {Object} input.playerId - player that sent the input
+     */
+
+    /**
       * Create a game engine instance.  This needs to happen
       * once on the server, and once on each client.
       *
       * @param {Object} options - options object
-      * @param {Number} options.traceLevel - the trace level from 0 to 5
-      * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will delay  the input
+      * @param {Number} options.traceLevel - the trace level from 0 to 5.  Lower value traces more.
+      * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
       */
     constructor(options) {
 
@@ -126,6 +186,17 @@ class GameEngine {
          * @param {Function} eventHandler - handler function
          */
         this.once = eventEmitter.once;
+
+        /**
+         * Remove a handler
+         *
+         * @method removeListener
+         * @memberof GameEngine
+         * @instance
+         * @param {String} eventName - name of the event
+         * @param {Function} eventHandler - handler function
+         */
+        this.removeListener = eventEmitter.removeListener;
 
         this.emit = eventEmitter.emit;
 
@@ -219,10 +290,18 @@ class GameEngine {
     }
 
     /**
-     * Override this function and implement input handling.
+     * Override this function to implement input handling.
      * This method will be called on the specific client where the
      * input was received, and will also be called on the server
-     * when the input reaches the server.
+     * when the input reaches the server.  The client does not call this
+     * method directly, rather the client calls {@link ClientEngine#sendInput}
+     * so that the input is sent to both server and client, and so that
+     * the input is delayed artificially if so configured.
+     *
+     * The input is described by a short string, and is given an index.
+     * The index is used internally to keep track of inputs which have already been applied
+     * on the client during synchronization.  The input is also associated with
+     * the ID of a player.
      *
      * @param {Object} inputMsg - input descriptor object
      * @param {String} inputMsg.input - describe the input (e.g. "up", "down", "fire")

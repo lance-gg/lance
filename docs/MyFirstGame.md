@@ -66,7 +66,7 @@ const DynamicObject = require('incheon').serialize.DynamicObject;
 class Ball extends DynamicObject {
 
     get bendingMultiple() { return 0.1; }
-    get velocityBendingMultiple() { return 0; }
+    get bendingVelocityMultiple() { return 0; }
 
     constructor(id, x, y) {
         super(id, x, y);
@@ -137,8 +137,7 @@ processInput(inputData, playerId) {
 };
 ```
 
-* **initGame**: create two paddles, a ball, and add these objects to the game world.
-Add the following initGame method:
+* **initGame**: create two paddles, a ball, and add these objects to the game world.  This method will be called only on the server.  Add the following initGame method:
 
 ```javascript
 initGame() {

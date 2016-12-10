@@ -11,11 +11,18 @@ const GAME_UPS = 60;
 /**
  * The client engine is the singleton which manages the client-side
  * process, starting the game engine, listening to network messages,
- * starting client steps, handling world updates which arrive from
+ * starting client steps, and handling world updates which arrive from
  * the server.
  */
 class ClientEngine {
 
+    /**
+      * Create a client engine instance.
+      *
+      * @param {GameEngine} gameEngine - a game engine
+      * @param {Object} inputOptions - options object
+      * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
+      */
     constructor(gameEngine, inputOptions) {
 
         this.options = Object.assign({
@@ -26,8 +33,16 @@ class ClientEngine {
             autoConnect: this.options.autoConnect
         });
 
+        /**
+         * reference to serializer
+         * @member {Serializer}
+         */
         this.serializer = new Serializer();
 
+        /**
+         * reference to game engine
+         * @member {GameEngine}
+         */
         this.gameEngine = gameEngine;
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
@@ -36,6 +51,12 @@ class ClientEngine {
 
         this.inboundMessages = [];
         this.outboundMessages = [];
+
+        /**
+        * client's player ID, as a string.
+        * @member {String}
+        */
+        this.playerId = NaN;
 
         this.configureSynchronization();
 
@@ -148,7 +169,7 @@ class ClientEngine {
         this.handleOutboundInput();
         this.applyDelayedInputs();
         this.gameEngine.step();
-        this.gameEngine.emit("client.postStep");
+        this.gameEngine.emit('client.postStep');
 
         if (this.gameEngine.trace.length) {
             this.socket.emit("trace", JSON.stringify(this.gameEngine.trace.rotate()));
@@ -178,13 +199,13 @@ class ClientEngine {
     }
 
     /**
-     * This function should be called by the client whenever an input
-     * needs to be handled.  This function will emit the input event,
+     * This function should be called by the client whenever a user input
+     * occurs.  This function will emit the input event,
      * forward the input to the client's game engine (with a delay if
-     * configured) and will transmit the input to the server.
+     * so configured) and will transmit the input to the server as well.
      *
      * This function can be called by the extended client engine class,
-     * at the beginning of client-side step processing (event client.preStep)
+     * typically at the beginning of client-side step processing (see event client.preStep)
      *
      * @param {Object} input - string representing the input
      * @param {Object} inputOptions - options for the input

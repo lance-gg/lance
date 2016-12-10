@@ -9,7 +9,7 @@ const MathUtils = require('../lib/MathUtils');
  * DynamicObject is the base class of your game's objects.  It defines the
  * base object which can move around in the game world.  The
  * extensions of this object (the subclasses)
- * will be periodically ynchronized from the server to every client.
+ * will be periodically synchronized from the server to every client.
  *
  * The dynamic objects have pseudo-physical properties, which
  * allow the client to extrapolate the position
@@ -26,7 +26,7 @@ class DynamicObject extends Serializable {
     *
     * You may choose not to implement this method, in which
     * case your object only transmits the default attributes
-    * which are already part of DynamicObject.
+    * which are already part of {@link DynamicObject}.
     * But if you choose to add more attributes, make sure
     * the return value includes the netScheme of the super class.
     *
@@ -53,30 +53,93 @@ class DynamicObject extends Serializable {
 
     /**
     * Creates an instance of a dynamic object.
-    * Provide starting values for position, acceleration, etc.
+    * Override to provide starting values for position, velocity, etc.
     * @param {String} id - the object id
     * @param {Number} x - position x-value
     * @param {Number} y - position y-value
     */
     constructor(id, x, y) {
         super();
-        this.id = id; // instance id
+
+        /**
+        * ID of this object's instance.  Each instance has an ID which is unique across the entire
+        * game world, including the server and all the clients.  In extrapolation mode,
+        * the client may have an object instance which does not yet exist on the server,
+        * these objects are known as shadow objects.  The ID value for shadow objects
+        * is chosen in the range of values reserved for the client, the clientIDSpace,
+        * and is unique only for that client.
+        * @member {Number}
+        */
+        this.id = id;
+
+        /**
+        * ID of player who created this object
+        * @member {Number}
+        */
         this.playerId = 0;
+
+        /**
+        * position x-coordinate
+        * @member {Number}
+        */
         this.x = x;
+
+        /**
+        * position y-coordinate
+        * @member {Number}
+        */
         this.y = y;
+
+        /**
+        * object orientation angle
+        * @member {Number}
+        */
+        this.angle = 90;
+
+        /**
+        * should rotate left by {@link DynamicObject#rotationSpeed} on next step
+        * @member {Boolean}
+        */
+        this.isRotatingLeft = false;
+
+        /**
+        * should rotate right by {@link DynamicObject#rotationSpeed} on next step
+        * @member {Boolean}
+        */
+        this.isRotatingRight = false;
+
+        /**
+        * should accelerate by {@link DynamicObject#acceleration} on next step
+        * @member {Boolean}
+        */
+        this.isAccelerating = false;
+
+        /**
+        * angle rotation per step
+        * @member {Number}
+        */
+        this.rotationSpeed = 2.5;
+
+        /**
+        * acceleration per step
+        * @member {Number}
+        */
+        this.acceleration = 0.1;
+
         this.velX = 0;
         this.velY = 0;
         this.bendingX = 0;
         this.bendingY = 0;
-        this.angle = 90;
         this.bendingAngle = 0;
-        this.rotationSpeed = 2.5;
-        this.acceleration = 0.1;
         this.deceleration = 0.99;
         this.maxSpeed = 5;
 
-        // todo deal with what goes over the wire
+        /**
+        * velocity of object
+        * @member {Point}
+        */
         this.velocity = new Point();
+
         this.temp = {
             accelerationVector: new Point()
         };
@@ -84,7 +147,9 @@ class DynamicObject extends Serializable {
     }
 
     /**
-     * Formatted description of the dynamic object, for debugging purposes.
+     * Formatted textual description of the dynamic object.
+     * The output of this method is used to describe each instance in the traces,
+     * which significantly helps in debugging.
      *
      * @return {String} description - a string describing the DynamicObject
      */
@@ -126,8 +191,8 @@ class DynamicObject extends Serializable {
     * on the client will be set to the server's object's position exactly.
     * When this value is zero, the client ignores the server object's position.
     * When this value is null, the bending is taken from the synchronization
-    * defaults.  You will need to set this to zero for objects whose position
-    * jumps suddenly - because your game intended a jump, not a gradual bend.
+    * defaults.  Set this to zero for objects whose position
+    * jumps suddenly - because the game intended a jump, not a gradual bend.
     * @memberof DynamicObject
     * @member {Number} bendingMultiple
     */
@@ -143,9 +208,9 @@ class DynamicObject extends Serializable {
     * suddenly - because your game intended a jump in velocity, not a gradual
     * bend.
     * @memberof DynamicObject
-    * @member {Number} velocityBendingMultiple
+    * @member {Number} bendingVelocityMultiple
     */
-    get velocityBendingMultiple() { return null; }
+    get bendingVelocityMultiple() { return null; }
 
     /**
      * Initialize the object.
@@ -191,8 +256,8 @@ class DynamicObject extends Serializable {
         if (this.bendingMultiple !== null)
             bending = this.bendingMultiple;
         let velocityBending = bending;
-        if (this.velocityBendingMultiple !== null)
-            velocityBending = this.velocityBendingMultiple;
+        if (this.bendingVelocityMultiple !== null)
+            velocityBending = this.bendingVelocityMultiple;
 
         // bend to position, velocity, and angle gradually
         if (worldSettings.worldWrap) {
@@ -222,23 +287,22 @@ class DynamicObject extends Serializable {
 
         // update other objects with interpolation
         // TODO refactor into general interpolation class
-        //if (this.isPlayerControlled !== true) {
 
-            if (Math.abs(nextObj.x - this.x) > worldSettings.height / 2) {
-                this.x = nextObj.x;
-            } else {
-                this.x = (nextObj.x - this.x) * playPercentage + this.x;
-            }
+        if (Math.abs(nextObj.x - this.x) > worldSettings.height / 2) {
+            this.x = nextObj.x;
+        } else {
+            this.x = (nextObj.x - this.x) * playPercentage + this.x;
+        }
 
-            if (Math.abs(nextObj.y - this.y) > worldSettings.height / 2) {
-                this.y = nextObj.y;
-            } else {
-                this.y = (nextObj.y - this.y) * playPercentage + this.y;
-            }
+        if (Math.abs(nextObj.y - this.y) > worldSettings.height / 2) {
+            this.y = nextObj.y;
+        } else {
+            this.y = (nextObj.y - this.y) * playPercentage + this.y;
+        }
 
-            var shortestAngle = ((((nextObj.angle - this.angle) % 360) + 540) % 360) - 180;
-            this.angle = this.angle + shortestAngle * playPercentage;
-        //}
+        var shortestAngle = ((((nextObj.angle - this.angle) % 360) + 540) % 360) - 180;
+        this.angle = this.angle + shortestAngle * playPercentage;
+
     }
 
     // release resources
