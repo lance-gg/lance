@@ -80,12 +80,6 @@ class ClientEngine {
             that.inboundMessages.push(worldData);
         });
 
-        // initialize the renderer
-        if (!this.renderer) {
-            alert('ERROR: game has not defined a renderer');
-        }
-        this.renderer.init();
-
         // Simple JS game loop adapted from
         // http://nokarma.org/2011/02/02/javascript-game-development-the-game-loop/
         let skipTicks = 1000 / GAME_UPS;
@@ -110,6 +104,12 @@ class ClientEngine {
         this.gameEngine.start();
         window.requestAnimationFrame(gameLoop);
         window.requestAnimationFrame(renderLoop);
+
+        // initialize the renderer
+        if (!this.renderer) {
+            alert('ERROR: game has not defined a renderer');
+        }
+        this.renderer.init();
     }
 
     step() {
