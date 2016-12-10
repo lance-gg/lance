@@ -2,7 +2,7 @@
 
 ![Incheon Logo](https://cloud.githubusercontent.com/assets/3951311/21020499/6f125344-bd7d-11e6-86e4-a4bb16b32f2a.png)
 
-#[Incheon](http://incheon.gg) is a real-time multiplayer game server#
+# [Incheon](http://incheon.gg) is a real-time multiplayer game server
 
 It provides an extendible Node.JS based server, on which game logic runs, as well as a client-side library
 which synchronizes the client's game state with the server game state.  In order
@@ -15,10 +15,10 @@ Incheon aims to optimize the player's visual experience, while providing
 a simple development model which is highly configurable and easy to analyze
 and debug.
 
-##See it in action##
+## See it in action
 An online demo is in the works! Stay tuned
 
-##Features:##
+## Features:
 
 * Focus on writing your game. Incheon takes care of the netcode
 * Supports any type of game or genre  
@@ -41,22 +41,22 @@ More features in the pipeline:
 * Full-stack testing suite
 * More physics engines
 
-##That's so neat! Where do I start?##
+## That's so neat! Where do I start?
 
 The official [Incheon documentation](http://docs.incheon.gg) contains articles on theory and rational, as well as the structure and architecture of the project.
 
 If you feel like learning by doing you can start with first tutorial, [My first game: Pong](http://docs.incheon.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step on implementation of a networked version of this classic game.
 
-##Something went wrong! I need help!##
+## Something went wrong! I need help!
 
 If you're not exactly sure how to do something, [Stack Overflow](http://stackoverflow.com/questions/tagged/incheon) is your friend.
 
 If you've encountered a bug and it's not already in the [issues page](https://github.com/OpherV/Incheon/issues), open a new issue.
 
-##I'd like to join in##
+## I'd like to join in
 
 For discussing Incheon, multiplayer games or just hanging out you're invited to join us on [slack](http://incheongg.slack.com).
 
-##Built something cool with Incheon?##
+## Built something cool with Incheon?
 
 Please [Let us know](http://www.twitter.com/opherv)! We'd love to play it, and feature it on the [Incheon homepage](http://incheon.gg).
