@@ -18,9 +18,14 @@ class ClientEngine {
 
     constructor(gameEngine, inputOptions) {
 
-        this.options = Object.assign({}, inputOptions);
+        this.options = Object.assign({
+            autoConnect: true
+        }, inputOptions);
 
-        this.socket = io();
+        this.socket = io.Manager(this.options.serverURL ,{
+            autoConnect: this.options.autoConnect
+        });
+
         this.serializer = new Serializer();
 
         this.gameEngine = gameEngine;
