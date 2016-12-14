@@ -21,6 +21,7 @@ class ClientEngine {
       *
       * @param {GameEngine} gameEngine - a game engine
       * @param {Object} inputOptions - options object
+      * @param {Boolean} options.autoConnect
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
       */
     constructor(gameEngine, inputOptions) {
@@ -29,9 +30,6 @@ class ClientEngine {
             autoConnect: true
         }, inputOptions);
 
-        this.socket = io.Manager(this.options.serverURL ,{
-            autoConnect: this.options.autoConnect
-        });
 
         /**
          * reference to serializer
@@ -47,7 +45,6 @@ class ClientEngine {
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
         this.networkMonitor = new NetworkMonitor();
-        this.networkMonitor.registerClient(this);
 
         this.inboundMessages = [];
         this.outboundMessages = [];
@@ -66,11 +63,6 @@ class ClientEngine {
             for (let i = 0; i < inputOptions.delayInputCount; i++)
                 this.delayedInputs[i] = [];
         }
-
-        this.socket.on('playerJoined', (playerData) => {
-            this.playerId = playerData.playerId;
-            this.messageIndex = Number(this.playerId) * 10000;
-        });
 
         // when objects get added, tag them as playerControlled if necessary
         this.gameEngine.on('objectAdded', (object) => {
@@ -100,12 +92,42 @@ class ClientEngine {
             synchronizer.frameSyncSelector = () => { return true; };
     }
 
-    start() {
-        var that = this;
-        this.socket.on('worldUpdate', function(worldData) {
-            that.inboundMessages.push(worldData);
+    /**
+     * Makes a connection to the game server
+     *
+     * @returns {Promise} Resolved when the connection is made to the server
+     */
+    connect(){
+        let connectionPromise = new Promise((resolve, reject) => {
+            this.socket = io(this.options.serverURL);
+
+            this.networkMonitor.registerClient(this);
+
+            this.socket.once("connection", (a)=>{
+                console.log("connection made", a);
+                resolve();
+            });
+
+            this.socket.on('playerJoined', (playerData) => {
+                this.playerId = playerData.playerId;
+                this.messageIndex = Number(this.playerId) * 10000;
+            });
+
+            this.socket.on('worldUpdate', (worldData)=>{
+                this.inboundMessages.push(worldData);
+            });
         });
 
+        return connectionPromise;
+    }
+
+    /**
+     * Start the client engine, setting up the game loop, rendering loop and renderer.
+     *
+     * @returns {Promise} Resolves once the Renderer has been initialized, and the game is
+     * ready to connect
+     */
+    start() {
         // Simple JS game loop adapted from
         // http://nokarma.org/2011/02/02/javascript-game-development-the-game-loop/
         let skipTicks = 1000 / GAME_UPS;
@@ -129,13 +151,20 @@ class ClientEngine {
         // start game, game loop, render loop
         this.gameEngine.start();
         window.requestAnimationFrame(gameLoop);
-        window.requestAnimationFrame(renderLoop);
 
         // initialize the renderer
         if (!this.renderer) {
             alert('ERROR: game has not defined a renderer');
         }
-        this.renderer.init();
+
+        return this.renderer.init().then(()=>{
+            window.requestAnimationFrame(renderLoop);
+
+            if (this.options.autoConnect){
+                this.connect();
+            }
+
+        });
     }
 
     step() {
@@ -171,7 +200,8 @@ class ClientEngine {
         this.gameEngine.step();
         this.gameEngine.emit('client.postStep');
 
-        if (this.gameEngine.trace.length) {
+        if (this.gameEngine.trace.length && this.socket) {
+            //socket might not have been initialized at this point
             this.socket.emit("trace", JSON.stringify(this.gameEngine.trace.rotate()));
         }
     }
