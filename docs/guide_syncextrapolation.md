@@ -20,7 +20,7 @@ When a sync arrives at the client, the client must reconcile the predicted game 
 
 5. Apply the delta so that the object on the client gradually bends towards the correct position as indicated by the server.
 
-    1. Not all the delta is applied.  A "bending factor" must be specified, to indicate how much of the delta should be applied.  A bending factor of 30% means that 30% of the correction will be applied until the next sync data arrives.
+    1. Not all the delta is applied.  A "bending factor" must be specified, to indicate how much of the delta should be applied.  A bending factor of 70% means that only 30% of the position will change, and that this 30% of the correction will be applied incrementally until the next sync data arrives.
 
     2. The delta is not applied in a single step.  Rather, split the correction into incremental corrections that are applied until the next sync data arrives.
 
@@ -31,5 +31,7 @@ Notes for the game developer: Multiple complications arise from the extrapolatio
 2. **Bending**.  The client’s objects positions gradually bend towards the server’s positions.  Velocity can also bend.  The game designer must choose bending values carefully.  Objects whose position can change suddenly (teleporting objects) will not bend well.  Objects whose velocity can change suddenly (impulse) should not have velocity bending.
 
 3. **Shadow Objects**. The client may create an object which does not yet exist on the server.  For example, if a ship fires a missile, the client must render a missile, even though the missile object is yet to exist on the server.  Until the true missile object will be created on the server, the client will model the missile with a shadow object.
+
+To select this synchronization method, the Client Engine syncOptions must be set to "extrapolate".  The option "localObjBending" describes the amount of bending (0.0 to 1.0) for local objects, and "remoteObjBending" describes the amount of bending (0.0 to 1.0) for remote objects.  See the client engine options as described in the API Reference: {@link ClientEngine}.
 
 Next: {@tutorial tutorials}

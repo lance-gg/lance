@@ -21,15 +21,18 @@ class ClientEngine {
       *
       * @param {GameEngine} gameEngine - a game engine
       * @param {Object} inputOptions - options object
-      * @param {Boolean} options.autoConnect
+      * @param {Boolean} inputOptions.autoConnect - if true, the client will automatically attempt connect to server.
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
+      * @param {Object} inputOptions.syncOptions - an object describing the synchronization method.  If not set, will be set to extrapolate, with local object bending set to 0.0 and remote object bending set to 0.6.  If the query-string parameter "sync" is defined, then that value is passed to this object's sync attribute.
+      * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
+      * @param {Number} inputOptions.syncOptions.localObjBending - amount of bending towards original client position, after each sync, for local objects
+      * @param {Number} inputOptions.syncOptions.remoteObjBending - amount of bending towards original client position, after each sync, for remote objects
       */
     constructor(gameEngine, inputOptions) {
 
         this.options = Object.assign({
             autoConnect: true
         }, inputOptions);
-
 
         /**
          * reference to serializer
@@ -95,7 +98,7 @@ class ClientEngine {
     /**
      * Makes a connection to the game server
      *
-     * @returns {Promise} Resolved when the connection is made to the server
+     * @return {Promise} Resolved when the connection is made to the server
      */
     connect(){
         let connectionPromise = new Promise((resolve, reject) => {

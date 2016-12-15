@@ -184,12 +184,12 @@ class DynamicObject extends Serializable {
     /**
     * The bending multiple is a getter, which returns the
     * amount of bending.
-    * For example, if this value is set to 0.2, then the object's position
+    * For example, if this value is set to 0.8, then the object's position
     * on the client side will slowly bend (by 20% on every server update) towards
     * the definitive position as indicated by the server.
-    * When this value is 1, the object's position
+    * When this value is zero, the object's position
     * on the client will be set to the server's object's position exactly.
-    * When this value is zero, the client ignores the server object's position.
+    * When this value is 1.0, the client ignores the server object's position.
     * When this value is null, the bending is taken from the synchronization
     * defaults.  Set this to zero for objects whose position
     * jumps suddenly - because the game intended a jump, not a gradual bend.
@@ -201,10 +201,10 @@ class DynamicObject extends Serializable {
     /**
     * The velocity bending multiple is a getter, which returns the
     * amount of velocity bending.
-    * For example, if this value is set to 0.2, then the object's velocity
+    * For example, if this value is set to 0.8, then the object's velocity
     * on the client side will slowly bend (by 20% on every server update) towards the
     * definitive velocity as indicated by the server, on every server update.
-    * You will need to set this to zero for objects whose velocity jumps
+    * You will need to set this to 1.0 for objects whose velocity jumps
     * suddenly - because your game intended a jump in velocity, not a gradual
     * bend.
     * @memberof DynamicObject
@@ -244,7 +244,7 @@ class DynamicObject extends Serializable {
         this.velocity.x = this.velX;
         this.velocity.y = this.velY;
 
-        // resent bending
+        // reset bending
         this.bendingX = 0;
         this.bendingY = 0;
         this.bendingAngle = 0;
