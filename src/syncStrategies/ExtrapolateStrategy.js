@@ -130,8 +130,7 @@ class ExtrapolateStrategy extends SyncStrategy {
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
                 let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
                 newObj.saveState(localShadowObj);
-                localShadowObj.destroy();
-                delete this.gameEngine.world.objects[localShadowObj.id];
+                this.gameEngine.removeObjectFromWorld(localShadowObj.id);
 
             } else if (curObj) {
 
@@ -209,8 +208,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         //       you will need to loop over prevObj instead of nextObj
         for (let objId of Object.keys(world.objects)) {
             if (objId < this.gameEngine.options.clientIDSpace && !this.newSync.syncObjects.hasOwnProperty(objId)) {
-                world.objects[objId].destroy();
-                delete this.gameEngine.world.objects[objId];
+                this.gameEngine.removeObjectFromWorld(objId);
             }
         }
 
