@@ -7,7 +7,7 @@
 
 
   .helpContainer{
-    width: span(6 of 12);
+    width: span(8 of 12);
     margin: 0 auto;
     padding: 2rem 0;
     @include clearfix;
@@ -19,7 +19,7 @@
     position: relative;
     display: block;
     height: 7rem;
-    @include span(2 of 6);
+    @include span(2 of 8);
     text-align: center;
     color: #fff;
     &:hover{
@@ -35,6 +35,6 @@
   }
 
   a:last-child{
-    @include span(2 of 6 last);
+    @include span(2 of 8 last);
   }
 }
