@@ -14,8 +14,8 @@ var Incheon = {
     },
     physics: {
         PhysicsEngine: require("./src/physics/PhysicsEngine"),
-        SimplePhysicsEngine: require("./src/physics/SimplePhysicsEngine"),
-        PhysijsPhysicsEngine: require("./src/physics/PhysijsPhysicsEngine")
+        SimplePhysicsEngine: require("./src/physics/SimplePhysicsEngine")
+        // PhysijsPhysicsEngine: require("./src/physics/PhysijsPhysicsEngine")
     },
     render: {
         Renderer: require("./src/render/Renderer"),
