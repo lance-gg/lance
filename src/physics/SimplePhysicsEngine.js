@@ -45,7 +45,8 @@ class SimplePhysicsEngine extends PhysicsEngine {
         o.velocity.x = Math.round(o.velocity.x * 100) / 100;
         o.velocity.y = Math.round(o.velocity.y * 100) / 100;
 
-        if (o.velocity.getMagnitude() > o.maxSpeed) o.velocity.setMagnitude(o.maxSpeed);
+        if ((o.maxSpeed !== null) && (o.velocity.getMagnitude() > o.maxSpeed))
+            o.velocity.setMagnitude(o.maxSpeed);
 
         o.velX = o.velocity.x;
         o.velY = o.velocity.y;

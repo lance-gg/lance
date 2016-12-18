@@ -132,7 +132,6 @@ class DynamicObject extends Serializable {
         this.bendingY = 0;
         this.bendingAngle = 0;
         this.deceleration = 0.99;
-        this.maxSpeed = 5;
 
         /**
         * velocity of object
@@ -178,7 +177,6 @@ class DynamicObject extends Serializable {
         this.rotationSpeed = sourceObj.rotationSpeed;
         this.acceleration = sourceObj.acceleration;
         this.deceleration = sourceObj.deceleration;
-        this.maxSpeed = sourceObj.maxSpeed;
     }
 
     /**
@@ -211,6 +209,13 @@ class DynamicObject extends Serializable {
     * @member {Number} bendingVelocityMultiple
     */
     get bendingVelocityMultiple() { return null; }
+
+    /**
+    * The maximum velocity allowed.  If returns null then ignored.
+    * @memberof DynamicObject
+    * @member {Number} maxSpeed
+    */
+    get maxSpeed() { return null; }
 
     /**
      * Initialize the object.
