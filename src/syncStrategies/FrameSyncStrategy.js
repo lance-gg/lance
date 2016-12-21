@@ -62,7 +62,7 @@ class FrameSyncStrategy extends SyncStrategy {
                         // TODO: the comparison below cannot be '===' because:
                         //       curObj.id = "1"
                         //       nextObj.id = 1
-                        isPlayerControlled: (this.playerId == nextObj.id)
+                        isPlayerControlled: (this.playerId == nextObj.playerId)
                     });
                     curObj.initRenderObject(this.gameEngine.renderer);
 

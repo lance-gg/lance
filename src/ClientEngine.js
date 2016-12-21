@@ -69,7 +69,7 @@ class ClientEngine {
 
         // when objects get added, tag them as playerControlled if necessary
         this.gameEngine.on('objectAdded', (object) => {
-            object.isPlayerControlled = (this.playerId == object.id);
+            object.isPlayerControlled = (this.playerId == object.playerId);
         });
     }
 
