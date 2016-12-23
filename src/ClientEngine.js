@@ -23,6 +23,8 @@ class ClientEngine {
       * @param {Object} inputOptions - options object
       * @param {Boolean} inputOptions.autoConnect - if true, the client will automatically attempt connect to server.
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
+      * @param {Number} inputOptions.healthCheckInterval - health check message interval (millisec).  Default is 1000.
+      * @param {Number} inputOptions.healthCheckRTTSample - health check RTT calculation sample size.  Default is 10.
       * @param {Object} inputOptions.syncOptions - an object describing the synchronization method.  If not set, will be set to extrapolate, with local object bending set to 0.0 and remote object bending set to 0.6.  If the query-string parameter "sync" is defined, then that value is passed to this object's sync attribute.
       * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
       * @param {Number} inputOptions.syncOptions.localObjBending - amount of bending towards original client position, after each sync, for local objects
@@ -31,7 +33,9 @@ class ClientEngine {
     constructor(gameEngine, inputOptions) {
 
         this.options = Object.assign({
-            autoConnect: true
+            autoConnect: true,
+            healthCheckInterval: 1000,
+            healthCheckRTTSample: 10
         }, inputOptions);
 
         /**
@@ -100,13 +104,13 @@ class ClientEngine {
      *
      * @return {Promise} Resolved when the connection is made to the server
      */
-    connect(){
+    connect() {
         let connectionPromise = new Promise((resolve, reject) => {
             this.socket = io(this.options.serverURL);
 
             this.networkMonitor.registerClient(this);
 
-            this.socket.once("connection", (a)=>{
+            this.socket.once("connection", (a) => {
                 console.log("connection made", a);
                 resolve();
             });
@@ -116,7 +120,7 @@ class ClientEngine {
                 this.messageIndex = Number(this.playerId) * 10000;
             });
 
-            this.socket.on('worldUpdate', (worldData)=>{
+            this.socket.on('worldUpdate', (worldData) => {
                 this.inboundMessages.push(worldData);
             });
         });
@@ -127,7 +131,7 @@ class ClientEngine {
     /**
      * Start the client engine, setting up the game loop, rendering loop and renderer.
      *
-     * @returns {Promise} Resolves once the Renderer has been initialized, and the game is
+     * @return {Promise} Resolves once the Renderer has been initialized, and the game is
      * ready to connect
      */
     start() {
@@ -160,10 +164,10 @@ class ClientEngine {
             alert('ERROR: game has not defined a renderer');
         }
 
-        return this.renderer.init().then(()=>{
+        return this.renderer.init().then(() => {
             window.requestAnimationFrame(renderLoop);
 
-            if (this.options.autoConnect){
+            if (this.options.autoConnect) {
                 this.connect();
             }
 
@@ -204,7 +208,7 @@ class ClientEngine {
         this.gameEngine.emit('client.postStep');
 
         if (this.gameEngine.trace.length && this.socket) {
-            //socket might not have been initialized at this point
+            // socket might not have been initialized at this point
             this.socket.emit("trace", JSON.stringify(this.gameEngine.trace.rotate()));
         }
     }
