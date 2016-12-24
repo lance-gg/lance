@@ -13,7 +13,9 @@ class SimplePhysicsEngine extends PhysicsEngine {
         super.init(initOptions);
         this.collisionDetection = new CollisionDetection();
         this.gameEngine = initOptions.gameEngine;
-        this.collisionDetection.init({ gameEngine: this.gameEngine });
+
+        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, initOptions.collisionOptions);
+        this.collisionDetection.init(collisionOptions);
     }
 
     // a single object advances, based on:
