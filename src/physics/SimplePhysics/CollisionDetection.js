@@ -25,6 +25,8 @@ class CollisionDetection {
         if (id1 === id2) return;
         let o1 = this.gameEngine.world.objects[id1];
         let o2 = this.gameEngine.world.objects[id2];
+        // make sure that objects actually exist. might have been destroyed
+        if (!o1 || !o2) return;
         let pairId = [id1, id2].sort().join(',');
 
         if (this.distance(o1, o2) < this.options.COLLISION_DISTANCE) {
