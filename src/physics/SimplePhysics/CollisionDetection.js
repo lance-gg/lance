@@ -22,12 +22,13 @@ class CollisionDetection {
 
     // check if pair (id1, id2) have collided
     checkPair(id1, id2) {
-        if (id1 === id2) return;
-        let o1 = this.gameEngine.world.objects[id1];
-        let o2 = this.gameEngine.world.objects[id2];
+        let objects = this.gameEngine.world.objects;
+        let o1 = objects[id1];
+        let o2 = objects[id2];
+
         // make sure that objects actually exist. might have been destroyed
         if (!o1 || !o2) return;
-        let pairId = [id1, id2].sort().join(',');
+        let pairId = [id1, id2].join(',');
 
         if (this.distance(o1, o2) < this.options.COLLISION_DISTANCE) {
             if (!(pairId in this.collisionPairs)) {
@@ -41,11 +42,11 @@ class CollisionDetection {
     }
 
     // detect by checking all pairs
-    // TODO: loop below checks pair (i,j) as well as redundant (j,i)
     detect() {
-        for (let o1 in this.gameEngine.world.objects)
-            for (let o2 in this.gameEngine.world.objects)
-                this.checkPair(o1, o2);
+        let objects = this.gameEngine.world.objects;
+        for (let k1 of Object.keys(objects))
+            for (let k2 of Object.keys(objects))
+                if (k2 > k1) this.checkPair(k1, k2);
     }
 
 }
