@@ -85,33 +85,33 @@ class GameEngine {
     /**
      * Marks the beginning of a game step on the client
      *
-     * @event GameEngine#client.preStep
+     * @event GameEngine#client__preStep
      */
 
     /**
      * Marks the end of a game step on the client
      *
-     * @event GameEngine#client.postStep
+     * @event GameEngine#client__postStep
      */
 
     /**
      * Client about to apply an input locally
      *
-     * @event GameEngine#client.preInput
+     * @event GameEngine#client__preInput
      * @param {Object} inputData - input descriptor
      */
 
     /**
      * Client finished applying an input locally
      *
-     * @event GameEngine#client.postInput
+     * @event GameEngine#client__postInput
      * @param {Object} inputData - input descriptor
      */
 
     /**
      * Client received a sync from the server
      *
-     * @event GameEngine#client.syncReceived
+     * @event GameEngine#client__syncReceived
      * @param {Object} sync - sync from the server
      * @param {Array} syncEvents - array of events in the sync
      * @param {Number} maxStepCount - highest step in the sync
@@ -120,21 +120,21 @@ class GameEngine {
     /**
      * Marks the beginning of a game step on the server
      *
-     * @event GameEngine#server.preStep
+     * @event GameEngine#server__preStep
      * @param {Number} stepNumber - the step number
      */
 
     /**
      * Marks the end of a game step on the server
      *
-     * @event GameEngine#server.postStep
+     * @event GameEngine#server__postStep
      * @param {Number} stepNumber - the step number
      */
 
     /**
      * User input received on the server
      *
-     * @event GameEngine#server.inputReceived
+     * @event GameEngine#server__inputReceived
      * @param {Object} input - input descriptor
      * @param {Object} input.data - input descriptor
      * @param {Object} input.playerId - player that sent the input

@@ -18,8 +18,8 @@ class InterpolateStrategy extends SyncStrategy {
         this.syncsBuffer = []; // buffer for server world updates
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.passive = true; // client side engine ignores inputs
-        this.gameEngine.on('client.postStep', this.interpolate.bind(this));
-        this.gameEngine.on('client.syncReceived', this.updatesyncsBuffer.bind(this));
+        this.gameEngine.on('client__postStep', this.interpolate.bind(this));
+        this.gameEngine.on('client__syncReceived', this.updatesyncsBuffer.bind(this));
     }
 
     updatesyncsBuffer(e) {

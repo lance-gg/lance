@@ -16,7 +16,7 @@ class FrameSyncStrategy extends SyncStrategy {
 
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('postStep', this.frameSync.bind(this));
-        this.gameEngine.on('client.syncReceived', this.keepSnapshot.bind(this));
+        this.gameEngine.on('client__syncReceived', this.keepSnapshot.bind(this));
     }
 
     // keep snapshot if it's the most recent we've seen

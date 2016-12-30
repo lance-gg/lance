@@ -10,7 +10,7 @@ class PlayerSnap extends SyncStrategy {
     constructor(clientEngine, inputOptions) {
         super(clientEngine, inputOptions);
 
-        this.clientEngine.gameEngine.on('client.syncReceived', this.handleSnapshot.bind(this));
+        this.clientEngine.gameEngine.on('client__syncReceived', this.handleSnapshot.bind(this));
     }
 
     handleSnapshot(e) {

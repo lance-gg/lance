@@ -82,7 +82,7 @@ class ServerEngine {
 
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
-        this.gameEngine.emit("server.preStep", this.gameEngine.world.stepCount + 1);
+        this.gameEngine.emit("server__preStep", this.gameEngine.world.stepCount + 1);
 
         this.serverTime = (new Date().getTime());
 
@@ -126,7 +126,7 @@ class ServerEngine {
         }
 
         // step is done on the server side
-        this.gameEngine.emit("server.postStep", this.gameEngine.world.stepCount);
+        this.gameEngine.emit("server__postStep", this.gameEngine.world.stepCount);
 
         if (this.gameEngine.trace.length) {
             let traceData = this.gameEngine.trace.rotate();
@@ -231,7 +231,7 @@ class ServerEngine {
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
         }
-        this.gameEngine.emit('server.inputReceived', {
+        this.gameEngine.emit('server__inputReceived', {
             input: data,
             playerId: socket.playerId
         });

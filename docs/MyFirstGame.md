@@ -406,7 +406,7 @@ class MyClientEngine extends ClientEngine {
 
         this.serializer.registerClass(Paddle);
         this.serializer.registerClass(Ball);
-        this.gameEngine.on('client.preStep', this.preStep.bind(this));
+        this.gameEngine.on('client__preStep', this.preStep.bind(this));
 
         this.gameEngine.on('objectAdded', (object) => {
             if (object.id == 1) {

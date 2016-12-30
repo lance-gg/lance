@@ -185,7 +185,7 @@ class ClientEngine {
             return;
         }
 
-        this.gameEngine.emit('client.preStep');
+        this.gameEngine.emit('client__preStep');
         while (this.inboundMessages.length > 0) {
             this.handleInboundMessage(this.inboundMessages.pop());
         }
@@ -205,7 +205,7 @@ class ClientEngine {
         this.handleOutboundInput();
         this.applyDelayedInputs();
         this.gameEngine.step();
-        this.gameEngine.emit('client.postStep');
+        this.gameEngine.emit('client__postStep');
 
         if (this.gameEngine.trace.length && this.socket) {
             // socket might not have been initialized at this point
@@ -218,9 +218,9 @@ class ClientEngine {
             return;
         }
 
-        this.gameEngine.emit('client.preInput', message.data);
+        this.gameEngine.emit('client__preInput', message.data);
         this.gameEngine.processInput(message.data, this.playerId);
-        this.gameEngine.emit('client.postInput', message.data);
+        this.gameEngine.emit('client__postInput', message.data);
     }
 
     applyDelayedInputs() {
@@ -242,7 +242,7 @@ class ClientEngine {
      * so configured) and will transmit the input to the server as well.
      *
      * This function can be called by the extended client engine class,
-     * typically at the beginning of client-side step processing (see event client.preStep)
+     * typically at the beginning of client-side step processing (see event client__preStep)
      *
      * @param {Object} input - string representing the input
      * @param {Object} inputOptions - options for the input
@@ -283,7 +283,7 @@ class ClientEngine {
         }, 0);
 
         // emit that a snapshot has been received
-        this.gameEngine.emit('client.syncReceived', {
+        this.gameEngine.emit('client__syncReceived', {
             syncEvents: syncEvents,
             stepCount: maxStepCount
         });

@@ -21,9 +21,9 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.newSync = null;
         this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.on('client.postStep', this.extrapolate.bind(this));
-        this.gameEngine.on('client.syncReceived', this.collectSync.bind(this));
-        this.gameEngine.on('client.preInput', this.clientInputSave.bind(this));
+        this.gameEngine.on('client__postStep', this.extrapolate.bind(this));
+        this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
+        this.gameEngine.on('client__preInput', this.clientInputSave.bind(this));
     }
 
     // keep a buffer of inputs so that we can replay them on extrapolation
