@@ -172,7 +172,7 @@ class ServerEngine {
 
         console.log("Client Connected", socket.id);
 
-        this.gameEngine.emit('server.playerJoined', {
+        this.gameEngine.emit('server__playerJoined', {
             playerId: playerId
         });
 
@@ -182,7 +182,7 @@ class ServerEngine {
 
         socket.on('disconnect', function() {
             that.onPlayerDisconnected(socket.id, playerId);
-            that.gameEngine.emit('server.playerDisconnected', {
+            that.gameEngine.emit('server__playerDisconnected', {
                 playerId: playerId
             });
         });

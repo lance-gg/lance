@@ -20,11 +20,13 @@ class Renderer {
 
     /**
      * Initialize the renderer.
+     * @return {Promise} Resolves when renderer is ready.
     */
     init() {
         if ((typeof window === 'undefined') || !document) {
             console.log('renderer invoked on server side.');
         }
+        return Promise.resolve(); // eslint-disable-line new-cap
     }
 
     /**
