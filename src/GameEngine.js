@@ -137,7 +137,7 @@ class GameEngine {
      * @event GameEngine#server__inputReceived
      * @param {Object} input - input descriptor
      * @param {Object} input.data - input descriptor
-     * @param {Object} input.playerId - player that sent the input
+     * @param {String} input.playerId - player that sent the input
      */
 
     /**
