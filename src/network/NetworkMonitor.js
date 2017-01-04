@@ -1,11 +1,15 @@
 "use strict";
 
+const EventEmitter = require('eventemitter3');
+
 /**
+ * Measures network performance between the client and the server
  * Represents both the client and server portions of NetworkMonitor
  */
-class NetworkMonitor {
+class NetworkMonitor extends EventEmitter{
 
     constructor() {
+        super();
     }
 
     // client
@@ -36,6 +40,10 @@ class NetworkMonitor {
             this.movingRTTAverageFrame.shift();
         }
         this.movingRTTAverage = this.movingRTTAverageFrame.reduce((a,b) => a + b) / this.movingRTTAverageFrame.length;
+        this.emit('RTTUpdate',{
+            RTT: RTT,
+            RTTAverage: this.movingRTTAverage
+        })
     }
 
     // server
