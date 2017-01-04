@@ -234,9 +234,9 @@ class DynamicObject extends Serializable {
     // TODO:
     // rather than pass worldSettings on each bend, they could
     // be passed in on the constructor just once.
-    bendToSavedState(bending, worldSettings) {
+    bendToSavedState(bending, worldSettings, isLocal) {
         if (this.savedCopy) {
-            this.bendTo(this.savedCopy, bending, worldSettings);
+            this.bendTo(this.savedCopy, bending, worldSettings, isLocal);
         }
         this.savedCopy = null;
     }
@@ -255,14 +255,27 @@ class DynamicObject extends Serializable {
         this.bendingAngle = 0;
     }
 
-    bendTo(original, bending, worldSettings) {
+    bendTo(original, bending, worldSettings, isLocal) {
+
+        // TODO: the bending parameters should now be an object,
+        //     with a single getter bendingMultiples which has local
+        //     and remote values for position, velocity, and angle
 
         // if the object has defined a bending multiples for this object, use them
-        if (this.bendingMultiple !== null)
+        if (typeof this.bendingMultiple === 'number')
             bending = this.bendingMultiple;
+
+        // velocity bending factor
         let velocityBending = bending;
-        if (this.bendingVelocityMultiple !== null)
+        if (typeof this.bendingVelocityMultiple === 'number')
             velocityBending = this.bendingVelocityMultiple;
+
+        // angle bending factor
+        let angleBending = bending;
+        if (typeof this.bendingAngleMultiple === 'number')
+            angleBending = this.bendingAngleMultiple;
+        if (isLocal && (typeof this.bendingAngleLocalMultiple === 'number'))
+            angleBending = this.bendingAngleLocalMultiple;
 
         // bend to position, velocity, and angle gradually
         if (worldSettings.worldWrap) {
@@ -272,7 +285,7 @@ class DynamicObject extends Serializable {
             this.bendingX = MathUtils.interpolateDelta(original.x, this.x, bending) / 10;
             this.bendingY = MathUtils.interpolateDelta(original.y, this.y, bending) / 10;
         }
-        this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, bending, 0, 360) / 10;
+        this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 360) / 10;
         this.velX = MathUtils.interpolate(original.velX, this.velX, velocityBending);
         this.velY = MathUtils.interpolate(original.velY, this.velY, velocityBending);
 
