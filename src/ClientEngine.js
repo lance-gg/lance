@@ -110,8 +110,8 @@ class ClientEngine {
 
             this.networkMonitor.registerClient(this);
 
-            this.socket.once("connection", (a) => {
-                console.log("connection made", a);
+            this.socket.once("connect", () => {
+                console.log("connection made");
                 resolve();
             });
 
