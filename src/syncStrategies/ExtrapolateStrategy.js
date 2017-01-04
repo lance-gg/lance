@@ -184,10 +184,14 @@ class ExtrapolateStrategy extends SyncStrategy {
             if (objId >= this.gameEngine.options.clientIDSpace)
                 continue;
 
-            let obj = world.objects[objId];
             // TODO: using == instead of === because of string/number mismatch
-            let bending = (objId == this.clientEngine.playerId) ? this.options.localObjBending : this.options.remoteObjBending;
-            obj.bendToSavedState(bending, this.gameEngine.worldSettings);
+            //       These values should always be strings (which contain a number)
+            //       Reminder: the reason we use a string is that these
+            //       values are sometimes used as object keys
+            let obj = world.objects[objId];
+            let isLocal = (obj.playerId == this.clientEngine.playerId); // eslint-disable-line eqeqeq
+            let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
+            obj.bendToSavedState(bending, this.gameEngine.worldSettings, isLocal);
             if (obj.renderObject && obj.renderObject.visible === false) {
                 // TODO: visible is broken because renderObject is gone.
                 // visible should be a property of the object now, the Renderer
