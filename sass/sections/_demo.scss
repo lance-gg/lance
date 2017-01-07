@@ -1,0 +1,19 @@
+#demo{
+  border-bottom: 2px solid #68b2f8;
+
+  @include aspect-ratio(16, 5);
+
+  @include breakpoint-tablet() {
+    display: none;
+  }
+
+  @include breakpoint-mobile() {
+    display: none;
+  }
+
+  iframe{
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}

@@ -47,6 +47,7 @@
 	
 	__webpack_require__(1);
 	__webpack_require__(4);
+	var smoothScroll = __webpack_require__(5);
 	
 	var innerWidth = window.innerWidth;
 	
@@ -55,10 +56,11 @@
 	});
 	
 	document.addEventListener("DOMContentLoaded",function(){
+	
 	    if (innerWidth>500) {
 	        var waypoint = new Waypoint({
-	            element: document.getElementById('par1'),
-	            context: document.querySelector('.siteContainer'),
+	            element: document.getElementById('demo'),
+	            context: qs('.siteContainer'),
 	            offset: 73,
 	            handler: function (direction) {
 	                if (direction == "down") {
@@ -70,7 +72,32 @@
 	            }
 	        });
 	    }
+	    var myScroller = smoothScroll.createScroller(qs('.siteContainer'), null, qs('#outerMenu').offsetHeight);
+	    var linksArr = document.querySelectorAll('a[href*="#"]:not([href="#"])');
+	    for (var x=0; x<linksArr.length;x++){
+	        linksArr[x].addEventListener("click",function(e){
+	            if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+	                var target = qs(this.hash);
+	                myScroller.to(target);
+	                e.preventDefault();
+	            }
+	        });
+	    }
+	
+	
+	    if (!is_touch_device()){
+	        document.querySelector("#demo iframe").setAttribute("src", "http://spaaace.herokuapp.com");
+	    }
 	});
+	
+	function qs(selector){
+	    return document.querySelector(selector);
+	}
+	
+	function is_touch_device() {
+	    return 'ontouchstart' in window        // works on most browsers
+	        || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+	};
 
 /***/ },
 /* 1 */
@@ -102,7 +129,7 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	module.exports = "@media (min-width: 1281px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    max-width: 1366px;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\n@media (min-width: 501px) and (max-width: 1280px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 74.35897%;\n      margin: 0 auto;\n      padding: 2rem 0; } }\n\n@media (max-width: 500px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\nsection {\n  position: relative;\n  width: 100%;\n  z-index: 5; }\n  section .content h3 {\n    font-size: 2.5rem;\n    font-weight: 100;\n    text-align: center;\n    display: flex;\n    align-items: stretch;\n    justify-content: center; }\n    section .content h3:before, section .content h3:after {\n      content: ' ';\n      display: inline-block;\n      flex: 1;\n      background-image: url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox=%220 0 20 48%22%3E%0A %3Crect width=%2248%22 height=%2248%22 stroke=%22%23FFF%22 fill=%22none%22 x=%225%22 y=%220%22 %2F%3E%0A%3C%2Fsvg%3E%0A\"), url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width=%221000%22 viewBox=%220 0 1000 10%22%3E%0A %3Crect width=%221000%22 height=%221%22 fill=%22%23FFF%22 y=%224%22 %2F%3E%0A%3C%2Fsvg%3E%0A\");\n      background-repeat: no-repeat, no-repeat;\n      background-position: center right, right 14px center;\n      background-size: auto, auto;\n      margin: 0 1rem; }\n    section .content h3:after {\n      transform: scale(-1, 1); }\n  section .content a {\n    transition: all 0.1s ease-in;\n    color: #68b2f8; }\n    section .content a:hover {\n      color: #506ee5; }\n\n.parallax {\n  perspective: 3px;\n  height: 100vh;\n  overflow-x: hidden;\n  overflow-y: auto;\n  perspective-origin-x: 100%; }\n\n.parallax__layer {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  transform-origin-x: 100%; }\n\n.parallax__group {\n  position: relative;\n  transform-style: preserve-3d; }\n\n.parallax__layer--base {\n  transform: translateZ(0); }\n\n.parallax__layer--back {\n  transform: translateZ(-1px); }\n\nhtml, body {\n  padding: 0;\n  margin: 0;\n  background: #1d0c24;\n  color: #fff;\n  text-align: center;\n  font-family: \"proxima-nova\", sans-serif; }\n\n#splash {\n  background-image: url(images/splash_bg.png), url(images/page_bg_black.png);\n  background-repeat: no-repeat, repeat;\n  background-position: center, center;\n  background-size: cover, auto;\n  z-index: 15;\n  padding-bottom: 72px; }\n  @media (min-width: 1281px) {\n    #splash {\n      padding-top: 10rem; } }\n  @media (max-width: 500px) {\n    #splash {\n      padding-top: 0; }\n      #splash .content {\n        padding: 0; } }\n  #splash h1 {\n    position: relative;\n    background-image: url(images/splash_incheonlogo.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    height: 16rem;\n    width: 100%;\n    margin: 0 auto;\n    z-index: 10; }\n    @media (max-width: 500px) {\n      #splash h1 {\n        background-size: 150%; } }\n  #splash h3:before {\n    display: none; }\n  #splash h3:after {\n    display: none; }\n  #splash .titleContainer {\n    clear: both;\n    position: relative; }\n  #splash h2 {\n    position: absolute;\n    top: 4rem;\n    right: 10%;\n    z-index: 11;\n    background-image: url(images/splash_beta.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    width: 23.72881%;\n    margin: 0;\n    height: 14rem; }\n    @media (max-width: 500px) {\n      #splash h2 {\n        top: 3rem;\n        right: 5%; } }\n  #splash h3 {\n    font-weight: 100;\n    font-size: 2.5rem;\n    margin: -3rem auto 2rem auto; }\n    @media (max-width: 500px) {\n      #splash h3 {\n        font-size: 2rem; } }\n  #splash .description {\n    width: 57.62712%;\n    margin: 1rem auto;\n    font-weight: 100;\n    font-size: 1.1rem;\n    line-height: 1.6rem;\n    text-align: justify; }\n    @media (max-width: 500px) {\n      #splash .description {\n        width: 100%;\n        padding: 1rem;\n        box-sizing: border-box; } }\n  #splash .ship1 {\n    transform: translateZ(-1px) scaleX(1) scaleY(1);\n    height: 13vw;\n    width: 13vw;\n    position: absolute;\n    top: -21vh;\n    left: 20%;\n    z-index: 1;\n    background-image: url(images/splash_ship1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    @media (max-width: 500px) {\n      #splash .ship1 {\n        display: none; } }\n  #splash .ship2 {\n    transform: translateZ(1px) scaleX(0.5) scaleY(0.5);\n    height: 20vw;\n    width: 20vw;\n    position: absolute;\n    bottom: -10%;\n    right: 19%;\n    z-index: 20;\n    background-image: url(images/splash_ship2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    @media (max-width: 500px) {\n      #splash .ship2 {\n        display: none; } }\n  #splash .ctaContainer {\n    position: relative;\n    background-color: rgba(104, 178, 248, 0.2);\n    display: inline-block;\n    padding: 0.2rem 1.8rem 0.1rem 1.8rem;\n    margin: 2rem auto;\n    font-size: 1.2rem;\n    transition: all 0.1s ease-in; }\n    #splash .ctaContainer:before {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      left: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      pointer-events: none; }\n    #splash .ctaContainer:after {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      right: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      transform: scaleX(-1);\n      pointer-events: none; }\n    #splash .ctaContainer a {\n      width: 100%;\n      padding: 0.2rem 0.5rem;\n      color: #fff;\n      transition: all 0.1s ease-in; }\n    #splash .ctaContainer:hover {\n      background: rgba(104, 178, 248, 0.4); }\n      #splash .ctaContainer:hover a {\n        padding: 0.2rem 0.8rem; }\n\n#innerMenu {\n  position: absolute;\n  background-image: -owg-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -webkit-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -moz-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -o-linear-gradient(top, transparent 0%, black 100%);\n  background-image: linear-gradient(top, transparent 0%, black 100%);\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  z-index: 50; }\n\n#innerMenu, #outerMenu {\n  border-bottom: 2px solid #68b2f8;\n  padding-bottom: 1rem;\n  z-index: 10; }\n  #innerMenu ul, #outerMenu ul {\n    padding-left: 0; }\n    #innerMenu ul li, #outerMenu ul li {\n      position: relative;\n      display: inline-block;\n      margin-right: 40px; }\n      #innerMenu ul li:after, #outerMenu ul li:after {\n        content: \"\";\n        position: absolute;\n        right: -57px;\n        top: -32px;\n        width: 71px;\n        height: 83px;\n        vertical-align: middle;\n        background-image: url(images/divider.png);\n        background-repeat: no-repeat;\n        background-position: center;\n        background-size: cover;\n        pointer-events: none;\n        transition: all 0.5s ease-in; }\n    #innerMenu ul li:last-child, #outerMenu ul li:last-child {\n      margin-right: 0; }\n      #innerMenu ul li:last-child:after, #outerMenu ul li:last-child:after {\n        opacity: 0;\n        top: -50px;\n        right: -130px;\n        background-image: url(images/splash_ship2.png);\n        width: 80px;\n        height: 80px;\n        transform: translateY(-150px); }\n  #innerMenu a, #outerMenu a {\n    transition: all 0.1s ease-in;\n    color: #ffffff; }\n    #innerMenu a:hover, #outerMenu a:hover {\n      color: #68b2f8; }\n\n#outerMenu {\n  position: fixed;\n  width: calc(100% - 18px);\n  top: 0;\n  z-index: 100;\n  opacity: 0;\n  pointer-events: none;\n  background: black;\n  margin-top: 0px;\n  padding: 0.5rem 0; }\n  @media (max-width: 500px) {\n    #outerMenu {\n      display: none; } }\n\n.fixedMenu #outerMenu {\n  opacity: 1;\n  pointer-events: all; }\n  .fixedMenu #outerMenu ul li:last-child:after {\n    transform: translateY(0px);\n    opacity: 1; }\n\na {\n  color: #fff;\n  text-decoration: none; }\n\n#par1 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1; }\n  #par1 .parallax__layer--back {\n    width: 100vw;\n    height: 90vh;\n    background-image: url(images/game1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.6) scaleY(1.6) translateY(0); }\n\n#par2 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1; }\n  #par2 .parallax__layer--back {\n    width: 100vw;\n    height: 70vh;\n    background-image: url(images/game2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.5) scaleY(1.5) translateY(0vh);\n    z-index: 4; }\n\n#features {\n  background: #751a62; }\n  #features .content {\n    box-sizing: border-box;\n    width: 66.10169%;\n    margin: 0 auto; }\n    @media (max-width: 500px) {\n      #features .content {\n        width: 205.26316%; } }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .content {\n        width: 100%; } }\n  #features .featureContainer {\n    padding-left: 15.25424%; }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .featureContainer {\n        padding-top: 2rem; } }\n    @media (max-width: 500px) {\n      #features .featureContainer {\n        padding: 0; } }\n  #features .feature {\n    position: relative;\n    padding-left: 6.77966%;\n    width: 32.20339%;\n    float: left;\n    margin-right: 1.69492%;\n    text-align: left;\n    margin-bottom: 4rem;\n    padding-right: 1rem; }\n    @media (max-width: 500px) {\n      #features .feature {\n        width: 73.68421%;\n        float: left;\n        margin-right: 5.26316%;\n        padding-left: 21.05263%;\n        margin: 2rem 0rem; } }\n  #features .title {\n    font-weight: 700;\n    font-size: 1.3rem;\n    padding-bottom: 0.3rem; }\n  #features .text {\n    font-size: 0.9rem;\n    text-align: j; }\n  #features .feature:before {\n    content: \"\";\n    position: absolute;\n    left: 0;\n    top: 0.3rem;\n    width: 3.5rem;\n    height: 3.5rem;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n  #features .feature.gameAgnostic:before {\n    background-image: url(images/icons/phantom.svg); }\n  #features .feature.physics:before {\n    background-image: url(images/icons/rpg-game.svg);\n    left: 0.4rem; }\n  #features .feature.binary:before {\n    background-image: url(images/icons/logic-game.svg);\n    left: 0.2rem; }\n  #features .feature.lag:before {\n    background-image: url(images/icons/online-game.svg); }\n  #features .feature.architecture:before {\n    background-image: url(images/icons/arcade.svg); }\n  #features .feature.opensource:before {\n    background-image: url(images/icons/multiplayer.svg); }\n  #features .shot {\n    transform: translateZ(2px) scaleX(1) scaleY(1);\n    height: 20vw;\n    width: 10vw;\n    position: absolute;\n    top: 0;\n    left: 33%;\n    z-index: 20;\n    background-image: url(images/shot1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n\n.bottom {\n  background-image: url(images/page_bg.png); }\n\n#quickstart {\n  padding-bottom: 5rem; }\n  @media (max-width: 500px) {\n    #quickstart {\n      display: none; } }\n  #quickstart .instructions {\n    clear: both;\n    width: 49.15254%;\n    margin: 0 auto;\n    text-align: left; }\n  #quickstart pre {\n    background: #1d0c20;\n    border: 0.2rem solid #68b2f8;\n    padding: 1rem;\n    font-family: monospace; }\n  #quickstart ol {\n    padding: 0; }\n\n#help {\n  padding-bottom: 5rem; }\n  @media (max-width: 500px) {\n    #help {\n      display: none; } }\n  #help .helpContainer {\n    width: 66.10169%;\n    margin: 0 auto;\n    padding: 2rem 0;\n    overflow: hidden;\n    *zoom: 1; }\n  #help a {\n    position: relative;\n    display: block;\n    height: 7rem;\n    width: 23.07692%;\n    float: left;\n    margin-right: 2.5641%;\n    text-align: center;\n    color: #fff;\n    pointer-events: all; }\n    #help a:hover {\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n    #help a:before {\n      position: absolute;\n      top: 2.5rem;\n      left: 4rem;\n      font-size: 5rem; }\n  #help a:last-child {\n    width: 23.07692%;\n    float: right;\n    margin-right: 0; }\n\n#about .aboutContainer {\n  width: 66.10169%;\n  margin: 0 auto;\n  padding: 2rem 0;\n  overflow: hidden;\n  *zoom: 1; }\n  @media (max-width: 500px) {\n    #about .aboutContainer {\n      width: 100%; } }\n  #about .aboutContainer .person {\n    width: 48.71795%;\n    float: left;\n    margin-right: 2.5641%;\n    position: relative;\n    position: relative;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    #about .aboutContainer .person:before {\n      display: block;\n      content: \"\";\n      width: 100%;\n      padding-top: 70.81218%; }\n    #about .aboutContainer .person > .content {\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n    #about .aboutContainer .person .name {\n      position: absolute;\n      left: 64%;\n      top: 16%;\n      font-size: 1.1rem; }\n    #about .aboutContainer .person .social {\n      position: absolute;\n      left: 65%;\n      top: 27%;\n      font-size: 2rem; }\n    #about .aboutContainer .person .social a {\n      color: #fff; }\n    #about .aboutContainer .person .social a:hover {\n      color: #fff;\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n  #about .aboutContainer .person:nth-child(even) {\n    width: 48.71795%;\n    float: right;\n    margin-right: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person:nth-child(even) {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n  #about .aboutContainer .person.opher {\n    background-image: url(images/opher.png); }\n  #about .aboutContainer .person.gary {\n    background-image: url(images/gary.png); }\n\n#footer {\n  height: 60vw;\n  background-image: url(images/footer_bg.png);\n  background-repeat: no-repeat;\n  background-position: top;\n  background-size: cover; }\n"
+	module.exports = "@media (min-width: 1281px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    max-width: 1366px;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\n@media (min-width: 501px) and (max-width: 1280px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 74.35897%;\n      margin: 0 auto;\n      padding: 2rem 0; } }\n\n@media (max-width: 500px) {\n  section .content {\n    max-width: 100%;\n    margin-left: auto;\n    margin-right: auto;\n    padding: 1rem; }\n    section .content:after {\n      content: \" \";\n      display: block;\n      clear: both; }\n    section .content h3 {\n      width: 100%;\n      float: left;\n      margin-left: 0;\n      margin-right: 0; } }\n\nsection {\n  position: relative;\n  width: 100%;\n  z-index: 5; }\n  section .content h3 {\n    font-size: 2.5rem;\n    font-weight: 100;\n    text-align: center;\n    display: flex;\n    align-items: stretch;\n    justify-content: center; }\n    section .content h3:before, section .content h3:after {\n      content: ' ';\n      display: inline-block;\n      flex: 1;\n      background-image: url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox=%220 0 20 48%22%3E%0A %3Crect width=%2248%22 height=%2248%22 stroke=%22%23FFF%22 fill=%22none%22 x=%225%22 y=%220%22 %2F%3E%0A%3C%2Fsvg%3E%0A\"), url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width=%221000%22 viewBox=%220 0 1000 10%22%3E%0A %3Crect width=%221000%22 height=%221%22 fill=%22%23FFF%22 y=%224%22 %2F%3E%0A%3C%2Fsvg%3E%0A\");\n      background-repeat: no-repeat, no-repeat;\n      background-position: center right, right 14px center;\n      background-size: auto, auto;\n      margin: 0 1rem; }\n    section .content h3:after {\n      transform: scale(-1, 1); }\n  section .content a {\n    transition: all 0.1s ease-in;\n    color: #68b2f8; }\n    section .content a:hover {\n      color: #506ee5; }\n\n.parallax {\n  perspective: 3px;\n  height: 100vh;\n  overflow-x: hidden;\n  overflow-y: auto;\n  perspective-origin-x: 100%; }\n\n.parallax__layer {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  transform-origin-x: 100%; }\n\n.parallax__group {\n  position: relative;\n  transform-style: preserve-3d; }\n\n.parallax__layer--base {\n  transform: translateZ(0); }\n\n.parallax__layer--back {\n  transform: translateZ(-1px); }\n\nhtml, body {\n  padding: 0;\n  margin: 0;\n  background: #1d0c24;\n  color: #fff;\n  text-align: center;\n  font-family: \"proxima-nova\", sans-serif; }\n\n#splash {\n  background-image: url(images/splash_bg.png), url(images/page_bg_black.png);\n  background-repeat: no-repeat, repeat;\n  background-position: center, center;\n  background-size: cover, auto;\n  z-index: 15;\n  padding-bottom: 72px; }\n  @media (min-width: 1281px) {\n    #splash {\n      padding-top: 10rem; } }\n  @media (max-width: 500px) {\n    #splash {\n      padding-top: 0; }\n      #splash .content {\n        padding: 0; } }\n  #splash h1 {\n    position: relative;\n    background-image: url(images/splash_incheonlogo.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    height: 16rem;\n    width: 100%;\n    margin: 0 auto;\n    z-index: 10; }\n    @media (max-width: 500px) {\n      #splash h1 {\n        background-size: 150%; } }\n  #splash h3:before {\n    display: none; }\n  #splash h3:after {\n    display: none; }\n  #splash .titleContainer {\n    clear: both;\n    position: relative; }\n  #splash h2 {\n    position: absolute;\n    top: 4rem;\n    right: 10%;\n    z-index: 11;\n    background-image: url(images/splash_beta.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain;\n    text-indent: -1000rem;\n    overflow: hidden;\n    width: 23.72881%;\n    margin: 0;\n    height: 14rem; }\n    @media (max-width: 500px) {\n      #splash h2 {\n        top: 3rem;\n        right: 5%; } }\n  #splash h3 {\n    font-weight: 100;\n    font-size: 2.5rem;\n    margin: -3rem auto 2rem auto; }\n    @media (max-width: 500px) {\n      #splash h3 {\n        font-size: 2rem; } }\n  #splash .description {\n    width: 57.62712%;\n    margin: 1rem auto;\n    font-weight: 100;\n    font-size: 1.1rem;\n    line-height: 1.6rem;\n    text-align: justify; }\n    @media (max-width: 500px) {\n      #splash .description {\n        width: 100%;\n        padding: 1rem;\n        box-sizing: border-box; } }\n  #splash .ship1 {\n    transform: translateZ(-1px) scaleX(1) scaleY(1);\n    height: 13vw;\n    width: 13vw;\n    position: absolute;\n    top: -21vh;\n    left: 20%;\n    z-index: 1;\n    background-image: url(images/splash_ship1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    @media (max-width: 500px) {\n      #splash .ship1 {\n        display: none; } }\n  #splash .ship2 {\n    transform: translateZ(1px) scaleX(0.5) scaleY(0.5);\n    height: 20vw;\n    width: 20vw;\n    position: absolute;\n    bottom: -10%;\n    right: 19%;\n    z-index: 20;\n    background-image: url(images/splash_ship2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    @media (max-width: 500px) {\n      #splash .ship2 {\n        display: none; } }\n  #splash .ctaContainer {\n    position: relative;\n    background-color: rgba(104, 178, 248, 0.2);\n    display: inline-block;\n    padding: 0.2rem 1.8rem 0.1rem 1.8rem;\n    margin: 2rem auto;\n    font-size: 1.2rem;\n    transition: all 0.1s ease-in;\n    margin-right: 1.5rem; }\n    #splash .ctaContainer:last-child {\n      margin-right: 0; }\n    #splash .ctaContainer:before {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      left: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      pointer-events: none; }\n    #splash .ctaContainer:after {\n      content: \"\";\n      position: absolute;\n      z-index: 10;\n      right: -3rem;\n      top: -2.4rem;\n      width: 6rem;\n      height: 7rem;\n      background-image: url(images/cta_glow_left.png);\n      background-repeat: no-repeat;\n      background-position: top;\n      background-size: auto;\n      transform: scaleX(-1);\n      pointer-events: none; }\n    #splash .ctaContainer a {\n      width: 100%;\n      padding: 0.2rem 0.5rem;\n      color: #fff;\n      transition: all 0.1s ease-in; }\n    #splash .ctaContainer:hover {\n      background: rgba(104, 178, 248, 0.4); }\n      #splash .ctaContainer:hover a {\n        padding: 0.2rem 0.8rem; }\n\n#innerMenu {\n  position: absolute;\n  background-image: -owg-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -webkit-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -moz-linear-gradient(top, transparent 0%, black 100%);\n  background-image: -o-linear-gradient(top, transparent 0%, black 100%);\n  background-image: linear-gradient(top, transparent 0%, black 100%);\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  z-index: 50; }\n\n#innerMenu, #outerMenu {\n  border-bottom: 2px solid #68b2f8;\n  padding-bottom: 1rem;\n  z-index: 10; }\n  #innerMenu ul, #outerMenu ul {\n    padding-left: 0; }\n    #innerMenu ul li, #outerMenu ul li {\n      position: relative;\n      display: inline-block;\n      margin-right: 40px; }\n      #innerMenu ul li:after, #outerMenu ul li:after {\n        content: \"\";\n        position: absolute;\n        right: -57px;\n        top: -32px;\n        width: 71px;\n        height: 83px;\n        vertical-align: middle;\n        background-image: url(images/divider.png);\n        background-repeat: no-repeat;\n        background-position: center;\n        background-size: cover;\n        pointer-events: none;\n        transition: all 0.5s ease-in; }\n    #innerMenu ul li:last-child, #outerMenu ul li:last-child {\n      margin-right: 0; }\n      #innerMenu ul li:last-child:after, #outerMenu ul li:last-child:after {\n        opacity: 0;\n        top: -50px;\n        right: -130px;\n        background-image: url(images/splash_ship2.png);\n        width: 80px;\n        height: 80px;\n        transform: translateY(-150px); }\n  #innerMenu a, #outerMenu a {\n    transition: all 0.1s ease-in;\n    color: #ffffff; }\n    #innerMenu a:hover, #outerMenu a:hover {\n      color: #68b2f8; }\n\n#outerMenu {\n  position: fixed;\n  width: calc(100% - 18px);\n  top: 0;\n  z-index: 100;\n  opacity: 0;\n  pointer-events: none;\n  background: black;\n  margin-top: 0px;\n  padding: 0.5rem 0; }\n  @media (max-width: 500px) {\n    #outerMenu {\n      display: none; } }\n\n.fixedMenu #outerMenu {\n  opacity: 1;\n  pointer-events: all; }\n  .fixedMenu #outerMenu ul li:last-child:after {\n    transform: translateY(0px);\n    opacity: 1; }\n\na {\n  color: #fff;\n  text-decoration: none; }\n\n#par1 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1;\n  display: none; }\n  #par1 .parallax__layer--back {\n    width: 100vw;\n    height: 90vh;\n    background-image: url(images/game1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.6) scaleY(1.6) translateY(0); }\n\n#par2 {\n  height: 50vh;\n  width: 100%;\n  z-index: -1; }\n  #par2 .parallax__layer--back {\n    width: 100vw;\n    height: 70vh;\n    background-image: url(images/game2.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: cover;\n    transform: translateZ(-1px) scaleX(1.5) scaleY(1.5) translateY(0vh);\n    z-index: 4; }\n\n#demo {\n  border-bottom: 2px solid #68b2f8;\n  position: relative; }\n  #demo:before {\n    display: block;\n    content: \"\";\n    width: 100%;\n    padding-top: 31.25%; }\n  #demo > .aspect_content {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n  @media (min-width: 501px) and (max-width: 1280px) {\n    #demo {\n      display: none; } }\n  @media (max-width: 500px) {\n    #demo {\n      display: none; } }\n  #demo iframe {\n    width: 100%;\n    height: 100%;\n    border: 0; }\n\n#features {\n  background: #751a62; }\n  #features .content {\n    box-sizing: border-box;\n    width: 66.10169%;\n    margin: 0 auto; }\n    @media (max-width: 500px) {\n      #features .content {\n        width: 205.26316%; } }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .content {\n        width: 100%; } }\n  #features .featureContainer {\n    padding-left: 15.25424%; }\n    @media (min-width: 501px) and (max-width: 1280px) {\n      #features .featureContainer {\n        padding-top: 2rem; } }\n    @media (max-width: 500px) {\n      #features .featureContainer {\n        padding: 0; } }\n  #features .feature {\n    position: relative;\n    padding-left: 6.77966%;\n    width: 32.20339%;\n    float: left;\n    margin-right: 1.69492%;\n    text-align: left;\n    margin-bottom: 4rem;\n    padding-right: 1rem; }\n    @media (max-width: 500px) {\n      #features .feature {\n        width: 73.68421%;\n        float: left;\n        margin-right: 5.26316%;\n        padding-left: 21.05263%;\n        margin: 2rem 0rem; } }\n  #features .title {\n    font-weight: 700;\n    font-size: 1.3rem;\n    padding-bottom: 0.3rem; }\n  #features .text {\n    font-size: 0.9rem;\n    text-align: j; }\n  #features .feature:before {\n    content: \"\";\n    position: absolute;\n    left: 0;\n    top: 0.3rem;\n    width: 3.5rem;\n    height: 3.5rem;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n  #features .feature.gameAgnostic:before {\n    background-image: url(images/icons/phantom.svg); }\n  #features .feature.physics:before {\n    background-image: url(images/icons/rpg-game.svg);\n    left: 0.4rem; }\n  #features .feature.binary:before {\n    background-image: url(images/icons/logic-game.svg);\n    left: 0.2rem; }\n  #features .feature.lag:before {\n    background-image: url(images/icons/online-game.svg); }\n  #features .feature.architecture:before {\n    background-image: url(images/icons/arcade.svg); }\n  #features .feature.opensource:before {\n    background-image: url(images/icons/multiplayer.svg); }\n  #features .shot {\n    transform: translateZ(2px) scaleX(1) scaleY(1);\n    height: 20vw;\n    width: 10vw;\n    position: absolute;\n    top: 0;\n    left: 33%;\n    z-index: 20;\n    background-image: url(images/shot1.png);\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n\n.bottom {\n  background-image: url(images/page_bg.png); }\n\n#quickstart {\n  padding-bottom: 5rem; }\n  #quickstart .instructions {\n    clear: both;\n    width: 49.15254%;\n    margin: 0 auto;\n    text-align: center; }\n  #quickstart pre {\n    background: #1d0c20;\n    border: 0.2rem solid #68b2f8;\n    padding: 1rem;\n    font-family: monospace; }\n  #quickstart ol {\n    padding: 0;\n    text-align: left; }\n\n#help {\n  padding-bottom: 5rem; }\n  @media (max-width: 500px) {\n    #help {\n      display: none; } }\n  #help .helpContainer {\n    width: 66.10169%;\n    margin: 0 auto;\n    padding: 2rem 0;\n    overflow: hidden;\n    *zoom: 1; }\n  #help a {\n    position: relative;\n    display: block;\n    height: 7rem;\n    width: 23.07692%;\n    float: left;\n    margin-right: 2.5641%;\n    text-align: center;\n    color: #fff;\n    pointer-events: all; }\n    #help a:hover {\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n    #help a:before {\n      position: absolute;\n      top: 2.5rem;\n      left: 4rem;\n      font-size: 5rem; }\n  #help a:last-child {\n    width: 23.07692%;\n    float: right;\n    margin-right: 0; }\n\n#about .aboutContainer {\n  width: 66.10169%;\n  margin: 0 auto;\n  padding: 2rem 0;\n  overflow: hidden;\n  *zoom: 1; }\n  @media (max-width: 500px) {\n    #about .aboutContainer {\n      width: 100%; } }\n  #about .aboutContainer .person {\n    width: 48.71795%;\n    float: left;\n    margin-right: 2.5641%;\n    position: relative;\n    position: relative;\n    background-repeat: no-repeat;\n    background-position: center;\n    background-size: contain; }\n    #about .aboutContainer .person:before {\n      display: block;\n      content: \"\";\n      width: 100%;\n      padding-top: 70.81218%; }\n    #about .aboutContainer .person > .aspect_content {\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n    #about .aboutContainer .person .name {\n      position: absolute;\n      left: 64%;\n      top: 16%;\n      font-size: 1.1rem; }\n    #about .aboutContainer .person .social {\n      position: absolute;\n      left: 65%;\n      top: 27%;\n      font-size: 2rem; }\n    #about .aboutContainer .person .social a {\n      color: #fff; }\n    #about .aboutContainer .person .social a:hover {\n      color: #fff;\n      text-shadow: #68b2f8 0rem 0rem 1rem; }\n  #about .aboutContainer .person:nth-child(even) {\n    width: 48.71795%;\n    float: right;\n    margin-right: 0; }\n    @media (max-width: 500px) {\n      #about .aboutContainer .person:nth-child(even) {\n        width: 100%;\n        float: left;\n        margin-left: 0;\n        margin-right: 0; } }\n  #about .aboutContainer .person.opher {\n    background-image: url(images/opher.png); }\n  #about .aboutContainer .person.gary {\n    background-image: url(images/gary.png); }\n\n#footer {\n  height: 60vw;\n  background-image: url(images/footer_bg.png);\n  background-repeat: no-repeat;\n  background-position: top;\n  background-size: cover; }\n"
 
 /***/ },
 /* 3 */
@@ -1118,6 +1145,313 @@
 	  Waypoint.Adapter = NoFrameworkAdapter
 	}())
 	;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * Zenscroll 3.3.0
+	 * https://github.com/zengabor/zenscroll/
+	 *
+	 * Copyright 2015–2016 Gabor Lenard
+	 *
+	 * This is free and unencumbered software released into the public domain.
+	 * 
+	 * Anyone is free to copy, modify, publish, use, compile, sell, or
+	 * distribute this software, either in source code form or as a compiled
+	 * binary, for any purpose, commercial or non-commercial, and by any
+	 * means.
+	 * 
+	 * In jurisdictions that recognize copyright laws, the author or authors
+	 * of this software dedicate any and all copyright interest in the
+	 * software to the public domain. We make this dedication for the benefit
+	 * of the public at large and to the detriment of our heirs and
+	 * successors. We intend this dedication to be an overt act of
+	 * relinquishment in perpetuity of all present and future rights to this
+	 * software under copyright law.
+	 * 
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	 * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+	 * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+	 * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+	 * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+	 * OTHER DEALINGS IN THE SOFTWARE.
+	 * 
+	 * For more information, please refer to <http://unlicense.org>
+	 *
+	 */
+	
+	/*jshint devel:true, asi:true */
+	
+	/*global define, module */
+	
+	
+	(function (root, factory) {
+		if (true) {
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory()), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+		} else if (typeof module === "object" && module.exports) {
+			module.exports = factory()
+		} else {
+			root.zenscroll = factory()
+		}
+	}(this, function () {
+		"use strict"
+		
+		// Detect if the browser already supports native smooth scrolling (e.g., Firefox 36+ and Chrome 49+) and it is enabled:
+		var isNativeSmoothScrollEnabledOn = function (elem) {
+			return ("getComputedStyle" in window) &&
+				window.getComputedStyle(elem)["scroll-behavior"] === "smooth"
+		}
+	
+		// Exit if it’s not a browser environment:
+		if (typeof window === "undefined" || !("document" in window)) {
+			return {}
+		}
+	
+		var createScroller = function (scrollContainer, defaultDuration, edgeOffset) {
+	
+			defaultDuration = defaultDuration || 999 //ms
+			if (!edgeOffset && edgeOffset !== 0) {
+				// When scrolling, this amount of distance is kept from the edges of the scrollContainer:
+				edgeOffset = 9 //px
+			}
+	
+			var scrollTimeoutId
+			var setScrollTimeoutId = function (newValue) {
+				scrollTimeoutId = newValue
+			}
+			var docElem = document.documentElement
+			
+			var getScrollTop = function () {
+				if (scrollContainer) {
+					return scrollContainer.scrollTop
+				} else {
+					return window.scrollY || docElem.scrollTop
+				}
+			}
+	
+			var getViewHeight = function () {
+				if (scrollContainer) {
+					return Math.min(scrollContainer.offsetHeight, window.innerHeight)
+				} else {
+					return window.innerHeight || docElem.clientHeight
+				}
+			}
+	
+			var getRelativeTopOf = function (elem) {
+				if (scrollContainer) {
+					return elem.offsetTop
+				} else {
+					return elem.getBoundingClientRect().top + getScrollTop() - docElem.offsetTop
+				}
+			}
+	
+			/**
+			 * Immediately stops the current smooth scroll operation
+			 */
+			var stopScroll = function () {
+				clearTimeout(scrollTimeoutId)
+				setScrollTimeoutId(0)
+			}
+	
+			/**
+			 * Scrolls to a specific vertical position in the document.
+			 *
+			 * @param {endY} The vertical position within the document.
+			 * @param {duration} Optionally the duration of the scroll operation.
+			 *        If 0 or not provided it is automatically calculated based on the 
+			 *        distance and the default duration.
+			 * @param {onDone} Callback function to be invoken once the scroll finishes.
+			 */
+			var scrollToY = function (endY, duration, onDone) {
+				stopScroll()
+				if (isNativeSmoothScrollEnabledOn(scrollContainer ? scrollContainer : document.body)) {
+					(scrollContainer || window).scrollTo(0, endY)
+					if (onDone) {
+						onDone()
+					}
+				} else {
+					var startY = getScrollTop()
+					var distance = Math.max(endY,0) - startY
+					duration = duration || Math.min(Math.abs(distance), defaultDuration)
+					var startTime = new Date().getTime();
+					(function loopScroll() {
+						setScrollTimeoutId(setTimeout(function () {
+							var p = Math.min((new Date().getTime() - startTime) / duration, 1) // percentage
+							var y = Math.max(Math.floor(startY + distance*(p < 0.5 ? 2*p*p : p*(4 - p*2)-1)), 0)
+							if (scrollContainer) {
+								scrollContainer.scrollTop = y
+							} else {
+								window.scrollTo(0, y)
+							}
+							if (p < 1 && (getViewHeight() + y) < (scrollContainer || docElem).scrollHeight) {
+								loopScroll()
+							} else {
+								setTimeout(stopScroll, 99) // with cooldown time
+								if (onDone) {
+									onDone()
+								}
+							}
+						}, 9))
+					})()
+				}
+			}
+	
+			/**
+			 * Scrolls to the top of a specific element.
+			 *
+			 * @param {elem} The element.
+			 * @param {duration} Optionally the duration of the scroll operation.
+			 *        A value of 0 is ignored.
+			 * @param {onDone} Callback function to be invoken once the scroll finishes.
+			 * @returns {endY} The new vertical scoll position that will be valid once the scroll finishes.
+			 */
+			var scrollToElem = function (elem, duration, onDone) {
+				var endY = getRelativeTopOf(elem) - edgeOffset
+				scrollToY(endY, duration, onDone)
+				return endY
+			}
+	
+			/**
+			 * Scrolls an element into view if necessary.
+			 *
+			 * @param {elem} The element.
+			 * @param {duration} Optionally the duration of the scroll operation.
+			 *        A value of 0 is ignored.
+			 * @param {onDone} Callback function to be invoken once the scroll finishes.
+			 */
+			var scrollIntoView = function (elem, duration, onDone) {
+				var elemHeight = elem.getBoundingClientRect().height
+				var elemTop = getRelativeTopOf(elem)
+				var elemBottom = elemTop + elemHeight
+				var containerHeight = getViewHeight()
+				var containerTop = getScrollTop()
+				var containerBottom = containerTop + containerHeight
+				if ((elemTop - edgeOffset) < containerTop || (elemHeight + edgeOffset) > containerHeight) {
+					// Element is clipped at top or is higher than screen.
+					scrollToElem(elem, duration, onDone)
+				} else if ((elemBottom + edgeOffset) > containerBottom) {
+					// Element is clipped at the bottom.
+					scrollToY(elemBottom - containerHeight + edgeOffset, duration, onDone)
+				} else if (onDone) {
+					onDone()
+				}
+			}
+	
+			/**
+			 * Scrolls to the center of an element.
+			 *
+			 * @param {elem} The element.
+			 * @param {duration} Optionally the duration of the scroll operation.
+			 * @param {offset} Optionally the offset of the top of the element from the center of the screen.
+			 *        A value of 0 is ignored.
+			 * @param {onDone} Callback function to be invoken once the scroll finishes.
+			 */
+			var scrollToCenterOf = function (elem, duration, offset, onDone) {
+				scrollToY(
+					Math.max(
+						getRelativeTopOf(elem) - getViewHeight()/2 + (offset || elem.getBoundingClientRect().height/2), 
+						0
+					), 
+					duration,
+					onDone
+				)
+			}
+	
+			/**
+			 * Changes default settings for this scroller.
+			 *
+			 * @param {newDefaultDuration} New value for default duration, used for each scroll method by default.
+			 *        Ignored if 0 or falsy.
+			 * @param {newEdgeOffset} New value for the edge offset, used by each scroll method by default.
+			 */
+			var setup = function (newDefaultDuration, newEdgeOffset) {
+				if (newDefaultDuration) {
+					defaultDuration = newDefaultDuration
+				}
+				if (newEdgeOffset === 0 || newEdgeOffset) {
+					edgeOffset = newEdgeOffset
+				}
+			}
+	
+			return {
+				setup: setup,
+				to: scrollToElem,
+				toY: scrollToY,
+				intoView: scrollIntoView,
+				center: scrollToCenterOf,
+				stop: stopScroll,
+				moving: function () { return !!scrollTimeoutId },
+				getY: getScrollTop
+			}
+	
+		}
+	
+		// Create a scroller for the browser window, omitting parameters:
+		var defaultScroller = createScroller()
+	
+		// Create listeners for the documentElement only & exclude IE8-
+		if ("addEventListener" in window && !(isNativeSmoothScrollEnabledOn(document.body) || window.noZensmooth)) {
+			if ("scrollRestoration" in history) {
+				history.scrollRestoration = "manual"
+				window.addEventListener("popstate", function (event) {
+					if (event.state && "scrollY" in event.state) {
+						defaultScroller.toY(event.state.scrollY)
+					}
+				}, false)
+			}
+			var replaceUrl = function (hash, newY) {
+				try {
+					history.replaceState({scrollY:defaultScroller.getY()}, "") // remember the scroll position before scrolling
+					history.pushState({scrollY:newY}, "", window.location.href.split("#")[0] + hash) // remember the new scroll position (which will be after scrolling)
+				} catch (e) {
+					// To avoid the Security exception in Chrome when the page was opened via the file protocol, e.g., file://index.html
+				}
+			}
+			window.addEventListener("click", function (event) {
+				var anchor = event.target
+				while (anchor && anchor.tagName !== "A") {
+					anchor = anchor.parentNode
+				}
+				// Only handle links that were clicked with the primary button, without modifier keys:
+				if (!anchor || event.which !== 1 || event.shiftKey || event.metaKey || event.ctrlKey || event.altKey) {
+					return
+				}
+				var href = anchor.getAttribute("href") || ""
+				if (href.indexOf("#") === 0) {
+					if (href === "#") {
+						event.preventDefault()
+						defaultScroller.toY(0)
+						replaceUrl("", 0)
+					} else {
+						var targetId = anchor.hash.substring(1)
+						var targetElem = document.getElementById(targetId)
+						if (targetElem) {
+							event.preventDefault()
+							replaceUrl("#" + targetId, defaultScroller.to(targetElem))
+						}
+					}
+				}
+			}, false)
+		}
+	
+		return {
+			// Expose the "constructor" that can create a new scroller:
+			createScroller: createScroller,
+			// Surface the methods of the default scroller:
+			setup: defaultScroller.setup,
+			to: defaultScroller.to,
+			toY: defaultScroller.toY,
+			intoView: defaultScroller.intoView,
+			center: defaultScroller.center,
+			stop: defaultScroller.stop,
+			moving: defaultScroller.moving
+		}
+	
+	}));
+
 
 /***/ }
 /******/ ]);

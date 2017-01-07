@@ -1,8 +1,4 @@
 #quickstart{
-  @include breakpoint-mobile() {
-    display: none;
-  }
-
   padding-bottom: 5rem;
 
   .content{
@@ -12,7 +8,7 @@
     clear: both;
     width: span(6 of 12);
     margin: 0 auto;
-    text-align: left;
+    text-align: center;
   }
 
   pre{
@@ -24,5 +20,10 @@
 
   ol{
     padding: 0;
+    text-align: left;
+  }
+
+  img{
+    
   }
 }

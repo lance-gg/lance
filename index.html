@@ -19,12 +19,12 @@
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 
         <script>try{Typekit.load({ async: true });}catch(e){}</script>
-        <script src="dist_bundles/bundle.js"></script>
     </head>
     <body>
     <section id="outerMenu">
         <ul>
             <li><a href="#quickstart">Getting Started</a></li>
+            <li><a href="#demo">Demo</a></li>
             <li><a href="http://docs.incheon.gg">Docs & API</a></li>
             <li><a href="https://github.com/OpherV/Incheon">Github</a></li>
         </ul>
@@ -42,15 +42,20 @@
                         Incheon is a node based game server. Created to enable game developers to build real time online javascript multiplayer games without worrying about implementing net synchronisation code. It strives to provide buttery smooth experience for both developer and player regardless of lag.
                     </div>
                     <div class="ctaContainer"><a href="#quickstart">Get Started</a></div>
+                    <div class="ctaContainer"><a href="#demo">Demo</a></div>
                     <div class="ship2"></div>
                 </div>
                 <div id="innerMenu">
                     <ul>
                         <li><a href="#quickstart">Getting Started</a></li>
+                        <li><a href="#demo">Demo</a></li>
                         <li><a href="http://docs.incheon.gg">Docs & API</a></li>
                         <li><a href="https://github.com/OpherV/Incheon">Github</a></li>
                     </ul>
                 </div>
+            </section>
+            <section id="demo">
+                <div class="aspect_content"><iframe></iframe></div>
             </section>
             <section id="par1" class="parallax__group">
                 <div class="parallax__layer parallax__layer--back"></div>
@@ -108,7 +113,8 @@
 
                                 </li>
                             </ol>
-                            <p>Wonder where to start to building such a project yourself? Check out the <a href="">Getting Started</a> guide</p>
+                            <img src="images/netpong.gif">
+                            <p>Wonder where to start to building such a project yourself? Check out the <a href="http://docs.incheon.gg/">Getting Started</a> guide</p>
                         </div>
                     </div>
                 </section>
@@ -128,7 +134,7 @@
                         <h3>Brought to you by</h3>
                         <div class="aboutContainer">
                             <div class="person opher">
-                                <div class="content">
+                                <div class="aspect_content">
                                     <div class="name">Opher Vishnia</div>
                                     <div class="social">
                                         <a href="https://github.com/OpherV" class="icon-github"></a>
@@ -137,7 +143,7 @@
                                 </div>
                             </div>
                             <div class="person gary">
-                                <div class="content">
+                                <div class="aspect_content">
                                     <div class="name">Gary Weiss</div>
                                     <div class="social">
                                         <a href="https://github.com/namel" class="icon-github"></a>
@@ -163,5 +169,6 @@
             ga('send', 'pageview');
         </script>
 
+        <script src="dist_bundles/bundle.js"></script>
     </body>
 </html>

@@ -143,6 +143,9 @@
     margin: 2rem auto;
     font-size: 1.2rem;
     transition: all 0.1s ease-in;
+    margin-right: 1.5rem;
+
+    &:last-child {margin-right: 0};
 
     &:before{
       content: "";

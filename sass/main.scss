@@ -33,6 +33,9 @@ a {
   height: 50vh;
   width: 100%;
   z-index: -1;
+  display: none;
+
+
 
   .parallax__layer--back{
     width: 100vw;
@@ -62,6 +65,7 @@ a {
   }
 }
 
+@import "sections/demo";
 @import "sections/features";
 
 .bottom{
