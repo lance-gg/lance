@@ -282,6 +282,11 @@ class GameEngine {
         this.emit("postStep", { step, isReenact });
     }
 
+    /**
+     * Add object to the game world.
+     *
+     * @param {Object} object - the object.
+     */
     addObjectToWorld(object) {
         this.world.objects[object.id] = object;
 
@@ -314,6 +319,11 @@ class GameEngine {
         this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 
+    /**
+     * Remove an object from the game world.
+     *
+     * @param {String} id - the object ID
+     */
     removeObjectFromWorld(id) {
         let ob = this.world.objects[id];
         this.trace.info(`========== destroying object ${ob.toString()} ==========`);

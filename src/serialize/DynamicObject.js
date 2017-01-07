@@ -54,9 +54,13 @@ class DynamicObject extends Serializable {
     /**
     * Creates an instance of a dynamic object.
     * Override to provide starting values for position, velocity, etc.
+    * The object ID should be the next value provided by `world.idCount`
     * @param {String} id - the object id
     * @param {Number} x - position x-value
     * @param {Number} y - position y-value
+    * @example
+    *    // Ship is a subclass of DynamicObject:
+    *    Ship(++this.world.idCount);
     */
     constructor(id, x, y) {
         super();
