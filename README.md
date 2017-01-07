@@ -16,18 +16,18 @@ a simple development model which is highly configurable and easy to analyze
 and debug.
 
 ## See it in action
-An online demo is in the works! Stay tuned
+Check out the official demo: [Spaaace](http://spaaace.herokuapp.com)
 
 ## Features:
 
 * Focus on writing your game. Incheon takes care of the netcode
-* Supports any type of game or genre  
+* Can support any type of game or genre  
 * Optimized networking
-    * TCP via websockets / UDP via WebRTC (soon)
+    * TCP via websockets
     * Communication is packed and serialized into binary
     * Automatic handling of network spikes with step correction
 * Intelligent sync strategies for lag handling
-    * Extrapolation with step re-enactment on the clients, or:
+    * Extrapolation (client side prediciton) with step re-enactment or:
     * Interpolation for optimal object motion
 * API for dynamic game-world objects
     * game worlds with physics engines (currently only physijs)
@@ -37,8 +37,9 @@ An online demo is in the works! Stay tuned
 
 More features in the pipeline:
 
-* UDP
+* UDP via WebRTC
 * Full-stack testing suite
+* Replay saving
 * More physics engines
 
 ## That's so neat! Where do I start?
