@@ -41,7 +41,7 @@ class DynamicObject extends Serializable {
     */
     static get netScheme() {
         return {
-            id: { type: Serializer.TYPES.UINT8 },
+            id: { type: Serializer.TYPES.INT32 },
             playerId: { type: Serializer.TYPES.UINT8 },
             x: { type: Serializer.TYPES.INT16 },
             y: { type: Serializer.TYPES.INT16 },
