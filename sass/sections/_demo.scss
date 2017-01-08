@@ -4,7 +4,7 @@
   @include aspect-ratio(16, 5);
 
   @include breakpoint-tablet() {
-    display: none;
+    //display: none;
   }
 
   @include breakpoint-mobile() {
