@@ -37,10 +37,11 @@ document.addEventListener("DOMContentLoaded",function(){
             }
         });
     }
-
-
-    if (!is_touch_device()){
-        document.querySelector("#demo iframe").setAttribute("src", "http://spaaace.herokuapp.com");
+    
+    if (is_touch_device() == true) {
+        qs("#demo").style.display = "none";
+    } else {
+        qs("#demo iframe").setAttribute("src", "http://spaaace.herokuapp.com");
     }
 });
 
@@ -49,6 +50,6 @@ function qs(selector){
 }
 
 function is_touch_device() {
-    return 'ontouchstart' in window        // works on most browsers
-        || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+    return ('ontouchstart' in window        // works on most browsers
+        || navigator.maxTouchPoints) == true;       // works on IE10/11 and Surface
 };
