@@ -26,18 +26,18 @@ sub-directories `client`, `server`, and `common`.
 We have two kinds of objects in Pong, the paddle and the ball.
 These files extend the `DynamicObject` class, but are quite simple.
 The boilerplate includes a sample game object class, in the file
-`src/common/Player.js`
+`src/common/PlayerAvatar.js`
 
 Create the following two classes in the `src/common` directory:
 
 ### src/common/Paddle.js
-The Paddle class is a bear-bones object.  It is an exact copy of
-the sample `Player.js` object, except that it is called `Paddle`.
+The Paddle class is a bear-bones object.  It is similar to
+the sample `PlayerAvatar.js` object, except that it is called `Paddle`.
 
 ```javascript
 'use strict';
 
-const DynamicObject  = require('incheon').serialize.DynamicObject;
+const DynamicObject = require('incheon').serialize.DynamicObject;
 
 class Paddle extends DynamicObject {
 
@@ -53,8 +53,8 @@ module.exports = Paddle;
 The Ball class is only slightly more complicated than the Paddle
 class.  It adds two getters, which define "bending" properties.
 The bending properties below indicate that the client object's position should
-gradually *bend* towards the server object's position at a rate of 0.1
-(10%) each time the server sends position updates.  The client object's
+gradually *bend* towards the server object's position at a rate of 0.8
+(80%) each time the server sends position updates.  The client object's
 velocity should not bend at all, because the ball's velocity can change
 suddenly as it hits a wall or a paddle.
 We also give the Ball an initial velocity when it is created.
@@ -65,7 +65,7 @@ const DynamicObject = require('incheon').serialize.DynamicObject;
 
 class Ball extends DynamicObject {
 
-    get bendingMultiple() { return 0.1; }
+    get bendingMultiple() { return 0.8; }
     get bendingVelocityMultiple() { return 0; }
 
     constructor(id, x, y) {
@@ -107,7 +107,7 @@ start() {
     };
 
     this.on('postStep', () => { this.postStepHandleBall(); });
-};
+}
 ```
 
 * **processInput**: handle user inputs by moving the paddle up or down.
@@ -119,10 +119,11 @@ processInput(inputData, playerId) {
     super.processInput(inputData, playerId);
 
     // get the player paddle tied to the player socket
-    var playerPaddle;
+    let playerPaddle;
 
     for (let objId in this.world.objects) {
-        if (this.world.objects[objId].playerId == playerId) {
+        let o = this.world.objects[objId];
+        if (o.playerId == playerId && o.class == Paddle) {
             playerPaddle = this.world.objects[objId];
             break;
         }
@@ -134,7 +135,7 @@ processInput(inputData, playerId) {
             playerPaddle.y += 5;
         }
     }
-};
+}
 ```
 
 * **initGame**: create two paddles, a ball, and add these objects to the game world.  This method will be called only on the server.  Add the following initGame method:
@@ -229,7 +230,7 @@ postStepHandleBall() {
             this.ball.velocity.y *= -1;
         }
     }
-};
+}
 
 player1Score() {}
 player2Score() {}
@@ -252,12 +253,12 @@ const ServerEngine = require('incheon').ServerEngine;
 
 class MyServerEngine extends ServerEngine {
 
-    constructor(io, gameEngine, inputOptions){
+    constructor(io, gameEngine, inputOptions) {
         super(io, gameEngine, inputOptions);
 
         this.serializer.registerClass(require('../common/Paddle'));
         this.serializer.registerClass(require('../common/Ball'));
-    };
+    }
 
     start(){
         super.start();
@@ -268,32 +269,32 @@ class MyServerEngine extends ServerEngine {
             player1: null,
             player2: null
         };
-    };
+    }
 
-    onPlayerConnected(socket){
+    onPlayerConnected(socket) {
         super.onPlayerConnected(socket);
 
         // attach newly connected player an available paddle
-        if (this.players.player1 === null){
+        if (this.players.player1 === null) {
             this.players.player1 = socket.id;
             this.gameEngine.attachPaddle(0, socket.playerId);
         } else if (this.players.player2 === null) {
             this.players.player2 = socket.id;
             this.gameEngine.attachPaddle(1, socket.playerId);
         }
-    };
+    }
 
-    onPlayerDisconnected(socketId, playerId){
+    onPlayerDisconnected(socketId, playerId) {
         super.onPlayerDisconnected(socketId, playerId);
 
-        if (this.players.player1 == socketId){
-            console.log("Player 1 disconnected");
+        if (this.players.player1 == socketId) {
+            console.log('Player 1 disconnected');
             this.players.player1 = null;
-        } else if (this.players.player2 == socketId){
-            console.log("Player 2 disconnected");
+        } else if (this.players.player2 == socketId) {
+            console.log('Player 2 disconnected');
             this.players.player2 = null;
         }
-    };
+    }
 }
 
 module.exports = MyServerEngine;
@@ -327,9 +328,6 @@ class MyRenderer extends Renderer {
             width: 400,
             height: 400
         };
-    }
-
-    init() {
     }
 
     draw() {
@@ -378,34 +376,24 @@ The client engine must register the Paddle and Ball classes just like the
 server did, and keep references to the objects created.
 
 ### src/client/MyClientEngine.js
-```js
+```javascript
 const ClientEngine = require('incheon').ClientEngine;
-const Synchronizer = require('incheon').Synchronizer;
 const MyRenderer = require('../client/MyRenderer');
+const Synchronizer = require('incheon').Synchronizer;
 
-const Paddle = require('../common/Paddle');
 const Ball = require('../common/Ball');
 
-class MyClientEngine extends ClientEngine {
 
+class MyClientEngine extends ClientEngine{
     constructor(gameEngine, options) {
         super(gameEngine, options);
 
         // initialize renderer
         this.renderer = new MyRenderer(gameEngine);
 
-        // initialize object synchronization
-        const syncOptions = {
-            extrapolate: {
-                localObjBending: 0.0,
-                remoteObjBending: 0.6
-            }
-        };
-        const synchronizer = new Synchronizer(this, syncOptions);
-        synchronizer.extrapolateObjectSelector = () => { return true; };
+        this.serializer.registerClass(require('../common/Paddle'));
+        this.serializer.registerClass(require('../common/Ball'));
 
-        this.serializer.registerClass(Paddle);
-        this.serializer.registerClass(Ball);
         this.gameEngine.on('client__preStep', this.preStep.bind(this));
 
         this.gameEngine.on('objectAdded', (object) => {
@@ -422,58 +410,44 @@ class MyClientEngine extends ClientEngine {
         // keep a reference for key press state
         this.pressedKeys = {
             down: false,
-            up: false,
-            left: false,
-            right: false,
-            space: false
+            up: false
         };
 
-        document.onkeydown = (e) => { onKeyChange.call(this, e, true); };
-        document.onkeyup = (e) => { onKeyChange.call(this, e, false); };
+        let that = this;
+        document.onkeydown = (e) => { that.onKeyChange(e, true); };
+        document.onkeyup = (e) => { that.onKeyChange(e, false); };
     }
 
     // our pre-step is to process all inputs
     preStep() {
-
+        // continuous press
         if (this.pressedKeys.up) {
-            this.sendInput('up', { movement: true });
+            this.sendInput('up');
         }
 
         if (this.pressedKeys.down) {
-            this.sendInput('down', { movement: true });
-        }
-
-        if (this.pressedKeys.left) {
-            this.sendInput('left', { movement: true });
-        }
-
-        if (this.pressedKeys.right) {
-            this.sendInput('right', { movement: true });
-        }
-
-        if (this.pressedKeys.space) {
-            this.sendInput('space', { movement: true });
+            this.sendInput('down');
         }
     }
-}
 
-function onKeyChange(e, isDown) {
-    e = e || window.event;
+    onKeyChange(e, isDown) {
+        e = e || window.event;
 
-    if (e.keyCode == '38') {
-        this.pressedKeys.up = isDown;
-    } else if (e.keyCode == '40') {
-        this.pressedKeys.down = isDown;
-    } else if (e.keyCode == '37') {
-        this.pressedKeys.left = isDown;
-    } else if (e.keyCode == '39') {
-        this.pressedKeys.right = isDown;
-    } else if (e.keyCode == '32') {
-        this.pressedKeys.space = isDown;
+        if (e.keyCode == '38') {
+            this.pressedKeys.up = isDown;
+        } else if (e.keyCode == '40') {
+            this.pressedKeys.down = isDown;
+        } else if (e.keyCode == '37') {
+            this.pressedKeys.left = isDown;
+        } else if (e.keyCode == '39') {
+            this.pressedKeys.right = isDown;
+        }
     }
+
 }
 
 module.exports = MyClientEngine;
+
 ```
 
 ## Step 4: the Client Visuals
