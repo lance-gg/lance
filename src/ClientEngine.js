@@ -193,7 +193,9 @@ class ClientEngine {
         if (this.gameEngine.serverStep) {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Client will skip a step.`);
-                this.skipOneStep = true;
+                // this.skipOneStep = true; // too jittery.
+                this.gameEngine.world.stepCount--;
+                this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
             } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  Client is behind server.`);
                 this.doubleStep = true;
