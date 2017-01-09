@@ -1,8 +1,8 @@
 #splash{
-  background-image: url(images/splash_bg.png), url(images/page_bg_black.png);
-  background-repeat: no-repeat, repeat;
-  background-position: center, center;
-  background-size: cover, auto;
+  @include background-image(url(images/splash_bg.png), url(images/page_bg_black.png), linear-gradient(top, #101a39 0%,#04080f 100%));
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-position: center, center, center;
+  background-size: cover, auto, auto;
   z-index: 15;
   padding-bottom: 72px;
 
