@@ -27,12 +27,8 @@ Check out the official demo: [Spaaace](http://spaaace.herokuapp.com)
     * Communication is packed and serialized into binary
     * Automatic handling of network spikes with step correction
 * Intelligent sync strategies for lag handling
-    * Extrapolation (client side prediciton) with step re-enactment or:
+    * Extrapolation (client side prediction) with step re-enactment or:
     * Interpolation for optimal object motion
-* API for dynamic game-world objects
-    * game worlds with physics engines (currently only physijs)
-    * game worlds with pseudo-physics, which track position, velocity, and orientation
-* Proper API documentation, user guide, tutorials, and samples
 * Tools for debugging and tracing
 
 More features in the pipeline:
