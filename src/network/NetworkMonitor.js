@@ -6,10 +6,11 @@ const EventEmitter = require('eventemitter3');
  * Measures network performance between the client and the server
  * Represents both the client and server portions of NetworkMonitor
  */
-class NetworkMonitor extends EventEmitter{
+class NetworkMonitor {
 
     constructor() {
-        super();
+        // mixin for EventEmitter
+        Object.assign(this, EventEmitter.prototype);
     }
 
     // client
