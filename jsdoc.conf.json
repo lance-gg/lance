@@ -1,11 +1,10 @@
 {
     "opts": {
-        "destination": "./docs-out/",
+        "destination": "./docs_out/",
         "encoding": "utf8",
-        "package": "package.json",
         "readme": "README.md",
-        "template": "./node_modules/ink-docstrap/template",
-        "tutorials": "./docs/tutorials"
+        "template": "node_modules/incheon-docs-template",
+        "tutorials": "./docs"
     },
     "source": {
         "include": [

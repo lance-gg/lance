@@ -16,7 +16,7 @@ class FrameSyncStrategy extends SyncStrategy {
 
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('postStep', this.frameSync.bind(this));
-        this.gameEngine.on('client.syncReceived', this.keepSnapshot.bind(this));
+        this.gameEngine.on('client__syncReceived', this.keepSnapshot.bind(this));
     }
 
     // keep snapshot if it's the most recent we've seen
@@ -62,7 +62,7 @@ class FrameSyncStrategy extends SyncStrategy {
                         // TODO: the comparison below cannot be '===' because:
                         //       curObj.id = "1"
                         //       nextObj.id = 1
-                        isPlayerControlled: (this.playerId == nextObj.id)
+                        isPlayerControlled: (this.playerId == nextObj.playerId)
                     });
                     curObj.initRenderObject(this.gameEngine.renderer);
 

@@ -1,62 +1,59 @@
-[![Build Status](https://travis-ci.org/OpherV/Incheon.svg?branch=master)](https://travis-ci.org/OpherV/Incheon)
+[![Build Status](https://travis-ci.org/OpherV/Incheon.svg?branch=master)](https://travis-ci.org/OpherV/Incheon) [![Inline docs](http://inch-ci.org/github/opherv/incheon.svg?branch=develop)](http://inch-ci.org/github/opherv/incheon)
 
-***Incheon is a general purpose low latency game server based on Node.JS and Socket.IO***
+<img src="https://cloud.githubusercontent.com/assets/3951311/21020499/6f125344-bd7d-11e6-86e4-a4bb16b32f2a.png" style="width: 100%" alt="Incheon logo">
 
-Still in early development. Check back with us soon :P
+# [Incheon](http://incheon.gg) is a real-time multiplayer game server
 
-**Features:**
+It provides an extendible Node.JS based server, on which game logic runs, as well as a client-side library
+which synchronizes the client's game state with the server game state.  In order
+to provide a smooth visual experience for each connected client, Incheon implements
+efficient networking methods, position interpolation and extrapolation, user input
+coordination, shadow objects, physics and pseudo-physical movement, automatic
+handling of network spikes.
 
-* Somewhat opinionated, letting you quickly develop your game without much hassle
-* Server to client communication:
-    * Communication is all binary
-    * A game engine can opt-in to which object properties are transported
-* Intelligent sync strategies for lag handling:
-    * Client side prediction for player-controlled objects (snap, gradual snap)
-    * Update interpolation for non-player objects
-* Provides API for dynamic game-world objects
-    * game worlds with physics engines (currently only physijs)
-    * game worlds with reduced-physics, which track position, velocity, orientation, momentum (linear and angular).
+Incheon aims to optimize the player's visual experience, while providing
+a simple development model which is highly configurable and easy to analyze
+and debug.
 
-Things to do:
+## See it in action
+Check out the official demo: [Spaaace](http://spaaace.herokuapp.com)
 
-* Allow general messages (not just world updates)
-* Input validation (check player can control ship)
-* Implement more types of lag compensation
-* Optimize what goes over the wire:
-    * Only dirty items get sent, with periodic sync
-    * Option to specify incremental updates
-    * client to server should also be binary
-* Implement more tests
-* * Recording and replaying sessions
+## Features:
 
+* Focus on writing your game. Incheon takes care of the netcode
+* Can support any type of game or genre  
+* Optimized networking
+    * TCP via websockets
+    * Communication is packed and serialized into binary
+    * Automatic handling of network spikes with step correction
+* Intelligent sync strategies for lag handling
+    * Extrapolation (client side prediction) with step re-enactment or:
+    * Interpolation for optimal object motion
+* Tools for debugging and tracing
 
-Caveats:
+More features in the pipeline:
 
-* Due to websocket limitations, only TCP and no UDP :(
+* UDP via WebRTC
+* Full-stack testing suite
+* Replay saving
+* More physics engines
 
-**Architecture**
+## That's so neat! Where do I start?
 
-**The Step Sequence**
+The official [Incheon documentation](http://docs.incheon.gg) contains articles on theory and rational, as well as the structure and architecture of the project.
 
-The fundamental sequence of each (client-side) step is organized as follows:
+If you feel like learning by doing you can start with first tutorial, [My first game: Pong](http://docs.incheon.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step on implementation of a networked version of this classic game.
 
-1. [clientEngine] process inputs
-2. [clientEngine] handle all inbound messages
-3. [clientEngine] handle outbound inputs
-4. [clientEngine:gameEngine] stepCount++
-5. [clientEngine:gameEngine] physicsEngine.step
-6. [clientEngine:gameEngine] updateGameWorld: for each object->step
-7. [clientEngine] render.draw
+## Something went wrong! I need help!
 
-**Event List**
+If you're not exactly sure how to do something, [Stack Overflow](http://stackoverflow.com/questions/tagged/incheon) is your friend.
 
-* preStep
-* postStep
-* objectAdded
-* server.playerJoined
-* server.playerDisconnected
-* server.inputReceived
-* client.preStep
-* client.postStep
-* server.preStep
-* server.postStep
+If you've encountered a bug and it's not already in the [issues page](https://github.com/OpherV/Incheon/issues), open a new issue.
+
+## I'd like to join in
+
+For discussing Incheon, multiplayer games or just hanging out you're invited to join us on [slack](http://incheongg.slack.com).
+
+## Built something cool with Incheon?
+
+Please [Let us know](http://www.twitter.com/opherv)! We'd love to play it, and feature it on the [Incheon homepage](http://incheon.gg).

@@ -6,21 +6,21 @@ const Trace = require('./lib/Trace');
 
 /**
  * The GameEngine contains the game logic.  Extend this class
- * to implement your game mechanics.  The GameEngine derived
+ * to implement game mechanics.  The GameEngine derived
  * instance runs once on the server, where the final decisions
  * are always taken, and one instance will run on each client as well,
- * where the client emulates what it expects to have happening
+ * where the client emulates what it expects to be happening
  * on the server.
  *
  * The game engine's logic must listen to user inputs and
  * act on these inputs to change the game state.  For example,
  * the game engine listens to controller/keyboard inputs to infer
  * movement for the player/ship/first-person.  The game engine listens
- * to clicks/button-presses to infer firing. etc..
+ * to clicks, button-presses to infer firing, etc..
  *
  * Note that the game engine runs on both the server and on the
- * clients - but the server decisions are always the final say,
- * and therefore clients must note that server updates may conflict
+ * clients - but the server decisions always have the final say,
+ * and therefore clients must resolve server updates which conflict
  * with client-side predictions.
  */
 class GameEngine {
@@ -34,6 +34,7 @@ class GameEngine {
      *
      * @event GameEngine#preStep
      * @param {Number} stepNumber - the step number
+     * @param {Boolean} isReenact - is this step a re-enactment
      */
 
     /**
@@ -41,6 +42,7 @@ class GameEngine {
      *
      * @event GameEngine#postStep
      * @param {Number} stepNumber - the step number
+     * @param {Boolean} isReenact - is this step a re-enactment
      */
 
     /**
@@ -81,12 +83,70 @@ class GameEngine {
      */
 
     /**
+     * Marks the beginning of a game step on the client
+     *
+     * @event GameEngine#client__preStep
+     */
+
+    /**
+     * Marks the end of a game step on the client
+     *
+     * @event GameEngine#client__postStep
+     */
+
+    /**
+     * Client about to apply an input locally
+     *
+     * @event GameEngine#client__preInput
+     * @param {Object} inputData - input descriptor
+     */
+
+    /**
+     * Client finished applying an input locally
+     *
+     * @event GameEngine#client__postInput
+     * @param {Object} inputData - input descriptor
+     */
+
+    /**
+     * Client received a sync from the server
+     *
+     * @event GameEngine#client__syncReceived
+     * @param {Object} sync - sync from the server
+     * @param {Array} syncEvents - array of events in the sync
+     * @param {Number} maxStepCount - highest step in the sync
+     */
+
+    /**
+     * Marks the beginning of a game step on the server
+     *
+     * @event GameEngine#server__preStep
+     * @param {Number} stepNumber - the step number
+     */
+
+    /**
+     * Marks the end of a game step on the server
+     *
+     * @event GameEngine#server__postStep
+     * @param {Number} stepNumber - the step number
+     */
+
+    /**
+     * User input received on the server
+     *
+     * @event GameEngine#server__inputReceived
+     * @param {Object} input - input descriptor
+     * @param {Object} input.data - input descriptor
+     * @param {String} input.playerId - player that sent the input
+     */
+
+    /**
       * Create a game engine instance.  This needs to happen
       * once on the server, and once on each client.
       *
       * @param {Object} options - options object
-      * @param {Number} options.traceLevel - the trace level from 0 to 5
-      * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will delay  the input
+      * @param {Number} options.traceLevel - the trace level from 0 to 5.  Lower value traces more.
+      * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
       */
     constructor(options) {
 
@@ -99,7 +159,7 @@ class GameEngine {
         // get the physics engine and initialize it
         if (this.options.physicsEngine) {
             this.physicsEngine = this.options.physicsEngine;
-            this.physicsEngine.init();
+            this.physicsEngine.init({ gameEngine: this });
         }
 
         // set up event emitting and interface
@@ -127,6 +187,17 @@ class GameEngine {
          */
         this.once = eventEmitter.once;
 
+        /**
+         * Remove a handler
+         *
+         * @method removeListener
+         * @memberof GameEngine
+         * @instance
+         * @param {String} eventName - name of the event
+         * @param {Function} eventHandler - handler function
+         */
+        this.removeListener = eventEmitter.removeListener;
+
         this.emit = eventEmitter.emit;
 
         // set up trace
@@ -153,7 +224,7 @@ class GameEngine {
         this.world = new GameWorld();
 
         // on the client we have a different ID space
-        if (this.options.clientIDSpace && this.isClient) {
+        if (this.options.clientIDSpace) {
             this.world.idCount = this.options.clientIDSpace;
         }
 
@@ -188,38 +259,34 @@ class GameEngine {
     step(isReenact) {
 
         // emit preStep event
-        isReenact = !!isReenact;
-        var step = ++this.world.stepCount;
+        isReenact = Boolean(isReenact);
+        let step = ++this.world.stepCount;
+        let clientIDSpace = this.options.clientIDSpace;
         this.emit("preStep", { step, isReenact });
 
-        // physics step
-        if (this.physicsEngine) {
-            this.physicsEngine.step();
+        // skip physics for shadow objects during re-enactment
+        function objectFilter(o) {
+            return !isReenact || o.id < clientIDSpace;
         }
 
-        // handle post-physics business logic
-        this.updateGameWorld(isReenact);
+        // physics step
+        if (this.physicsEngine)
+            this.physicsEngine.step(objectFilter);
+
+        // trace object positions after physics
+        for (let objId of Object.keys(this.world.objects)) {
+            this.trace.trace(`object[${objId}] after ${isReenact ? "reenact" : "step"} : ${this.world.objects[objId].toString()}`);
+        }
 
         // emit postStep event
         this.emit("postStep", { step, isReenact });
     }
 
-    updateGameWorld(isReenact) {
-
-        for (let objId of Object.keys(this.world.objects)) {
-
-            // shadow objects are not re-enacted
-            if (isReenact && objId >= this.options.clientIDSpace)
-                continue;
-
-            // run the object step
-            let ob = this.world.objects[objId];
-            ob.step(this.worldSettings);
-
-            this.trace.trace(`object[${objId}] after ${isReenact?"reenact":"step"} : ${ob.toString()}`);
-        }
-    }
-
+    /**
+     * Add object to the game world.
+     *
+     * @param {Object} object - the object.
+     */
     addObjectToWorld(object) {
         this.world.objects[object.id] = object;
 
@@ -228,10 +295,18 @@ class GameEngine {
     }
 
     /**
-     * Override this function and implement input handling.
+     * Override this function to implement input handling.
      * This method will be called on the specific client where the
      * input was received, and will also be called on the server
-     * when the input reaches the server.
+     * when the input reaches the server.  The client does not call this
+     * method directly, rather the client calls {@link ClientEngine#sendInput}
+     * so that the input is sent to both server and client, and so that
+     * the input is delayed artificially if so configured.
+     *
+     * The input is described by a short string, and is given an index.
+     * The index is used internally to keep track of inputs which have already been applied
+     * on the client during synchronization.  The input is also associated with
+     * the ID of a player.
      *
      * @param {Object} inputMsg - input descriptor object
      * @param {String} inputMsg.input - describe the input (e.g. "up", "down", "fire")
@@ -244,6 +319,11 @@ class GameEngine {
         this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 
+    /**
+     * Remove an object from the game world.
+     *
+     * @param {String} id - the object ID
+     */
     removeObjectFromWorld(id) {
         let ob = this.world.objects[id];
         this.trace.info(`========== destroying object ${ob.toString()} ==========`);

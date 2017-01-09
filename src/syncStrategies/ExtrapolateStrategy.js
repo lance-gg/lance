@@ -4,11 +4,12 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    maxReEnactSteps: 60,  // maximum number of steps to re-enact
-    RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
-    extrapolate: 2,       // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
-    localObjBending: 0.1, // amount of bending towards position of sync object
-    remoteObjBending: 0.6 // amount of bending towards position of sync object
+    maxReEnactSteps: 60,   // maximum number of steps to re-enact
+    RTTEstimate: 2,        // estimate the RTT as two steps (for updateRate=6, that's 200ms)
+    extrapolate: 2,        // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
+    localObjBending: 0.1,  // amount of bending towards position of sync object
+    remoteObjBending: 0.6, // amount of bending towards position of sync object
+    bendingIncrements: 10   // the bending should be applied increments (how many steps for entire bend)
 };
 
 class ExtrapolateStrategy extends SyncStrategy {
@@ -21,9 +22,9 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.newSync = null;
         this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.on('client.postStep', this.extrapolate.bind(this));
-        this.gameEngine.on('client.syncReceived', this.collectSync.bind(this));
-        this.gameEngine.on('client.preInput', this.clientInputSave.bind(this));
+        this.gameEngine.on('client__postStep', this.extrapolate.bind(this));
+        this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
+        this.gameEngine.on('client__preInput', this.clientInputSave.bind(this));
     }
 
     // keep a buffer of inputs so that we can replay them on extrapolation
@@ -130,8 +131,7 @@ class ExtrapolateStrategy extends SyncStrategy {
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
                 let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
                 newObj.saveState(localShadowObj);
-                localShadowObj.destroy();
-                delete this.gameEngine.world.objects[localShadowObj.id];
+                this.gameEngine.removeObjectFromWorld(localShadowObj.id);
 
             } else if (curObj) {
 
@@ -185,10 +185,14 @@ class ExtrapolateStrategy extends SyncStrategy {
             if (objId >= this.gameEngine.options.clientIDSpace)
                 continue;
 
-            let obj = world.objects[objId];
             // TODO: using == instead of === because of string/number mismatch
-            let bending = (objId == this.clientEngine.playerId) ? this.options.localObjBending : this.options.remoteObjBending;
-            obj.bendToSavedState(bending, this.gameEngine.worldSettings);
+            //       These values should always be strings (which contain a number)
+            //       Reminder: the reason we use a string is that these
+            //       values are sometimes used as object keys
+            let obj = world.objects[objId];
+            let isLocal = (obj.playerId == this.clientEngine.playerId); // eslint-disable-line eqeqeq
+            let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
+            obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
             if (obj.renderObject && obj.renderObject.visible === false) {
                 // TODO: visible is broken because renderObject is gone.
                 // visible should be a property of the object now, the Renderer
@@ -209,8 +213,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         //       you will need to loop over prevObj instead of nextObj
         for (let objId of Object.keys(world.objects)) {
             if (objId < this.gameEngine.options.clientIDSpace && !this.newSync.syncObjects.hasOwnProperty(objId)) {
-                world.objects[objId].destroy();
-                delete this.gameEngine.world.objects[objId];
+                this.gameEngine.removeObjectFromWorld(objId);
             }
         }
 

@@ -20,17 +20,18 @@ class Renderer {
 
     /**
      * Initialize the renderer.
+     * @return {Promise} Resolves when renderer is ready.
     */
     init() {
         if ((typeof window === 'undefined') || !document) {
             console.log('renderer invoked on server side.');
         }
+        return Promise.resolve(); // eslint-disable-line new-cap
     }
 
     /**
      * The main draw function.  This method is called at high frequency,
-     * at the rate of the render loop, which can be 60Hz - 90Hz depending
-     * on the context.
+     * at the rate of the render loop.  Typically this is 60Hz, in WebVR 90Hz.
      */
     draw() {}
 

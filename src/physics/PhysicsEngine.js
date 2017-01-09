@@ -1,16 +1,19 @@
-"use strict";
-
+'use strict';
 
 // The base Physics Engine class defines the expected interface
 // for all physics engines
-
 class PhysicsEngine {
 
-    constructor() {}
+    init(initOptions) {
+        this.gameEngine = initOptions.gameEngine;
+    }
 
-    init() {}
-
-    step() {}
+    /**
+     * A single Physics step.
+     *
+     * @param {Function} objectFilter - a test function which filters which objects should move
+     */
+    step(objectFilter) {}
 
     addObject() {}
 

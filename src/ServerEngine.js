@@ -14,7 +14,6 @@ const NetworkMonitor = require('./network/NetworkMonitor');
  * This class should not be used to contain the actual
  * game logic.  That belongs in the GameEngine class, where the mechanics
  * of the gameplay are actually implemented.
- *
  * The ServerEngine singleton is typically a lightweight
  * implementation, logging gameplay statistics and registering
  * user activity and user data.
@@ -32,18 +31,25 @@ class ServerEngine {
      * @param {SocketIO} io - the SocketIO server
      * @param {GameEngine} gameEngine - instance of GameEngine
      * @param {Object} options - server options
+     * @param {Number} options.frameRate - number of steps per second
+     * @param {Number} options.updateRate - number of steps in each update (sync)
      * @return {ServerEngine} serverEngine - self
      */
     constructor(io, gameEngine, options) {
         this.options = Object.assign({
             updateRate: 6,
-            frameRate: 60,
+            frameRate: 60,  // TODO: this is no longer a frame rate, this is a stepRate
             debug: {
                 serverSendLag: false
             }
         }, options);
 
         this.io = io;
+
+        /**
+         * reference to game engine
+         * @member {GameEngine}
+         */
         this.gameEngine = gameEngine;
         this.serializer = new Serializer();
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
@@ -76,7 +82,7 @@ class ServerEngine {
 
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
-        this.gameEngine.emit("server.preStep", this.gameEngine.world.stepCount + 1);
+        this.gameEngine.emit("server__preStep", this.gameEngine.world.stepCount + 1);
 
         this.serverTime = (new Date().getTime());
 
@@ -120,7 +126,7 @@ class ServerEngine {
         }
 
         // step is done on the server side
-        this.gameEngine.emit("server.postStep", this.gameEngine.world.stepCount);
+        this.gameEngine.emit("server__postStep", this.gameEngine.world.stepCount);
 
         if (this.gameEngine.trace.length) {
             let traceData = this.gameEngine.trace.rotate();
@@ -166,7 +172,7 @@ class ServerEngine {
 
         console.log("Client Connected", socket.id);
 
-        this.gameEngine.emit('server.playerJoined', {
+        this.gameEngine.emit('server__playerJoined', {
             playerId: playerId
         });
 
@@ -176,7 +182,7 @@ class ServerEngine {
 
         socket.on('disconnect', function() {
             that.onPlayerDisconnected(socket.id, playerId);
-            that.gameEngine.emit('server.playerDisconnected', {
+            that.gameEngine.emit('server__playerDisconnected', {
                 playerId: playerId
             });
         });
@@ -225,7 +231,7 @@ class ServerEngine {
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
         }
-        this.gameEngine.emit('server.inputReceived', {
+        this.gameEngine.emit('server__inputReceived', {
             input: data,
             playerId: socket.playerId
         });
