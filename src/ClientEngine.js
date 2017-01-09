@@ -175,7 +175,6 @@ class ClientEngine {
     }
 
     step() {
-
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
 
@@ -288,7 +287,7 @@ class ClientEngine {
             stepCount: maxStepCount
         });
 
-        this.gameEngine.trace.info(`========== inbound world update ${this.gameEngine.world.stepCount} ==========`);
+        this.gameEngine.trace.info(`========== inbound world update ${maxStepCount} ==========`);
 
         // finally update the stepCount
         if (maxStepCount > this.gameEngine.world.stepCount) {

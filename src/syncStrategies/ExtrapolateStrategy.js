@@ -4,11 +4,12 @@ const SyncStrategy = require("./SyncStrategy");
 
 const defaults = {
     syncsBufferLength: 5,
-    maxReEnactSteps: 60,  // maximum number of steps to re-enact
-    RTTEstimate: 2,       // estimate the RTT as two steps (for updateRate=6, that's 200ms)
-    extrapolate: 2,       // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
-    localObjBending: 0.1, // amount of bending towards position of sync object
-    remoteObjBending: 0.6 // amount of bending towards position of sync object
+    maxReEnactSteps: 60,   // maximum number of steps to re-enact
+    RTTEstimate: 2,        // estimate the RTT as two steps (for updateRate=6, that's 200ms)
+    extrapolate: 2,        // player performs method "X" which means extrapolate to match server time. that 100 + (0..100)
+    localObjBending: 0.1,  // amount of bending towards position of sync object
+    remoteObjBending: 0.6, // amount of bending towards position of sync object
+    bendingIncrements: 10   // the bending should be applied increments (how many steps for entire bend)
 };
 
 class ExtrapolateStrategy extends SyncStrategy {
@@ -191,7 +192,7 @@ class ExtrapolateStrategy extends SyncStrategy {
             let obj = world.objects[objId];
             let isLocal = (obj.playerId == this.clientEngine.playerId); // eslint-disable-line eqeqeq
             let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
-            obj.bendToSavedState(bending, this.gameEngine.worldSettings, isLocal);
+            obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
             if (obj.renderObject && obj.renderObject.visible === false) {
                 // TODO: visible is broken because renderObject is gone.
                 // visible should be a property of the object now, the Renderer

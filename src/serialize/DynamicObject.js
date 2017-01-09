@@ -159,7 +159,7 @@ class DynamicObject extends Serializable {
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
         function showVec(x, y, z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }
-        return `DynamicObject[${this.id}] position${showVec(this.x, this.y, this.z)} velocity${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
+        return `dObj[${this.id}] player${this.playerId} pos${showVec(this.x, this.y, this.z)} vel${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
     }
 
     copyFrom(sourceObj) {
@@ -238,15 +238,15 @@ class DynamicObject extends Serializable {
     // TODO:
     // rather than pass worldSettings on each bend, they could
     // be passed in on the constructor just once.
-    bendToSavedState(bending, worldSettings, isLocal) {
+    bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
         if (this.savedCopy) {
-            this.bendTo(this.savedCopy, bending, worldSettings, isLocal);
+            this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
         }
         this.savedCopy = null;
     }
 
     syncTo(other) {
-        ['x', 'y', 'velX', 'velY', 'angle']
+        ['playerId', 'x', 'y', 'velX', 'velY', 'angle']
             .forEach(attr => {
                 this[attr] = other[attr];
             });
@@ -259,7 +259,7 @@ class DynamicObject extends Serializable {
         this.bendingAngle = 0;
     }
 
-    bendTo(original, bending, worldSettings, isLocal) {
+    bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
 
         // TODO: the bending parameters should now be an object,
         //     with a single getter bendingMultiples which has local
@@ -283,13 +283,13 @@ class DynamicObject extends Serializable {
 
         // bend to position, velocity, and angle gradually
         if (worldSettings.worldWrap) {
-            this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / 10;
-            this.bendingY = MathUtils.interpolateDeltaWithWrapping(original.y, this.y, bending, 0, worldSettings.height) / 10;
+            this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / bendingIncrements;
+            this.bendingY = MathUtils.interpolateDeltaWithWrapping(original.y, this.y, bending, 0, worldSettings.height) / bendingIncrements;
         } else {
-            this.bendingX = MathUtils.interpolateDelta(original.x, this.x, bending) / 10;
-            this.bendingY = MathUtils.interpolateDelta(original.y, this.y, bending) / 10;
+            this.bendingX = MathUtils.interpolateDelta(original.x, this.x, bending) / bendingIncrements;
+            this.bendingY = MathUtils.interpolateDelta(original.y, this.y, bending) / bendingIncrements;
         }
-        this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 360) / 10;
+        this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 360) / bendingIncrements;
         this.velX = MathUtils.interpolate(original.velX, this.velX, velocityBending);
         this.velY = MathUtils.interpolate(original.velY, this.velY, velocityBending);
 
