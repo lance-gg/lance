@@ -87,3 +87,7 @@
     opacity: 1;
   }
 }
+
+.hasTouch #innerMenu, .hasTouch #outerMenu{
+  .demoLink{display: none;}
+}
