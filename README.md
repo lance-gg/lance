@@ -53,7 +53,7 @@ If you've encountered a bug and it's not already in the [issues page](https://gi
 
 ## I'd like to join in
 
-For discussing Incheon, multiplayer games or just hanging out you're invited to join us on [slack](http://incheongg.slack.com).
+For discussing Incheon, multiplayer games or just hanging out you're invited to join us on [slack](http://slack.incheon.gg).
 
 ## Built something cool with Incheon?
 
