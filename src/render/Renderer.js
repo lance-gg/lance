@@ -1,5 +1,7 @@
 'use strict';
 
+const EventEmitter = require('eventemitter3');
+
 /**
  * The Renderer is the component which must *draw* the game on the client.
  * It will be instantiated once on each client, and must implement the draw
@@ -16,6 +18,9 @@ class Renderer {
         this.gameEngine = gameEngine;
         gameEngine.on('objectAdded', this.addObject.bind(this));
         gameEngine.on('objectDestroyed', this.removeObject.bind(this));
+
+        // mixin for EventEmitter
+        Object.assign(this, EventEmitter.prototype);
     }
 
     /**
