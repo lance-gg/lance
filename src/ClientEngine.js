@@ -139,21 +139,38 @@ class ClientEngine {
      */
     start() {
 
+        // TODO: pull out gameLoop, renderLoop, gameLoopChecker to
+        // a separate module called scheduler.js
+        let nextExecTime = null;
         let gameLoop = () => {
-
             let stepStartTime = (new Date()).getTime();
             this.step();
 
             // delay the execution of next step if requested.
             // this could happen because of client-server step drift.
-            let nextExecTime = this.options.stepPeriod - ((new Date()).getTime() - stepStartTime);
+            nextExecTime = stepStartTime + this.options.stepPeriod;
             if (this.delayNextStep) {
                 nextExecTime += STEP_DELAY_MSEC;
                 this.delayNextStep = false;
+            } else if (this.hurryNextStep) {
+                nextExecTime -= STEP_DELAY_MSEC;
+                this.hurryNextStep = false;
             }
 
-            setTimeout(gameLoop, nextExecTime);
-        }
+            setTimeout(gameLoop, nextExecTime - (new Date()).getTime());
+        };
+
+        // in same cases, setTimeout is ignored by the browser,
+        // this is known to happen during the first 100ms of a touch event
+        // on android chrome.  Double-check the game loop using requestAnimationFrame
+        let gameLoopChecker = () => {
+            let currentTime = (new Date()).getTime();
+            if (currentTime > nextExecTime) {
+                this.step();
+                nextExecTime = currentTime + this.options.stepPeriod;
+            }
+            window.requestAnimationFrame(gameLoopChecker);
+        };
 
         // the render loop waits for next animation frame
         let renderLoop = () => {
@@ -161,9 +178,10 @@ class ClientEngine {
             window.requestAnimationFrame(renderLoop);
         };
 
-        // start game, game loop, render loop
+        // start game, game loop, game loop checker, render loop
         this.gameEngine.start();
-        window.requestAnimationFrame(gameLoop);
+        setTimeout(gameLoop, 0);
+        window.requestAnimationFrame(gameLoopChecker);
 
         // initialize the renderer
         if (!this.renderer) {
@@ -198,14 +216,11 @@ class ClientEngine {
         // check for server/client step drift
         if (this.gameEngine.serverStep) {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Client will skip a step.`);
-                // this.skipOneStep = true; // too jittery.
-                // this.gameEngine.world.stepCount--;
-                // this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
+                this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Delaying next step.`);
                 this.delayNextStep = true;
             } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  Client is behind server.`);
-                this.doubleStep = true;
+                this.gameEngine.trace.warn(`step drift.  Client is behind server.  Hurrying next step.`);
+                this.hurryNextStep = true;
             }
         }
 
