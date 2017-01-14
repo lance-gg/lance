@@ -135,6 +135,14 @@
 
   }
 
+  .buttonContainer{
+    @include breakpoint-mobile() {
+      @include display-flex;
+      @include flex-direction(column);
+      @include align-items(center);
+    }
+  }
+
   .ctaContainer{
     position: relative;
     background-color: rgba(#68b2f8, 0.2);
@@ -144,6 +152,10 @@
     font-size: 1.2rem;
     transition: all 0.1s ease-in;
     margin-right: 1.5rem;
+
+    @include breakpoint-mobile() {
+      margin: 1rem 0;
+    }
 
     &:last-child {margin-right: 0};
 
@@ -192,9 +204,4 @@
       }
     }
   }
-}
-
-.hasTouch #splash{
-  .ctaContainer{ margin-right: 0;}
-  .demoLink{ display: none; }
 }

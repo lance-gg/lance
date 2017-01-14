@@ -8,6 +8,10 @@
       width: span(8 of 4);
     }
 
+    @include breakpoint-mobile-landscape() {
+      width: span(8 of 4);
+    }
+
     @include breakpoint-tablet() {
       width: span(8 of 8);
     }
@@ -24,6 +28,10 @@
     @include breakpoint-mobile() {
       padding: 0;
     }
+
+    @include breakpoint-mobile-landscape() {
+      padding: 0;
+    }
   }
 
   .feature{
@@ -35,6 +43,12 @@
     padding-right: 1rem;
 
     @include breakpoint-mobile() {
+      @include span(3 of 4);
+      padding-left: span(1 of 4);
+      margin: 2rem 0rem;
+    }
+
+    @include breakpoint-mobile-landscape() {
       @include span(3 of 4);
       padding-left: span(1 of 4);
       margin: 2rem 0rem;
@@ -63,6 +77,16 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+
+    @include breakpoint-mobile(){
+      width: 3rem;
+      height: 3rem;
+    }
+
+    @include breakpoint-mobile-landscape(){
+      width: 3rem;
+      height: 3rem;
+    }
   }
 
   .feature.gameAgnostic:before{

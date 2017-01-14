@@ -1,5 +1,6 @@
-$breakpoint-mobile: max-width 500px;
-$breakpoint-tablet: 501px 1280px;
+$breakpoint-mobile: (max-width 568px) (orientation portrait);
+$breakpoint-mobile-landscape: (max-width 568px) (orientation landscape);
+$breakpoint-tablet: 569px 1280px;
 $breakpoint-desktop: min-width 1281px;
 
 
@@ -11,6 +12,12 @@ $breakpoint-desktop: min-width 1281px;
 
 @mixin breakpoint-mobile(){
   @include susy-breakpoint($breakpoint-mobile, 4) {
+    @content;
+  }
+}
+
+@mixin breakpoint-mobile-landscape(){
+  @include susy-breakpoint($breakpoint-mobile-landscape, 4) {
     @content;
   }
 }
@@ -74,6 +81,22 @@ $breakpoint-desktop: min-width 1281px;
 }
 
 @include breakpoint-mobile(){
+
+  section{
+    .content{
+      @include container;
+      padding: 1rem;
+
+      h3{
+        @include span(4 of 4);
+      }
+
+    }
+  }
+
+}
+
+@include breakpoint-mobile-landscape(){
 
   section{
     .content{

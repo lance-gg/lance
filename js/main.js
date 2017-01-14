@@ -40,8 +40,6 @@ document.addEventListener("DOMContentLoaded",function(){
     
     if (is_touch_device() == true) {
         qs("body").classList.add('hasTouch');
-    } else {
-        qs("#demo iframe").setAttribute("src", "http://spaaace.herokuapp.com");
     }
 });
 
