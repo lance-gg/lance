@@ -33,12 +33,14 @@ class ServerEngine {
      * @param {Object} options - server options
      * @param {Number} options.frameRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
+     * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
      * @return {ServerEngine} serverEngine - self
      */
     constructor(io, gameEngine, options) {
         this.options = Object.assign({
             updateRate: 6,
             frameRate: 60,  // TODO: this is no longer a frame rate, this is a stepRate
+            timeoutInterval: 180,
             debug: {
                 serverSendLag: false
             }
@@ -167,8 +169,9 @@ class ServerEngine {
 
         // save player
         this.connectedPlayers[socket.id] = socket;
-        var playerId = socket.playerId = ++this.gameEngine.world.playerCount;
+        let playerId = socket.playerId = ++this.gameEngine.world.playerCount;
         socket.lastHandledInput = null;
+        this.resetIdleTimeout(socket);
 
         console.log("Client Connected", socket.id);
 
@@ -203,10 +206,26 @@ class ServerEngine {
         this.networkMonitor.registerPlayerOnServer(socket);
     }
 
+    // handle player timeout
+    onPlayerTimeout(socket) {
+        console.log(`Client timed out after ${this.options.timeoutInterval} seconds`, socket.id);
+        socket.disconnect();
+    }
+
     // handle player dis-connection
     onPlayerDisconnected(socketId, playerId) {
         delete this.connectedPlayers[socketId];
         console.log('Client disconnected');
+    }
+
+    // resets the idle timeout for a given player
+    resetIdleTimeout(socket) {
+        if (socket.idleTimeout) clearTimeout(socket.idleTimeout);
+        if (this.options.timeoutInterval > 0) {
+            socket.idleTimeout = setTimeout(() => {
+                this.onPlayerTimeout(socket);
+            }, this.options.timeoutInterval * 1000);
+        }
     }
 
     // add an input to the input-queue for the specific player
@@ -235,6 +254,7 @@ class ServerEngine {
             input: data,
             playerId: socket.playerId
         });
+        this.resetIdleTimeout(socket);
 
         this.queueInputForPlayer(data, socket.playerId);
     }
