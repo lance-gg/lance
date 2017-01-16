@@ -25,10 +25,10 @@
     display: none;
     position: absolute;
     z-index: 2;
-    left: 50%;
-    top: 57%;
-    width: 80%;
-    height: 3rem;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
     //background: red;
     transform: translateX(-50%) translateY(-50%);
   }
