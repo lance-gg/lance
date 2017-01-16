@@ -113,6 +113,11 @@ $breakpoint-desktop: min-width 1281px;
 }
 
 
+.siteContainer{
+  //fix for ios behaviour
+  -webkit-overflow-scrolling: touch;
+}
+
 section{
   position: relative;
   width: 100%;

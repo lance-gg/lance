@@ -41,11 +41,16 @@ document.addEventListener("DOMContentLoaded",function(){
     if (is_touch_device() == true) {
         qs("body").classList.add('hasTouch');
     }
+    if (isiOS){
+        qs("body").classList.add('iOS');
+    }
 });
 
 function qs(selector){
     return document.querySelector(selector);
 }
+
+var isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
 function is_touch_device() {
     return ('ontouchstart' in window        // works on most browsers
