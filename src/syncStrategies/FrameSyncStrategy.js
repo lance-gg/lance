@@ -57,12 +57,7 @@ class FrameSyncStrategy extends SyncStrategy {
                     curObj.init({
                         velX: nextObj.velX,
                         velY: nextObj.velY,
-                        velZ: nextObj.velZ,
-
-                        // TODO: the comparison below cannot be '===' because:
-                        //       curObj.id = "1"
-                        //       nextObj.id = 1
-                        isPlayerControlled: (this.playerId == nextObj.playerId)
+                        velZ: nextObj.velZ
                     });
                     curObj.initRenderObject(this.gameEngine.renderer);
 

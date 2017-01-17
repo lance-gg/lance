@@ -14,8 +14,9 @@ class Renderer {
     * Constructor of the Renderer singleton.
     * @param {GameEngine} gameEngine - Reference to the GameEngine instance.
     */
-    constructor(gameEngine) {
+    constructor(gameEngine, clientEngine) {
         this.gameEngine = gameEngine;
+        this.clientEngine = clientEngine;
         gameEngine.on('objectAdded', this.addObject.bind(this));
         gameEngine.on('objectDestroyed', this.removeObject.bind(this));
 

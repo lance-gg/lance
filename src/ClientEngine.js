@@ -73,11 +73,16 @@ class ClientEngine {
             for (let i = 0; i < inputOptions.delayInputCount; i++)
                 this.delayedInputs[i] = [];
         }
+    }
 
-        // when objects get added, tag them as playerControlled if necessary
-        this.gameEngine.on('objectAdded', (object) => {
-            object.isPlayerControlled = (this.playerId == object.playerId);
-        });
+    /**
+     * Check if a given object is owned by the player on this client
+     *
+     * @param {Object} object the game object to check
+     * @returns {Boolean} true if the game object is owned by the player on this client
+     */
+    isOwnedByPlayer(object) {
+        return (object.playerId == this.playerId)
     }
 
     configureSynchronization() {
