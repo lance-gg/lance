@@ -107,11 +107,15 @@ class ServerEngine {
 
         // update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
+            let payload = this.serializeUpdate();
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
-                    let payload = this.serializeUpdate(socketId);
                     this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} ==========`);
 
+                    // TODO: this is the wrong way to simulate server lag.
+                    //       the right way is to keep a queue of pending payloads
+                    //       and to send them when their scheduled step arrives.
+                    //       setTimeout is our nemesis and should be bludgeoned
                     // simulate server send lag
                     if (this.options.debug.serverSendLag !== false) {
                         setTimeout(function() {
@@ -139,7 +143,7 @@ class ServerEngine {
     }
 
     // create a serialized package of the game world
-    serializeUpdate(socketId) {
+    serializeUpdate() {
         let world = this.gameEngine.world;
 
         for (let objId of Object.keys(world.objects)) {

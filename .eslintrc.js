@@ -2,7 +2,8 @@ module.exports = {
     "extends": "google",
     "env": {
         "browser": true,
-        "node": true
+        "node": true,
+        "mocha": true
     },
     "installedESLint": true,
     "parserOptions": {

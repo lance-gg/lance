@@ -63,6 +63,11 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // remember this sync
         this.newSync = e;
+
+        let objCount = (Object.keys(e.syncObjects)).length;
+        let eventCount = e.syncEvents.length;
+        let stepCount = (Object.keys(e.syncSteps)).length;
+        this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
     }
 
     // add an object to our world

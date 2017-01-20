@@ -17,16 +17,20 @@
   "homepage": "https://github.com/OpherV/incheon#readme",
   "scripts": {
     "docs": "jsdoc -c jsdoc.conf.json",
-    "test": "node ./node_modules/mocha/bin/mocha ./tests/**/*.js"
+    "test": "mocha test/EndToEnd/",
+    "test-serializer": "mocha ./test/serializer/"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "docmeta": "OpherV/docmeta",
     "eslint": "^3.10.1",
     "eslint-config-google": "^0.6.0",
+    "express": "^4.14.0",
     "incheon-docs-template": "OpherV/incheon-docs-template",
-    "docmeta": "OpherV/docmeta",
     "ink-docstrap": "^1.3.0",
     "jsdoc": "dkniffin/jsdoc#tutorial-ordering",
     "mocha": "^3.0.2",
+    "query-string": "^4.3.1",
     "should": "^11.0.0",
     "travis-after-all": "^1.4.4"
   }
