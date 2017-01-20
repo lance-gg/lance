@@ -32,6 +32,11 @@
     @include breakpoint-mobile-landscape() {
       padding: 0;
     }
+
+  }
+
+  .roadmap{
+    clear: both;
   }
 
   .feature{
