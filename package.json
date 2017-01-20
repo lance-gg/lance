@@ -17,8 +17,8 @@
   "homepage": "https://github.com/OpherV/incheon#readme",
   "scripts": {
     "docs": "jsdoc -c jsdoc.conf.json",
-    "test": "mocha test/EndToEnd/",
-    "test-serializer": "mocha ./test/serializer/"
+    "test-full": "mocha test/EndToEnd/",
+    "test": "mocha ./test/serializer/"
   },
   "devDependencies": {
     "chai": "^3.5.0",
