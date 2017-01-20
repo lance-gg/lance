@@ -2,7 +2,7 @@
     "opts": {
         "destination": "./docs_out/",
         "encoding": "utf8",
-        "readme": "README.md",
+        "readme": "docs/introduction.md",
         "template": "node_modules/incheon-docs-template",
         "tutorials": "./docs"
     },

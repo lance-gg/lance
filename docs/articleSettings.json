@@ -1,12 +1,29 @@
 {
-  "prologue": {
-    "title": "Prologue",
-    "order": 1
+  "category_introduction": {
+    "title": "Introduction",
+    "order": 1,
+    "children": {
+      "introduction": {
+        "title": "Introduction"
+      },
+      "introduction_prologue": {
+        "title": "Prologue"
+      },
+      "introduction_community": {
+        "title": "Community"
+      },
+      "introduction_roadmap": {
+        "title": "Development Roadmap"
+      }
+    }
   },
-  "guide": {
-    "title": "Architecture of a Multiplayer Game",
+  "category_overview": {
+    "title": "Overview",
     "order": 2,
     "children": {
+      "overview_architecture":{
+        "title": "Architecture of a Multiplayer Game"
+      },
       "guide_gameengine":{
         "title": "Game Engine"
       },
@@ -27,7 +44,7 @@
       }
     }
   },
-  "guide_synchronization_methods":{
+  "category_sync":{
     "title": "Synchronization Methods",
     "order": 30,
     "children": {
@@ -39,7 +56,7 @@
       }
     }
   },
-  "tutorials": {
+  "category_tutorials": {
     "title": "Tutorials",
     "order": 50,
     "children": {
@@ -51,12 +68,19 @@
       }
     }
   },
-  "guide_tuningdebugging": {
-    "title": "Fine Tuning and Debugging",
-    "order": 80
-  },
-  "furtherreading": {
-    "title": "Further Reading",
-    "order": 100
+  "category_extras": {
+    "title": "Extras",
+    "order": 200,
+    "children": {
+      "guide_tuningdebugging": {
+        "title": "Fine Tuning and Debugging",
+        "order": 80
+      },
+      "furtherreading": {
+        "title": "Further Reading",
+        "order": 100
+      }
+    }
   }
+
 }

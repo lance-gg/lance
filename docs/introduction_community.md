@@ -2,7 +2,7 @@ We make great efforts to maintain an active, positive, friendly and inclusive co
 
 ### Starting out
 
-To get a bird's eye view on how what's Incheon all about and how to use it to make a multiplayer game, we recommend reading the {@tutorial guide}
+To get a bird's eye view on what's Incheon all about and how to use it to make a multiplayer game, we recommend reading the guide: {@tutorial architecture}
 
 If you're more of the learning-by-doing type, you can start with the first tutorial, [My first game: Pong](http://docs.incheon.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step instructions on how to implement a networked version of this classic game.
 
