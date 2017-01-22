@@ -22,12 +22,6 @@ class MyClientEngine extends ClientEngine {
             right: false,
             space: false
         };
-
-        let that = this;
-        if (typeof document !== 'undefined') {
-            document.onkeydown = (e) => { that.onKeyChange(e, true); };
-            document.onkeyup = (e) => { that.onKeyChange(e, false); };
-        }
     }
 
     // our pre-step is to process all inputs
@@ -54,22 +48,6 @@ class MyClientEngine extends ClientEngine {
         }
     }
 
-    onKeyChange(e, isDown) {
-        e = e || window.event;
-
-        // TODO: keyCode is a deprecated attribute of KeyboardEvent
-        if (e.keyCode === 38) {
-            this.pressedKeys.up = isDown;
-        } else if (e.keyCode === 40) {
-            this.pressedKeys.down = isDown;
-        } else if (e.keyCode === 37) {
-            this.pressedKeys.left = isDown;
-        } else if (e.keyCode === 39) {
-            this.pressedKeys.right = isDown;
-        } else if (e.keyCode === 32) {
-            this.pressedKeys.space = isDown;
-        }
-    }
 }
 
 module.exports = MyClientEngine;
