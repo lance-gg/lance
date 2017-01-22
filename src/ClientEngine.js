@@ -79,10 +79,10 @@ class ClientEngine {
      * Check if a given object is owned by the player on this client
      *
      * @param {Object} object the game object to check
-     * @returns {Boolean} true if the game object is owned by the player on this client
+     * @return {Boolean} true if the game object is owned by the player on this client
      */
     isOwnedByPlayer(object) {
-        return (object.playerId == this.playerId)
+        return (object.playerId == this.playerId);
     }
 
     configureSynchronization() {
@@ -186,7 +186,8 @@ class ClientEngine {
         // start game, game loop, game loop checker, render loop
         this.gameEngine.start();
         setTimeout(gameLoop, 0);
-        window.requestAnimationFrame(gameLoopChecker);
+        if (typeof window !== 'undefined')
+            window.requestAnimationFrame(gameLoopChecker);
 
         // initialize the renderer
         if (!this.renderer) {
@@ -194,12 +195,11 @@ class ClientEngine {
         }
 
         return this.renderer.init().then(() => {
-            window.requestAnimationFrame(renderLoop);
-
+            if (typeof window !== 'undefined')
+                window.requestAnimationFrame(renderLoop);
             if (this.options.autoConnect) {
                 this.connect();
             }
-
         });
     }
 
