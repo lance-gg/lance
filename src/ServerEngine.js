@@ -33,12 +33,14 @@ class ServerEngine {
      * @param {Object} options - server options
      * @param {Number} options.frameRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
+     * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
      * @return {ServerEngine} serverEngine - self
      */
     constructor(io, gameEngine, options) {
         this.options = Object.assign({
             updateRate: 6,
             frameRate: 60,  // TODO: this is no longer a frame rate, this is a stepRate
+            timeoutInterval: 180,
             debug: {
                 serverSendLag: false
             }
@@ -105,11 +107,15 @@ class ServerEngine {
 
         // update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
+            let payload = this.serializeUpdate();
             for (let socketId in this.connectedPlayers) {
                 if (this.connectedPlayers.hasOwnProperty(socketId)) {
-                    let payload = this.serializeUpdate(socketId);
                     this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} ==========`);
 
+                    // TODO: this is the wrong way to simulate server lag.
+                    //       the right way is to keep a queue of pending payloads
+                    //       and to send them when their scheduled step arrives.
+                    //       setTimeout is our nemesis and should be bludgeoned
                     // simulate server send lag
                     if (this.options.debug.serverSendLag !== false) {
                         setTimeout(function() {
@@ -137,7 +143,7 @@ class ServerEngine {
     }
 
     // create a serialized package of the game world
-    serializeUpdate(socketId) {
+    serializeUpdate() {
         let world = this.gameEngine.world;
 
         for (let objId of Object.keys(world.objects)) {
@@ -167,8 +173,9 @@ class ServerEngine {
 
         // save player
         this.connectedPlayers[socket.id] = socket;
-        var playerId = socket.playerId = ++this.gameEngine.world.playerCount;
+        let playerId = socket.playerId = ++this.gameEngine.world.playerCount;
         socket.lastHandledInput = null;
+        this.resetIdleTimeout(socket);
 
         console.log("Client Connected", socket.id);
 
@@ -203,10 +210,26 @@ class ServerEngine {
         this.networkMonitor.registerPlayerOnServer(socket);
     }
 
+    // handle player timeout
+    onPlayerTimeout(socket) {
+        console.log(`Client timed out after ${this.options.timeoutInterval} seconds`, socket.id);
+        socket.disconnect();
+    }
+
     // handle player dis-connection
     onPlayerDisconnected(socketId, playerId) {
         delete this.connectedPlayers[socketId];
         console.log('Client disconnected');
+    }
+
+    // resets the idle timeout for a given player
+    resetIdleTimeout(socket) {
+        if (socket.idleTimeout) clearTimeout(socket.idleTimeout);
+        if (this.options.timeoutInterval > 0) {
+            socket.idleTimeout = setTimeout(() => {
+                this.onPlayerTimeout(socket);
+            }, this.options.timeoutInterval * 1000);
+        }
     }
 
     // add an input to the input-queue for the specific player
@@ -235,6 +258,7 @@ class ServerEngine {
             input: data,
             playerId: socket.playerId
         });
+        this.resetIdleTimeout(socket);
 
         this.queueInputForPlayer(data, socket.playerId);
     }

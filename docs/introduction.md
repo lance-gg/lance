@@ -19,6 +19,10 @@ and debug.
 ## See it in action
 Check out the official demo: [Spaaace](http://spaaace.herokuapp.com)
 
+![spaaace](https://cloud.githubusercontent.com/assets/3951311/21784604/ffc2d282-d6c4-11e6-97f0-0ada12c4fab7.gif)
+
+
+
 ## Features:
 
 * Focus on writing your game. Incheon takes care of the netcode
@@ -32,28 +36,22 @@ Check out the official demo: [Spaaace](http://spaaace.herokuapp.com)
     * Interpolation for optimal object motion
 * Tools for debugging and tracing
 
-More features in the pipeline:
-
-* UDP via WebRTC
-* Full-stack testing suite
-* Replay saving
-* More physics engines
-
 ## That's so neat! Where do I start?
 
-The official [Incheon documentation](http://docs.incheon.gg) contains articles on theory and rational, as well as the structure and architecture of the project.
+To get a bird's eye view on what's Incheon all about and how to use it to make a multiplayer game, we recommend reading the guide: {@tutorial overview_architecture}
 
-If you feel like learning by doing you can start with first tutorial, [My first game: Pong](http://docs.incheon.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step on implementation of a networked version of this classic game.
+If you're more of the learning-by-doing type, you can start with the first tutorial, [My first game: Pong](http://docs.incheon.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step instructions on how to implement a networked version of this classic game.
 
-## Something went wrong! I need help!
+## Join the fun!
+
+We are working hard to build an active, positive and inclusive {@tutorial introduction_community}
+
+## Need help?
 
 If you're not exactly sure how to do something, [Stack Overflow](http://stackoverflow.com/questions/tagged/incheon) is your friend.
 
 If you've encountered a bug and it's not already in the [issues page](https://github.com/OpherV/Incheon/issues), open a new issue.
 
-## I'd like to join in
-
-For discussing Incheon, multiplayer games or just hanging out you're invited to join us on [slack](http://slack.incheon.gg).
 
 ## Built something cool with Incheon?
 

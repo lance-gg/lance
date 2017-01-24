@@ -20,11 +20,10 @@ class PlayerSnap extends SyncStrategy {
 
         for (var objId in e.snapshot.objects) {
             var snapshotObj = e.snapshot.objects[objId];
-            snapshotObj.isPlayerControlled = (this.clientEngine.playerId == snapshotObj.playerId);
 
             // TODO: the logic below can be simplified, with the copyFrom()
             //       being called in both if-section and else-section
-            if (snapshotObj.isPlayerControlled) {
+            if (this.clientEngine.isOwnedByPlayer(snapshotObj)) {
 
                 // object doesn't exist yet - create it
                 if (! (objId in world.objects)) {

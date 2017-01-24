@@ -9,8 +9,12 @@ networked game,
 and sequence flows on the server and the clients.
 
 
-All the code in this tutorial references the repository [spaaace](https://github.com/OpherV/spaaace) - so
-clone that repository to see the referenced files.
+All the code in this tutorial references the **tutorial** branch of the [spaaace](https://github.com/OpherV/spaaace/tree/tutorial) repository - so
+clone that branch repository to see the referenced files:
+
+```shell
+git clone https://github.com/OpherV/spaaace --branch tutorial
+```
 
 ## The Components of a Networked Game
 
@@ -37,7 +41,7 @@ and the client.  But this is not always the case.
 
 ### Server Flow:
 
-The server main entry point is a simple javascript file which initializes an instance of an extended `ServerEngine` class and an instance of an extended `GameEngine` class. In our tutorial the file is called [`main.js`](https://github.com/OpherV/spaaace/blob/master/main.js).  The entry point starts the serverEngine instance.
+The server main entry point is a simple javascript file which initializes an instance of an extended `ServerEngine` class and an instance of an extended `GameEngine` class. In our tutorial the file is called [`main.js`](https://github.com/OpherV/spaaace/blob/tutorial/main.js).  The entry point starts the serverEngine instance.
 
 The server engine schedules a `step` function to be called at a regular interval.  The
 flow is:
@@ -65,46 +69,53 @@ flow is:
 ### Build your own ServerEngine class:
 
 The first step is to build your own ServerEngine-derived class.  For this tutorial
-you can look at file [`src/server/SpaaaceServerEngine.js`](https://github.com/OpherV/spaaace/blob/master/src/server/SpaaaceServerEngine.js)
+you can look at file [`src/server/SpaaaceServerEngine.js`](https://github.com/OpherV/spaaace/blob/tutorial/src/server/SpaaaceServerEngine.js)
 
 This file does the following:
 
-1. register game object classes Ship and Missile in the constructor
 1. handle player-connected logic by creating a ship for the new player
 1. handle player-disconnected logic by removing the ship of the disconnected player
 
 ### Build your the main entry point:
 
 The next step is to write the server entry code.  For this tutorial the corresponding
-file is [`main.js`](https://github.com/OpherV/spaaace/blob/master/main.js)
+file is [`main.js`](https://github.com/OpherV/spaaace/blob/tutorial/main.js)
 
 The file does the following:
 
 1. create an express server and configure the root route '/'
 1. create a socketIO handler
-1. create an instance of SpaaaceGameEngine
 1. create an instance of SpaaaceServerEngine
+1. create an instance of SpaaaceGameEngine
 1. start the serverEngine instance
 
 Sample entry code will look like this:
 ```javascript
-// the HTTP server
-const server = express();
-server.get('/', function (req, res) {
-    res.sendFile(INDEX)
-});
-server.use('/', express.static(path.join(__dirname, '.')));
+'use strict';
 
-// socket requests
-var requestHandler = server.listen(PORT, () => console.log(`Listening on ${ PORT }`));
+const express = require('express');
+const socketIO = require('socket.io');
+const path = require('path');
+
+const PORT = process.env.PORT || 3000;
+const INDEX = path.join(__dirname, './index.html');
+
+// define routes and socket
+const server = express();
+server.get('/', function(req, res) { res.sendFile(INDEX); });
+server.use('/', express.static(path.join(__dirname, '.')));
+let requestHandler = server.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 const io = socketIO(requestHandler);
 
-// game engines
+// Game Server
 const SpaaaceServerEngine = require(path.join(__dirname, 'src/server/SpaaaceServerEngine.js'));
 const SpaaaceGameEngine = require(path.join(__dirname, 'src/common/SpaaaceGameEngine.js'));
+const SimplePhysicsEngine = require('incheon').physics.SimplePhysicsEngine;
 
-const gameEngine = new SpaaaceGameEngine({ traceLevel: 1 });
-const serverEngine = new SpaaaceServerEngine(io, gameEngine, {});
+// Game Instances
+const physicsEngine = new SimplePhysicsEngine({ collisionOptions: { COLLISION_DISTANCE: 40 } });
+const gameEngine = new SpaaaceGameEngine({ physicsEngine, traceLevel: 1 });
+const serverEngine = new SpaaaceServerEngine(io, gameEngine, { debug: {} });
 
 // start the game
 serverEngine.start();
@@ -118,7 +129,7 @@ GameEngine class.  This is where your game mechanics (a.k.a. game rules,
 Remember that this code will execute on the server
 as well as on each client.
 
-For this tutorial, take a look at [`src/common/SpaaaceGameEngine.js`](https://github.com/OpherV/spaaace/blob/master/src/common/SpaaaceGameEngine.js)
+For this tutorial, take a look at [`src/common/SpaaaceGameEngine.js`](https://github.com/OpherV/spaaace/blob/tutorial/src/common/SpaaaceGameEngine.js)
 The game engine logic has three major tasks:
 
 1. to extend the `processInput()` method.  This is the logic which handles new user input such as movement, firing, activate ability, etc.  In the sample code the `processInput()` method handles the keyboard inputs "up", "right", "left", "space".  The inputs will cause the spaceship to accelerate, turn right or left, or to fire a missile.
@@ -132,15 +143,28 @@ The client entry code is different in several ways from the server.  First
 it will need a renderer, it will need to configure a synchronization strategy,
 and it will create and start a client engine instance.
 
-The full sample code is in [`src/client/clientMain.js`](https://github.com/OpherV/spaaace/blob/master/src/client/clientMain.js) and is roughly implemented as follows:
+The full sample code is in [`src/client/clientMain.js`](https://github.com/OpherV/spaaace/blob/tutorial/src/client/clientMain.js) and is roughly implemented as follows:
 
 ```javascript
-// create a client engine, a game engine, a synchronizer, and a renderer
-const renderer = new SpaaaceRenderer();
-const gameOptions = Object.assign({ renderer }, options);
+// default options, overwritten by query-string options
+// is sent to both game engine and client engine
+const defaults = {
+    traceLevel: 1,
+    delayInputCount: 3,
+    clientIDSpace: 1000000,
+    syncOptions: {
+        sync: qsOptions.sync || 'extrapolate',
+        localObjBending: 0.6,
+        remoteObjBending: 0.6
+    }
+};
+let options = Object.assign(defaults, qsOptions);
+
+// create a client engine and a game engine
+const physicsEngine = new SimplePhysicsEngine({ collisionOptions: { COLLISION_DISTANCE: 25 } });
+const gameOptions = Object.assign({ physicsEngine }, options);
 const gameEngine = new SpaaaceGameEngine(gameOptions);
-const spaaaceClientEngine = new SpaaaceClientEngine(gameEngine, options);
-const synchronizer = new Synchronizer(spaaaceClientEngine);
+const clientEngine = new SpaaaceClientEngine(gameEngine, options);
 ```
 
 ## Step 4: DynamicObjects
@@ -152,15 +176,15 @@ serializable class, meaning that the server can serialize any instance of the cl
 object instances
 must be serializable so that the server can send updates to the clients.
 
-Take a look at [`src/common/Ship.js`](https://github.com/OpherV/spaaace/blob/master/src/common/Ship.js) and
-[`src/common/Missile.js`](https://github.com/OpherV/spaaace/blob/master/src/common/Missile.js).  In both files
+Take a look at [`src/common/Ship.js`](https://github.com/OpherV/spaaace/blob/tutorial/src/common/Ship.js) and
+[`src/common/Missile.js`](https://github.com/OpherV/spaaace/blob/tutorial/src/common/Missile.js).  In both files
 you will find that the base class provides most of the needed logic for movement,
 synchronization, and that the extended classes can be quite simple.
 
 ## Step 5: Putting it all together
 
-For the full game, you will need to create a [`package.json`](https://github.com/OpherV/spaaace/blob/master/package.json) file, and [`index.html`](https://github.com/OpherV/spaaace/blob/master/index.html) file,
-examples of which are available in the [spaaace](https://github.com/OpherV/spaaace) repository.
+For the full game, you will need to create a [`package.json`](https://github.com/OpherV/spaaace/blob/tutorial/package.json) file, and [`index.html`](https://github.com/OpherV/spaaace/blob/tutorial/index.html) file,
+examples of which are available in the **tutorial** branch of the [spaaace](https://github.com/OpherV/spaaace/tree/tutorial) repository.
 
 To run the server, you simply run `npm start`.  
 The server has two roles: **(1)** it acts as an HTTP server, serving index.html to clients
@@ -203,7 +227,7 @@ where **_n_** is the player's id.
 
 In our tutorial example, the query-string parameters become options which are
 passed to the game engine constructor.  So the client-side trace can be activated
-from the query string, simply by setting the parameter `traceLevel` on the query
+from the query string, simply by setting the parameter `&traceLevel=0` on the query
 string.
 
 

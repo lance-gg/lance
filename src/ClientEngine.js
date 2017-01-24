@@ -5,8 +5,11 @@ const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
 const Synchronizer = require('./Synchronizer');
 
-const STEP_DRIFT_THRESHOLD = 10;
-const GAME_UPS = 60;
+// externalizing these parameters as options would add confusion to game
+// developers, and provide no real benefit.
+const STEP_DRIFT_THRESHOLD = 10; // min # steps that qualifies a client-server drift
+const GAME_UPS = 60; // default number of game steps per second
+const STEP_DELAY_MSEC = 5; // if drift detected, delay next execution by this amount
 
 /**
  * The client engine is the singleton which manages the client-side
@@ -35,7 +38,8 @@ class ClientEngine {
         this.options = Object.assign({
             autoConnect: true,
             healthCheckInterval: 1000,
-            healthCheckRTTSample: 10
+            healthCheckRTTSample: 10,
+            stepPeriod: 1000 / GAME_UPS
         }, inputOptions);
 
         /**
@@ -50,7 +54,6 @@ class ClientEngine {
          */
         this.gameEngine = gameEngine;
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
-
         this.networkMonitor = new NetworkMonitor();
 
         this.inboundMessages = [];
@@ -70,11 +73,16 @@ class ClientEngine {
             for (let i = 0; i < inputOptions.delayInputCount; i++)
                 this.delayedInputs[i] = [];
         }
+    }
 
-        // when objects get added, tag them as playerControlled if necessary
-        this.gameEngine.on('objectAdded', (object) => {
-            object.isPlayerControlled = (this.playerId == object.playerId);
-        });
+    /**
+     * Check if a given object is owned by the player on this client
+     *
+     * @param {Object} object the game object to check
+     * @return {Boolean} true if the game object is owned by the player on this client
+     */
+    isOwnedByPlayer(object) {
+        return (object.playerId == this.playerId);
     }
 
     configureSynchronization() {
@@ -135,18 +143,38 @@ class ClientEngine {
      * ready to connect
      */
     start() {
-        // Simple JS game loop adapted from
-        // http://nokarma.org/2011/02/02/javascript-game-development-the-game-loop/
-        let skipTicks = 1000 / GAME_UPS;
-        let nextGameTick = (new Date()).getTime();
 
-        // the game loop ensures a fixed number of steps per second
+        // TODO: pull out gameLoop, renderLoop, gameLoopChecker to
+        // a separate module called scheduler.js
+        let nextExecTime = null;
         let gameLoop = () => {
-            while ((new Date()).getTime() > nextGameTick) {
-                this.step();
-                nextGameTick += skipTicks;
+            let stepStartTime = (new Date()).getTime();
+            this.step();
+
+            // delay the execution of next step if requested.
+            // this could happen because of client-server step drift.
+            nextExecTime = stepStartTime + this.options.stepPeriod;
+            if (this.delayNextStep) {
+                nextExecTime += STEP_DELAY_MSEC;
+                this.delayNextStep = false;
+            } else if (this.hurryNextStep) {
+                nextExecTime -= STEP_DELAY_MSEC;
+                this.hurryNextStep = false;
             }
-            window.requestAnimationFrame(gameLoop);
+
+            setTimeout(gameLoop, nextExecTime - (new Date()).getTime());
+        };
+
+        // in same cases, setTimeout is ignored by the browser,
+        // this is known to happen during the first 100ms of a touch event
+        // on android chrome.  Double-check the game loop using requestAnimationFrame
+        let gameLoopChecker = () => {
+            let currentTime = (new Date()).getTime();
+            if (currentTime > nextExecTime) {
+                this.step();
+                nextExecTime = currentTime + this.options.stepPeriod;
+            }
+            window.requestAnimationFrame(gameLoopChecker);
         };
 
         // the render loop waits for next animation frame
@@ -155,9 +183,11 @@ class ClientEngine {
             window.requestAnimationFrame(renderLoop);
         };
 
-        // start game, game loop, render loop
+        // start game, game loop, game loop checker, render loop
         this.gameEngine.start();
-        window.requestAnimationFrame(gameLoop);
+        setTimeout(gameLoop, 0);
+        if (typeof window !== 'undefined')
+            window.requestAnimationFrame(gameLoopChecker);
 
         // initialize the renderer
         if (!this.renderer) {
@@ -165,12 +195,11 @@ class ClientEngine {
         }
 
         return this.renderer.init().then(() => {
-            window.requestAnimationFrame(renderLoop);
-
+            if (typeof window !== 'undefined')
+                window.requestAnimationFrame(renderLoop);
             if (this.options.autoConnect) {
                 this.connect();
             }
-
         });
     }
 
@@ -192,13 +221,11 @@ class ClientEngine {
         // check for server/client step drift
         if (this.gameEngine.serverStep) {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Client will skip a step.`);
-                // this.skipOneStep = true; // too jittery.
-                this.gameEngine.world.stepCount--;
-                this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
+                this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Delaying next step.`);
+                this.delayNextStep = true;
             } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  Client is behind server.`);
-                this.doubleStep = true;
+                this.gameEngine.trace.warn(`step drift.  Client is behind server.  Hurrying next step.`);
+                this.hurryNextStep = true;
             }
         }
 

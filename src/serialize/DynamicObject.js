@@ -167,7 +167,6 @@ class DynamicObject extends Serializable {
         // TODO: copyFrom could just look at the netscheme?
         this.id = sourceObj.id;
         this.playerId = sourceObj.playerId;
-        this.isPlayerControlled = sourceObj.isPlayerControlled;
 
         this.x = sourceObj.x;
         this.y = sourceObj.y;
