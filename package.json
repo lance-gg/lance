@@ -1,7 +1,20 @@
 {
   "name": "incheon",
-  "version": "0.2.0",
+  "version": "0.9.3",
   "description": "A Node.js based real-time game server",
+  "keywords": [
+      "pixijs",
+      "pixi",
+      "socket",
+      "canvas",
+      "WebGL",
+      "HTML5",
+      "physics",
+      "engine",
+      "game",
+      "realtime",
+      "multiplayer"
+  ],
   "dependencies": {
     "eventemitter3": "^1.2.0",
     "node-gameloop": "^0.1.0",
