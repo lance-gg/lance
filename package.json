@@ -3,20 +3,21 @@
   "version": "0.9.3",
   "description": "A Node.js based real-time game server",
   "keywords": [
-      "pixijs",
-      "pixi",
-      "socket",
-      "canvas",
-      "WebGL",
-      "HTML5",
-      "physics",
-      "engine",
-      "game",
-      "realtime",
-      "multiplayer"
+    "pixijs",
+    "pixi",
+    "socket",
+    "canvas",
+    "WebGL",
+    "HTML5",
+    "physics",
+    "engine",
+    "game",
+    "realtime",
+    "multiplayer"
   ],
   "dependencies": {
     "eventemitter3": "^1.2.0",
+    "mkdirp": "^0.5.1",
     "node-gameloop": "^0.1.0",
     "socket.io": "^1.4.6",
     "socket.io-client": "^1.4.6"

@@ -33,6 +33,7 @@ class ServerEngine {
      * @param {Object} options - server options
      * @param {Number} options.frameRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
+     * @param {String} options.tracesPath - path where traces should go
      * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
      * @return {ServerEngine} serverEngine - self
      */
@@ -41,10 +42,15 @@ class ServerEngine {
             updateRate: 6,
             frameRate: 60,  // TODO: this is no longer a frame rate, this is a stepRate
             timeoutInterval: 180,
+            tracesPath: '',
             debug: {
                 serverSendLag: false
             }
         }, options);
+        if (this.options.tracesPath !== '') {
+            this.options.tracesPath += '/';
+            require('mkdirp').sync(this.options.tracesPath);
+        }
 
         this.io = io;
 
@@ -138,7 +144,7 @@ class ServerEngine {
             let traceData = this.gameEngine.trace.rotate();
             let traceString = '';
             traceData.forEach(t => { traceString += `[${t.time.toISOString()}]${t.step}>${t.data}\n`; });
-            fs.appendFile('server.trace', traceString, err => { if (err) throw err; });
+            fs.appendFile(`${this.options.tracesPath}server.trace`, traceString, err => { if (err) throw err; });
         }
     }
 
@@ -204,7 +210,7 @@ class ServerEngine {
             traceData = JSON.parse(traceData);
             let traceString = '';
             traceData.forEach(t => { traceString += `[${t.time}]${t.step}>${t.data}\n`; });
-            fs.appendFile(`client.${playerId}.trace`, traceString, err => { if (err) throw err; });
+            fs.appendFile(`${that.options.tracesPath}client.${playerId}.trace`, traceString, err => { if (err) throw err; });
         });
 
         this.networkMonitor.registerPlayerOnServer(socket);
