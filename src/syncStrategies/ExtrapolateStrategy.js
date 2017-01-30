@@ -213,13 +213,16 @@ class ExtrapolateStrategy extends SyncStrategy {
             this.gameEngine.trace.trace(`object after extrapolate replay: ${world.objects[objId].toString()}`);
         }
 
-        // destroy uneeded objects
-        // TODO: use this.forEachSyncObject instead of for-loop
-        //       you will need to loop over prevObj instead of nextObj
+        // destroy objects
         for (let objId of Object.keys(world.objects)) {
-            if (objId < this.gameEngine.options.clientIDSpace && !this.newSync.syncObjects.hasOwnProperty(objId)) {
-                this.gameEngine.removeObjectFromWorld(objId);
-            }
+            let objEvents = this.newSync.syncObjects[objId];
+            if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
+                continue;
+
+            objEvents.forEach((e) => {
+                if (e.eventName === 'objectDestroy')
+                    this.gameEngine.removeObjectFromWorld(objId);
+            });
         }
 
         this.newSync = null;

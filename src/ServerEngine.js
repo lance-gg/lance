@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const Utils = require('./lib/Utils');
 const Gameloop = require('node-gameloop');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
@@ -67,9 +68,11 @@ class ServerEngine {
         this.connectedPlayers = {};
         this.playerInputQueues = {};
         this.pendingAtomicEvents = [];
+        this.objMemory = {};
 
         io.on('connection', this.onPlayerConnected.bind(this));
         this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
+        this.gameEngine.on('objectDestroyed', this.onObjectDestroyed.bind(this));
 
         return this;
     }
@@ -86,7 +89,6 @@ class ServerEngine {
 
     // every server step starts here
     step() {
-        var that = this;
 
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
@@ -112,29 +114,25 @@ class ServerEngine {
         this.gameEngine.step();
 
         // update clients only at the specified step interval, as defined in options
-        if (this.gameEngine.world.stepCount % this.options.updateRate == 0) {
-            let payload = this.serializeUpdate();
-            for (let socketId in this.connectedPlayers) {
-                if (this.connectedPlayers.hasOwnProperty(socketId)) {
-                    this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} ==========`);
+        if (this.gameEngine.world.stepCount % this.options.updateRate === 0) {
+            this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} ==========`);
 
-                    // TODO: this is the wrong way to simulate server lag.
-                    //       the right way is to keep a queue of pending payloads
-                    //       and to send them when their scheduled step arrives.
-                    //       setTimeout is our nemesis and should be bludgeoned
-                    // simulate server send lag
-                    if (this.options.debug.serverSendLag !== false) {
-                        setTimeout(function() {
-                            // verify again that the player exists
-                            if (that.connectedPlayers[socketId]) {
-                                that.connectedPlayers[socketId].emit('worldUpdate', payload);
-                            }
-                        }, that.options.debug.serverSendLag);
-                    } else {
-                        this.connectedPlayers[socketId].emit('worldUpdate', payload);
-                    }
+            // if at least one player is new, we should send a full payload
+            let diffUpdate = true;
+            for (let socketId of Object.keys(this.connectedPlayers)) {
+                let player = this.connectedPlayers[socketId];
+                if (player.state === 'new') {
+                    player.state = 'synced';
+                    diffUpdate = false;
                 }
             }
+            let payload = this.serializeUpdate({ diffUpdate });
+            for (let socketId of Object.keys(this.connectedPlayers)) {
+
+                // TODO: implement server lag by queuing the emit to a future step
+                this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
+            }
+            this.networkTransmitter.clearPayload();
         }
 
         // step is done on the server side
@@ -149,23 +147,55 @@ class ServerEngine {
     }
 
     // create a serialized package of the game world
-    serializeUpdate() {
+    serializeUpdate(options) {
         let world = this.gameEngine.world;
+        let diffUpdate = Boolean(options && options.diffUpdate);
 
         for (let objId of Object.keys(world.objects)) {
+            let obj = world.objects[objId];
+
+            // if the object (in serialized form)
+            // hasn't changed, move on to next object
+            if (diffUpdate) {
+                let s = obj.serialize(this.serializer);
+                if (this.objMemory[objId] && Utils.arrayBuffersEqual(s.dataBuffer, this.objMemory[objId])) {
+                    continue;
+                } else {
+                    this.objMemory[objId] = s.dataBuffer;
+                }
+            }
+
             this.networkTransmitter.addNetworkedEvent("objectUpdate", {
                 stepCount: world.stepCount,
-                objectInstance: world.objects[objId]
+                objectInstance: obj
             });
         }
 
-        return this.networkTransmitter.serializePayload({ resetPayload: true });
+        // remove memory objects which no longer exist
+        if (diffUpdate) {
+            for (let objId of Object.keys(this.objMemory)) {
+                if (!(objId in world.objects)) {
+                    delete this.objMemory[objId];
+                }
+            }
+        }
+
+        return this.networkTransmitter.serializePayload();
     }
 
     // handle the object creation
     onObjectAdded(obj) {
         console.log('object created event');
         this.networkTransmitter.addNetworkedEvent("objectCreate", {
+            stepCount: this.gameEngine.world.stepCount,
+            objectInstance: obj
+        });
+    }
+
+    // handle the object creation
+    onObjectDestroyed(obj) {
+        console.log('object destroyed event');
+        this.networkTransmitter.addNetworkedEvent("objectDestroy", {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
         });
@@ -178,7 +208,10 @@ class ServerEngine {
         console.log('Client connected');
 
         // save player
-        this.connectedPlayers[socket.id] = socket;
+        this.connectedPlayers[socket.id] = {
+            socket: socket,
+            state: 'new'
+        };
         let playerId = socket.playerId = ++this.gameEngine.world.playerCount;
         socket.lastHandledInput = null;
         this.resetIdleTimeout(socket);
@@ -258,7 +291,7 @@ class ServerEngine {
     // an input has been received from a client, queue it for next step
     onReceivedInput(data, socket) {
         if (this.connectedPlayers[socket.id]) {
-            this.connectedPlayers[socket.id].lastHandledInput = data.messageIndex;
+            this.connectedPlayers[socket.id].socket.lastHandledInput = data.messageIndex;
         }
         this.gameEngine.emit('server__inputReceived', {
             input: data,

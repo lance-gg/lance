@@ -34,7 +34,7 @@ class NetworkTransmitter {
         this.registerNetworkedEventFactory("objectDestroy", {
             netScheme: {
                 stepCount: { type: Serializer.TYPES.INT32 },
-                id: { type: Serializer.TYPES.UINT8 }
+                objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
             }
         });
     }
@@ -66,14 +66,9 @@ class NetworkTransmitter {
         return stagedNetworkedEvent;
     }
 
-    serializePayload(options) {
+    serializePayload() {
         let networkedEventCollection = new NetworkedEventCollection(this.payload);
         let dataBuffer = networkedEventCollection.serialize(this.serializer);
-
-        // reset payload
-        if (options.resetPayload) {
-            this.payload = [];
-        }
 
         return dataBuffer;
     }
