@@ -41,6 +41,13 @@ const DynamicObject = require('incheon').serialize.DynamicObject;
 
 class Paddle extends DynamicObject {
 
+    static newFrom(sourceObj){
+        let newPaddle = new Paddle();
+        newPaddle.copyFrom(sourceObj);
+
+        return newPaddle;
+    }
+
     constructor(id, x, y) {
         super(id, x, y);
         this.class = Paddle;
@@ -64,6 +71,13 @@ We also give the Ball an initial velocity when it is created.
 const DynamicObject = require('incheon').serialize.DynamicObject;
 
 class Ball extends DynamicObject {
+
+    static newFrom(sourceObj){
+        let newBall = new Ball();
+        newBall.copyFrom(sourceObj);
+
+        return newBall;
+    }
 
     get bendingMultiple() { return 0.8; }
     get bendingVelocityMultiple() { return 0; }
