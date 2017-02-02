@@ -16,6 +16,7 @@
     "multiplayer"
   ],
   "dependencies": {
+    "cannon": "^0.6.2",
     "eventemitter3": "^1.2.0",
     "mkdirp": "^0.5.1",
     "node-gameloop": "^0.1.0",

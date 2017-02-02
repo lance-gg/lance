@@ -5,7 +5,6 @@
 class PhysicsEngine {
 
     init(options) {
-
         this.options = options;
         this.gameEngine = options.gameEngine;
     }

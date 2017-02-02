@@ -9,7 +9,7 @@ class PhysicalObject extends Serializable {
 
     static get netScheme() {
         return {
-            id: { type: Serializer.TYPES.UINT32 },
+            id: { type: Serializer.TYPES.INT32 },
             playerId: { type: Serializer.TYPES.UINT8 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
@@ -17,14 +17,21 @@ class PhysicalObject extends Serializable {
         };
     }
 
-    constructor(id, position, velocity, quaternion, physicsBody) {
+    constructor(id, position, velocity, quaternion) {
         super();
         this.id = id;
         this.playerId = 0;
-        this.position = new ThreeVector(position.x, position.y, position.z);
-        this.velocity = new ThreeVector(velocity.x, velocity.y, velocity.z);
-        this.quaternion = new FourVector(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
-        this.physicsBody = physicsBody;
+
+        // set default position, velocity and quaternion
+        this.position = new ThreeVector(0, 0, 0);
+        this.velocity = new ThreeVector(0, 0, 0);
+        this.quaternion = new FourVector(0, 0, 0, 0);
+
+        // use values if provided
+        if (position) this.position.copy(position);
+        if (velocity) this.position.copy(velocity);
+        if (quaternion) this.position.copy(quaternion);
+
         this.class = PhysicalObject;
     }
 
@@ -37,9 +44,15 @@ class PhysicalObject extends Serializable {
     }
 
     refreshPhysics() {
-        this.position.copy(this.physicsBody.position);
-        this.quaternion.copy(this.physicsBody.quaternion);
-        this.velocity.copy(this.physicsBody.velocity);
+        this.position.copy(this.physicsObj.position);
+        this.quaternion.copy(this.physicsObj.quaternion);
+        this.velocity.copy(this.physicsObj.velocity);
+
+        if (this.renderObj) {
+            this.renderObj.position.copy(this.physicsObj.position);
+            this.renderObj.quaternion.copy(this.physicsObj.quaternion);
+            this.renderObj.velocity.copy(this.physicsObj.velocity);
+        }
     }
 }
 

@@ -1,6 +1,6 @@
-/* global CANNON */
 'use strict';
 const PhysicsEngine = require('./PhysicsEngine');
+const CANNON = require('cannon');
 
 /**
  * CannonPhysicsEngine is a three-dimensional lightweight physics engine
@@ -8,7 +8,7 @@ const PhysicsEngine = require('./PhysicsEngine');
 class CannonPhysicsEngine extends PhysicsEngine {
 
     init(options) {
-        super(options);
+        super.init(options);
 
         this.options.dt = this.options.dt || (1 / 60);
         let world = this.world = new CANNON.World();
@@ -23,22 +23,27 @@ class CannonPhysicsEngine extends PhysicsEngine {
         this.world.step(this.options.dt);
     }
 
-    addSphere(r) {
-        let s = new CANNON.Sphere(r);
-        this.world.addBody(s);
-        return s;
+    addSphere(radius, mass) {
+        let shape = new CANNON.Sphere(radius);
+        let body = new CANNON.Body({ mass, shape });
+        body.position.set(0, 0, 0);
+        this.world.addBody(body);
+        return body;
     }
 
-    addBox(x, y, z) {
-        let b = new CANNON.Box(x, y, z);
-        this.world.addBody(b);
-        return b;
+    addBox(x, y, z, mass) {
+        let shape = new CANNON.Box(x, y, z);
+        let body = new CANNON.Body({ mass, shape });
+        body.position.set(0, 0, 0);
+        this.world.addBody(body);
+        return body;
     }
 
-    addCylinder(radiusTop, radiusBottom, height, numSegments) {
-        let c = new CANNON.Cylinder(radiusTop, radiusBottom, height, numSegments);
-        this.world.addBody(c);
-        return c;
+    addCylinder(radiusTop, radiusBottom, height, numSegments, mass) {
+        let shape = new CANNON.Cylinder(radiusTop, radiusBottom, height, numSegments);
+        let body = new CANNON.Body({ mass, shape });
+        this.world.addBody(body);
+        return body;
     }
 
     removeBody(obj) {
