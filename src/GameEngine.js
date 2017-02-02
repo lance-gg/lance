@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 const GameWorld = require('./GameWorld');
 const Timer = require('./lib/Timer');
 const EventEmitter = require('eventemitter3');
@@ -240,7 +240,7 @@ class GameEngine {
         this.timer = new Timer();
         this.timer.play();
 
-        this.on("postStep", function() {
+        this.on('postStep', function() {
             that.timer.tick();
         });
     }
@@ -252,7 +252,7 @@ class GameEngine {
       * and registering methods on the event handler.
       */
     start() {
-        this.trace.info(`========== game engine started ==========`);
+        this.trace.info('========== game engine started ==========');
         this.initWorld();
     }
 
@@ -262,7 +262,7 @@ class GameEngine {
         isReenact = Boolean(isReenact);
         let step = ++this.world.stepCount;
         let clientIDSpace = this.options.clientIDSpace;
-        this.emit("preStep", { step, isReenact });
+        this.emit('preStep', { step, isReenact });
 
         // skip physics for shadow objects during re-enactment
         function objectFilter(o) {
@@ -273,13 +273,16 @@ class GameEngine {
         if (this.physicsEngine)
             this.physicsEngine.step(objectFilter);
 
-        // trace object positions after physics
+        // refresh object positions after physics
         for (let objId of Object.keys(this.world.objects)) {
-            this.trace.trace(`object[${objId}] after ${isReenact ? "reenact" : "step"} : ${this.world.objects[objId].toString()}`);
+            let o = this.world.objects[objId];
+            if (typeof o.refreshPhysics === 'function')
+                o.refreshPhysics();
+            this.trace.trace(`object[${objId}] after ${isReenact ? 'reenact' : 'step'} : ${this.world.objects[objId].toString()}`);
         }
 
         // emit postStep event
-        this.emit("postStep", { step, isReenact });
+        this.emit('postStep', { step, isReenact });
     }
 
     /**
@@ -290,7 +293,7 @@ class GameEngine {
     addObjectToWorld(object) {
         this.world.objects[object.id] = object;
 
-        this.emit("objectAdded", object);
+        this.emit('objectAdded', object);
         this.trace.info(`========== object added ${object.toString()} ==========`);
     }
 
@@ -327,7 +330,7 @@ class GameEngine {
     removeObjectFromWorld(id) {
         let ob = this.world.objects[id];
         this.trace.info(`========== destroying object ${ob.toString()} ==========`);
-        this.emit("objectDestroyed", ob);
+        this.emit('objectDestroyed', ob);
         ob.destroy();
         delete this.world.objects[id];
     }

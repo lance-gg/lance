@@ -1,93 +1,46 @@
-"use strict";
+'use strict';
 
 const Serializable = require('./Serializable');
 const Serializer = require('./Serializer');
+const ThreeVector = require('./ThreeVector');
+const FourVector = require('./FourVector');
 
 class PhysicalObject extends Serializable {
 
-    static get properties() {
-        return {
-            id: 7, // class id  //TODO this should hashed from the class name
-            name: "PhysicalObject"
-        };
-    }
-
     static get netScheme() {
         return {
-            id: {
-                type: Serializer.TYPES.UINT8
-            },
-            x: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            y: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            z: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            rx: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            ry: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            rz: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            velX: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            velY: {
-                type: Serializer.TYPES.FLOAT32
-            },
-            velZ: {
-                type: Serializer.TYPES.FLOAT32
-            }
+            id: { type: Serializer.TYPES.UINT32 },
+            playerId: { type: Serializer.TYPES.UINT8 },
+            position: { type: Serializer.TYPES.CLASSINSTANCE },
+            velocity: { type: Serializer.TYPES.CLASSINSTANCE },
+            quaternion: { type: Serializer.TYPES.CLASSINSTANCE }
         };
     }
 
-    constructor(id, x, y, z, rx, ry, rz) {
+    constructor(id, position, velocity, quaternion, physicsBody) {
         super();
-        this.id = id; // instance id
-        this.copy(x, y, z, rx, ry, rz);
-        this.velX = 0;
-        this.velY = 0;
-        this.velZ = 0;
-        this.physicsEngine = null;
-        this.physicalObject = null;
+        this.id = id;
+        this.playerId = 0;
+        this.position = new ThreeVector(position.x, position.y, position.z);
+        this.velocity = new ThreeVector(velocity.x, velocity.y, velocity.z);
+        this.quaternion = new FourVector(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
+        this.physicsBody = physicsBody;
         this.class = PhysicalObject;
-    }
-
-    copy(x, y, z, rx, ry, rz) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.rx = rx;
-        this.ry = ry;
-        this.rz = rz;
     }
 
     // for debugging purposes mostly
     toString() {
-        function round3(x) { return Math.round(x*1000)/1000; }
-        function showVec(x,y,z) { return `(${round3(x)},${round3(y)},${round3(z)})`; }
-        return `PhysicalObject[${this.id}] position${showVec(this.x, this.y, this.z)} rotation${showVec(this.rx, this.ry, this.rz)}`;
+        let p = this.position.toString();
+        let v = this.velocity.toString();
+        let q = this.quaternion.toString();
+        return `phyObj[${this.id}] player${this.playerId} pos${p} vel${v} quat${q}`;
     }
 
-    // intialize physics for this object
-    initPhysicsObject(physicsEngine) {
-        if (!this.physicalObject) {
-            this.physicsEngine = physicsEngine;
-            this.physicalObject = physicsEngine.addObject(this.id);
-        }
+    refreshPhysics() {
+        this.position.copy(this.physicsBody.position);
+        this.quaternion.copy(this.physicsBody.quaternion);
+        this.velocity.copy(this.physicsBody.velocity);
     }
-
-    // release resources
-    destroy() {
-        console.log(`destroying object ${this.id}`);
-    }
-
 }
 
 module.exports = PhysicalObject;

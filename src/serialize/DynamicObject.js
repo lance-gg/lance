@@ -325,11 +325,6 @@ class DynamicObject extends Serializable {
         this.angle = this.angle + shortestAngle * playPercentage;
 
     }
-
-    // release resources
-    destroy() {
-        console.log(`destroying object ${this.id}`);
-    }
 }
 
 module.exports = DynamicObject;

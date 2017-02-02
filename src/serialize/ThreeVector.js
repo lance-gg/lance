@@ -1,0 +1,52 @@
+'use strict';
+
+const Serializable = require('./Serializable');
+const Serializer = require('./Serializer');
+
+/**
+ * A ThreeVector is a geometric object which is completely described
+ * by three values.
+ */
+class ThreeVector extends Serializable {
+
+    static get netScheme() {
+        return {
+            x: { type: Serializer.TYPES.INT32 },
+            y: { type: Serializer.TYPES.INT32 },
+            z: { type: Serializer.TYPES.INT32 }
+        };
+    }
+
+    /**
+    * Creates an instance of a ThreeVector.
+    * @param {Number} x - first value
+    * @param {Number} y - second value
+    * @param {Number} z - second value
+    * @return {ThreeVector} v - the new ThreeVector
+    */
+    constructor(x, y, z) {
+        super();
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        return this;
+    }
+
+    /**
+     * Formatted textual description of the ThreeVector.
+     * @return {String} description
+     */
+    toString() {
+        function round3(x) { return Math.round(x * 1000) / 1000; }
+        return `(${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)})`;
+    }
+
+    copy(sourceObj) {
+        this.x = sourceObj.x;
+        this.y = sourceObj.y;
+        this.z = sourceObj.z;
+    }
+}
+
+module.exports = ThreeVector;

@@ -12,7 +12,6 @@ class SimplePhysicsEngine extends PhysicsEngine {
     init(initOptions) {
         super.init(initOptions);
         this.collisionDetection = new CollisionDetection();
-        this.gameEngine = initOptions.gameEngine;
 
         let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, initOptions.collisionOptions);
         this.collisionDetection.init(collisionOptions);

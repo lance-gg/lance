@@ -1,12 +1,11 @@
-"use strict";
+'use strict';
 
-const Serializer = require('./../serialize/Serializer');
 const Serializable = require('./../serialize/Serializable');
 const Utils = require('./../lib/Utils');
 
 class NetworkedEventFactory {
 
-    constructor(serializer, eventName, options){
+    constructor(serializer, eventName, options) {
         options = Object.assign({}, options);
 
         this.seriazlier = serializer;
@@ -19,31 +18,27 @@ class NetworkedEventFactory {
 
     /**
      * Creates a new networkedEvent
-     * @param payload an object representing the payload to be transferred over the wire
-     * @returns {Serializable} the new networkedEvent object
+     * @param {Object} payload an object representing the payload to be transferred over the wire
+     * @return {Serializable} the new networkedEvent object
      */
-    create(payload){
+    create(payload) {
         let networkedEvent = new Serializable();
         networkedEvent.classId = Utils.hashStr(this.eventName);
 
         if (this.netScheme) {
             networkedEvent.netScheme = Object.assign({}, this.netScheme);
 
-            //copy properties from the networkedEvent instance to its ad-hoc netsScheme
-            for(let property of Object.keys(this.netScheme)){
+            // copy properties from the networkedEvent instance to its ad-hoc netsScheme
+            for (let property of Object.keys(this.netScheme)) {
                 networkedEvent[property] = payload[property];
             }
 
+        } else {
+            // todo take care of the event where no netScheme is defined
         }
-        else{
-            //todo take care of the event where no netScheme is defined
-
-        }
-
 
         return networkedEvent;
-    };
-
+    }
 
 }
 

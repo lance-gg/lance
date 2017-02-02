@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class GameWorld {
     constructor() {
@@ -30,6 +30,36 @@ class GameWorld {
         }
 
         return world;
+    }
+
+    /**
+     * Return the primary game object for a specific player
+     *
+     * @param {String} playerId the player ID
+     * @return {Object} game object for this player
+     */
+    getPlayerObject(playerId) {
+        for (let objId in this.world.objects) {
+            let o = this.world.objects[objId];
+            if (o.playerId === playerId)
+                return o;
+        }
+    }
+
+    /**
+     * Return an array of all the game objects owned by a specific player
+     *
+     * @param {String} playerId the player ID
+     * @return {Array} game objects owned by this player
+     */
+    getOwnedObject(playerId) {
+        let owned = [];
+        for (let objId in this.world.objects) {
+            let o = this.world.objects[objId];
+            if (o.ownerId === playerId)
+                owned.push(o);
+        }
+        return owned;
     }
 
 }
