@@ -75,6 +75,22 @@ class GameEngine {
      * @param {String} playerDesc.playerId - the player ID
      */
 
+     /**
+      * A player has joined on the server
+      *
+      * @event GameEngine#server__playerJoined
+      * @param {Object} playerDesc - player descriptor
+      * @param {String} playerDesc.playerId - the player ID
+      */
+
+     /**
+      * A player has left on the server
+      *
+      * @event GameEngine#server__playerDisconnected
+      * @param {Object} playerDesc - player descriptor
+      * @param {String} playerDesc.playerId - the player ID
+      */
+
     /**
      * A synchronization update arrived from the server
      *
@@ -237,6 +253,7 @@ class GameEngine {
         */
         this.worldSettings = {};
 
+        // TODO: remove this timer
         this.timer = new Timer();
         this.timer.play();
 

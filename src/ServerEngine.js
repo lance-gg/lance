@@ -81,6 +81,7 @@ class ServerEngine {
     start() {
         var that = this;
         this.gameEngine.start();
+        this.gameEngine.emit('server__init');
 
         this.gameLoopId = Gameloop.setGameLoop(function() {
             that.step();
@@ -92,7 +93,7 @@ class ServerEngine {
 
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
-        this.gameEngine.emit("server__preStep", this.gameEngine.world.stepCount + 1);
+        this.gameEngine.emit('server__preStep', this.gameEngine.world.stepCount + 1);
 
         this.serverTime = (new Date().getTime());
 
@@ -136,7 +137,7 @@ class ServerEngine {
         }
 
         // step is done on the server side
-        this.gameEngine.emit("server__postStep", this.gameEngine.world.stepCount);
+        this.gameEngine.emit('server__postStep', this.gameEngine.world.stepCount);
 
         if (this.gameEngine.trace.length) {
             let traceData = this.gameEngine.trace.rotate();
@@ -165,7 +166,7 @@ class ServerEngine {
                 }
             }
 
-            this.networkTransmitter.addNetworkedEvent("objectUpdate", {
+            this.networkTransmitter.addNetworkedEvent('objectUpdate', {
                 stepCount: world.stepCount,
                 objectInstance: obj
             });
@@ -186,7 +187,7 @@ class ServerEngine {
     // handle the object creation
     onObjectAdded(obj) {
         console.log('object created event');
-        this.networkTransmitter.addNetworkedEvent("objectCreate", {
+        this.networkTransmitter.addNetworkedEvent('objectCreate', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
         });
@@ -195,7 +196,7 @@ class ServerEngine {
     // handle the object creation
     onObjectDestroyed(obj) {
         console.log('object destroyed event');
-        this.networkTransmitter.addNetworkedEvent("objectDestroy", {
+        this.networkTransmitter.addNetworkedEvent('objectDestroy', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
         });
@@ -216,7 +217,7 @@ class ServerEngine {
         socket.lastHandledInput = null;
         this.resetIdleTimeout(socket);
 
-        console.log("Client Connected", socket.id);
+        console.log('Client Connected', socket.id);
 
         this.gameEngine.emit('server__playerJoined', {
             playerId: playerId
