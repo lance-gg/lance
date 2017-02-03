@@ -5,6 +5,26 @@ const Serializer = require('./Serializer');
 const ThreeVector = require('./ThreeVector');
 const FourVector = require('./FourVector');
 
+/**
+ * The PhysicalObject is the base class for physical game objects.
+ *
+ * Each sub-class of PhysicalObject must override the following methods
+ * if necessary:
+ *
+ * - static get netScheme() - base attributes which must be broadcast
+ *   to all clients, on every update.  Make sure you extend the existing
+ *   netScheme, don't start from scratch.
+ * - constructor() - creates a simple object, temporary in nature.
+ * - joinGame() - the object should now join the game, by creating
+ *   physical entities in the physics engine, and by creating renderable
+ *   objects in the renderer.  The object becomes part of the game.
+ * - toString() - a textual representation of the object which can help
+ *   in debugging and traces
+ * - copyFrom() - adopt values from another object. Used to update an
+ *   object on the client with new values that arrived from the server.
+ * - refreshPhysics() - the physical sub-entities may have changed, this
+ *   function must update the object's attributes accordingly.
+ */
 class PhysicalObject extends Serializable {
 
     static get netScheme() {
@@ -35,6 +55,9 @@ class PhysicalObject extends Serializable {
         this.class = PhysicalObject;
     }
 
+    // join game by creating physics sub-objects, and renderer sub-objects
+    joinGame(gameEngine) {}
+
     // for debugging purposes mostly
     toString() {
         let p = this.position.toString();
@@ -43,6 +66,39 @@ class PhysicalObject extends Serializable {
         return `phyObj[${this.id}] player${this.playerId} pos${p} vel${v} quat${q}`;
     }
 
+    saveState(other) {
+        this.savedCopy = (new this.constructor());
+        this.savedCopy.copyFrom(other ? other : this);
+    }
+
+    bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
+        if (this.savedCopy) {
+            this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
+        }
+        this.savedCopy = null;
+    }
+
+    // TODO: implement
+    bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
+
+    }
+
+    syncTo(other) {
+        this.id = other.id;
+        this.playerId = other.playerId;
+
+        this.position.copy(other.position);
+        this.quaternion.copy(other.quaternion);
+        this.velocity.copy(other.velocity);
+    }
+
+    // remove copyFrom method
+    copyFrom(other) {
+        this.syncTo(other);
+    }
+
+    // update position, quaternion, and velocity according to
+    // new physical state.
     refreshPhysics() {
         this.position.copy(this.physicsObj.position);
         this.quaternion.copy(this.physicsObj.quaternion);
@@ -51,7 +107,6 @@ class PhysicalObject extends Serializable {
         if (this.renderObj) {
             this.renderObj.position.copy(this.physicsObj.position);
             this.renderObj.quaternion.copy(this.physicsObj.quaternion);
-            this.renderObj.velocity.copy(this.physicsObj.velocity);
         }
     }
 }

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const Point = require('../Point');
 const Serializable = require('./Serializable');
@@ -162,6 +162,7 @@ class DynamicObject extends Serializable {
         return `dObj[${this.id}] player${this.playerId} pos${showVec(this.x, this.y, this.z)} vel${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
     }
 
+    // TODO: remove this
     copyFrom(sourceObj) {
 
         // TODO: copyFrom could just look at the netscheme?

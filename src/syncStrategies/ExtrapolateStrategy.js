@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const SyncStrategy = require("./SyncStrategy");
+const SyncStrategy = require('./SyncStrategy');
 
 const defaults = {
     syncsBufferLength: 5,
@@ -77,13 +77,6 @@ class ExtrapolateStrategy extends SyncStrategy {
         curObj.copyFrom(newObj);
         this.gameEngine.addObjectToWorld(curObj);
         console.log(`adding new object ${curObj}`);
-
-        // if this game keeps a physics engine on the client side,
-        // we need to update it as well
-        // TODO: why not have this call inside (gameEngine.addObjectToWorld() above?)
-        if (this.gameEngine.physicsEngine && curObj.hasOwnProperty('initPhysicsObject')) {
-            curObj.initPhysicsObject(this.gameEngine.physicsEngine);
-        }
 
         return curObj;
     }
