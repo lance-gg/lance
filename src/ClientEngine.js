@@ -33,7 +33,7 @@ class ClientEngine {
       * @param {Number} inputOptions.syncOptions.localObjBending - amount of bending towards original client position, after each sync, for local objects
       * @param {Number} inputOptions.syncOptions.remoteObjBending - amount of bending towards original client position, after each sync, for remote objects
       */
-    constructor(gameEngine, inputOptions) {
+    constructor(gameEngine, inputOptions, Renderer) {
 
         this.options = Object.assign({
             autoConnect: true,
@@ -58,6 +58,9 @@ class ClientEngine {
 
         this.inboundMessages = [];
         this.outboundMessages = [];
+
+        // create the renderer
+        this.renderer = this.gameEngine.renderer = new Renderer(gameEngine, this);
 
         /**
         * client's player ID, as a string.
