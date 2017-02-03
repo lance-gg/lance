@@ -39,8 +39,8 @@ class GameWorld {
      * @return {Object} game object for this player
      */
     getPlayerObject(playerId) {
-        for (let objId in this.world.objects) {
-            let o = this.world.objects[objId];
+        for (let objId of Object.keys(this.objects)) {
+            let o = this.objects[objId];
             if (o.playerId === playerId)
                 return o;
         }
@@ -54,8 +54,8 @@ class GameWorld {
      */
     getOwnedObject(playerId) {
         let owned = [];
-        for (let objId in this.world.objects) {
-            let o = this.world.objects[objId];
+        for (let objId of Object.keys(this.objects)) {
+            let o = this.objects[objId];
             if (o.ownerId === playerId)
                 owned.push(o);
         }
