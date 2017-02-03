@@ -16,6 +16,7 @@ class CannonPhysicsEngine extends PhysicsEngine {
         world.quatNormalizeFast = false;
         world.gravity.set(0, -10, 0);
         world.broadphase = new CANNON.NaiveBroadphase();
+        this.CANNON = CANNON;
     }
 
     // entry point for a single step of the Simple Physics
@@ -32,7 +33,7 @@ class CannonPhysicsEngine extends PhysicsEngine {
     }
 
     addBox(x, y, z, mass) {
-        let shape = new CANNON.Box(x, y, z);
+        let shape = new CANNON.Box(new CANNON.Vec3(x, y, z));
         let body = new CANNON.Body({ mass, shape });
         body.position.set(0, 0, 0);
         this.world.addBody(body);

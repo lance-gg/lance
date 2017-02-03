@@ -42,6 +42,23 @@ class ThreeVector extends Serializable {
         return `(${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)})`;
     }
 
+    multiplyScalar(s) {
+        this.x *= s;
+        this.y *= s;
+        this.z *= s;
+
+        return this;
+    }
+
+    length() {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    }
+
+    normalize() {
+        this.multiplyScalar(1 / this.length());
+        return this;
+    }
+
     copy(sourceObj) {
         this.x = sourceObj.x;
         this.y = sourceObj.y;
