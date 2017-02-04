@@ -11,10 +11,10 @@ class FourVector extends Serializable {
 
     static get netScheme() {
         return {
-            w: { type: Serializer.TYPES.INT32 },
-            x: { type: Serializer.TYPES.INT32 },
-            y: { type: Serializer.TYPES.INT32 },
-            z: { type: Serializer.TYPES.INT32 }
+            w: { type: Serializer.TYPES.FLOAT32 },
+            x: { type: Serializer.TYPES.FLOAT32 },
+            y: { type: Serializer.TYPES.FLOAT32 },
+            z: { type: Serializer.TYPES.FLOAT32 }
         };
     }
 

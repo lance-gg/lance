@@ -11,9 +11,9 @@ class ThreeVector extends Serializable {
 
     static get netScheme() {
         return {
-            x: { type: Serializer.TYPES.INT32 },
-            y: { type: Serializer.TYPES.INT32 },
-            z: { type: Serializer.TYPES.INT32 }
+            x: { type: Serializer.TYPES.FLOAT32 },
+            y: { type: Serializer.TYPES.FLOAT32 },
+            z: { type: Serializer.TYPES.FLOAT32 }
         };
     }
 
