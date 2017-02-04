@@ -15,7 +15,7 @@ const FourVector = require('./FourVector');
  *   to all clients, on every update.  Make sure you extend the existing
  *   netScheme, don't start from scratch.
  * - constructor() - creates a simple object, temporary in nature.
- * - joinGame() - the object should now join the game, by creating
+ * - onAddToWorld() - the object should now join the game, by creating
  *   physical entities in the physics engine, and by creating renderable
  *   objects in the renderer.  The object becomes part of the game.
  * - toString() - a textual representation of the object which can help
@@ -55,8 +55,9 @@ class PhysicalObject extends Serializable {
         this.class = PhysicalObject;
     }
 
-    // join game by creating physics sub-objects, and renderer sub-objects
-    joinGame(gameEngine) {}
+    // add this object to the game-world by creating physics sub-objects,
+    // and renderer sub-objects
+    onAddToWorld(gameEngine) {}
 
     // for debugging purposes mostly
     toString() {

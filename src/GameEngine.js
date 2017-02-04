@@ -312,8 +312,8 @@ class GameEngine {
 
         // tell the object to join the game, by creating
         // its corresponding physical entities and renderer entities.
-        if (typeof object.joinGame === 'function')
-            object.joinGame(this);
+        if (typeof object.onAddToWorld === 'function')
+            object.onAddToWorld(this);
 
         this.emit('objectAdded', object);
         this.trace.info(`========== object added ${object.toString()} ==========`);
