@@ -8,6 +8,14 @@ class GameWorld {
         this.idCount = 0;
     }
 
+    // TODO: objectIDs are strings, because they are keys into the attributes
+    // this.objects.  This is the source of many bugs.  Keep the objects keyed
+    // by strings because javascript requires it (attribute keys cannot
+    // be numbers).  But enforce a new rule that
+    // objectIDs should be passed around from function to function as integers.
+    // As well as playerId and ownerId. This is because of better netScheme
+    // optimization.
+
     // TODO: remove this function
     static deserialize(gameEngine, serializer, worldData) {
 
@@ -35,7 +43,7 @@ class GameWorld {
     /**
      * Return the primary game object for a specific player
      *
-     * @param {String} playerId the player ID
+     * @param {Number} playerId the player ID
      * @return {Object} game object for this player
      */
     getPlayerObject(playerId) {
@@ -49,7 +57,7 @@ class GameWorld {
     /**
      * Return an array of all the game objects owned by a specific player
      *
-     * @param {String} playerId the player ID
+     * @param {Number} playerId the player ID
      * @return {Array} game objects owned by this player
      */
     getOwnedObject(playerId) {

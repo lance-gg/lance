@@ -98,7 +98,8 @@ class ServerEngine {
         this.serverTime = (new Date().getTime());
 
         // for each player, replay all the inputs in the oldest step
-        for (let playerId of Object.keys(this.playerInputQueues)) {
+        for (let playerIdStr of Object.keys(this.playerInputQueues)) {
+            let playerId = Number(playerIdStr);
             let inputQueue = this.playerInputQueues[playerId];
             let queueSteps = Object.keys(inputQueue);
             let minStep = Math.min.apply(null, queueSteps);
@@ -219,19 +220,12 @@ class ServerEngine {
 
         console.log('Client Connected', socket.id);
 
-        this.gameEngine.emit('server__playerJoined', {
-            playerId: playerId
-        });
-
-        socket.emit('playerJoined', {
-            playerId: playerId
-        });
+        this.gameEngine.emit('server__playerJoined', { playerId });
+        socket.emit('playerJoined', { playerId });
 
         socket.on('disconnect', function() {
             that.onPlayerDisconnected(socket.id, playerId);
-            that.gameEngine.emit('server__playerDisconnected', {
-                playerId: playerId
-            });
+            that.gameEngine.emit('server__playerDisconnected', { playerId });
         });
 
         // todo rename, use number instead of name
