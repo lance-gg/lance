@@ -30,7 +30,7 @@ class PhysicalObject extends Serializable {
     static get netScheme() {
         return {
             id: { type: Serializer.TYPES.INT32 },
-            playerId: { type: Serializer.TYPES.UINT8 },
+            playerId: { type: Serializer.TYPES.INT16 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
             quaternion: { type: Serializer.TYPES.CLASSINSTANCE }
