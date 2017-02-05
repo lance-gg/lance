@@ -41,6 +41,17 @@ class GameWorld {
     }
 
     /**
+     * World object iterator.
+     * Invoke callback(objId, obj) for each object
+     *
+     * @param {function} callback function receives id and object
+     */
+    forEachObject(callback) {
+        for (let id of Object.keys(this.objects))
+            callback(id, this.objects[id]);
+    }
+
+    /**
      * Return the primary game object for a specific player
      *
      * @param {Number} playerId the player ID
