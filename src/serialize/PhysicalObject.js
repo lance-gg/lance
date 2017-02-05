@@ -22,7 +22,7 @@ const FourVector = require('./FourVector');
  *   in debugging and traces
  * - copyFrom() - adopt values from another object. Used to update an
  *   object on the client with new values that arrived from the server.
- * - refreshPhysics() - the physical sub-entities may have changed, this
+ * - refreshFromPhysics() - the physical sub-entities may have changed, this
  *   function must update the object's attributes accordingly.
  */
 class PhysicalObject extends Serializable {
@@ -91,6 +91,9 @@ class PhysicalObject extends Serializable {
         this.position.copy(other.position);
         this.quaternion.copy(other.quaternion);
         this.velocity.copy(other.velocity);
+
+        if (this.physicsObj)
+            this.refreshToPhysics();
     }
 
     // remove copyFrom method
@@ -98,13 +101,22 @@ class PhysicalObject extends Serializable {
         this.syncTo(other);
     }
 
-    // update position, quaternion, and velocity according to
-    // new physical state.
-    refreshPhysics() {
+    // update position, quaternion, and velocity from new physical state.
+    refreshFromPhysics() {
         this.position.copy(this.physicsObj.position);
         this.quaternion.copy(this.physicsObj.quaternion);
         this.velocity.copy(this.physicsObj.velocity);
+    }
 
+    // update position, quaternion, and velocity from new physical state.
+    refreshToPhysics() {
+        this.physicsObj.position.copy(this.position);
+        this.physicsObj.quaternion.copy(this.quaternion);
+        this.physicsObj.velocity.copy(this.velocity);
+    }
+
+    // refresh the renderable position
+    refreshRenderObject() {
         if (this.renderObj) {
             this.renderObj.position.copy(this.physicsObj.position);
             this.renderObj.quaternion.copy(this.physicsObj.quaternion);

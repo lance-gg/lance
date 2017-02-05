@@ -293,8 +293,8 @@ class GameEngine {
         // refresh object positions after physics
         for (let objId of Object.keys(this.world.objects)) {
             let o = this.world.objects[objId];
-            if (typeof o.refreshPhysics === 'function')
-                o.refreshPhysics();
+            if (typeof o.refreshFromPhysics === 'function')
+                o.refreshFromPhysics();
             this.trace.trace(`object[${objId}] after ${isReenact ? 'reenact' : 'step'} : ${this.world.objects[objId].toString()}`);
         }
 
