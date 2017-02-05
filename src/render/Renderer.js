@@ -13,6 +13,7 @@ class Renderer {
     /**
     * Constructor of the Renderer singleton.
     * @param {GameEngine} gameEngine - Reference to the GameEngine instance.
+    * @param {ClientEngine} clientEngine - Reference to the ClientEngine instance.
     */
     constructor(gameEngine, clientEngine) {
         this.gameEngine = gameEngine;
@@ -39,7 +40,12 @@ class Renderer {
      * The main draw function.  This method is called at high frequency,
      * at the rate of the render loop.  Typically this is 60Hz, in WebVR 90Hz.
      */
-    draw() {}
+    draw() {
+        this.gameEngine.world.forEachObject((id, o) => {
+            if (typeof o.refreshRenderObject === 'function')
+                o.refreshRenderObject();
+        });
+    }
 
     /**
      * Handle the addition of a new object to the world.
