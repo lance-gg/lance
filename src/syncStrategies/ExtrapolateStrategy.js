@@ -39,6 +39,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
     // collect a sync and its events
     collectSync(e) {
+
         // TODO avoid editing the input event
 
         // keep a reference of events by object id
@@ -113,15 +114,13 @@ class ExtrapolateStrategy extends SyncStrategy {
         // 3. if the object is new, just create it
         //
         let world = this.gameEngine.world;
-        let serverStep = -1;
+        let serverStep = this.newSync.stepCount;
         for (let ids of Object.keys(this.newSync.syncObjects)) {
 
             // TODO: we are currently taking only the first event out of
             // the events that may have arrived for this object
             let ev = this.newSync.syncObjects[ids][0];
-
             let curObj = world.objects[ev.objectInstance.id];
-            serverStep = Math.max(serverStep, ev.stepCount);
 
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
             if (localShadowObj) {
@@ -192,13 +191,8 @@ class ExtrapolateStrategy extends SyncStrategy {
             let isLocal = (obj.playerId == this.clientEngine.playerId); // eslint-disable-line eqeqeq
             let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
-            if (obj.renderObject && obj.renderObject.visible === false) {
-                // TODO: visible is broken because renderObject is gone.
-                // visible should be a property of the object now, the Renderer
-                // can just look at it and understand.
-                obj.updateRenderObject();
-                obj.renderObject.visible = true;
-            }
+            if (typeof obj.refreshRenderObject === 'function')
+                obj.refreshRenderObject();
             this.gameEngine.trace.trace(`object[${objId}] bending=${bending} values (dx, dy, dphi) = (${obj.bendingX},${obj.bendingY},${obj.bendingAngle})`);
         }
 
