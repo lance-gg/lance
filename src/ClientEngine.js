@@ -240,7 +240,7 @@ class ClientEngine {
 
         if (this.gameEngine.trace.length && this.socket) {
             // socket might not have been initialized at this point
-            this.socket.emit("trace", JSON.stringify(this.gameEngine.trace.rotate()));
+            this.socket.emit('trace', JSON.stringify(this.gameEngine.trace.rotate()));
         }
     }
 
@@ -306,25 +306,20 @@ class ClientEngine {
     handleInboundMessage(syncData) {
 
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
-
-        // TODO: this should be done in a better way.
-        // derive stepCount by taking the max of all events
-        let maxStepCount = syncEvents.reduce((max, el) => {
-            return el.stepCount ? Math.max(max, el.stepCount) : max;
-        }, 0);
+        let syncHeader = syncEvents.filter((e) => e.eventName === 'syncHeader');
 
         // emit that a snapshot has been received
         this.gameEngine.emit('client__syncReceived', {
             syncEvents: syncEvents,
-            stepCount: maxStepCount
+            stepCount: syncHeader.stepCount
         });
 
-        this.gameEngine.trace.info(`========== inbound world update ${maxStepCount} ==========`);
+        this.gameEngine.trace.info(`========== inbound world update ${syncHeader.stepCount} ==========`);
 
         // finally update the stepCount
-        if (maxStepCount > this.gameEngine.world.stepCount) {
-            this.gameEngine.world.stepCount = maxStepCount;
-            this.gameEngine.trace.info(`========== world step count updated to  ${maxStepCount} ==========`);
+        if (syncHeader.stepCount > this.gameEngine.world.stepCount) {
+            this.gameEngine.world.stepCount = syncHeader.stepCount;
+            this.gameEngine.trace.info(`========== world step count updated to  ${syncHeader.stepCount} ==========`);
         }
     }
 

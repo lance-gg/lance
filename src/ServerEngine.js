@@ -117,7 +117,6 @@ class ServerEngine {
 
         // update clients only at the specified step interval, as defined in options
         if (this.gameEngine.world.stepCount % this.options.updateRate === 0) {
-            this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} ==========`);
 
             // if at least one player is new, we should send a full payload
             let diffUpdate = true;
@@ -128,12 +127,12 @@ class ServerEngine {
                     diffUpdate = false;
                 }
             }
-            let payload = this.serializeUpdate({ diffUpdate });
-            for (let socketId of Object.keys(this.connectedPlayers)) {
 
-                // TODO: implement server lag by queuing the emit to a future step
+            let payload = this.serializeUpdate({ diffUpdate });
+            this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} is delta update: ${diffUpdate} ==========`);
+            // TODO: implement server lag by queuing the emit to a future step
+            for (let socketId of Object.keys(this.connectedPlayers))
                 this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
-            }
             this.networkTransmitter.clearPayload();
         }
 
@@ -152,6 +151,12 @@ class ServerEngine {
     serializeUpdate(options) {
         let world = this.gameEngine.world;
         let diffUpdate = Boolean(options && options.diffUpdate);
+
+        // add this sync header
+        // currently this is just the sync step count
+        this.networkTransmitter.addNetworkedEvent('syncHeader', {
+            stepCount: world.stepCount
+        });
 
         for (let objId of Object.keys(world.objects)) {
             let obj = world.objects[objId];
