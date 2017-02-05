@@ -45,6 +45,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         e.syncObjects = {};
         e.syncEvents.forEach(sEvent => {
             let o = sEvent.objectInstance;
+            if (!o) return;
             if (!e.syncObjects[o.id]) {
                 e.syncObjects[o.id] = [];
             }

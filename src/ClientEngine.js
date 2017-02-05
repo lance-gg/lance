@@ -306,7 +306,7 @@ class ClientEngine {
     handleInboundMessage(syncData) {
 
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
-        let syncHeader = syncEvents.filter((e) => e.eventName === 'syncHeader');
+        let syncHeader = syncEvents.find((e) => e.eventName === 'syncHeader');
 
         // emit that a snapshot has been received
         this.gameEngine.emit('client__syncReceived', {
