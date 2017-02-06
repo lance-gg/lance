@@ -41,6 +41,7 @@ class ExtrapolateStrategy extends SyncStrategy {
     collectSync(e) {
 
         let lastSync = this.lastSync = {};
+        lastSync.stepCount = e.stepCount;
 
         // keep a reference of events by object id
         lastSync.syncObjects = {};
