@@ -290,13 +290,16 @@ class GameEngine {
         if (this.physicsEngine)
             this.physicsEngine.step(objectFilter);
 
-        // refresh object positions after physics
-        for (let objId of Object.keys(this.world.objects)) {
-            let o = this.world.objects[objId];
+        // for each object
+        // - apply incremental bending
+        // - refresh object positions after physics
+        this.world.forEachObject((id, o) => {
+            if (typeof o.applyIncrementalBending === 'function')
+                o.applyIncrementalBending(); 
             if (typeof o.refreshFromPhysics === 'function')
                 o.refreshFromPhysics();
-            this.trace.trace(`object[${objId}] after ${isReenact ? 'reenact' : 'step'} : ${this.world.objects[objId].toString()}`);
-        }
+            this.trace.trace(`object[${id}] after ${isReenact ? 'reenact' : 'step'} : ${o.toString()}`);
+        });
 
         // emit postStep event
         this.emit('postStep', { step, isReenact });

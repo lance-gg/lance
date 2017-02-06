@@ -326,6 +326,9 @@ class DynamicObject extends Serializable {
         this.angle = this.angle + shortestAngle * playPercentage;
 
     }
+
+    // TODO: implement incremental bending below
+    applyIncrementalBending() { }
 }
 
 module.exports = DynamicObject;

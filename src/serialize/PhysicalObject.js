@@ -81,7 +81,9 @@ class PhysicalObject extends Serializable {
 
     // TODO: implement
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
-
+        this.bendingTarget = (new this.constructor());
+        this.bendingTarget.copyFrom(this);
+        this.copyFrom(original);
     }
 
     syncTo(other) {
@@ -121,6 +123,12 @@ class PhysicalObject extends Serializable {
             this.renderObj.position.copy(this.physicsObj.position);
             this.renderObj.quaternion.copy(this.physicsObj.quaternion);
         }
+    }
+
+    // apply incremental bending
+    applyIncrementalBending(bending) {
+        this.position.lerp(this.bendingTarget.position, bending);
+        this.quaternion.slerp(this.bendingTarget.quaternion, bending);
     }
 }
 
