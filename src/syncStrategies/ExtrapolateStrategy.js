@@ -19,7 +19,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         const options = Object.assign({}, defaults, inputOptions);
         super(clientEngine, options);
 
-        this.newSync = null;
+        this.lastSync = null;
         this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('client__postStep', this.extrapolate.bind(this));
@@ -40,35 +40,32 @@ class ExtrapolateStrategy extends SyncStrategy {
     // collect a sync and its events
     collectSync(e) {
 
-        // TODO avoid editing the input event
+        let lastSync = this.lastSync = {};
 
         // keep a reference of events by object id
-        e.syncObjects = {};
+        lastSync.syncObjects = {};
         e.syncEvents.forEach(sEvent => {
             let o = sEvent.objectInstance;
             if (!o) return;
-            if (!e.syncObjects[o.id]) {
-                e.syncObjects[o.id] = [];
+            if (!lastSync.syncObjects[o.id]) {
+                lastSync.syncObjects[o.id] = [];
             }
-            e.syncObjects[o.id].push(sEvent);
+            lastSync.syncObjects[o.id].push(sEvent);
         });
 
         // keep a reference of events by step
-        e.syncSteps = {};
+        lastSync.syncSteps = {};
         e.syncEvents.forEach(sEvent => {
 
             // add an entry for this step and event-name
-            if (!e.syncSteps[sEvent.stepCount]) e.syncSteps[sEvent.stepCount] = {};
-            if (!e.syncSteps[sEvent.stepCount][sEvent.eventName]) e.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            e.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
+            if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
+            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
+            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
         });
 
-        // remember this sync
-        this.newSync = e;
-
-        let objCount = (Object.keys(e.syncObjects)).length;
+        let objCount = (Object.keys(lastSync.syncObjects)).length;
         let eventCount = e.syncEvents.length;
-        let stepCount = (Object.keys(e.syncSteps)).length;
+        let stepCount = (Object.keys(lastSync.syncSteps)).length;
         this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
     }
 
@@ -95,7 +92,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
     // apply a new sync
     applySync() {
-        if (!this.newSync) {
+        if (!this.lastSync) {
             return;
         }
 
@@ -114,12 +111,12 @@ class ExtrapolateStrategy extends SyncStrategy {
         // 3. if the object is new, just create it
         //
         let world = this.gameEngine.world;
-        let serverStep = this.newSync.stepCount;
-        for (let ids of Object.keys(this.newSync.syncObjects)) {
+        let serverStep = this.lastSync.stepCount;
+        for (let ids of Object.keys(this.lastSync.syncObjects)) {
 
             // TODO: we are currently taking only the first event out of
             // the events that may have arrived for this object
-            let ev = this.newSync.syncObjects[ids][0];
+            let ev = this.lastSync.syncObjects[ids][0];
             let curObj = world.objects[ev.objectInstance.id];
 
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
@@ -203,7 +200,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // destroy objects
         for (let objId of Object.keys(world.objects)) {
-            let objEvents = this.newSync.syncObjects[objId];
+            let objEvents = this.lastSync.syncObjects[objId];
             if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
                 continue;
 
@@ -213,7 +210,7 @@ class ExtrapolateStrategy extends SyncStrategy {
             });
         }
 
-        this.newSync = null;
+        this.lastSync = null;
     }
 
     // Perform client-side extrapolation.
