@@ -32,9 +32,13 @@ class CannonPhysicsEngine extends PhysicsEngine {
         return body;
     }
 
-    addBox(x, y, z, mass) {
+    addBox(x, y, z, mass, friction) {
         let shape = new CANNON.Box(new CANNON.Vec3(x, y, z));
-        let body = new CANNON.Body({ mass, shape });
+        let options = { mass, shape };
+        if (friction !== undefined)
+            options.material = new CANNON.Material({ friction });
+
+        let body = new CANNON.Body(options);
         body.position.set(0, 0, 0);
         this.world.addBody(body);
         return body;
@@ -47,7 +51,7 @@ class CannonPhysicsEngine extends PhysicsEngine {
         return body;
     }
 
-    removeBody(obj) {
+    removeObject(obj) {
         this.world.removeBody(obj);
     }
 }
