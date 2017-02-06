@@ -3,7 +3,7 @@
 const Serializable = require('./Serializable');
 const Serializer = require('./Serializer');
 const ThreeVector = require('./ThreeVector');
-const FourVector = require('./FourVector');
+const Quaternion = require('./Quaternion');
 
 /**
  * The PhysicalObject is the base class for physical game objects.
@@ -41,11 +41,12 @@ class PhysicalObject extends Serializable {
         super();
         this.id = id;
         this.playerId = 0;
+        this.bendingIncrements = 0;
 
         // set default position, velocity and quaternion
         this.position = new ThreeVector(0, 0, 0);
         this.velocity = new ThreeVector(0, 0, 0);
-        this.quaternion = new FourVector(0, 0, 0, 0);
+        this.quaternion = new Quaternion(0, 0, 0, 0);
 
         // use values if provided
         if (position) this.position.copy(position);
@@ -79,11 +80,12 @@ class PhysicalObject extends Serializable {
         this.savedCopy = null;
     }
 
-    // TODO: implement
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.copyFrom(this);
         this.copyFrom(original);
+        this.bendingIncrements = bendingIncrements;
+        this.bendingDelta = bending / bendingIncrements;
     }
 
     syncTo(other) {
@@ -126,9 +128,18 @@ class PhysicalObject extends Serializable {
     }
 
     // apply incremental bending
-    applyIncrementalBending(bending) {
-        this.position.lerp(this.bendingTarget.position, bending);
-        this.quaternion.slerp(this.bendingTarget.quaternion, bending);
+    applyIncrementalBending() {
+        if (this.bendingIncrements === 0)
+            return;
+
+        this.bendingIncrements--;
+        this.position.lerp(this.bendingTarget.position, this.bendingDelta);
+        this.quaternion.slerp(this.bendingTarget.quaternion, this.bendingDelta);
+        // TODO: mathematically, it's incorrect to apply the same delta each
+        // iteration because we are starting from a different state.  A correct
+        // calculation would reduce the bendingDelta after each application.
+        // I'm ok with this for now because it is simply bending less than
+        // expected.
     }
 }
 

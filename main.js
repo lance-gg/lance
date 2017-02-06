@@ -12,7 +12,7 @@ var Incheon = {
         THREEPhysicalObject: require('./src/serialize/THREEPhysicalObject'),
         DynamicObject: require('./src/serialize/DynamicObject'),
         ThreeVector: require('./src/serialize/ThreeVector'),
-        FourVector: require('./src/serialize/FourVector')
+        Quaternion: require('./src/serialize/Quaternion')
     },
     physics: {
         PhysicsEngine: require('./src/physics/PhysicsEngine'),

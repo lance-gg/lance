@@ -93,9 +93,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
     // apply a new sync
     applySync() {
-        if (!this.lastSync) {
-            return;
-        }
+
 
         this.gameEngine.trace.debug('extrapolate applying sync');
 
@@ -210,15 +208,21 @@ class ExtrapolateStrategy extends SyncStrategy {
                     this.gameEngine.removeObjectFromWorld(objId);
             });
         }
-
-        this.lastSync = null;
     }
 
     // Perform client-side extrapolation.
     extrapolate() {
 
+        // apply incremental bending
+        this.gameEngine.world.forEachObject((id, o) => {
+            if (typeof o.applyIncrementalBending === 'function')
+                o.applyIncrementalBending();
+        });
+
         // if there is a sync from the server, apply it now
-        this.applySync();
+        if (this.lastSync)
+            this.applySync();
+        this.lastSync = null;
     }
 }
 
