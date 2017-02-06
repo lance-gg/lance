@@ -64,6 +64,12 @@ class ThreeVector extends Serializable {
         this.y = sourceObj.y;
         this.z = sourceObj.z;
     }
+
+    lerp(target, p) {
+        this.x += (target.x - this.x) * p;
+        this.y += (target.y - this.y) * p;
+        this.z += (target.z - this.z) * p;
+    }
 }
 
 module.exports = ThreeVector;
