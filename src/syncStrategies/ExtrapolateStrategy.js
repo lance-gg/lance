@@ -41,6 +41,7 @@ class ExtrapolateStrategy extends SyncStrategy {
     collectSync(e) {
 
         let lastSync = this.lastSync = {};
+        lastSync.stepCount = e.stepCount;
 
         // keep a reference of events by object id
         lastSync.syncObjects = {};
@@ -122,7 +123,7 @@ class ExtrapolateStrategy extends SyncStrategy {
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
             if (localShadowObj) {
 
-                // case 1: this object as a local shadow object on the client
+                // case 1: this object has a local shadow object on the client
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
                 let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
                 newObj.saveState(localShadowObj);
