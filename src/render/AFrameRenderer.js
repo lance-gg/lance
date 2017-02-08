@@ -40,14 +40,16 @@ class AFrameRenderer {
         if (sceneElArray.length !== 1) {
             throw new Error('A-Frame scene element not found');
         }
-        this.aframeEl = sceneElArray[0];
+        this.aframeSceneEl = sceneElArray[0];
 
         this.gameEngine.on('objectAdded', (o) => {
             let el = document.createElement('a-entity');
-            el.setAttribute('position', o.position);
-            el.setAttribute('quaternion', o.quaternion);
-            el.setAttribute('geometry', 'primitive: box');
-            this.aframeEl.appendChild(el);
+            this.aframeSceneEl.appendChild(el);
+            el.setAttribute('position', `${o.position.x} ${o.position.y} ${o.position.z}`);
+            el.setAttribute('quaternion', `${o.quaternion.w} ${o.quaternion.x} ${o.quaternion.y} ${o.quaternion.z}`);
+            el.setAttribute('material', 'color: red');
+            el.setAttribute('geometry', 'primitive: box; width: 3; height: 3; depth: 3');
+//            el.setAttribute('obj-model', 'obj: #car-obj');
         });
 
         this.gameEngine.on('objectRemoved', (o) => {

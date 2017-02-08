@@ -1,5 +1,6 @@
 'use strict';
 
+// TODO: this file doesn't belong in src/network.  Need to think about it.
 const NetworkedPhysics = {
     schema: {
         traceLevel: { default: 4 }
@@ -14,6 +15,9 @@ const NetworkedPhysics = {
     tick: () => {
         // for each object in the world, update the corresponding
         // a-frame element
+        if (!this.gameEngine)
+            return;
+
         this.gameEngine.world.forEachObject((id, o) => {
             let el = o.renderObj;
             if (el) {
