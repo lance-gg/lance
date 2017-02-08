@@ -32,6 +32,7 @@ class ClientEngine {
       * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
       * @param {Number} inputOptions.syncOptions.localObjBending - amount of bending towards original client position, after each sync, for local objects
       * @param {Number} inputOptions.syncOptions.remoteObjBending - amount of bending towards original client position, after each sync, for remote objects
+      * @param {Renderer} Renderer - the Renderer class constructor
       */
     constructor(gameEngine, inputOptions, Renderer) {
 

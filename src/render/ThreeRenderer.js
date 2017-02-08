@@ -1,7 +1,7 @@
-"use strict";
+/* global THREE */
+'use strict';
 
 const Renderer = require('./Renderer');
-
 
 // TODO: I have mixed feelings about this class.  It doesn't actually provide
 // anything useful.  I assume each game will write their own renderer even in THREE.
@@ -47,8 +47,8 @@ class ThreeRenderer extends Renderer {
 
     // add one object
     addObject(id) {
-        this.scene.add(sphere);
-        return sphere;
+        // this.scene.add(sphere);
+        // return sphere;
     }
 
     removeObject(o) {
