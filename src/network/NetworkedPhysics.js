@@ -2,7 +2,7 @@
 
 const NetworkedPhysics = {
     schema: {
-        property1: 1
+        traceLevel: { default: 4 }
     },
 
     init: () => {

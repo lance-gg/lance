@@ -24,6 +24,7 @@ class AFrameRenderer {
         // set up the networkedPhysics as an A-Frame system
         networkedPhysics.gameEngine = gameEngine;
         AFRAME.registerSystem('incheon-networked-physics', networkedPhysics);
+
     }
 
     /**
@@ -34,6 +35,25 @@ class AFrameRenderer {
         if ((typeof window === 'undefined') || !document) {
             console.log('renderer invoked on server side.');
         }
+
+        let sceneElArray = document.getElementsByTagName('a-scene');
+        if (sceneElArray.length !== 1) {
+            throw new Error('A-Frame scene element not found');
+        }
+        this.aframeEl = sceneElArray[0];
+
+        this.gameEngine.on('objectAdded', (o) => {
+            let el = document.createElement('a-entity');
+            el.setAttribute('position', o.position);
+            el.setAttribute('quaternion', o.quaternion);
+            el.setAttribute('geometry', 'primitive: box');
+            this.aframeEl.appendChild(el);
+        });
+
+        this.gameEngine.on('objectRemoved', (o) => {
+            o.renderObj.remove();
+        });
+
         return Promise.resolve(); // eslint-disable-line new-cap
     }
 

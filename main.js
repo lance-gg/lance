@@ -21,7 +21,8 @@ var Incheon = {
     },
     render: {
         Renderer: require('./src/render/Renderer'),
-        ThreeRenderer: require('./src/render/ThreeRenderer')
+        ThreeRenderer: require('./src/render/ThreeRenderer'),
+        AFrameRenderer: require('./src/render/AFrameRenderer')
     }
 };
 
