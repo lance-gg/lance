@@ -22,9 +22,8 @@ class AFrameRenderer {
         Object.assign(this, EventEmitter.prototype);
 
         // set up the networkedPhysics as an A-Frame system
-        networkedPhysics.gameEngine = gameEngine;
-        AFRAME.registerSystem('incheon-networked-physics', networkedPhysics);
-
+        networkedPhysics.setGameEngine(gameEngine);
+        AFRAME.registerSystem('networked-physics', networkedPhysics);
     }
 
     /**
@@ -40,17 +39,7 @@ class AFrameRenderer {
         if (sceneElArray.length !== 1) {
             throw new Error('A-Frame scene element not found');
         }
-        this.aframeSceneEl = sceneElArray[0];
-
-        this.gameEngine.on('objectAdded', (o) => {
-            let el = document.createElement('a-entity');
-            this.aframeSceneEl.appendChild(el);
-            el.setAttribute('position', `${o.position.x} ${o.position.y} ${o.position.z}`);
-            el.setAttribute('quaternion', `${o.quaternion.w} ${o.quaternion.x} ${o.quaternion.y} ${o.quaternion.z}`);
-            el.setAttribute('material', 'color: red');
-            el.setAttribute('geometry', 'primitive: box; width: 3; height: 3; depth: 3');
-//            el.setAttribute('obj-model', 'obj: #car-obj');
-        });
+        this.scene = sceneElArray[0];
 
         this.gameEngine.on('objectRemoved', (o) => {
             o.renderObj.remove();

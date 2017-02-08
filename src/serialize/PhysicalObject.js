@@ -65,7 +65,7 @@ class PhysicalObject extends Serializable {
         let p = this.position.toString();
         let v = this.velocity.toString();
         let q = this.quaternion.toString();
-        return `phyObj[${this.id}] player${this.playerId} pos${p} vel${v} quat${q}`;
+        return `phyObj[${this.id}] player${this.playerId} pos${p} vel${v} ${q}`;
     }
 
     saveState(other) {
@@ -119,6 +119,11 @@ class PhysicalObject extends Serializable {
         this.physicsObj.velocity.copy(this.velocity);
     }
 
+    // TODO: remove this.  It shouldn't be part of the
+    //    physical object, and it shouldn't be called by the ExtrapolationStrategy logic
+    //    Correct approach:
+    //       render object should be refreshed only at the next iteration of the renderer's
+    //       draw function.  And then it should be smart about positions (it should interpolate)
     // refresh the renderable position
     refreshRenderObject() {
         if (this.renderObj) {
