@@ -86,6 +86,14 @@ class PhysicalObject extends Serializable {
         this.copyFrom(original);
         this.bendingIncrements = bendingIncrements;
         this.bendingDelta = bending / bendingIncrements;
+
+        // TODO: use configurable physics bending
+        // TODO: does refreshToPhysics() really belong here?
+        //       should refreshToPhysics be decoupled from syncTo
+        //       and called explicitly in all cases?
+        // currently velocity bending is a constant 0.8
+        this.velocity.lerp(this.bendingTarget.velocity, 0.8);
+        this.refreshToPhysics();
     }
 
     syncTo(other) {
