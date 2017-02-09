@@ -9,8 +9,14 @@ let NetworkedPhysics = {
 
     init: () => {
 
-        // TODO: on object added events, add an element dynamically
-        // TODO: on object removal events, remove an element dynamically
+        // TODO: Sometimes an object is "simple".  For example it uses
+        //       existing AFrame asstes (an OBJ file and a material)
+        //       in this case, we can auto-generate the DOM element,
+        //       setting the quaternion, position, material, game-object-id
+        //       and obj-model.  Same goes for objects which use primitive
+        //       geometric objects.  Then developers don't need to create
+        //       a class for each object type.
+        //       Remember to also remove them.
     },
 
     tick: () => {
@@ -26,7 +32,7 @@ let NetworkedPhysics = {
                 let p = o.position;
                 el.setAttribute('position', `${p.x} ${p.y} ${p.z}`);
                 el.setAttribute('quaternion', `${q.w} ${q.x} ${q.y} ${q.z}`);
-            };
+            }
         });
     },
 

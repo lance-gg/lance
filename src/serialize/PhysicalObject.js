@@ -32,12 +32,13 @@ class PhysicalObject extends Serializable {
             id: { type: Serializer.TYPES.INT32 },
             playerId: { type: Serializer.TYPES.INT16 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
+            quaternion: { type: Serializer.TYPES.CLASSINSTANCE },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
-            quaternion: { type: Serializer.TYPES.CLASSINSTANCE }
+            angularVelocity: { type: Serializer.TYPES.CLASSINSTANCE }
         };
     }
 
-    constructor(id, position, velocity, quaternion) {
+    constructor(id, position, velocity, quaternion, angularVelocity) {
         super();
         this.id = id;
         this.playerId = 0;
@@ -46,12 +47,14 @@ class PhysicalObject extends Serializable {
         // set default position, velocity and quaternion
         this.position = new ThreeVector(0, 0, 0);
         this.velocity = new ThreeVector(0, 0, 0);
-        this.quaternion = new Quaternion(0, 0, 0, 0);
+        this.quaternion = new Quaternion(1, 0, 0, 0);
+        this.angularVelocity = new ThreeVector(0, 0, 0);
 
         // use values if provided
         if (position) this.position.copy(position);
-        if (velocity) this.position.copy(velocity);
-        if (quaternion) this.position.copy(quaternion);
+        if (velocity) this.velocity.copy(velocity);
+        if (quaternion) this.quaternion.copy(quaternion);
+        if (angularVelocity) this.angularVelocity.copy(angularVelocity);
 
         this.class = PhysicalObject;
     }
@@ -65,7 +68,8 @@ class PhysicalObject extends Serializable {
         let p = this.position.toString();
         let v = this.velocity.toString();
         let q = this.quaternion.toString();
-        return `phyObj[${this.id}] player${this.playerId} pos${p} vel${v} ${q}`;
+        let a = this.angularVelocity.toString();
+        return `phyObj[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Dir=${q} AVel=${a}`;
     }
 
     saveState(other) {
@@ -93,6 +97,7 @@ class PhysicalObject extends Serializable {
         //       and called explicitly in all cases?
         // currently velocity bending is a constant 0.8
         this.velocity.lerp(this.bendingTarget.velocity, 0.8);
+        this.angularVelocity.lerp(this.bendingTarget.angularVelocity, 0.8);
         this.refreshToPhysics();
     }
 
@@ -103,6 +108,7 @@ class PhysicalObject extends Serializable {
         this.position.copy(other.position);
         this.quaternion.copy(other.quaternion);
         this.velocity.copy(other.velocity);
+        this.angularVelocity.copy(other.angularVelocity);
 
         if (this.physicsObj)
             this.refreshToPhysics();
@@ -118,6 +124,7 @@ class PhysicalObject extends Serializable {
         this.position.copy(this.physicsObj.position);
         this.quaternion.copy(this.physicsObj.quaternion);
         this.velocity.copy(this.physicsObj.velocity);
+        this.angularVelocity.copy(this.physicsObj.angularVelocity);
     }
 
     // update position, quaternion, and velocity from new physical state.
@@ -125,6 +132,7 @@ class PhysicalObject extends Serializable {
         this.physicsObj.position.copy(this.position);
         this.physicsObj.quaternion.copy(this.quaternion);
         this.physicsObj.velocity.copy(this.velocity);
+        this.physicsObj.angularVelocity.copy(this.angularVelocity);
     }
 
     // TODO: remove this.  It shouldn't be part of the
