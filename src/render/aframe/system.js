@@ -1,9 +1,6 @@
-/* globals THREE */
 'use strict';
 
-// TODO: this file doesn't belong in src/network.  Need to think about it.
-//       suggestion: it should be called src/render/aframe/system.js
-let NetworkedPhysics = {
+let AFrameSystem = {
     schema: {
         traceLevel: { default: 4 }
     },
@@ -16,16 +13,16 @@ let NetworkedPhysics = {
         //       setting the quaternion, position, material, game-object-id
         //       and obj-model.  Same goes for objects which use primitive
         //       geometric objects.  Then developers don't need to create
-        //       a class for each object type.
+        //       a class for each simple object type.
+        //
         //       Remember to also remove them.
     },
 
     tick: () => {
-        // for each object in the world, update the corresponding
-        // a-frame element
         if (!this.gameEngine)
             return;
 
+        // for each object in the world, update the a-frame element
         this.gameEngine.world.forEachObject((id, o) => {
             let el = o.renderEl;
             if (el) {
@@ -42,4 +39,4 @@ let NetworkedPhysics = {
     }
 };
 
-module.exports = NetworkedPhysics;
+module.exports = AFrameSystem;

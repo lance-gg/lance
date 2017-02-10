@@ -2,7 +2,7 @@
 /* globals AFRAME */
 
 const EventEmitter = require('eventemitter3');
-const networkedPhysics = require('../network/NetworkedPhysics');
+const networkedPhysics = require('./aframe/system');
 
 /**
  * The A-Frame Renderer
