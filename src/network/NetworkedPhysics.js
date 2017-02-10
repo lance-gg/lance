@@ -1,3 +1,4 @@
+/* globals THREE */
 'use strict';
 
 // TODO: this file doesn't belong in src/network.  Need to think about it.
@@ -25,13 +26,25 @@ let NetworkedPhysics = {
         if (!this.gameEngine)
             return;
 
+        function rad2deg(r) {
+            let d = r * 180 / Math.PI;
+            d = Math.round(d * 100000) / 100000; // TODO: horrible performace impact
+            if (d < 0) d += 360;
+            return d;
+        }
+
         this.gameEngine.world.forEachObject((id, o) => {
             let el = o.renderEl;
             if (el) {
                 let q = o.quaternion;
                 let p = o.position;
+                let euler = (new THREE.Euler()).setFromQuaternion(q, 'YXZ');
+                let r = { x: rad2deg(euler.x), y: rad2deg(euler.y), z: rad2deg(euler.z) };
+
                 el.setAttribute('position', `${p.x} ${p.y} ${p.z}`);
-                el.setAttribute('quaternion', `${q.w} ${q.x} ${q.y} ${q.z}`);
+                // el.setAttribute('quaternion', `${q.w} ${q.x} ${q.y} ${q.z}`);
+                el.setAttribute('rotation', `${r.x} ${r.y} ${r.z}`);
+
             }
         });
     },
