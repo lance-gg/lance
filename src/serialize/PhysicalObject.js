@@ -89,15 +89,16 @@ class PhysicalObject extends Serializable {
         this.bendingTarget.copyFrom(this);
         this.copyFrom(original);
         this.bendingIncrements = bendingIncrements;
-        this.bendingDelta = bending / bendingIncrements;
+        this.bending = bending;
 
         // TODO: use configurable physics bending
         // TODO: does refreshToPhysics() really belong here?
         //       should refreshToPhysics be decoupled from syncTo
         //       and called explicitly in all cases?
-        // currently velocity bending is a constant 0.8
-        this.velocity.lerp(this.bendingTarget.velocity, 0.8);
-        this.angularVelocity.lerp(this.bendingTarget.angularVelocity, 0.8);
+        this.velocity.copy(this.bendingTarget.velocity);
+        this.angularVelocity.copy(this.bendingTarget.angularVelocity);
+        // this.velocity.lerp(this.bendingTarget.velocity, 0.8);
+        // this.angularVelocity.lerp(this.bendingTarget.angularVelocity, 0.8);
         this.refreshToPhysics();
     }
 
@@ -153,14 +154,10 @@ class PhysicalObject extends Serializable {
         if (this.bendingIncrements === 0)
             return;
 
+        let incrementalBending = this.bending / this.bendingIncrements;
+        this.position.lerp(this.bendingTarget.position, incrementalBending);
+        this.quaternion.slerp(this.bendingTarget.quaternion, incrementalBending);
         this.bendingIncrements--;
-        this.position.lerp(this.bendingTarget.position, this.bendingDelta);
-        this.quaternion.slerp(this.bendingTarget.quaternion, this.bendingDelta);
-        // TODO: mathematically, it's incorrect to apply the same delta each
-        // iteration because we are starting from a different state.  A correct
-        // calculation would reduce the bendingDelta after each application.
-        // I'm ok with this for now because it is simply bending less than
-        // expected.
     }
 }
 
