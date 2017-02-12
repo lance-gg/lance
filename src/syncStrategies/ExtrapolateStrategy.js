@@ -215,8 +215,10 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // apply incremental bending
         this.gameEngine.world.forEachObject((id, o) => {
-            if (typeof o.applyIncrementalBending === 'function')
+            if (typeof o.applyIncrementalBending === 'function') {
                 o.applyIncrementalBending();
+                o.refreshToPhysics();
+            }
         });
 
         // if there is a sync from the server, apply it now
