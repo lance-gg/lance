@@ -4,7 +4,6 @@ var Incheon = {
     ClientEngine: require('./src/ClientEngine'),
     Synchronizer: require('./src/Synchronizer'),
     GameWorld: require('./src/GameWorld'),
-    Point: require('./src/Point'),  // TODO: remove this
     serialize: {
         Serializer: require('./src/serialize/Serializer'),
         Serializable: require('./src/serialize/Serializable'),

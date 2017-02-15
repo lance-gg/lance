@@ -1,5 +1,4 @@
 'use strict';
-const Point = require('../Point');
 const PhysicsEngine = require('./PhysicsEngine');
 const CollisionDetection = require('./SimplePhysics/CollisionDetection');
 
@@ -40,24 +39,24 @@ class SimplePhysicsEngine extends PhysicsEngine {
         }
 
         // acceleration
-        Point.add(o.velocity, o.temp.accelerationVector, o.velocity);
+        o.velX += o.temp.accelerationVector.x;
+        o.velY += o.temp.accelerationVector.y;
+        o.velX = Math.round(o.velX * 100) / 100;
+        o.velY = Math.round(o.velY * 100) / 100;
 
-        // o.velocity.multiply(o.deceleration, o.deceleration);
-        o.velocity.x = Math.round(o.velocity.x * 100) / 100;
-        o.velocity.y = Math.round(o.velocity.y * 100) / 100;
-
-        if ((o.maxSpeed !== null) && (o.velocity.getMagnitude() > o.maxSpeed))
-            o.velocity.setMagnitude(o.maxSpeed);
-
-        o.velX = o.velocity.x;
-        o.velY = o.velocity.y;
+        let velMagnitude = Math.sqrt(o.velX * o.velX + o.velY * o.velY);
+        if ((o.maxSpeed !== null) && (velMagnitude > o.maxSpeed)) {
+            let resizeFactor = o.maxSpeed / velMagnitude;
+            o.velX *= resizeFactor;
+            o.velY *= resizeFactor;
+        }
 
         o.isAccelerating = false;
         o.isRotatingLeft = false;
         o.isRotatingRight = false;
 
-        o.x = o.x + o.velocity.x + o.bendingX;
-        o.y = o.y + o.velocity.y + o.bendingY;
+        o.x = o.x + o.velX + o.bendingX;
+        o.y = o.y + o.velY + o.bendingY;
 
         // wrap around the world edges
         if (worldSettings.worldWrap) {
