@@ -1,6 +1,5 @@
 'use strict';
 const GameWorld = require('./GameWorld');
-const Timer = require('./lib/Timer');
 const EventEmitter = require('eventemitter3');
 const Trace = require('./lib/Trace');
 
@@ -252,14 +251,6 @@ class GameEngine {
         * @memberof GameEngine
         */
         this.worldSettings = {};
-
-        // TODO: remove this timer
-        this.timer = new Timer();
-        this.timer.play();
-
-        this.on('postStep', function() {
-            that.timer.tick();
-        });
     }
 
     /**

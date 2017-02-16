@@ -15,11 +15,9 @@ class Scheduler {
      * @param {Number} options.delay number of milliseconds to add when delaying or hurrying the execution
      */
     constructor(options) {
-
         this.options = options;
         this.nextExecTime = null;
         this.requestedDelay = 0;
-
     }
 
     // in same cases, setTimeout is ignored by the browser,
