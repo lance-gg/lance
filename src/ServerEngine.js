@@ -32,7 +32,7 @@ class ServerEngine {
      * @param {SocketIO} io - the SocketIO server
      * @param {GameEngine} gameEngine - instance of GameEngine
      * @param {Object} options - server options
-     * @param {Number} options.frameRate - number of steps per second
+     * @param {Number} options.stepRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
      * @param {String} options.tracesPath - path where traces should go
      * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
@@ -41,7 +41,7 @@ class ServerEngine {
     constructor(io, gameEngine, options) {
         this.options = Object.assign({
             updateRate: 6,
-            frameRate: 60,  // TODO: this is no longer a frame rate, this is a stepRate
+            stepRate: 60,
             timeoutInterval: 180,
             tracesPath: '',
             debug: {
@@ -85,7 +85,7 @@ class ServerEngine {
 
         this.gameLoopId = Gameloop.setGameLoop(function() {
             that.step();
-        }, 1000 / this.options.frameRate);
+        }, 1000 / this.options.stepRate);
     }
 
     // every server step starts here

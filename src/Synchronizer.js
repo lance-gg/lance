@@ -1,9 +1,13 @@
 "use strict";
 
 const InterpolateStrategy = require('./syncStrategies/InterpolateStrategy');
-const ClientPredictionStrategy = require('./syncStrategies/ClientPredictionStrategy');
-const FrameSyncStrategy = require('./syncStrategies/FrameSyncStrategy');
 const ExtrapolateStrategy = require('./syncStrategies/ExtrapolateStrategy');
+const FrameSyncStrategy = require('./syncStrategies/FrameSyncStrategy');
+const strategies = {
+    extrapolate: ExtrapolateStrategy,
+    interpolate: InterpolateStrategy,
+    frameSync: FrameSyncStrategy
+};
 
 class Synchronizer {
 
@@ -11,39 +15,11 @@ class Synchronizer {
     constructor(clientEngine, options) {
         this.clientEngine = clientEngine;
         this.options = options || {};
-    }
-
-    // TODO:
-    // The code below can surely be folded.  Maybe with a Proxy object.
-    // or by adding the methods in a loop over each strategy name.
-    set interpolateObjectSelector(selector) {
-        if (!this.interpolateStrategy) {
-            this.interpolateStrategy = new InterpolateStrategy(this.clientEngine, this.options);
+        if (!strategies.hasOwnProperty(this.options.sync)) {
+            throw new Error(`ERROR: unknown synchronzation strategy ${this.options.sync}`);
         }
-        this.interpolateStrategy.objectSelector = selector;
+        this.syncStrategy = new strategies[this.options.sync](this.clientEngine, this.options);
     }
-
-    set clientPredictionSelector(selector) {
-        if (!this.clientPredictionStrategy) {
-            this.clientPredictionStrategy = new ClientPredictionStrategy(this.clientEngine, this.options);
-        }
-        this.clientPredictionStrategy.objectSelector = selector;
-    }
-
-    set frameSyncSelector(selector) {
-        if (!this.frameSyncStrategy) {
-            this.frameSyncStrategy = new FrameSyncStrategy(this.clientEngine, this.options);
-        }
-        this.frameSyncStrategy.objectSelector = selector;
-    }
-
-    set extrapolateObjectSelector(selector) {
-        if (!this.extrapolateStrategy) {
-            this.extrapolateStrategy = new ExtrapolateStrategy(this.clientEngine, this.options);
-        }
-        this.extrapolateStrategy.objectSelector = selector;
-    }
-
 }
 
 module.exports = Synchronizer;

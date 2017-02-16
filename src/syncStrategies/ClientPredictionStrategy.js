@@ -1,5 +1,6 @@
 "use strict";
 
+// TODO remove this file.
 const SyncStrategy = require("./SyncStrategy");
 const defaults = {};
 

@@ -100,16 +100,6 @@ class ClientEngine {
             syncOptions.reflect = true;
         }
         const synchronizer = new Synchronizer(this, syncOptions);
-
-        // TODO: mixing different strategies together doesn't
-        //     really make sense, so we need to refactor the code
-        //     below.
-        if (syncOptions.sync === 'extrapolate')
-            synchronizer.extrapolateObjectSelector = () => { return true; };
-        else if (syncOptions.sync === 'interpolate')
-            synchronizer.interpolateObjectSelector = () => { return true; };
-        else if (syncOptions.sync === 'frameSync')
-            synchronizer.frameSyncSelector = () => { return true; };
     }
 
     /**
