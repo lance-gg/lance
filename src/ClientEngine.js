@@ -4,6 +4,7 @@ const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
 const Synchronizer = require('./Synchronizer');
+const Scheduler = require('./lib/Scheduler');
 
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
@@ -148,55 +149,22 @@ class ClientEngine {
      */
     start() {
 
-        // TODO: pull out gameLoop, renderLoop, gameLoopChecker to
-        // a separate module called scheduler.js
-        let nextExecTime = null;
-        let gameLoop = () => {
-            let stepStartTime = (new Date()).getTime();
-            this.step();
+        // schedule and start the game loop
+        this.scheduler = new Scheduler({
+            period: this.options.stepPeriod,
+            tick: this.step.bind(this),
+            delay: STEP_DELAY_MSEC
+        });
+        this.gameEngine.start();
+        this.scheduler.start();
 
-            // delay the execution of next step if requested.
-            // this could happen because of client-server step drift.
-            nextExecTime = stepStartTime + this.options.stepPeriod;
-            if (this.delayNextStep) {
-                nextExecTime += STEP_DELAY_MSEC;
-                this.delayNextStep = false;
-            } else if (this.hurryNextStep) {
-                nextExecTime -= STEP_DELAY_MSEC;
-                this.hurryNextStep = false;
-            }
-
-            setTimeout(gameLoop, nextExecTime - (new Date()).getTime());
-        };
-
-        // in same cases, setTimeout is ignored by the browser,
-        // this is known to happen during the first 100ms of a touch event
-        // on android chrome.  Double-check the game loop using requestAnimationFrame
-        let gameLoopChecker = () => {
-            let currentTime = (new Date()).getTime();
-            if (currentTime > nextExecTime) {
-                this.step();
-                nextExecTime = currentTime + this.options.stepPeriod;
-            }
-            window.requestAnimationFrame(gameLoopChecker);
-        };
-
+        // initialize the renderer
         // the render loop waits for next animation frame
+        if (!this.renderer) alert('ERROR: game has not defined a renderer');
         let renderLoop = () => {
             this.renderer.draw();
             window.requestAnimationFrame(renderLoop);
         };
-
-        // start game, game loop, game loop checker, render loop
-        this.gameEngine.start();
-        setTimeout(gameLoop, 0);
-        if (typeof window !== 'undefined')
-            window.requestAnimationFrame(gameLoopChecker);
-
-        // initialize the renderer
-        if (!this.renderer) {
-            alert('ERROR: game has not defined a renderer');
-        }
 
         return this.renderer.init().then(() => {
             if (typeof window !== 'undefined')
@@ -226,10 +194,10 @@ class ClientEngine {
         if (this.gameEngine.serverStep) {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Delaying next step.`);
-                this.delayNextStep = true;
+                this.scheduler.delayTick();
             } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  Client is behind server.  Hurrying next step.`);
-                this.hurryNextStep = true;
+                this.scheduler.hurryTick();
             }
         }
 
