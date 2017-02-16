@@ -20,7 +20,7 @@ When a sync arrives at the client, the client must reconcile the predicted game 
 
 5. Apply the delta so that the object on the client gradually bends towards the correct position as indicated by the server.
 
-    1. Not all the delta is applied.  A "bending factor" must be specified, to indicate how much of the delta should be applied.  A bending factor of 70% means that only 30% of the position will change, and that this 30% of the correction will be applied incrementally until the next sync data arrives.
+    1. Not all the delta is applied.  A "bending factor" must be specified, to indicate how much of the delta should be applied.
 
     2. The delta is not applied in a single step.  Rather, split the correction into incremental corrections that are applied until the next sync data arrives.
 
