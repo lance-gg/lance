@@ -28,7 +28,6 @@ class Scheduler {
     nextTickChecker() {
         let currentTime = (new Date()).getTime();
         if (currentTime > this.nextExecTime) {
-console.log('run by checker');
             this.options.tick();
             this.nextExecTime = currentTime + this.options.stepPeriod;
         }
@@ -37,7 +36,6 @@ console.log('run by checker');
 
     nextTick() {
         let stepStartTime = (new Date()).getTime();
-console.log('run by nextTick');
         this.options.tick();
         this.nextExecTime = stepStartTime + this.options.period + this.requestedDelay;
         this.requestedDelay = 0;
