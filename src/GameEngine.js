@@ -232,10 +232,6 @@ class GameEngine {
 
     initWorld() {
 
-        // TODO: with arrow functions, we no longer need that=this mechanism
-        // remove the usage here and in all places in the code
-        var that = this;
-
         this.world = new GameWorld();
 
         // on the client we have a different ID space
@@ -328,11 +324,9 @@ class GameEngine {
      * @param {Object} inputMsg - input descriptor object
      * @param {String} inputMsg.input - describe the input (e.g. "up", "down", "fire")
      * @param {Number} inputMsg.messageIndex - input identifier
-     * @param {String} playerId - the player number (as a string)
+     * @param {Number} playerId - the player ID
      */
     processInput(inputMsg, playerId) {
-        // TODO - I don't think we need the playerId as an argument above.
-        //    it could be a class member.
         this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 

@@ -181,6 +181,12 @@ class DynamicObject extends Serializable {
         this.deceleration = sourceObj.deceleration;
     }
 
+    // TODO:
+    // the description below is no longer correct.
+    // the bending multiple has flipped.
+    // 1.0 = apply 100% of correction by the next server update
+    // 0.0 = apply no correction
+
     /**
     * The bending multiple is a getter, which returns the
     * amount of bending.
