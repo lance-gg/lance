@@ -30,17 +30,11 @@ class SimplePhysicsEngine extends PhysicsEngine {
         if (o.angle < 0) { o.angle += 360; }
 
         if (o.isAccelerating) {
-            o.temp.accelerationVector.set(
-                Math.cos(o.angle * (Math.PI / 180)),
-                Math.sin(o.angle * (Math.PI / 180))
-            ).setMagnitude(o.acceleration);
-        } else {
-            o.temp.accelerationVector.set(0, 0);
+            o.velX += Math.cos(o.angle * (Math.PI / 180)) * o.acceleration;
+            o.velY += Math.sin(o.angle * (Math.PI / 180)) * o.acceleration;
         }
 
         // acceleration
-        o.velX += o.temp.accelerationVector.x;
-        o.velY += o.temp.accelerationVector.y;
         o.velX = Math.round(o.velX * 100) / 100;
         o.velY = Math.round(o.velY * 100) / 100;
 
