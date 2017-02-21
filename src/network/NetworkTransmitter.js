@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const Serializer = require('./../serialize/Serializer');
 
@@ -17,24 +17,30 @@ class NetworkTransmitter {
 
         this.serializer.registerClass(NetworkedEventCollection);
 
-        this.registerNetworkedEventFactory("objectUpdate", {
+        this.registerNetworkedEventFactory('objectUpdate', {
             netScheme: {
                 stepCount: { type: Serializer.TYPES.INT32 },
                 objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
             }
         });
 
-        this.registerNetworkedEventFactory("objectCreate", {
+        this.registerNetworkedEventFactory('objectCreate', {
             netScheme: {
                 stepCount: { type: Serializer.TYPES.INT32 },
                 objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
             }
         });
 
-        this.registerNetworkedEventFactory("objectDestroy", {
+        this.registerNetworkedEventFactory('objectDestroy', {
             netScheme: {
                 stepCount: { type: Serializer.TYPES.INT32 },
                 objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
+            }
+        });
+
+        this.registerNetworkedEventFactory('syncHeader', {
+            netScheme: {
+                stepCount: { type: Serializer.TYPES.INT32 }
             }
         });
     }
@@ -67,6 +73,9 @@ class NetworkTransmitter {
     }
 
     serializePayload() {
+        if (this.payload.length === 0)
+            return null;
+
         let networkedEventCollection = new NetworkedEventCollection(this.payload);
         let dataBuffer = networkedEventCollection.serialize(this.serializer);
 

@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const SyncStrategy = require("./SyncStrategy");
+const SyncStrategy = require('./SyncStrategy');
 
 const defaults = {
     syncsBufferLength: 5,
@@ -19,7 +19,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         const options = Object.assign({}, defaults, inputOptions);
         super(clientEngine, options);
 
-        this.newSync = null;
+        this.lastSync = null;
         this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('client__postStep', this.extrapolate.bind(this));
@@ -39,34 +39,34 @@ class ExtrapolateStrategy extends SyncStrategy {
 
     // collect a sync and its events
     collectSync(e) {
-        // TODO avoid editing the input event
+
+        let lastSync = this.lastSync = {};
+        lastSync.stepCount = e.stepCount;
 
         // keep a reference of events by object id
-        e.syncObjects = {};
+        lastSync.syncObjects = {};
         e.syncEvents.forEach(sEvent => {
             let o = sEvent.objectInstance;
-            if (!e.syncObjects[o.id]) {
-                e.syncObjects[o.id] = [];
+            if (!o) return;
+            if (!lastSync.syncObjects[o.id]) {
+                lastSync.syncObjects[o.id] = [];
             }
-            e.syncObjects[o.id].push(sEvent);
+            lastSync.syncObjects[o.id].push(sEvent);
         });
 
         // keep a reference of events by step
-        e.syncSteps = {};
+        lastSync.syncSteps = {};
         e.syncEvents.forEach(sEvent => {
 
             // add an entry for this step and event-name
-            if (!e.syncSteps[sEvent.stepCount]) e.syncSteps[sEvent.stepCount] = {};
-            if (!e.syncSteps[sEvent.stepCount][sEvent.eventName]) e.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            e.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
+            if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
+            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
+            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
         });
 
-        // remember this sync
-        this.newSync = e;
-
-        let objCount = (Object.keys(e.syncObjects)).length;
+        let objCount = (Object.keys(lastSync.syncObjects)).length;
         let eventCount = e.syncEvents.length;
-        let stepCount = (Object.keys(e.syncSteps)).length;
+        let stepCount = (Object.keys(lastSync.syncSteps)).length;
         this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
     }
 
@@ -77,13 +77,6 @@ class ExtrapolateStrategy extends SyncStrategy {
         curObj.copyFrom(newObj);
         this.gameEngine.addObjectToWorld(curObj);
         console.log(`adding new object ${curObj}`);
-
-        // if this game keeps a physics engine on the client side,
-        // we need to update it as well
-        // TODO: why not have this call inside (gameEngine.addObjectToWorld() above?)
-        if (this.gameEngine.physicsEngine && curObj.hasOwnProperty('initPhysicsObject')) {
-            curObj.initPhysicsObject(this.gameEngine.physicsEngine);
-        }
 
         return curObj;
     }
@@ -100,9 +93,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
     // apply a new sync
     applySync() {
-        if (!this.newSync) {
-            return;
-        }
+
 
         this.gameEngine.trace.debug('extrapolate applying sync');
 
@@ -119,20 +110,18 @@ class ExtrapolateStrategy extends SyncStrategy {
         // 3. if the object is new, just create it
         //
         let world = this.gameEngine.world;
-        let serverStep = -1;
-        for (let ids of Object.keys(this.newSync.syncObjects)) {
+        let serverStep = this.lastSync.stepCount;
+        for (let ids of Object.keys(this.lastSync.syncObjects)) {
 
             // TODO: we are currently taking only the first event out of
             // the events that may have arrived for this object
-            let ev = this.newSync.syncObjects[ids][0];
-
+            let ev = this.lastSync.syncObjects[ids][0];
             let curObj = world.objects[ev.objectInstance.id];
-            serverStep = Math.max(serverStep, ev.stepCount);
 
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
             if (localShadowObj) {
 
-                // case 1: this object as a local shadow object on the client
+                // case 1: this object has a local shadow object on the client
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
                 let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
                 newObj.saveState(localShadowObj);
@@ -198,13 +187,8 @@ class ExtrapolateStrategy extends SyncStrategy {
             let isLocal = (obj.playerId == this.clientEngine.playerId); // eslint-disable-line eqeqeq
             let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
-            if (obj.renderObject && obj.renderObject.visible === false) {
-                // TODO: visible is broken because renderObject is gone.
-                // visible should be a property of the object now, the Renderer
-                // can just look at it and understand.
-                obj.updateRenderObject();
-                obj.renderObject.visible = true;
-            }
+            if (typeof obj.refreshRenderObject === 'function')
+                obj.refreshRenderObject();
             this.gameEngine.trace.trace(`object[${objId}] bending=${bending} values (dx, dy, dphi) = (${obj.bendingX},${obj.bendingY},${obj.bendingAngle})`);
         }
 
@@ -215,7 +199,7 @@ class ExtrapolateStrategy extends SyncStrategy {
 
         // destroy objects
         for (let objId of Object.keys(world.objects)) {
-            let objEvents = this.newSync.syncObjects[objId];
+            let objEvents = this.lastSync.syncObjects[objId];
             if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
                 continue;
 
@@ -224,15 +208,23 @@ class ExtrapolateStrategy extends SyncStrategy {
                     this.gameEngine.removeObjectFromWorld(objId);
             });
         }
-
-        this.newSync = null;
     }
 
     // Perform client-side extrapolation.
     extrapolate() {
 
+        // apply incremental bending
+        this.gameEngine.world.forEachObject((id, o) => {
+            if (typeof o.applyIncrementalBending === 'function') {
+                o.applyIncrementalBending();
+                o.refreshToPhysics();
+            }
+        });
+
         // if there is a sync from the server, apply it now
-        this.applySync();
+        if (this.lastSync)
+            this.applySync();
+        this.lastSync = null;
     }
 }
 

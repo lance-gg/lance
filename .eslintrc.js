@@ -13,6 +13,7 @@ module.exports = {
         "arrow-parens": "off",
         "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
         "comma-dangle": "off",
+        "quotes": ["error", "single"],
         "guard-for-in": "off",
         "indent": ["error", 4],
         "linebreak-style": ["error", "unix"],

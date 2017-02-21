@@ -1,6 +1,5 @@
-"use strict";
+'use strict';
 
-const Point = require('../Point');
 const Serializable = require('./Serializable');
 const Serializer = require('./Serializer');
 const MathUtils = require('../lib/MathUtils');
@@ -42,7 +41,7 @@ class DynamicObject extends Serializable {
     static get netScheme() {
         return {
             id: { type: Serializer.TYPES.INT32 },
-            playerId: { type: Serializer.TYPES.UINT8 },
+            playerId: { type: Serializer.TYPES.INT16 },
             x: { type: Serializer.TYPES.INT16 },
             y: { type: Serializer.TYPES.INT16 },
             velX: { type: Serializer.TYPES.FLOAT32 },
@@ -82,6 +81,8 @@ class DynamicObject extends Serializable {
         */
         this.playerId = 0;
 
+        // TODO instead of storing attributes x,y,velX,velY, consider using
+        // new ThreeVector.js
         /**
         * position x-coordinate
         * @member {Number}
@@ -130,23 +131,21 @@ class DynamicObject extends Serializable {
         */
         this.acceleration = 0.1;
 
+        /**
+        * velocity x-coordinate
+        * @member {Number}
+        */
         this.velX = 0;
+
+        /**
+        * velocity y-coordinate
+        * @member {Number}
+        */
         this.velY = 0;
         this.bendingX = 0;
         this.bendingY = 0;
         this.bendingAngle = 0;
         this.deceleration = 0.99;
-
-        /**
-        * velocity of object
-        * @member {Point}
-        */
-        this.velocity = new Point();
-
-        this.temp = {
-            accelerationVector: new Point()
-        };
-
     }
 
     /**
@@ -162,6 +161,7 @@ class DynamicObject extends Serializable {
         return `dObj[${this.id}] player${this.playerId} pos${showVec(this.x, this.y, this.z)} vel${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
     }
 
+    // TODO: remove this
     copyFrom(sourceObj) {
 
         // TODO: copyFrom could just look at the netscheme?
@@ -175,12 +175,17 @@ class DynamicObject extends Serializable {
         this.bendingX = sourceObj.bendingX;
         this.bendingY = sourceObj.bendingY;
         this.bendingAngle = sourceObj.bendingAngle;
-        this.velocity.set(sourceObj.velX, sourceObj.velY);
         this.angle = sourceObj.angle;
         this.rotationSpeed = sourceObj.rotationSpeed;
         this.acceleration = sourceObj.acceleration;
         this.deceleration = sourceObj.deceleration;
     }
+
+    // TODO:
+    // the description below is no longer correct.
+    // the bending multiple has flipped.
+    // 1.0 = apply 100% of correction by the next server update
+    // 0.0 = apply no correction
 
     /**
     * The bending multiple is a getter, which returns the
@@ -249,8 +254,6 @@ class DynamicObject extends Serializable {
             .forEach(attr => {
                 this[attr] = other[attr];
             });
-        this.velocity.x = this.velX;
-        this.velocity.y = this.velY;
 
         // reset bending
         this.bendingX = 0;
@@ -296,12 +299,6 @@ class DynamicObject extends Serializable {
         this.x = original.x;
         this.y = original.y;
         this.angle = original.angle;
-
-        // TODO: these next two lines are a side-effect of the fact
-        // that velocity is stored both in attribute "velocity" and in velX/velY
-        // which is redundant now that we can set a Point instance over the network
-        this.velocity.x = this.velX;
-        this.velocity.y = this.velY;
     }
 
     interpolate(nextObj, playPercentage, worldSettings) {
@@ -326,10 +323,8 @@ class DynamicObject extends Serializable {
 
     }
 
-    // release resources
-    destroy() {
-        console.log(`destroying object ${this.id}`);
-    }
+    // TODO: implement incremental bending below
+    applyIncrementalBending() { }
 }
 
 module.exports = DynamicObject;

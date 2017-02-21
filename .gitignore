@@ -43,6 +43,9 @@ jspm_packages
 # jsdoc output
 docs_out
 
+# yarn files
+yarn.lock
+
 
 deploy_key
 docmeta_temp

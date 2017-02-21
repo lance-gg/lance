@@ -1,6 +1,5 @@
-"use strict";
+'use strict';
 const GameWorld = require('./GameWorld');
-const Timer = require('./lib/Timer');
 const EventEmitter = require('eventemitter3');
 const Trace = require('./lib/Trace');
 
@@ -74,6 +73,22 @@ class GameEngine {
      * @param {Object} playerDesc - player descriptor
      * @param {String} playerDesc.playerId - the player ID
      */
+
+     /**
+      * A player has joined on the server
+      *
+      * @event GameEngine#server__playerJoined
+      * @param {Object} playerDesc - player descriptor
+      * @param {String} playerDesc.playerId - the player ID
+      */
+
+     /**
+      * A player has left on the server
+      *
+      * @event GameEngine#server__playerDisconnected
+      * @param {Object} playerDesc - player descriptor
+      * @param {String} playerDesc.playerId - the player ID
+      */
 
     /**
      * A synchronization update arrived from the server
@@ -217,10 +232,6 @@ class GameEngine {
 
     initWorld() {
 
-        // TODO: with arrow functions, we no longer need that=this mechanism
-        // remove the usage here and in all places in the code
-        var that = this;
-
         this.world = new GameWorld();
 
         // on the client we have a different ID space
@@ -236,13 +247,6 @@ class GameEngine {
         * @memberof GameEngine
         */
         this.worldSettings = {};
-
-        this.timer = new Timer();
-        this.timer.play();
-
-        this.on("postStep", function() {
-            that.timer.tick();
-        });
     }
 
     /**
@@ -252,7 +256,7 @@ class GameEngine {
       * and registering methods on the event handler.
       */
     start() {
-        this.trace.info(`========== game engine started ==========`);
+        this.trace.info('========== game engine started ==========');
         this.initWorld();
     }
 
@@ -262,7 +266,7 @@ class GameEngine {
         isReenact = Boolean(isReenact);
         let step = ++this.world.stepCount;
         let clientIDSpace = this.options.clientIDSpace;
-        this.emit("preStep", { step, isReenact });
+        this.emit('preStep', { step, isReenact });
 
         // skip physics for shadow objects during re-enactment
         function objectFilter(o) {
@@ -273,13 +277,17 @@ class GameEngine {
         if (this.physicsEngine)
             this.physicsEngine.step(objectFilter);
 
-        // trace object positions after physics
-        for (let objId of Object.keys(this.world.objects)) {
-            this.trace.trace(`object[${objId}] after ${isReenact ? "reenact" : "step"} : ${this.world.objects[objId].toString()}`);
-        }
+        // for each object
+        // - apply incremental bending
+        // - refresh object positions after physics
+        this.world.forEachObject((id, o) => {
+            if (typeof o.refreshFromPhysics === 'function')
+                o.refreshFromPhysics();
+            this.trace.trace(`object[${id}] after ${isReenact ? 'reenact' : 'step'} : ${o.toString()}`);
+        });
 
         // emit postStep event
-        this.emit("postStep", { step, isReenact });
+        this.emit('postStep', { step, isReenact });
     }
 
     /**
@@ -290,7 +298,12 @@ class GameEngine {
     addObjectToWorld(object) {
         this.world.objects[object.id] = object;
 
-        this.emit("objectAdded", object);
+        // tell the object to join the game, by creating
+        // its corresponding physical entities and renderer entities.
+        if (typeof object.onAddToWorld === 'function')
+            object.onAddToWorld(this);
+
+        this.emit('objectAdded', object);
         this.trace.info(`========== object added ${object.toString()} ==========`);
     }
 
@@ -311,11 +324,9 @@ class GameEngine {
      * @param {Object} inputMsg - input descriptor object
      * @param {String} inputMsg.input - describe the input (e.g. "up", "down", "fire")
      * @param {Number} inputMsg.messageIndex - input identifier
-     * @param {String} playerId - the player number (as a string)
+     * @param {Number} playerId - the player ID
      */
     processInput(inputMsg, playerId) {
-        // TODO - I don't think we need the playerId as an argument above.
-        //    it could be a class member.
         this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 
@@ -327,7 +338,7 @@ class GameEngine {
     removeObjectFromWorld(id) {
         let ob = this.world.objects[id];
         this.trace.info(`========== destroying object ${ob.toString()} ==========`);
-        this.emit("objectDestroyed", ob);
+        this.emit('objectDestroyed', ob);
         ob.destroy();
         delete this.world.objects[id];
     }

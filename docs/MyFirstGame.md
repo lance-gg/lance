@@ -336,8 +336,6 @@ class MyRenderer extends Renderer {
         super(gameEngine);
         this.sprites = {};
 
-        // TODO: the world settings are really a property of the GameEngine.
-        //       but they are currently used by interpolate function of DynamicObject.
         this.worldSettings = {
             width: 400,
             height: 400

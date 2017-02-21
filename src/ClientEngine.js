@@ -4,6 +4,7 @@ const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
 const Synchronizer = require('./Synchronizer');
+const Scheduler = require('./lib/Scheduler');
 
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
@@ -32,8 +33,9 @@ class ClientEngine {
       * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
       * @param {Number} inputOptions.syncOptions.localObjBending - amount of bending towards original client position, after each sync, for local objects
       * @param {Number} inputOptions.syncOptions.remoteObjBending - amount of bending towards original client position, after each sync, for remote objects
+      * @param {Renderer} Renderer - the Renderer class constructor
       */
-    constructor(gameEngine, inputOptions) {
+    constructor(gameEngine, inputOptions, Renderer) {
 
         this.options = Object.assign({
             autoConnect: true,
@@ -58,6 +60,9 @@ class ClientEngine {
 
         this.inboundMessages = [];
         this.outboundMessages = [];
+
+        // create the renderer
+        this.renderer = this.gameEngine.renderer = new Renderer(gameEngine, this);
 
         /**
         * client's player ID, as a string.
@@ -95,16 +100,6 @@ class ClientEngine {
             syncOptions.reflect = true;
         }
         const synchronizer = new Synchronizer(this, syncOptions);
-
-        // TODO: mixing different strategies together doesn't
-        //     really make sense, so we need to refactor the code
-        //     below.
-        if (syncOptions.sync === 'extrapolate')
-            synchronizer.extrapolateObjectSelector = () => { return true; };
-        else if (syncOptions.sync === 'interpolate')
-            synchronizer.interpolateObjectSelector = () => { return true; };
-        else if (syncOptions.sync === 'frameSync')
-            synchronizer.frameSyncSelector = () => { return true; };
     }
 
     /**
@@ -144,55 +139,22 @@ class ClientEngine {
      */
     start() {
 
-        // TODO: pull out gameLoop, renderLoop, gameLoopChecker to
-        // a separate module called scheduler.js
-        let nextExecTime = null;
-        let gameLoop = () => {
-            let stepStartTime = (new Date()).getTime();
-            this.step();
+        // schedule and start the game loop
+        this.scheduler = new Scheduler({
+            period: this.options.stepPeriod,
+            tick: this.step.bind(this),
+            delay: STEP_DELAY_MSEC
+        });
+        this.gameEngine.start();
+        this.scheduler.start();
 
-            // delay the execution of next step if requested.
-            // this could happen because of client-server step drift.
-            nextExecTime = stepStartTime + this.options.stepPeriod;
-            if (this.delayNextStep) {
-                nextExecTime += STEP_DELAY_MSEC;
-                this.delayNextStep = false;
-            } else if (this.hurryNextStep) {
-                nextExecTime -= STEP_DELAY_MSEC;
-                this.hurryNextStep = false;
-            }
-
-            setTimeout(gameLoop, nextExecTime - (new Date()).getTime());
-        };
-
-        // in same cases, setTimeout is ignored by the browser,
-        // this is known to happen during the first 100ms of a touch event
-        // on android chrome.  Double-check the game loop using requestAnimationFrame
-        let gameLoopChecker = () => {
-            let currentTime = (new Date()).getTime();
-            if (currentTime > nextExecTime) {
-                this.step();
-                nextExecTime = currentTime + this.options.stepPeriod;
-            }
-            window.requestAnimationFrame(gameLoopChecker);
-        };
-
+        // initialize the renderer
         // the render loop waits for next animation frame
+        if (!this.renderer) alert('ERROR: game has not defined a renderer');
         let renderLoop = () => {
             this.renderer.draw();
             window.requestAnimationFrame(renderLoop);
         };
-
-        // start game, game loop, game loop checker, render loop
-        this.gameEngine.start();
-        setTimeout(gameLoop, 0);
-        if (typeof window !== 'undefined')
-            window.requestAnimationFrame(gameLoopChecker);
-
-        // initialize the renderer
-        if (!this.renderer) {
-            alert('ERROR: game has not defined a renderer');
-        }
 
         return this.renderer.init().then(() => {
             if (typeof window !== 'undefined')
@@ -222,10 +184,10 @@ class ClientEngine {
         if (this.gameEngine.serverStep) {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Delaying next step.`);
-                this.delayNextStep = true;
+                this.scheduler.delayTick();
             } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
                 this.gameEngine.trace.warn(`step drift.  Client is behind server.  Hurrying next step.`);
-                this.hurryNextStep = true;
+                this.scheduler.hurryTick();
             }
         }
 
@@ -237,7 +199,7 @@ class ClientEngine {
 
         if (this.gameEngine.trace.length && this.socket) {
             // socket might not have been initialized at this point
-            this.socket.emit("trace", JSON.stringify(this.gameEngine.trace.rotate()));
+            this.socket.emit('trace', JSON.stringify(this.gameEngine.trace.rotate()));
         }
     }
 
@@ -303,25 +265,20 @@ class ClientEngine {
     handleInboundMessage(syncData) {
 
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
-
-        // TODO: this should be done in a better way.
-        // derive stepCount by taking the max of all events
-        let maxStepCount = syncEvents.reduce((max, el) => {
-            return el.stepCount ? Math.max(max, el.stepCount) : max;
-        }, 0);
+        let syncHeader = syncEvents.find((e) => e.eventName === 'syncHeader');
 
         // emit that a snapshot has been received
         this.gameEngine.emit('client__syncReceived', {
             syncEvents: syncEvents,
-            stepCount: maxStepCount
+            stepCount: syncHeader.stepCount
         });
 
-        this.gameEngine.trace.info(`========== inbound world update ${maxStepCount} ==========`);
+        this.gameEngine.trace.info(`========== inbound world update ${syncHeader.stepCount} ==========`);
 
         // finally update the stepCount
-        if (maxStepCount > this.gameEngine.world.stepCount) {
-            this.gameEngine.world.stepCount = maxStepCount;
-            this.gameEngine.trace.info(`========== world step count updated to  ${maxStepCount} ==========`);
+        if (syncHeader.stepCount > this.gameEngine.world.stepCount) {
+            this.gameEngine.world.stepCount = syncHeader.stepCount;
+            this.gameEngine.trace.info(`========== world step count updated to  ${syncHeader.stepCount} ==========`);
         }
     }
 

@@ -47,7 +47,7 @@ The ServerEngine has options to set the step rate and the sync update rate:
 ```javascript
 const serverEngine = new MyServerEngine(io, gameEngine, {
     updateRate: 6,
-    frameRate: 60,
+    stepRate: 60,
 });
 ```
 
