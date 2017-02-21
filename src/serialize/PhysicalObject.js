@@ -1,46 +1,27 @@
 'use strict';
 
-const Serializable = require('./Serializable');
+const GameObject = require('./GameObject');
 const Serializer = require('./Serializer');
 const ThreeVector = require('./ThreeVector');
 const Quaternion = require('./Quaternion');
 
 /**
- * The PhysicalObject is the base class for physical game objects.
- *
- * Each sub-class of PhysicalObject must override the following methods
- * if necessary:
- *
- * - static get netScheme() - base attributes which must be broadcast
- *   to all clients, on every update.  Make sure you extend the existing
- *   netScheme, don't start from scratch.
- * - constructor() - creates a simple object, temporary in nature.
- * - onAddToWorld() - the object should now join the game, by creating
- *   physical entities in the physics engine, and by creating renderable
- *   objects in the renderer.  The object becomes part of the game.
- * - toString() - a textual representation of the object which can help
- *   in debugging and traces
- * - copyFrom() - adopt values from another object. Used to update an
- *   object on the client with new values that arrived from the server.
- * - refreshFromPhysics() - the physical sub-entities may have changed, this
- *   function must update the object's attributes accordingly.
+ * The PhysicalObject is the base class for physical game objects
  */
-class PhysicalObject extends Serializable {
+class PhysicalObject extends GameObject {
 
     static get netScheme() {
-        return {
-            id: { type: Serializer.TYPES.INT32 },
+        return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
             quaternion: { type: Serializer.TYPES.CLASSINSTANCE },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
             angularVelocity: { type: Serializer.TYPES.CLASSINSTANCE }
-        };
+        }, super.netScheme);
     }
 
     constructor(id, position, velocity, quaternion, angularVelocity) {
-        super();
-        this.id = id;
+        super(id);
         this.playerId = 0;
         this.bendingIncrements = 0;
 
@@ -59,10 +40,6 @@ class PhysicalObject extends Serializable {
         this.class = PhysicalObject;
     }
 
-    // add this object to the game-world by creating physics sub-objects,
-    // and renderer sub-objects
-    onAddToWorld(gameEngine) {}
-
     // for debugging purposes mostly
     toString() {
         let p = this.position.toString();
@@ -70,18 +47,6 @@ class PhysicalObject extends Serializable {
         let q = this.quaternion.toString();
         let a = this.angularVelocity.toString();
         return `phyObj[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Dir=${q} AVel=${a}`;
-    }
-
-    saveState(other) {
-        this.savedCopy = (new this.constructor());
-        this.savedCopy.copyFrom(other ? other : this);
-    }
-
-    bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
-        if (this.savedCopy) {
-            this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
-        }
-        this.savedCopy = null;
     }
 
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
@@ -113,11 +78,6 @@ class PhysicalObject extends Serializable {
 
         if (this.physicsObj)
             this.refreshToPhysics();
-    }
-
-    // remove copyFrom method
-    copyFrom(other) {
-        this.syncTo(other);
     }
 
     // update position, quaternion, and velocity from new physical state.

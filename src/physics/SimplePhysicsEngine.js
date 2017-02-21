@@ -17,14 +17,13 @@ class SimplePhysicsEngine extends PhysicsEngine {
     }
 
     // a single object advances, based on:
-    // isRotatingRight, isRotatingLeft, isAccelerating, current velocity, current bending
+    // isRotatingRight, isRotatingLeft, isAccelerating, current velocity
     // wrap-around the world if necessary
     objectStep(o) {
         let worldSettings = this.gameEngine.worldSettings;
 
         if (o.isRotatingRight) { o.angle += o.rotationSpeed; }
         if (o.isRotatingLeft) { o.angle -= o.rotationSpeed; }
-        o.angle += o.bendingAngle;
 
         if (o.angle >= 360) { o.angle -= 360; }
         if (o.angle < 0) { o.angle += 360; }
@@ -49,8 +48,8 @@ class SimplePhysicsEngine extends PhysicsEngine {
         o.isRotatingLeft = false;
         o.isRotatingRight = false;
 
-        o.x = o.x + o.velX + o.bendingX;
-        o.y = o.y + o.velY + o.bendingY;
+        o.x = o.x + o.velX;
+        o.y = o.y + o.velY;
 
         // wrap around the world edges
         if (worldSettings.worldWrap) {

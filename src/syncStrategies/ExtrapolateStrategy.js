@@ -74,7 +74,7 @@ class ExtrapolateStrategy extends SyncStrategy {
     addNewObject(objId, newObj, options) {
 
         let curObj = new newObj.constructor();
-        curObj.copyFrom(newObj);
+        curObj.syncTo(newObj);
         this.gameEngine.addObjectToWorld(curObj);
         console.log(`adding new object ${curObj}`);
 
