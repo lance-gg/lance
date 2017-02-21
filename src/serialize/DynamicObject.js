@@ -323,6 +323,15 @@ class DynamicObject extends Serializable {
 
     }
 
+    // this is a no-op because there is no proper physics sub-object
+    refreshToPhysics() {}
+
+    // this is a no-op because there is no proper physics sub-object
+    refreshFromPhysics() {}
+
+    // this is a no-op because there are no sub-objects in the base DynamicObject
+    destroy() {}
+
     // TODO: implement incremental bending below
     applyIncrementalBending() { }
 }
