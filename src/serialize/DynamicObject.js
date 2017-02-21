@@ -1,11 +1,13 @@
 'use strict';
 
+const TwoVector = require('./TwoVector');
 const GameObject = require('./GameObject');
 const Serializer = require('./Serializer');
 const MathUtils = require('../lib/MathUtils');
 
 /**
- * DynamicObject is the base class of your game's objects.  It defines the
+ * DynamicObject is the base class of the game's objects, for games which
+ * rely on SimplePhysicsEngine.  It defines the
  * base object which can move around in the game world.  The
  * extensions of this object (the subclasses)
  * will be periodically synchronized from the server to every client.
@@ -41,11 +43,9 @@ class DynamicObject extends GameObject {
     static get netScheme() {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
-            x: { type: Serializer.TYPES.INT16 },
-            y: { type: Serializer.TYPES.INT16 },
-            velX: { type: Serializer.TYPES.FLOAT32 },
-            velY: { type: Serializer.TYPES.FLOAT32 },
-            angle: { type: Serializer.TYPES.INT16 }
+            position: { type: Serializer.TYPES.CLASSINSTANCE },
+            velocity: { type: Serializer.TYPES.CLASSINSTANCE },
+            angle: { type: Serializer.TYPES.FLOAT32 }
         }, super.netScheme);
     }
 
@@ -54,13 +54,13 @@ class DynamicObject extends GameObject {
     * Override to provide starting values for position, velocity, etc.
     * The object ID should be the next value provided by `world.idCount`
     * @param {String} id - the object id
-    * @param {Number} x - position x-value
-    * @param {Number} y - position y-value
+    * @param {TwoVector} position - position vector
+    * @param {TwoVector} velocity - velocity vector
     * @example
     *    // Ship is a subclass of DynamicObject:
     *    Ship(++this.world.idCount);
     */
-    constructor(id, x, y) {
+    constructor(id, position, velocity) {
         super(id);
 
         /**
@@ -69,22 +69,23 @@ class DynamicObject extends GameObject {
         */
         this.playerId = 0;
 
-        // TODO instead of storing attributes x,y,velX,velY, consider using
-        // new ThreeVector.js
-        /**
-        * position x-coordinate
-        * @member {Number}
-        */
-        this.x = x;
+        this.position = new TwoVector(0, 0);
+        this.velocity = new TwoVector(0, 0);
 
         /**
-        * position y-coordinate
-        * @member {Number}
+        * position
+        * @member {TwoVector}
         */
-        this.y = y;
+        if (position) this.position.copy(position);
 
         /**
-        * object orientation angle
+        * velocity
+        * @member {TwoVector}
+        */
+        if (velocity) this.velocity.copy(velocity);
+
+        /**
+        * object orientation angle in degrees
         * @member {Number}
         */
         this.angle = 90;
@@ -119,22 +120,14 @@ class DynamicObject extends GameObject {
         */
         this.acceleration = 0.1;
 
-        /**
-        * velocity x-coordinate
-        * @member {Number}
-        */
-        this.velX = 0;
-
-        /**
-        * velocity y-coordinate
-        * @member {Number}
-        */
-        this.velY = 0;
-        this.bendingX = 0;
-        this.bendingY = 0;
+        this.bending = new TwoVector(0, 0);
         this.bendingAngle = 0;
         this.deceleration = 0.99;
     }
+
+    // convenience getters
+    get x() { return this.position.x; }
+    get y() { return this.position.y; }
 
     /**
      * Formatted textual description of the dynamic object.
@@ -145,8 +138,7 @@ class DynamicObject extends GameObject {
      */
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
-        function showVec(x, y, z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }
-        return `dObj[${this.id}] player${this.playerId} pos${showVec(this.x, this.y, this.z)} vel${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
+        return `dObj[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
     }
 
     /**
@@ -159,12 +151,9 @@ class DynamicObject extends GameObject {
     syncTo(other) {
         this.id = other.id;
         this.playerId = other.playerId;
-        this.x = other.x;
-        this.y = other.y;
-        this.velX = other.velX;
-        this.velY = other.velY;
-        this.bendingX = other.bendingX;
-        this.bendingY = other.bendingY;
+        this.position.copy(other.position);
+        this.velocity.copy(other.velocity);
+        this.bending.copy(other.bending);
         this.bendingAngle = other.bendingAngle;
         this.angle = other.angle;
         this.rotationSpeed = other.rotationSpeed;
@@ -195,26 +184,26 @@ class DynamicObject extends GameObject {
             angleBending = this.bendingAngleLocalMultiple;
 
         // bend to position, velocity, and angle gradually
+        // TODO: consider using lerp() method of TwoVector instead.
+        //     you will need implement lerpWrapped() first.
         if (worldSettings.worldWrap) {
-            this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / bendingIncrements;
-            this.bendingY = MathUtils.interpolateDeltaWithWrapping(original.y, this.y, bending, 0, worldSettings.height) / bendingIncrements;
+            this.bending.x = MathUtils.interpolateDeltaWithWrapping(original.position.x, this.position.x, bending, 0, worldSettings.width) / bendingIncrements;
+            this.bending.y = MathUtils.interpolateDeltaWithWrapping(original.position.y, this.position.y, bending, 0, worldSettings.height) / bendingIncrements;
         } else {
-            this.bendingX = MathUtils.interpolateDelta(original.x, this.x, bending) / bendingIncrements;
-            this.bendingY = MathUtils.interpolateDelta(original.y, this.y, bending) / bendingIncrements;
+            this.bending.x = MathUtils.interpolateDelta(original.position.x, this.position.x, bending) / bendingIncrements;
+            this.bending.y = MathUtils.interpolateDelta(original.position.y, this.position.y, bending) / bendingIncrements;
         }
         this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 360) / bendingIncrements;
-        this.velX = MathUtils.interpolate(original.velX, this.velX, velocityBending);
-        this.velY = MathUtils.interpolate(original.velY, this.velY, velocityBending);
+        this.velocity.x = MathUtils.interpolate(original.velocity.x, this.velocity.x, velocityBending);
+        this.velocity.y = MathUtils.interpolate(original.velocity.y, this.velocity.y, velocityBending);
 
         // revert to original
-        this.x = original.x;
-        this.y = original.y;
+        this.position.copy(original.position);
         this.angle = original.angle;
     }
 
     applyIncrementalBending() {
-        this.x += this.bendingX;
-        this.y += this.bendingY;
+        this.position.add(this.bending);
         this.angle += this.bendingAngle
     }
 }

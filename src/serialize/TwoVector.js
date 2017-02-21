@@ -39,9 +39,29 @@ class TwoVector extends Serializable {
         return `(${round3(this.x)}, ${round3(this.y)})`;
     }
 
+    set(x, y) {
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+
     multiplyScalar(s) {
         this.x *= s;
         this.y *= s;
+
+        return this;
+    }
+
+    add(other) {
+        this.x += other.x;
+        this.y += other.y;
+
+        return this;
+    }
+
+    subtract(other) {
+        this.x -= other.x;
+        this.y -= other.y;
 
         return this;
     }
@@ -58,6 +78,8 @@ class TwoVector extends Serializable {
     copy(sourceObj) {
         this.x = sourceObj.x;
         this.y = sourceObj.y;
+
+        return this;
     }
 
     lerp(target, p) {

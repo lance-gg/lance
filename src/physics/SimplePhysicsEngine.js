@@ -1,7 +1,9 @@
 'use strict';
 const PhysicsEngine = require('./PhysicsEngine');
 const CollisionDetection = require('./SimplePhysics/CollisionDetection');
+const TwoVector = require('../serialize/TwoVector');
 
+let dv = new TwoVector();
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
@@ -29,34 +31,31 @@ class SimplePhysicsEngine extends PhysicsEngine {
         if (o.angle < 0) { o.angle += 360; }
 
         if (o.isAccelerating) {
-            o.velX += Math.cos(o.angle * (Math.PI / 180)) * o.acceleration;
-            o.velY += Math.sin(o.angle * (Math.PI / 180)) * o.acceleration;
+            let rad = o.angle * (Math.PI / 180);
+            dv.set(Math.cos(rad), Math.sin(rad)).multiplyScalar(o.acceleration);
+            o.velocity.add(dv);
         }
 
-        // acceleration
-        o.velX = Math.round(o.velX * 100) / 100;
-        o.velY = Math.round(o.velY * 100) / 100;
+        // o.velX = Math.round(o.velX * 100) / 100;
+        // o.velY = Math.round(o.velY * 100) / 100;
 
-        let velMagnitude = Math.sqrt(o.velX * o.velX + o.velY * o.velY);
+        let velMagnitude = o.velocity.length();
         if ((o.maxSpeed !== null) && (velMagnitude > o.maxSpeed)) {
-            let resizeFactor = o.maxSpeed / velMagnitude;
-            o.velX *= resizeFactor;
-            o.velY *= resizeFactor;
+            o.velocity.multiplyScalar(o.maxSpeed / velMagnitude);
         }
 
         o.isAccelerating = false;
         o.isRotatingLeft = false;
         o.isRotatingRight = false;
 
-        o.x = o.x + o.velX;
-        o.y = o.y + o.velY;
+        o.position.add(o.velocity);
 
         // wrap around the world edges
         if (worldSettings.worldWrap) {
-            if (o.x >= worldSettings.width) { o.x -= worldSettings.width; }
-            if (o.y >= worldSettings.height) { o.y -= worldSettings.height; }
-            if (o.x < 0) { o.x += worldSettings.width; }
-            if (o.y < 0) { o.y += worldSettings.height; }
+            if (o.position.x >= worldSettings.width) { o.position.x -= worldSettings.width; }
+            if (o.position.y >= worldSettings.height) { o.position.y -= worldSettings.height; }
+            if (o.position.x < 0) { o.position.x += worldSettings.width; }
+            if (o.position.y < 0) { o.position.y += worldSettings.height; }
         }
     }
 
