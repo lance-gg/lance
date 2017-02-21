@@ -51,8 +51,8 @@ class PhysicalObject extends GameObject {
 
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
         this.bendingTarget = (new this.constructor());
-        this.bendingTarget.copyFrom(this);
-        this.copyFrom(original);
+        this.bendingTarget.syncTo(this);
+        this.syncTo(original);
         this.bendingIncrements = bendingIncrements;
         this.bending = bending;
 
