@@ -31,7 +31,7 @@ The boilerplate includes a sample game object class, in the file
 Create the following two classes in the `src/common` directory:
 
 ### src/common/Paddle.js
-The Paddle class is a bear-bones object.  It is similar to
+The Paddle class is a bare-bones object.  It is similar to
 the sample `PlayerAvatar.js` object, except that it is called `Paddle`.
 
 ```javascript
