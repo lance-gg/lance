@@ -166,6 +166,7 @@ class DynamicObject extends GameObject {
         // TODO: the bending parameters should now be an object,
         //     with a single getter bendingMultiples which has local
         //     and remote values for position, velocity, and angle
+        this.bendingIncrements = bendingIncrements;
 
         // if the object has defined a bending multiples for this object, use them
         if (typeof this.bendingMultiple === 'number')
@@ -203,8 +204,12 @@ class DynamicObject extends GameObject {
     }
 
     applyIncrementalBending() {
+        if (this.bendingIncrements === 0)
+            return;
+
         this.position.add(this.bending);
-        this.angle += this.bendingAngle
+        this.angle += this.bendingAngle;
+        this.bendingIncrements--;
     }
 }
 
