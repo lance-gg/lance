@@ -14,8 +14,10 @@ class Serializer {
     constructor() {
         this.registeredClasses = {};
         this.customTypes = {};
-
         this.netSchemeSizeCache = {}; // used to cache calculated netSchemes sizes
+        this.registerClass(require('./TwoVector'));
+        this.registerClass(require('./ThreeVector'));
+        this.registerClass(require('./Quaternion'));
     }
 
     /**
