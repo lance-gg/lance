@@ -8,9 +8,13 @@ const Scheduler = require('./lib/Scheduler');
 
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
-const STEP_DRIFT_THRESHOLD = 10; // min # steps that qualifies a client-server drift
+const STEP_DRIFT_THRESHOLDS = {
+    onServerSync: { MAX_LEAD: 3, MAX_LAG: 4 }, // max step lead/lag allowed after every server sync
+    onEveryStep: { MAX_LEAD: 10, MAX_LAG: 10 } // max step lead/lag allowed at every step
+};
+const STEP_DRIFT_THRESHOLD__CLIENT_RESET = 20; // if we are behind this many steps, just reset the step counter
 const GAME_UPS = 60; // default number of game steps per second
-const STEP_DELAY_MSEC = 5; // if drift detected, delay next execution by this amount
+const STEP_DELAY_MSEC = 12; // if drift detected, delay next execution by this amount
 
 /**
  * The client engine is the singleton which manages the client-side
@@ -165,7 +169,28 @@ class ClientEngine {
         });
     }
 
+    // check if client step is too far ahead (leading) or too far
+    // behing (lagging) the server step
+    checkDrift(checkType) {
+
+        if (!this.gameEngine.serverStep)
+            return;
+
+        let maxLead = STEP_DRIFT_THRESHOLDS[checkType].MAX_LEAD;
+        let maxLag = STEP_DRIFT_THRESHOLDS[checkType].MAX_LAG;
+        let clientStep = this.gameEngine.world.stepCount;
+        let serverStep = this.gameEngine.serverStep;
+        if (clientStep > serverStep + maxLead) {
+            this.gameEngine.trace.warn(`step drift ${checkType}. [${clientStep} > ${serverStep} + ${maxLead}] Client is ahead of server.  Delaying next step.`);
+            this.scheduler.delayTick();
+        } else if (serverStep > clientStep + maxLag) {
+            this.gameEngine.trace.warn(`step drift ${checkType}. [${serverStep} > ${clientStep} + ${maxLag}] Client is behind server.  Hurrying next step.`);
+            this.scheduler.hurryTick();
+        }
+    }
+
     step() {
+
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
 
@@ -178,18 +203,11 @@ class ClientEngine {
         this.gameEngine.emit('client__preStep');
         while (this.inboundMessages.length > 0) {
             this.handleInboundMessage(this.inboundMessages.pop());
+            this.checkDrift('onServerSync');
         }
 
-        // check for server/client step drift
-        if (this.gameEngine.serverStep) {
-            if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn('step drift.  Client is ahead of server.  Delaying next step.');
-                this.scheduler.delayTick();
-            } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn('step drift.  Client is behind server.  Hurrying next step.');
-                this.scheduler.hurryTick();
-            }
-        }
+        // check for server/client step drift without update
+        this.checkDrift('onEveryStep');
 
         // perform game engine step
         this.handleOutboundInput();
@@ -276,9 +294,9 @@ class ClientEngine {
         this.gameEngine.trace.info(`========== inbound world update ${syncHeader.stepCount} ==========`);
 
         // finally update the stepCount
-        if (syncHeader.stepCount > this.gameEngine.world.stepCount) {
+        if (syncHeader.stepCount > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD__CLIENT_RESET) {
+            this.gameEngine.trace.info(`========== world step count updated from ${this.gameEngine.world.stepCount} to  ${syncHeader.stepCount} ==========`);
             this.gameEngine.world.stepCount = syncHeader.stepCount;
-            this.gameEngine.trace.info(`========== world step count updated to  ${syncHeader.stepCount} ==========`);
         }
     }
 
