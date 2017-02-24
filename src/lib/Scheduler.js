@@ -42,11 +42,13 @@ class Scheduler {
 
     /**
      * start the schedule
+     * @return {Scheduler} returns this scheduler instance
      */
     start() {
         setTimeout(this.nextTick.bind(this));
         if (typeof window === 'object' && typeof window.requestAnimationFrame === 'function')
             window.requestAnimationFrame(this.nextTickChecker.bind(this));
+        return this;
     }
 
     /**

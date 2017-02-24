@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const Utils = require('./lib/Utils');
-const Gameloop = require('node-gameloop');
+const Scheduler = require('./lib/Scheduler');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
@@ -79,13 +79,15 @@ class ServerEngine {
 
     // start the ServerEngine
     start() {
-        var that = this;
         this.gameEngine.start();
         this.gameEngine.emit('server__init');
 
-        this.gameLoopId = Gameloop.setGameLoop(function() {
-            that.step();
-        }, 1000 / this.options.stepRate);
+        let schedulerConfig = {
+            tick: this.step.bind(this),
+            period: 1000 / this.options.stepRate,
+            delay: 4
+        };
+        this.scheduler = new Scheduler(schedulerConfig).start();
     }
 
     // every server step starts here
