@@ -1,5 +1,5 @@
-"use strict";
-var io = require("socket.io-client");
+'use strict';
+var io = require('socket.io-client');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
@@ -113,8 +113,8 @@ class ClientEngine {
 
             this.networkMonitor.registerClient(this);
 
-            this.socket.once("connect", () => {
-                console.log("connection made");
+            this.socket.once('connect', () => {
+                console.log('connection made');
                 resolve();
             });
 
@@ -183,10 +183,10 @@ class ClientEngine {
         // check for server/client step drift
         if (this.gameEngine.serverStep) {
             if (this.gameEngine.world.stepCount > this.gameEngine.serverStep + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  Client is ahead of server.  Delaying next step.`);
+                this.gameEngine.trace.warn('step drift.  Client is ahead of server.  Delaying next step.');
                 this.scheduler.delayTick();
             } else if (this.gameEngine.serverStep > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD) {
-                this.gameEngine.trace.warn(`step drift.  Client is behind server.  Hurrying next step.`);
+                this.gameEngine.trace.warn('step drift.  Client is behind server.  Hurrying next step.');
                 this.scheduler.hurryTick();
             }
         }

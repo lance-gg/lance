@@ -16,10 +16,6 @@ class PhysicsEngine {
      */
     step(objectFilter) {}
 
-    addObject() {}
-
-    removeObject() {}
-
 }
 
 module.exports = PhysicsEngine;
