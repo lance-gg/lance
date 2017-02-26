@@ -222,6 +222,7 @@ class GameEngine {
     findLocalShadow(serverObj) {
 
         for (let localId of Object.keys(this.world.objects)) {
+            if (Number(localId) < this.options.clientIDSpace) continue;
             let localObj = this.world.objects[localId];
             if (localObj.hasOwnProperty('inputId') && localObj.inputId === serverObj.inputId)
                 return localObj;

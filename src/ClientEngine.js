@@ -9,7 +9,7 @@ const Scheduler = require('./lib/Scheduler');
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
 const STEP_DRIFT_THRESHOLDS = {
-    onServerSync: { MAX_LEAD: 3, MAX_LAG: 4 }, // max step lead/lag allowed after every server sync
+    onServerSync: { MAX_LEAD: 1, MAX_LAG: 4 }, // max step lead/lag allowed after every server sync
     onEveryStep: { MAX_LEAD: 10, MAX_LAG: 10 } // max step lead/lag allowed at every step
 };
 const STEP_DRIFT_THRESHOLD__CLIENT_RESET = 20; // if we are behind this many steps, just reset the step counter
@@ -286,6 +286,7 @@ class ClientEngine {
         let syncHeader = syncEvents.find((e) => e.eventName === 'syncHeader');
 
         // emit that a snapshot has been received
+        this.gameEngine.serverStep = syncHeader.stepCount;
         this.gameEngine.emit('client__syncReceived', {
             syncEvents: syncEvents,
             stepCount: syncHeader.stepCount

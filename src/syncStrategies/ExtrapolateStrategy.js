@@ -94,7 +94,6 @@ class ExtrapolateStrategy extends SyncStrategy {
     // apply a new sync
     applySync() {
 
-
         this.gameEngine.trace.debug('extrapolate applying sync');
 
         //
@@ -123,8 +122,11 @@ class ExtrapolateStrategy extends SyncStrategy {
 
                 // case 1: this object has a local shadow object on the client
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
-                let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
-                newObj.saveState(localShadowObj);
+
+                if (!world.objects.hasOwnProperty(ev.objectInstance.id)) {
+                    let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
+                    newObj.saveState(localShadowObj);
+                }
                 this.gameEngine.removeObjectFromWorld(localShadowObj.id);
 
             } else if (curObj) {
@@ -152,7 +154,6 @@ class ExtrapolateStrategy extends SyncStrategy {
             this.gameEngine.trace.info(`too many steps to re-enact.  Starting from [${serverStep}] to [${world.stepCount}]`);
         }
 
-        this.gameEngine.serverStep = serverStep;
         let clientStep = world.stepCount;
         for (world.stepCount = serverStep; world.stepCount < clientStep;) {
             if (this.recentInputs[world.stepCount]) {

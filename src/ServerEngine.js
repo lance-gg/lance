@@ -35,6 +35,7 @@ class ServerEngine {
      * @param {Number} options.stepRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
      * @param {String} options.tracesPath - path where traces should go
+     * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
      * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
      * @return {ServerEngine} serverEngine - self
      */
@@ -43,6 +44,7 @@ class ServerEngine {
             updateRate: 6,
             stepRate: 60,
             timeoutInterval: 180,
+            updateOnObjectCreation: true,
             tracesPath: '',
             debug: {
                 serverSendLag: false
@@ -69,6 +71,7 @@ class ServerEngine {
         this.playerInputQueues = {};
         this.pendingAtomicEvents = [];
         this.objMemory = {};
+        this.requestImmediateUpdate = false;
 
         io.on('connection', this.onPlayerConnected.bind(this));
         this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
@@ -118,7 +121,8 @@ class ServerEngine {
         this.gameEngine.step();
 
         // update clients only at the specified step interval, as defined in options
-        if (this.gameEngine.world.stepCount % this.options.updateRate === 0) {
+        if (this.requestImmediateUpdate ||
+            this.gameEngine.world.stepCount % this.options.updateRate === 0) {
 
             // if at least one player is new, we should send a full payload
             let diffUpdate = true;
@@ -136,6 +140,7 @@ class ServerEngine {
             for (let socketId of Object.keys(this.connectedPlayers))
                 this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
             this.networkTransmitter.clearPayload();
+            this.requestImmediateUpdate = false;
         }
 
         // step is done on the server side
@@ -199,6 +204,9 @@ class ServerEngine {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
         });
+
+        if (this.options.updateOnObjectCreation)
+            this.requestImmediateUpdate = true;
     }
 
     // handle the object creation
