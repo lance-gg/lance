@@ -46,12 +46,25 @@ class ThreeVector extends Serializable {
         this.x *= s;
         this.y *= s;
         this.z *= s;
-
         return this;
     }
 
     length() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    }
+
+    add(other) {
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+        return this;
+    }
+
+    subtract(other) {
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+        return this;
     }
 
     normalize() {
@@ -63,12 +76,14 @@ class ThreeVector extends Serializable {
         this.x = sourceObj.x;
         this.y = sourceObj.y;
         this.z = sourceObj.z;
+        return this;
     }
 
     lerp(target, p) {
         this.x += (target.x - this.x) * p;
         this.y += (target.y - this.y) * p;
         this.z += (target.z - this.z) * p;
+        return this;
     }
 }
 

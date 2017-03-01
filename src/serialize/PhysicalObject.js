@@ -10,6 +10,12 @@ const Quaternion = require('./Quaternion');
  */
 class PhysicalObject extends GameObject {
 
+    // TODO:
+    // this code is not performance optimized, generally speaking.
+    // a lot can be done to make it faster, by using temp objects
+    // insead of creating new ones, less copying, and removing some redundancy
+    // in calculations.
+
     static get netScheme() {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
@@ -40,6 +46,7 @@ class PhysicalObject extends GameObject {
         this.class = PhysicalObject;
     }
 
+    // display object's physical attributes as a string
     // for debugging purposes mostly
     toString() {
         let p = this.position.toString();
@@ -49,10 +56,33 @@ class PhysicalObject extends GameObject {
         return `phyObj[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Dir=${q} AVel=${a}`;
     }
 
+    // display object's physical attributes as a string
+    // for debugging purposes mostly
+    bendingToString() {
+        if (this.bendingIncrements)
+            return `bend=${this.bending} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaQuat=${this.bendingQuaternionDelta}`;
+        return 'no bending';
+    }
+
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
-        this.bendingTarget = (new this.constructor());
-        this.bendingTarget.syncTo(this);
-        this.syncTo(original);
+
+        // get the incremental delta position
+        let incrementScale = bending/bendingIncrements;
+        this.bendingPositionDelta = (new ThreeVector()).copy(this.position);
+        this.bendingPositionDelta.subtract(original.position);
+        this.bendingPositionDelta.multiplyScalar(incrementScale);
+
+        // get the incremental quaternion rotation
+        let currentConjugate = (new Quaternion()).copy(original.quaternion).conjugate();
+        this.bendingQuaternionDelta = (new Quaternion()).copy(this.quaternion);
+        this.bendingQuaternionDelta.multiply(currentConjugate);
+        let axisAngle = this.bendingQuaternionDelta.toAxisAngle();
+        axisAngle.angle *= incrementScale;
+        this.bendingQuaternionDelta.setFromAxisAngle(axisAngle.axis, axisAngle.angle);
+
+        // this.bendingTarget = (new this.constructor());
+        // this.bendingTarget.syncTo(this);
+        this.syncTo(original, { keepVelocities: true });
         this.bendingIncrements = bendingIncrements;
         this.bending = bending;
 
@@ -60,21 +90,20 @@ class PhysicalObject extends GameObject {
         // TODO: does refreshToPhysics() really belong here?
         //       should refreshToPhysics be decoupled from syncTo
         //       and called explicitly in all cases?
-        this.velocity.copy(this.bendingTarget.velocity);
-        this.angularVelocity.copy(this.bendingTarget.angularVelocity);
-        // this.velocity.lerp(this.bendingTarget.velocity, 0.8);
-        // this.angularVelocity.lerp(this.bendingTarget.angularVelocity, 0.8);
         this.refreshToPhysics();
     }
 
-    syncTo(other) {
+    syncTo(other, options) {
         this.id = other.id;
         this.playerId = other.playerId;
 
         this.position.copy(other.position);
         this.quaternion.copy(other.quaternion);
-        this.velocity.copy(other.velocity);
-        this.angularVelocity.copy(other.angularVelocity);
+
+        if (!options || Boolean(options.keepVelocities)) {
+            this.velocity.copy(other.velocity);
+            this.angularVelocity.copy(other.angularVelocity);
+        }
 
         if (this.physicsObj)
             this.refreshToPhysics();
@@ -109,14 +138,13 @@ class PhysicalObject extends GameObject {
         }
     }
 
-    // apply incremental bending
+    // apply one increment of bending
     applyIncrementalBending() {
         if (this.bendingIncrements === 0)
             return;
 
-        let incrementalBending = this.bending / this.bendingIncrements;
-        this.position.lerp(this.bendingTarget.position, incrementalBending);
-        this.quaternion.slerp(this.bendingTarget.quaternion, incrementalBending);
+        this.position.add(this.bendingPositionDelta);
+        this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;
     }
 }

@@ -2,6 +2,7 @@
 
 const Serializable = require('./Serializable');
 const Serializer = require('./Serializer');
+const ThreeVector = require('./ThreeVector');
 
 /**
  * A Quaternion is a geometric object which can be used to
@@ -56,6 +57,54 @@ class Quaternion extends Serializable {
         this.y = y;
         this.z = z;
     }
+
+    toAxisAngle() {
+
+        // assuming quaternion normalised then w is less than 1, so term always positive.
+        let axis = new ThreeVector(1, 0, 0);
+        let angle = 2 * Math.acos(this.w);
+        let s = Math.sqrt(1 - this.w * this.w);
+        if (s > 0.001) {
+            let divS = 1 / s;
+            axis.x = this.x * divS;
+            axis.y = this.y * divS;
+            axis.z = this.z * divS;
+        }
+        return { axis, angle };
+    }
+
+    setFromAxisAngle(axis, angle) {
+
+        let halfAngle = angle * 0.5;
+        let s = Math.sin(halfAngle);
+        this.x = axis.x * s;
+        this.y = axis.y * s;
+        this.z = axis.z * s;
+        this.w = Math.cos(halfAngle);
+
+        return this;
+    }
+
+    conjugate() {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
+        return this;
+    }
+
+    /* eslint-disable */
+    multiply(other) {
+        let aw = this.w, ax = this.x, ay = this.y, az = this.z;
+        let bw = other.w, bx = other.x, by = other.y, bz = other.z;
+
+        this.x = ax * bw + aw * bx + ay * bz - az * by;
+        this.y = ay * bw + aw * by + az * bx - ax * bz;
+        this.z = az * bw + aw * bz + ax * by - ay * bx;
+        this.w = aw * bw - ax * bx - ay * by - az * bz;
+
+        return this;
+    }
+    /* eslint-enable */
 
     /* eslint-disable */
     slerp(target, bending) {

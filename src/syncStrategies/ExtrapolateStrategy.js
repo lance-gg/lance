@@ -190,7 +190,7 @@ class ExtrapolateStrategy extends SyncStrategy {
             obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
             if (typeof obj.refreshRenderObject === 'function')
                 obj.refreshRenderObject();
-            this.gameEngine.trace.trace(`object[${objId}] bending=${bending} values = (${obj.bending},${obj.bendingAngle})`);
+            this.gameEngine.trace.trace(`object[${objId}] ${obj.bendingToString()}`);
         }
 
         // trace object state after sync

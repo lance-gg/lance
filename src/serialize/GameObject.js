@@ -60,6 +60,14 @@ class GameObject extends Serializable {
         return `game-object[${this.id}]`;
     }
 
+    /**
+     * Formatted textual description of the game object's current bending properties.
+     * @return {String} description - a string description
+     */
+    bendingToString() {
+        return 'no bending';
+    }
+
     saveState(other) {
         this.savedCopy = (new this.constructor());
         this.savedCopy.syncTo(other ? other : this);

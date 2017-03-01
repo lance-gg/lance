@@ -142,6 +142,16 @@ class DynamicObject extends GameObject {
     }
 
     /**
+     * Formatted textual description of the game object's current bending properties.
+     * @return {String} description - a string description
+     */
+    bendingToString() {
+        if (this.bendingIncrements)
+            return `bend=${this.bending} angle=${this.bendingAngle} num_increments=${this.bendingIncrements}`;
+        return 'no bending';
+    }
+
+    /**
     * The maximum velocity allowed.  If returns null then ignored.
     * @memberof DynamicObject
     * @member {Number} maxSpeed
