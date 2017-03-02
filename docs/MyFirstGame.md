@@ -40,9 +40,11 @@ the sample `PlayerAvatar.js` object, except that it is called `Paddle` and it as
 const DynamicObject = require('incheon').serialize.DynamicObject;
 
 class Paddle extends DynamicObject {
-    constructor(id, x) {
+
+    constructor(id, x, playerId) {
         super(id);
         this.position.set(x, 0);
+        this.playerId = playerId;
         this.class = Paddle;
     }
 
@@ -167,8 +169,8 @@ processInput(inputData, playerId) {
 initGame() {
 
     // create the paddle objects
-    this.addObjectToWorld(new Paddle(++this.world.idCount, PADDING));
-    this.addObjectToWorld(new Paddle(++this.world.idCount, WIDTH - PADDING));
+    this.addObjectToWorld(new Paddle(++this.world.idCount, PADDING, 1));
+    this.addObjectToWorld(new Paddle(++this.world.idCount, WIDTH - PADDING, 2));
     this.addObjectToWorld(new Ball(++this.world.idCount, WIDTH / 2, HEIGHT / 2));
 }
 ```
@@ -308,8 +310,8 @@ draw() {
     // bad practice, but used here for code brevity
     for (let objId of Object.keys(this.sprites)) {
         if (this.sprites[objId].el) {
-            this.sprites[objId].el.style.top = this.gameEngine.world.objects[objId].y + 'px';
-            this.sprites[objId].el.style.left = this.gameEngine.world.objects[objId].x + 'px';
+            this.sprites[objId].el.style.top = this.gameEngine.world.objects[objId].position.y + 'px';
+            this.sprites[objId].el.style.left = this.gameEngine.world.objects[objId].position.x + 'px';
         }
     }
 }
