@@ -16,7 +16,7 @@ class GameWorld {
      */
     forEachObject(callback) {
         for (let id of Object.keys(this.objects))
-            callback(id, this.objects[id]);
+            callback(id, this.objects[id]);  // TODO: the key should be Number(id)
     }
 
     /**

@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
-const SyncStrategy = require("./SyncStrategy");
+const SyncStrategy = require('./SyncStrategy');
 
 const defaults = {
-    syncsBufferLength: 5,
-    clientStepHold: 10,
+    syncsBufferLength: 6,
+    clientStepHold: 6,
     reflect: false
 };
 
@@ -19,37 +19,45 @@ class InterpolateStrategy extends SyncStrategy {
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.passive = true; // client side engine ignores inputs
         this.gameEngine.on('client__postStep', this.interpolate.bind(this));
-        this.gameEngine.on('client__syncReceived', this.updatesyncsBuffer.bind(this));
+        this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
     }
 
-    updatesyncsBuffer(e) {
-        // TODO avoid editing the input event
+    collectSync(e) {
+
         // TODO the event sorting code below is used in one way or another
         //    by interpolate, extrapolate and reflect.  Consider placing
         //    it in the base class.
 
+        let lastSync = this.lastSync = {};
+        lastSync.stepCount = e.stepCount;
+
         // keep a reference of events by object id
-        e.syncObjects = {};
+        lastSync.syncObjects = {};
         e.syncEvents.forEach(sEvent => {
             let o = sEvent.objectInstance;
-            if (!e.syncObjects[o.id]) {
-                e.syncObjects[o.id] = [];
+            if (!o) return;
+            if (!lastSync.syncObjects[o.id]) {
+                lastSync.syncObjects[o.id] = [];
             }
-            e.syncObjects[o.id].push(sEvent);
+            lastSync.syncObjects[o.id].push(sEvent);
         });
 
         // keep a reference of events by step
-        e.syncSteps = {};
+        lastSync.syncSteps = {};
         e.syncEvents.forEach(sEvent => {
 
             // add an entry for this step and event-name
-            if (!e.syncSteps[sEvent.stepCount]) e.syncSteps[sEvent.stepCount] = {};
-            if (!e.syncSteps[sEvent.stepCount][sEvent.eventName]) e.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            e.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
+            if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
+            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
+            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
         });
 
-        // add the sync to the buffer
-        this.syncsBuffer.push(e);
+        let objCount = (Object.keys(lastSync.syncObjects)).length;
+        let eventCount = e.syncEvents.length;
+        let stepCount = (Object.keys(lastSync.syncSteps)).length;
+        this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
+
+        this.syncsBuffer.push(lastSync);
         if (this.syncsBuffer.length >= this.options.syncsBufferLength) {
             this.syncsBuffer.shift();
         }
@@ -59,9 +67,10 @@ class InterpolateStrategy extends SyncStrategy {
     addNewObject(objId, newObj, stepCount) {
 
         let curObj = new newObj.constructor();
-        curObj.copyFrom(newObj);
+        curObj.syncTo(newObj);
         curObj.passive = true;
         this.gameEngine.addObjectToWorld(curObj);
+        console.log(`adding new object ${curObj}`);
 
         // if this game keeps a physics engine on the client side,
         // we need to update it as well
@@ -101,15 +110,12 @@ class InterpolateStrategy extends SyncStrategy {
             return;
         }
 
-        this.gameEngine.trace.debug(`interpolate step ${stepToPlay} towards sync at step ${nextSync.stepCount}`);
+        this.gameEngine.trace.debug(`interpolate past step [${stepToPlay}] using sync from step ${nextSync.stepCount}`);
 
-        // TODO: events of type objectCreate were never
-        //      implemented.  possibly for a good reason.
         // create objects which are created at this step
         let stepEvents = nextSync.syncSteps[stepToPlay];
         if (stepEvents && stepEvents.objectCreate) {
             stepEvents.objectCreate.forEach(ev => {
-                // TODO maybe separate addNewObject into two generate/add methods
                 this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
             });
         }
@@ -125,50 +131,49 @@ class InterpolateStrategy extends SyncStrategy {
         // remove objects which are removed at this step
         if (stepEvents && stepEvents.objectDestroy) {
             stepEvents.objectDestroy.forEach(ev => {
-                world.objects[ev.id].destroy();
-                delete this.gameEngine.world.objects[ev.id];
+                this.gameEngine.removeObjectFromWorld(ev.objectInstance.id);
             });
         }
 
         // interpolate values for all objects in this world
-        for (let id of Object.keys(world.objects)) {
-            let ob = world.objects[id];
+        world.forEachObject((id, ob) => {
+
             let nextObj = null;
             let nextStep = null;
 
             // if we already handled this object, continue
             // TODO maybe call it lastUpdatedStep
-            if (ob.lastUpdateStep === stepToPlay) {
-                continue;
-            }
+            if (ob.lastUpdateStep === stepToPlay)
+                return;
 
             // get the nearest object we can interpolate to
-            if (!nextSync.syncObjects.hasOwnProperty(id)) {
-                continue;
-            }
+            if (!nextSync.syncObjects.hasOwnProperty(id))
+                return;
+
             nextSync.syncObjects[id].forEach(ev => {
                 if (!nextObj && ev.stepCount >= stepToPlay) {
                     nextObj = ev.objectInstance;
                     nextStep = ev.stepCount;
                 }
             });
+
             if (nextObj) {
                 let playPercentage = 1 / (nextStep + 1 - stepToPlay);
                 if (this.options.reflect)
                     playPercentage = 1.0;
                 this.interpolateOneObject(ob, nextObj, id, playPercentage);
             }
-        }
+        });
 
-        // destroy unneeded objects
-        // TODO: use this.forEachSyncObject instead of for-loop
-        //       you will need to loop over prevObj instead of nextObj
-        for (let objId in world.objects) {
-            if (objId < this.gameEngine.options.clientIDSpace && !nextSync.syncObjects.hasOwnProperty(objId)) {
-                world.objects[objId].destroy();
-                delete this.gameEngine.world.objects[objId];
-            }
-        }
+        // destroy objects
+        world.forEachObject((id, ob) => {
+            let objEvents = nextSync.syncObjects[id];
+            if (!objEvents || Number(id) >= this.gameEngine.options.clientIDSpace) return;
+
+            objEvents.forEach((e) => {
+                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(id);
+            });
+        });
 
     }
 

@@ -221,6 +221,22 @@ class DynamicObject extends GameObject {
         this.angle += this.bendingAngle;
         this.bendingIncrements--;
     }
+
+    interpolate(nextObj, playPercentage, worldSettings) {
+
+        // update other objects with interpolation
+        // TODO interpolate using TwoVector methods, including wrap-around
+        function calcInterpolate(start, end, wrap, percent) {
+            if (Math.abs(end - start) > worldSettings.height / 2) return end;
+            return (end - start) * playPercentage + start;
+        }
+        this.position.x = calcInterpolate(this.position.x, nextObj.position.x, worldSettings.width, playPercentage);
+        this.position.y = calcInterpolate(this.position.y, nextObj.position.y, worldSettings.height, playPercentage);
+
+        var shortestAngle = ((((nextObj.angle - this.angle) % 360) + 540) % 360) - 180;
+        this.angle = this.angle + shortestAngle * playPercentage;
+
+    }
 }
 
 module.exports = DynamicObject;

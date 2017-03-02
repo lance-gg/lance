@@ -199,14 +199,15 @@ class ExtrapolateStrategy extends SyncStrategy {
         }
 
         // destroy objects
+        // TODO: use world.forEachObject((id, ob) => {});
+        // TODO: identical code is in InterpolateStrategy
         for (let objId of Object.keys(world.objects)) {
             let objEvents = this.lastSync.syncObjects[objId];
             if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
                 continue;
 
             objEvents.forEach((e) => {
-                if (e.eventName === 'objectDestroy')
-                    this.gameEngine.removeObjectFromWorld(objId);
+                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
             });
         }
     }
