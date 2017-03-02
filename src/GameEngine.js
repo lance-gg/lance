@@ -346,6 +346,14 @@ class GameEngine {
         delete this.world.objects[id];
     }
 
+    /**
+     * Register Game Object Classes
+     *
+     * @param {Serializer} serializer - the serializer
+     */
+    registerClasses(serializer) {
+    }
+
 }
 
 module.exports = GameEngine;

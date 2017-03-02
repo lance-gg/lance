@@ -59,6 +59,7 @@ class ClientEngine {
          * @member {GameEngine}
          */
         this.gameEngine = gameEngine;
+        this.gameEngine.registerClasses(this.serializer);
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
         this.networkMonitor = new NetworkMonitor();
 

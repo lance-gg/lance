@@ -61,8 +61,9 @@ class ServerEngine {
          * reference to game engine
          * @member {GameEngine}
          */
-        this.gameEngine = gameEngine;
         this.serializer = new Serializer();
+        this.gameEngine = gameEngine;
+        this.gameEngine.registerClasses(this.serializer);
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
 
         this.networkMonitor = new NetworkMonitor();
