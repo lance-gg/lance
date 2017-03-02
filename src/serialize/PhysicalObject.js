@@ -67,21 +67,21 @@ class PhysicalObject extends GameObject {
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
 
         // get the incremental delta position
-        let incrementScale = bending/bendingIncrements;
+        this.incrementScale = bending / bendingIncrements;
         this.bendingPositionDelta = (new ThreeVector()).copy(this.position);
         this.bendingPositionDelta.subtract(original.position);
-        this.bendingPositionDelta.multiplyScalar(incrementScale);
+        this.bendingPositionDelta.multiplyScalar(this.incrementScale);
 
         // get the incremental quaternion rotation
         let currentConjugate = (new Quaternion()).copy(original.quaternion).conjugate();
         this.bendingQuaternionDelta = (new Quaternion()).copy(this.quaternion);
         this.bendingQuaternionDelta.multiply(currentConjugate);
         let axisAngle = this.bendingQuaternionDelta.toAxisAngle();
-        axisAngle.angle *= incrementScale;
+        axisAngle.angle *= this.incrementScale;
         this.bendingQuaternionDelta.setFromAxisAngle(axisAngle.axis, axisAngle.angle);
 
-        // this.bendingTarget = (new this.constructor());
-        // this.bendingTarget.syncTo(this);
+        this.bendingTarget = (new this.constructor());
+        this.bendingTarget.syncTo(this);
         this.syncTo(original, { keepVelocities: true });
         this.bendingIncrements = bendingIncrements;
         this.bending = bending;
@@ -100,7 +100,7 @@ class PhysicalObject extends GameObject {
         this.position.copy(other.position);
         this.quaternion.copy(other.quaternion);
 
-        if (!options || Boolean(options.keepVelocities)) {
+        if (!options || !options.keepVelocities) {
             this.velocity.copy(other.velocity);
             this.angularVelocity.copy(other.angularVelocity);
         }
@@ -144,7 +144,9 @@ class PhysicalObject extends GameObject {
             return;
 
         this.position.add(this.bendingPositionDelta);
-        this.quaternion.multiply(this.bendingQuaternionDelta);
+        this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
+        // TODO: the following approach is encountering gimbal lock
+        // this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;
     }
 }

@@ -131,7 +131,8 @@ class InterpolateStrategy extends SyncStrategy {
         // remove objects which are removed at this step
         if (stepEvents && stepEvents.objectDestroy) {
             stepEvents.objectDestroy.forEach(ev => {
-                this.gameEngine.removeObjectFromWorld(ev.objectInstance.id);
+                if (world.objects[ev.objectInstance.id])
+                    this.gameEngine.removeObjectFromWorld(ev.objectInstance.id);
             });
         }
 
