@@ -79,6 +79,13 @@ class ThreeVector extends Serializable {
         return this;
     }
 
+    set(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+
     lerp(target, p) {
         this.x += (target.x - this.x) * p;
         this.y += (target.y - this.y) * p;
