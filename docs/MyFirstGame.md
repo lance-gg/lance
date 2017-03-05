@@ -1,11 +1,13 @@
-This tutorial will guide you in building the simplest
-javascript networked game, [Pong](https://en.wikipedia.org/wiki/Pong).  It starts with a walk-through of environment setup,
+This tutorial takes about 30 minutes.  It will guide you in building the simplest
+JavaScript networked game, [Pong](https://en.wikipedia.org/wiki/Pong).  It starts with a walk-through of environment setup,
 then proceeds with the writing of client code, server
 code, and game logic.
 
 ![Pong](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Pong.png/220px-Pong.png)
 
 ## Setting up the Environment
+
+*Side Note:* we use [yarn](https://yarnpkg.com/) in this tutorial, however you can use the `npm` command in each case - it will work just as well.
 
 The creation of a new game starts by cloning boilerplate code:
 
@@ -102,7 +104,7 @@ For Pong, we will need to bounce the ball around the board, and check if it
 hit a paddle.  We will also need to respond to the user's up/down inputs.
 
 ### src/common/MyGameEngine.js
-The MyGameEngine class implements the actual logic of the game.  First add the objects we created at the top of the file:
+The MyGameEngine class implements the actual logic of the game.  First add the objects we created, and some constants, at the top of the file:
 
 ```javascript
 const Paddle = require('./Paddle');
@@ -114,7 +116,7 @@ const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 50;
 ```
 
-* **start()**: define the "world" settings, and register the game logic to run as a post-step function.  Modify the start method to match the following:
+* **start()**: registers the game logic to run as a post-step function, and keep references to the game objects.  Modify the start method to match the following:
 
 ```javascript
 start() {
@@ -134,7 +136,7 @@ start() {
 }
 ```
 
-* **registerClasses**: register all the game objects.
+* **registerClasses**: register all the game objects on the serializer.  Add this function:
 
 ```javascript
 registerClasses(serializer) {
@@ -175,7 +177,7 @@ initGame() {
 }
 ```
 
-* **postStepHandleBall**: this method is executed after the ball has moved.  Check if the ball has hit a wall, or a paddle, and if a player has scored.  
+* **postStepHandleBall**: this method is executed after the ball has moved.  It contains **all the core pong game logic**: it checks if the ball has hit any wall, or any paddle, and decides if a player has scored.  
 
 ```javascript
 postStepHandleBall() {
@@ -227,14 +229,10 @@ postStepHandleBall() {
 }
 ```
 
-The end result should be this [file](https://github.com/OpherV/netpong/blob/master/src/common/NetpongGameEngine.js).
 
 ## Step 3: Extend the MyServerEngine Class
 
-The server engine will need to register the classes (`Ball` and `Paddle`)
-with the serializer, so that they can be sent over the network.
-This happens in the constructor.  It must initialize the game engine
-when the game is started, and handle player connections and disconnections.
+The server engine will initialize the game engine when the game is started, and handle player connections and "disconnections".
 
 ### src/server/MyServerEngine.js
 ```javascript
@@ -246,9 +244,6 @@ class MyServerEngine extends ServerEngine {
 
     constructor(io, gameEngine, inputOptions) {
         super(io, gameEngine, inputOptions);
-
-        this.serializer.registerClass(require('../common/Paddle'));
-        this.serializer.registerClass(require('../common/Ball'));
     }
 
     start() {
@@ -339,12 +334,13 @@ Change the `<body>` DOM element contain just the following snippet.
 ## Step 5: Running the Game
 
 Once everything has been put together the end result should look like
-the following [repository](https://github.com/opherv/netpong).
+the pong branch of the repository.
 
 To get a working copy, run:
 ```shell
-git clone https://github.com/opherv/netpong.git
-cd netpong
+git clone https://github.com/namel/incheongame.git pong
+cd pong
+git checkout pong
 yarn install
 ```
 
