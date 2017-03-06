@@ -338,6 +338,8 @@ class GameEngine {
      */
     removeObjectFromWorld(id) {
         let ob = this.world.objects[id];
+        if (!ob)
+            throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${id}`);
         this.trace.info(`========== destroying object ${ob.toString()} ==========`);
         this.emit('objectDestroyed', ob);
         ob.destroy();
