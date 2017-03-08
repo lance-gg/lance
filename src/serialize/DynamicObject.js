@@ -128,6 +128,7 @@ class DynamicObject extends GameObject {
     // convenience getters
     get x() { return this.position.x; }
     get y() { return this.position.y; }
+    get z() { return this.position.z; }
 
     /**
      * Formatted textual description of the dynamic object.
