@@ -9,6 +9,7 @@
     "canvas",
     "WebGL",
     "HTML5",
+    "AFrame",
     "physics",
     "engine",
     "game",
