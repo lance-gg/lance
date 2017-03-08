@@ -1,12 +1,13 @@
-"use strict";
+'use strict';
 
-const Point = require('../Point');
-const Serializable = require('./Serializable');
+const TwoVector = require('./TwoVector');
+const GameObject = require('./GameObject');
 const Serializer = require('./Serializer');
 const MathUtils = require('../lib/MathUtils');
 
 /**
- * DynamicObject is the base class of your game's objects.  It defines the
+ * DynamicObject is the base class of the game's objects, for games which
+ * rely on SimplePhysicsEngine.  It defines the
  * base object which can move around in the game world.  The
  * extensions of this object (the subclasses)
  * will be periodically synchronized from the server to every client.
@@ -15,7 +16,7 @@ const MathUtils = require('../lib/MathUtils');
  * allow the client to extrapolate the position
  * of dynamic objects in-between server updates.
  */
-class DynamicObject extends Serializable {
+class DynamicObject extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -40,15 +41,12 @@ class DynamicObject extends Serializable {
     *     }
     */
     static get netScheme() {
-        return {
-            id: { type: Serializer.TYPES.INT32 },
-            playerId: { type: Serializer.TYPES.UINT8 },
-            x: { type: Serializer.TYPES.INT16 },
-            y: { type: Serializer.TYPES.INT16 },
-            velX: { type: Serializer.TYPES.FLOAT32 },
-            velY: { type: Serializer.TYPES.FLOAT32 },
-            angle: { type: Serializer.TYPES.INT16 }
-        };
+        return Object.assign({
+            playerId: { type: Serializer.TYPES.INT16 },
+            position: { type: Serializer.TYPES.CLASSINSTANCE },
+            velocity: { type: Serializer.TYPES.CLASSINSTANCE },
+            angle: { type: Serializer.TYPES.FLOAT32 }
+        }, super.netScheme);
     }
 
     /**
@@ -56,25 +54,14 @@ class DynamicObject extends Serializable {
     * Override to provide starting values for position, velocity, etc.
     * The object ID should be the next value provided by `world.idCount`
     * @param {String} id - the object id
-    * @param {Number} x - position x-value
-    * @param {Number} y - position y-value
+    * @param {TwoVector} position - position vector
+    * @param {TwoVector} velocity - velocity vector
     * @example
     *    // Ship is a subclass of DynamicObject:
     *    Ship(++this.world.idCount);
     */
-    constructor(id, x, y) {
-        super();
-
-        /**
-        * ID of this object's instance.  Each instance has an ID which is unique across the entire
-        * game world, including the server and all the clients.  In extrapolation mode,
-        * the client may have an object instance which does not yet exist on the server,
-        * these objects are known as shadow objects.  The ID value for shadow objects
-        * is chosen in the range of values reserved for the client, the clientIDSpace,
-        * and is unique only for that client.
-        * @member {Number}
-        */
-        this.id = id;
+    constructor(id, position, velocity) {
+        super(id);
 
         /**
         * ID of player who created this object
@@ -82,20 +69,23 @@ class DynamicObject extends Serializable {
         */
         this.playerId = 0;
 
-        /**
-        * position x-coordinate
-        * @member {Number}
-        */
-        this.x = x;
+        this.position = new TwoVector(0, 0);
+        this.velocity = new TwoVector(0, 0);
 
         /**
-        * position y-coordinate
-        * @member {Number}
+        * position
+        * @member {TwoVector}
         */
-        this.y = y;
+        if (position) this.position.copy(position);
 
         /**
-        * object orientation angle
+        * velocity
+        * @member {TwoVector}
+        */
+        if (velocity) this.velocity.copy(velocity);
+
+        /**
+        * object orientation angle in degrees
         * @member {Number}
         */
         this.angle = 90;
@@ -130,24 +120,14 @@ class DynamicObject extends Serializable {
         */
         this.acceleration = 0.1;
 
-        this.velX = 0;
-        this.velY = 0;
-        this.bendingX = 0;
-        this.bendingY = 0;
+        this.bending = new TwoVector(0, 0);
         this.bendingAngle = 0;
         this.deceleration = 0.99;
-
-        /**
-        * velocity of object
-        * @member {Point}
-        */
-        this.velocity = new Point();
-
-        this.temp = {
-            accelerationVector: new Point()
-        };
-
     }
+
+    // convenience getters
+    get x() { return this.position.x; }
+    get y() { return this.position.y; }
 
     /**
      * Formatted textual description of the dynamic object.
@@ -158,60 +138,18 @@ class DynamicObject extends Serializable {
      */
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
-        function showVec(x, y, z) { return `(${round3(x)}, ${round3(y)}, ${round3(z)})`; }
-        return `dObj[${this.id}] player${this.playerId} pos${showVec(this.x, this.y, this.z)} vel${showVec(this.velX, this.velY, this.velZ)} angle${round3(this.angle)}`;
-    }
-
-    copyFrom(sourceObj) {
-
-        // TODO: copyFrom could just look at the netscheme?
-        this.id = sourceObj.id;
-        this.playerId = sourceObj.playerId;
-
-        this.x = sourceObj.x;
-        this.y = sourceObj.y;
-        this.velX = sourceObj.velX;
-        this.velY = sourceObj.velY;
-        this.bendingX = sourceObj.bendingX;
-        this.bendingY = sourceObj.bendingY;
-        this.bendingAngle = sourceObj.bendingAngle;
-        this.velocity.set(sourceObj.velX, sourceObj.velY);
-        this.angle = sourceObj.angle;
-        this.rotationSpeed = sourceObj.rotationSpeed;
-        this.acceleration = sourceObj.acceleration;
-        this.deceleration = sourceObj.deceleration;
+        return `dObj[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
     }
 
     /**
-    * The bending multiple is a getter, which returns the
-    * amount of bending.
-    * For example, if this value is set to 0.8, then the object's position
-    * on the client side will slowly bend (by 20% on every server update) towards
-    * the definitive position as indicated by the server.
-    * When this value is zero, the object's position
-    * on the client will be set to the server's object's position exactly.
-    * When this value is 1.0, the client ignores the server object's position.
-    * When this value is null, the bending is taken from the synchronization
-    * defaults.  Set this to zero for objects whose position
-    * jumps suddenly - because the game intended a jump, not a gradual bend.
-    * @memberof DynamicObject
-    * @member {Number} bendingMultiple
-    */
-    get bendingMultiple() { return null; }
-
-    /**
-    * The velocity bending multiple is a getter, which returns the
-    * amount of velocity bending.
-    * For example, if this value is set to 0.8, then the object's velocity
-    * on the client side will slowly bend (by 20% on every server update) towards the
-    * definitive velocity as indicated by the server, on every server update.
-    * You will need to set this to 1.0 for objects whose velocity jumps
-    * suddenly - because your game intended a jump in velocity, not a gradual
-    * bend.
-    * @memberof DynamicObject
-    * @member {Number} bendingVelocityMultiple
-    */
-    get bendingVelocityMultiple() { return null; }
+     * Formatted textual description of the game object's current bending properties.
+     * @return {String} description - a string description
+     */
+    bendingToString() {
+        if (this.bendingIncrements)
+            return `bend=${this.bending} angle=${this.bendingAngle} num_increments=${this.bendingIncrements}`;
+        return 'no bending';
+    }
 
     /**
     * The maximum velocity allowed.  If returns null then ignored.
@@ -220,42 +158,17 @@ class DynamicObject extends Serializable {
     */
     get maxSpeed() { return null; }
 
-    /**
-     * Initialize the object.
-     * Extend this method if you have object initialization logic.
-     * @param {Object} options Your object's options
-     */
-    init(options) {
-        Object.assign(this, options);
-    }
-
-    saveState(other) {
-        this.savedCopy = (new this.constructor());
-        this.savedCopy.copyFrom(other ? other : this);
-    }
-
-    // TODO:
-    // rather than pass worldSettings on each bend, they could
-    // be passed in on the constructor just once.
-    bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
-        if (this.savedCopy) {
-            this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
-        }
-        this.savedCopy = null;
-    }
-
     syncTo(other) {
-        ['playerId', 'x', 'y', 'velX', 'velY', 'angle']
-            .forEach(attr => {
-                this[attr] = other[attr];
-            });
-        this.velocity.x = this.velX;
-        this.velocity.y = this.velY;
-
-        // reset bending
-        this.bendingX = 0;
-        this.bendingY = 0;
-        this.bendingAngle = 0;
+        this.id = other.id;
+        this.playerId = other.playerId;
+        this.position.copy(other.position);
+        this.velocity.copy(other.velocity);
+        this.bending.copy(other.bending);
+        this.bendingAngle = other.bendingAngle;
+        this.angle = other.angle;
+        this.rotationSpeed = other.rotationSpeed;
+        this.acceleration = other.acceleration;
+        this.deceleration = other.deceleration;
     }
 
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
@@ -263,6 +176,7 @@ class DynamicObject extends Serializable {
         // TODO: the bending parameters should now be an object,
         //     with a single getter bendingMultiples which has local
         //     and remote values for position, velocity, and angle
+        this.bendingIncrements = bendingIncrements;
 
         // if the object has defined a bending multiples for this object, use them
         if (typeof this.bendingMultiple === 'number')
@@ -281,54 +195,47 @@ class DynamicObject extends Serializable {
             angleBending = this.bendingAngleLocalMultiple;
 
         // bend to position, velocity, and angle gradually
+        // TODO: consider using lerp() method of TwoVector instead.
+        //     you will need implement lerpWrapped() first.
         if (worldSettings.worldWrap) {
-            this.bendingX = MathUtils.interpolateDeltaWithWrapping(original.x, this.x, bending, 0, worldSettings.width) / bendingIncrements;
-            this.bendingY = MathUtils.interpolateDeltaWithWrapping(original.y, this.y, bending, 0, worldSettings.height) / bendingIncrements;
+            this.bending.x = MathUtils.interpolateDeltaWithWrapping(original.position.x, this.position.x, bending, 0, worldSettings.width) / bendingIncrements;
+            this.bending.y = MathUtils.interpolateDeltaWithWrapping(original.position.y, this.position.y, bending, 0, worldSettings.height) / bendingIncrements;
         } else {
-            this.bendingX = MathUtils.interpolateDelta(original.x, this.x, bending) / bendingIncrements;
-            this.bendingY = MathUtils.interpolateDelta(original.y, this.y, bending) / bendingIncrements;
+            this.bending.x = MathUtils.interpolateDelta(original.position.x, this.position.x, bending) / bendingIncrements;
+            this.bending.y = MathUtils.interpolateDelta(original.position.y, this.position.y, bending) / bendingIncrements;
         }
         this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 360) / bendingIncrements;
-        this.velX = MathUtils.interpolate(original.velX, this.velX, velocityBending);
-        this.velY = MathUtils.interpolate(original.velY, this.velY, velocityBending);
+        this.velocity.x = MathUtils.interpolate(original.velocity.x, this.velocity.x, velocityBending);
+        this.velocity.y = MathUtils.interpolate(original.velocity.y, this.velocity.y, velocityBending);
 
         // revert to original
-        this.x = original.x;
-        this.y = original.y;
+        this.position.copy(original.position);
         this.angle = original.angle;
+    }
 
-        // TODO: these next two lines are a side-effect of the fact
-        // that velocity is stored both in attribute "velocity" and in velX/velY
-        // which is redundant now that we can set a Point instance over the network
-        this.velocity.x = this.velX;
-        this.velocity.y = this.velY;
+    applyIncrementalBending() {
+        if (this.bendingIncrements === 0)
+            return;
+
+        this.position.add(this.bending);
+        this.angle += this.bendingAngle;
+        this.bendingIncrements--;
     }
 
     interpolate(nextObj, playPercentage, worldSettings) {
 
         // update other objects with interpolation
-        // TODO refactor into general interpolation class
-
-        if (Math.abs(nextObj.x - this.x) > worldSettings.height / 2) {
-            this.x = nextObj.x;
-        } else {
-            this.x = (nextObj.x - this.x) * playPercentage + this.x;
+        // TODO interpolate using TwoVector methods, including wrap-around
+        function calcInterpolate(start, end, wrap, percent) {
+            if (Math.abs(end - start) > worldSettings.height / 2) return end;
+            return (end - start) * playPercentage + start;
         }
-
-        if (Math.abs(nextObj.y - this.y) > worldSettings.height / 2) {
-            this.y = nextObj.y;
-        } else {
-            this.y = (nextObj.y - this.y) * playPercentage + this.y;
-        }
+        this.position.x = calcInterpolate(this.position.x, nextObj.position.x, worldSettings.width, playPercentage);
+        this.position.y = calcInterpolate(this.position.y, nextObj.position.y, worldSettings.height, playPercentage);
 
         var shortestAngle = ((((nextObj.angle - this.angle) % 360) + 540) % 360) - 180;
         this.angle = this.angle + shortestAngle * playPercentage;
 
-    }
-
-    // release resources
-    destroy() {
-        console.log(`destroying object ${this.id}`);
     }
 }
 

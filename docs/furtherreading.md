@@ -14,5 +14,11 @@ A series on Game Networking and a series on Networked Physics.
  Articles discussing the multiplayer architecture of the RTS title *Supreme Commander*
  
 * **[Source Multiplayer Networking](https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking)** by Valve  
- A thourough description of Valve's Source Engine multiplayer architecture  
+ A thorough description of Valve's Source Engine multiplayer architecture  
 
+* **[Timelines: simplifying the programming of lag compensation for the next generation of networked games
+     Authors
+](http://link.springer.com/article/10.1007/s00530-012-0271-3#Sec17)** by Cheryl Savery, T. C. Nicholas Graham  
+ In depth discussion of a timeline model for multiplayer games
+
+http://link.springer.com/article/10.1007/s00530-012-0271-3#Sec17

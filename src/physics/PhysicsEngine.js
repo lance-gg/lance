@@ -4,8 +4,9 @@
 // for all physics engines
 class PhysicsEngine {
 
-    init(initOptions) {
-        this.gameEngine = initOptions.gameEngine;
+    init(options) {
+        this.options = options;
+        this.gameEngine = options.gameEngine;
     }
 
     /**
@@ -14,10 +15,6 @@ class PhysicsEngine {
      * @param {Function} objectFilter - a test function which filters which objects should move
      */
     step(objectFilter) {}
-
-    addObject() {}
-
-    removeObject() {}
 
 }
 

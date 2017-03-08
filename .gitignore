@@ -2,6 +2,7 @@
 logs
 *.log
 npm-debug.log*
+*.trace
 
 # Runtime data
 pids
@@ -41,6 +42,9 @@ jspm_packages
 
 # jsdoc output
 docs_out
+
+# yarn files
+yarn.lock
 
 
 deploy_key

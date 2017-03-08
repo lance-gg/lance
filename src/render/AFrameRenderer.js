@@ -1,14 +1,13 @@
 'use strict';
+/* globals AFRAME */
 
 const EventEmitter = require('eventemitter3');
+const networkedPhysics = require('./aframe/system');
 
 /**
- * The Renderer is the component which must *draw* the game on the client.
- * It will be instantiated once on each client, and must implement the draw
- * method.  The draw method will be invoked on every iteration of the browser's
- * render loop.
+ * The A-Frame Renderer
  */
-class Renderer {
+class AFrameRenderer {
 
     /**
     * Constructor of the Renderer singleton.
@@ -18,11 +17,13 @@ class Renderer {
     constructor(gameEngine, clientEngine) {
         this.gameEngine = gameEngine;
         this.clientEngine = clientEngine;
-        gameEngine.on('objectAdded', this.addObject.bind(this));
-        gameEngine.on('objectDestroyed', this.removeObject.bind(this));
 
         // mixin for EventEmitter
         Object.assign(this, EventEmitter.prototype);
+
+        // set up the networkedPhysics as an A-Frame system
+        networkedPhysics.setGameEngine(gameEngine);
+        AFRAME.registerSystem('networked-physics', networkedPhysics);
     }
 
     /**
@@ -33,6 +34,17 @@ class Renderer {
         if ((typeof window === 'undefined') || !document) {
             console.log('renderer invoked on server side.');
         }
+
+        let sceneElArray = document.getElementsByTagName('a-scene');
+        if (sceneElArray.length !== 1) {
+            throw new Error('A-Frame scene element not found');
+        }
+        this.scene = sceneElArray[0];
+
+        this.gameEngine.on('objectRemoved', (o) => {
+            o.renderObj.remove();
+        });
+
         return Promise.resolve(); // eslint-disable-line new-cap
     }
 
@@ -47,19 +59,6 @@ class Renderer {
         });
     }
 
-    /**
-     * Handle the addition of a new object to the world.
-     * @param {Object} obj - The object to be added.
-     */
-    addObject(obj) {
-    }
-
-    /**
-     * Handle the removal of an old object from the world.
-     * @param {Object} obj - The object to be removed.
-     */
-    removeObject(obj) {
-    }
 }
 
-module.exports = Renderer;
+module.exports = AFrameRenderer;

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class Trace {
 
@@ -9,6 +9,7 @@ class Trace {
         }, options);
 
         this.traceBuffer = [];
+        this.step = 'initializing';
 
         // syntactic sugar functions
         this.error = this.trace.bind(this, Trace.TRACE_ERROR);

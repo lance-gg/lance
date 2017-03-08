@@ -1,23 +1,19 @@
 'use strict';
 
+const TwoVector = require('../../serialize/TwoVector');
+
+let differenceVector = new TwoVector();
+
 // The collision detection of SimplePhysicsEngine is a brute-force approach
 class CollisionDetection {
 
     constructor(options) {
-        this.options = Object.assign({
-            COLLISION_DISTANCE: 28
-        }, options);
+        this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);
         this.collisionPairs = {};
     }
 
     init(options) {
         this.gameEngine = options.gameEngine;
-    }
-
-    distance(o1, o2) {
-        let dx = o2.x - o1.x;
-        let dy = o2.y - o1.y;
-        return Math.sqrt(dx * dx + dy * dy);
     }
 
     // check if pair (id1, id2) have collided
@@ -29,8 +25,9 @@ class CollisionDetection {
         // make sure that objects actually exist. might have been destroyed
         if (!o1 || !o2) return;
         let pairId = [id1, id2].join(',');
+        differenceVector.copy(o1.position).subtract(o2.position);
 
-        if (this.distance(o1, o2) < this.options.COLLISION_DISTANCE) {
+        if (differenceVector.length() < this.options.COLLISION_DISTANCE) {
             if (!(pairId in this.collisionPairs)) {
                 this.collisionPairs[pairId] = true;
                 this.gameEngine.emit('collisionStart', { o1, o2 });

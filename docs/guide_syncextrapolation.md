@@ -20,13 +20,13 @@ When a sync arrives at the client, the client must reconcile the predicted game 
 
 5. Apply the delta so that the object on the client gradually bends towards the correct position as indicated by the server.
 
-    1. Not all the delta is applied.  A "bending factor" must be specified, to indicate how much of the delta should be applied.  A bending factor of 70% means that only 30% of the position will change, and that this 30% of the correction will be applied incrementally until the next sync data arrives.
+    1. Not all the delta is applied.  A "bending factor" must be specified, to indicate how much of the delta should be applied.
 
     2. The delta is not applied in a single step.  Rather, split the correction into incremental corrections that are applied until the next sync data arrives.
 
 Notes for the game developer: Multiple complications arise from the extrapolation method.
 
-1. **Re-enactment**.  Interpolation re-enacts the game steps, and sometimes it may re-enact many steps.  This means that the game engine must be capable of stepping through the same step multiple times.  These are known as re-enactment steps.  The step() method is passed an argument so that it can know when a step is a re-enactment step.
+1. **Re-enactment**.  Extrapolation re-enacts the game steps, and sometimes it may re-enact many steps.  This means that the game engine must be capable of stepping through the same step multiple times.  These are known as re-enactment steps.  The step() method is passed an argument so that it can know when a step is a re-enactment step.
 
 2. **Bending**.  The client’s objects positions gradually bend towards the server’s positions.  Velocity can also bend.  The game designer must choose bending values carefully.  Objects whose position can change suddenly (teleporting objects) will not bend well.  Objects whose velocity can change suddenly (impulse) should not have velocity bending.
 

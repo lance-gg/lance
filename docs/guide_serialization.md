@@ -8,4 +8,4 @@ Synchronizations of the game state occurs at regular intervals, which are less f
 this can be problematic for game events which occur at a very specific step.  For example, a sync that describes the game evolution from step *N* to step *N+10* may
 need to report that a projectile was fired at step *N+5*.  In order to handle this requirement the game must create "atomic" events.
 
-Next: {@tutorial guide_synchronization_methods}
+Next: {@tutorial guide_syncinterpolation}

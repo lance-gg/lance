@@ -26,12 +26,6 @@ class PhysijsPhysicsEngine extends PhysicsEngine {
         this.scene.simulate();
     }
 
-    addObject() {
-    }
-
-    removeObject() {
-    }
-
 }
 
 module.exports = PhysijsPhysicsEngine;
