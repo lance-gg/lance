@@ -349,6 +349,12 @@ class GameEngine {
     /**
      * Register Game Object Classes
      *
+     * @example
+     * registerClasses(serializer) {
+     *   serializer.registerClass(require('../common/Paddle'));
+     *   serializer.registerClass(require('../common/Ball'));
+     * }
+     *
      * @param {Serializer} serializer - the serializer
      */
     registerClasses(serializer) {

@@ -336,7 +336,7 @@ Change the `<body>` DOM element contain just the following snippet.
 Once everything has been put together the end result should look like
 the pong branch of the repository.
 
-To get a working copy, run:
+If you prefer to get a clean working copy, run:
 ```shell
 git clone https://github.com/namel/incheongame.git pong
 cd pong
@@ -344,7 +344,7 @@ git checkout pong
 yarn install
 ```
 
-To run the game you must first build the javascript bundle.  The `yarn install`
+To run the game you must first build the JavaScript bundle.  The `yarn install`
 command above already did this for you, but if you change code, you can rebuild by
 executing:
 ```shell

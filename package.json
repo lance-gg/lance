@@ -1,6 +1,6 @@
 {
   "name": "incheon",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Node.js based real-time game server",
   "keywords": [
     "pixijs",
