@@ -13,7 +13,12 @@
             "src/GameEngine.js",
             "src/serialize/DynamicObject.js",
             "src/serialize/Serializer.js",
-            "src/render/Renderer.js"
+            "src/serialize/PhysicalObject.js",
+            "src/serialize/TwoVector.js",
+            "src/serialize/ThreeVector.js",
+            "src/serialize/Quaternion.js",
+            "src/render/Renderer.js",
+            "src/render/AFrameRenderer.js"
         ]
     },
     "plugins": [
