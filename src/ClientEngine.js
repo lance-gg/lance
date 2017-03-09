@@ -227,9 +227,11 @@ class ClientEngine {
             return;
         }
 
-        this.gameEngine.emit('client__preInput', message.data);
-        this.gameEngine.processInput(message.data, this.playerId);
-        this.gameEngine.emit('client__postInput', message.data);
+        const inputEvent = { input: message.data, playerId: this.playerId };
+        this.gameEngine.emit('client__processInput', inputEvent);
+        this.gameEngine.emit('processInput', inputEvent);
+        this.gameEngine.processInput(message.data, this.playerId, false);
+
     }
 
     applyDelayedInputs() {

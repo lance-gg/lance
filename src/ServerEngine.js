@@ -113,7 +113,11 @@ class ServerEngine {
             // check that there are inputs for this step,
             // and that we have reached/passed this step
             if (queueSteps.length > 0 && minStep <= this.gameEngine.world.stepCount) {
-                inputQueue[minStep].forEach(i => { this.gameEngine.processInput(i, playerId); });
+                inputQueue[minStep].forEach(input => {
+                    this.gameEngine.emit('server__processInput', { input, playerId });
+                    this.gameEngine.emit('processInput', { input, playerId });
+                    this.gameEngine.processInput(input, playerId, true);
+                });
                 delete inputQueue[minStep];
             }
         }
@@ -304,10 +308,7 @@ class ServerEngine {
         if (this.connectedPlayers[socket.id]) {
             this.connectedPlayers[socket.id].socket.lastHandledInput = data.messageIndex;
         }
-        this.gameEngine.emit('server__inputReceived', {
-            input: data,
-            playerId: socket.playerId
-        });
+
         this.resetIdleTimeout(socket);
 
         this.queueInputForPlayer(data, socket.playerId);

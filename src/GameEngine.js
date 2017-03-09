@@ -74,15 +74,15 @@ class GameEngine {
      * @param {String} playerDesc.playerId - the player ID
      */
 
-     /**
-      * A player has joined on the server
-      *
-      * @event GameEngine#server__playerJoined
-      * @param {Object} playerDesc - player descriptor
-      * @param {String} playerDesc.playerId - the player ID
-      */
+    /**
+     * A player has joined on the server
+     *
+     * @event GameEngine#server__playerJoined
+     * @param {Object} playerDesc - player descriptor
+     * @param {String} playerDesc.playerId - the player ID
+     */
 
-     /**
+    /**
       * A player has left on the server
       *
       * @event GameEngine#server__playerDisconnected
@@ -97,30 +97,54 @@ class GameEngine {
      * @param {Object} sync - the synchronization object
      */
 
+     /**
+      * Marks the beginning of a game step on the client
+      *
+      * @event GameEngine#client__preStep
+      */
+
+     /**
+      * Marks the end of a game step on the client
+      *
+      * @event GameEngine#client__postStep
+      */
+
     /**
-     * Marks the beginning of a game step on the client
+     * An input needs to be handled.  Emitted just before the GameEngine
+     * method processInput is invoked.
      *
-     * @event GameEngine#client__preStep
+     * @event GameEngine#processInput
+     * @param {Object} input - input descriptor object
+     * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
+     * @param {Number} input.messageIndex - input identifier
+     * @param {Number} input.step - input execution step
+     * @param {Number} playerId - the player ID
      */
 
     /**
-     * Marks the end of a game step on the client
+     * An input needs to be handled.
+     * This event is emitted on the server only, just before the
+     * general processInput event.
      *
-     * @event GameEngine#client__postStep
+     * @event GameEngine#server__processInput
+     * @param {Object} input - input descriptor object
+     * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
+     * @param {Number} input.messageIndex - input identifier
+     * @param {Number} input.step - input execution step
+     * @param {Number} playerId - the player ID
      */
 
     /**
-     * Client about to apply an input locally
+     * An input needs to be handled.
+     * This event is emitted on the client only, just before the
+     * general processInput event.
      *
-     * @event GameEngine#client__preInput
-     * @param {Object} inputData - input descriptor
-     */
-
-    /**
-     * Client finished applying an input locally
-     *
-     * @event GameEngine#client__postInput
-     * @param {Object} inputData - input descriptor
+     * @event GameEngine#client__processInput
+     * @param {Object} input - input descriptor object
+     * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
+     * @param {Number} input.messageIndex - input identifier
+     * @param {Number} input.step - input execution step
+     * @param {Number} playerId - the player ID
      */
 
     /**
@@ -326,8 +350,9 @@ class GameEngine {
      * @param {String} inputMsg.input - describe the input (e.g. "up", "down", "fire")
      * @param {Number} inputMsg.messageIndex - input identifier
      * @param {Number} playerId - the player ID
+     * @param {Boolean} isServer - indicate if this function is being called on the server side
      */
-    processInput(inputMsg, playerId) {
+    processInput(inputMsg, playerId, isServer) {
         this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 
