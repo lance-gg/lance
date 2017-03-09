@@ -2,6 +2,12 @@
 
 # Release Notes for Incheon
 
+## Release 1.0.1
+
+### Breaking Changes
+
+1. Event `preInput` was renamed to `processInput`, `client__processInput`, `server__processInput`.  `postInput`. This is a breaking change but no one actually used these events.
+
 ## Release 1.0.0 - March 2017
 
 ### New Features
