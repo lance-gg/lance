@@ -317,10 +317,29 @@ class GameEngine {
 
     /**
      * Add object to the game world.
+     * On the client side, the object may not be created, if the server copy
+     * of this object is already in the game world.  This could happen when the client
+     * is using delayed-input, and the RTT is very low.
      *
      * @param {Object} object - the object.
+     * @return {Object} object - the final object.
      */
     addObjectToWorld(object) {
+
+        // if we are asked to create a local shadow object
+        // the server copy may already have arrived.
+        if (Number(object.id) >= this.options.clientIDSpace) {
+            let serverCopyArrived = false;
+            this.world.forEachObject((id, o) => {
+                if (o.hasOwnProperty('inputId') && o.inputId === object.inputId)
+                    serverCopyArrived = true;
+            });
+            if (serverCopyArrived) {
+                this.trace.info(`========== shadow object NOT added ${object.toString()} ==========`);
+                return null;
+            }
+        }
+
         this.world.objects[object.id] = object;
 
         // tell the object to join the game, by creating
@@ -330,6 +349,8 @@ class GameEngine {
 
         this.emit('objectAdded', object);
         this.trace.info(`========== object added ${object.toString()} ==========`);
+
+        return object;
     }
 
     /**
@@ -373,6 +394,12 @@ class GameEngine {
 
     /**
      * Register Game Object Classes
+     *
+     * @example
+     * registerClasses(serializer) {
+     *   serializer.registerClass(require('../common/Paddle'));
+     *   serializer.registerClass(require('../common/Ball'));
+     * }
      *
      * @param {Serializer} serializer - the serializer
      */
