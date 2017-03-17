@@ -5,7 +5,7 @@ let AFrameSystem = {
         traceLevel: { default: 4 }
     },
 
-    init: () => {
+    init: function() {
 
         // TODO: Sometimes an object is "simple".  For example it uses
         //       existing AFrame asstes (an OBJ file and a material)
@@ -18,7 +18,7 @@ let AFrameSystem = {
         //       Remember to also remove them.
     },
 
-    tick: () => {
+    tick: function() {
         if (!this.gameEngine)
             return;
 
@@ -34,7 +34,7 @@ let AFrameSystem = {
         });
     },
 
-    setGameEngine: (gameEngine) => {
+    setGameEngine: function(gameEngine){
         this.gameEngine = gameEngine;
     }
 };
