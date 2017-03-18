@@ -1,6 +1,15 @@
 'use strict';
 
+/**
+ * This class represents an instance of the game world,
+ * where all data pertaining to the current state of the
+ * world is saved.
+ */
 class GameWorld {
+
+    /**
+     * Constructor of the World instance
+     */
     constructor() {
         this.stepCount = 0;
         this.objects = {};
