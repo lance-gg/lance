@@ -230,9 +230,9 @@ class DynamicObject extends GameObject {
 
         // TODO allow netscheme to designate interpolatable attribute (power, shield, etc)
         // first copy all the assignable attributes
-        for (let k of Object.keys(this.netScheme)) {
+        for (let k of Object.keys(this.constructor.netScheme)) {
             let val = nextObj[k];
-            if (Serializer.typeCanAssign(this.netScheme[k].type))
+            if (Serializer.typeCanAssign(this.constructor.netScheme[k].type))
                 this[k] = val;
             else if (typeof val.clone === 'function')
                 this[k] = val.clone();
