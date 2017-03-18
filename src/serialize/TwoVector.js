@@ -82,6 +82,10 @@ class TwoVector extends Serializable {
         return this;
     }
 
+    clone() {
+        return new TwoVector(this.x, this.y);
+    }
+
     lerp(target, p) {
         this.x += (target.x - this.x) * p;
         this.y += (target.y - this.y) * p;
