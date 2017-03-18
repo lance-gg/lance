@@ -32,6 +32,15 @@ class Serializer {
     }
 
     /**
+     * Checks if type can be assigned by value.
+     * @param {String} type Type to Checks
+     * @return {Boolean} True if type can be assigned
+     */
+    static typeCanAssign(type) {
+        return type !== Serializer.TYPES.CLASSINSTANCE && type !== Serializer.TYPES.LIST;
+    }
+
+    /**
      * Registers a new class with the serializer, so it may be deserialized later
      * @param {Function} classObj reference to the class (not an instance!)
      * @param [classId] Unit specifying a class ID

@@ -224,17 +224,31 @@ class DynamicObject extends GameObject {
 
     interpolate(nextObj, playPercentage, worldSettings) {
 
+        let px = this.position.x;
+        let py = this.position.y;
+        let angle = this.angle;
+
+        // TODO allow netscheme to designate interpolatable attribute (power, shield, etc)
+        // first copy all the assignable attributes
+        for (let k of Object.keys(this.constructor.netScheme)) {
+            let val = nextObj[k];
+            if (Serializer.typeCanAssign(this.constructor.netScheme[k].type))
+                this[k] = val;
+            else if (typeof val.clone === 'function')
+                this[k] = val.clone();
+        }
+
         // update other objects with interpolation
         // TODO interpolate using TwoVector methods, including wrap-around
-        function calcInterpolate(start, end, wrap, percent) {
-            if (Math.abs(end - start) > worldSettings.height / 2) return end;
-            return (end - start) * playPercentage + start;
+        function calcInterpolate(start, end, wrap, p) {
+            if (Math.abs(end - start) > wrap / 2) return end;
+            return (end - start) * p + start;
         }
-        this.position.x = calcInterpolate(this.position.x, nextObj.position.x, worldSettings.width, playPercentage);
-        this.position.y = calcInterpolate(this.position.y, nextObj.position.y, worldSettings.height, playPercentage);
+        this.position.x = calcInterpolate(px, nextObj.position.x, worldSettings.width, playPercentage);
+        this.position.y = calcInterpolate(py, nextObj.position.y, worldSettings.height, playPercentage);
 
-        var shortestAngle = ((((nextObj.angle - this.angle) % 360) + 540) % 360) - 180;
-        this.angle = this.angle + shortestAngle * playPercentage;
+        var shortestAngle = ((((nextObj.angle - angle) % 360) + 540) % 360) - 180;
+        this.angle = angle + shortestAngle * playPercentage;
 
     }
 }
