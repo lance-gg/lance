@@ -1,7 +1,7 @@
 
 ## Current Release
 
-### r1.0.0 - *Tensor* - March 2017
+### r1.0.1 - *Tensor* - March 2017
 * Full 3D support
 * Pluggable Physics Engine support: cannon.js
 * Demonstrate A-Frame support
@@ -9,7 +9,7 @@
 
 ## Future Releases
 
-All releases listed here, along with their planned release dates and their listed contents, are a statement of intentions, and are provided with no guarantee whatsoever.  Incheon is an open-source project and as such depends on the available time of its developers.  The roadmap is subject to change at any time.
+All releases listed here, along with their planned release dates and their listed contents, are a statement of intentions, and are provided with no guarantee whatsoever.  Lance is an open-source project and as such depends on the available time of its developers.  The roadmap is subject to change at any time.
 
 ### r1.1.0 - *Spinor* - July 2017
 * Console level logging
@@ -21,11 +21,11 @@ All releases listed here, along with their planned release dates and their liste
 
 ### r2.0.0 - *Quaternion* - December 2017
 * UDP via WebRTC
-* Automated Cloud Deploy system for Incheon game servers
+* Automated Cloud Deploy system for Lance game servers
 
 ## Past Releases
 
-### r0.9.1 - “Phase 2” External Beta Release - January 2017
+### r0.9.1 - “Incheon Phase 2” External Beta Release - January 2017
 
 * Games: Pong, Spaaace
 * Sync Strategies: Extrapolation, Interpolation
@@ -33,17 +33,17 @@ All releases listed here, along with their planned release dates and their liste
 * Spaaace - Online Desktop/Mobile Live Demo
 * Refactor event names (remove dot) to make compatible with jsdoc
 
-### r0.2.0 - “Phase 1” Internal Release - December 2016
+### r0.2.0 - “Incheon Phase 1” Internal Release - December 2016
 
 * Games: Pong
 * Sync Strategies: Extrapolation, Interpolation
 * Refactor Renderer
-* Incheon.gg web site
+* Lance.gg web site
 * Boilerplate Game Repository
 * Documentation started.  Tutorials: MyFirstGame, Spaceships
 
 
-### r0.1.0 - October 2016
+### r0.1.0 - "Incheon" October 2016
 
 * First working model
 * Games: Spaaace, Sumo

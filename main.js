@@ -1,4 +1,4 @@
-var Incheon = {
+var Lance = {
     GameEngine: require('./src/GameEngine'),
     ServerEngine: require('./src/ServerEngine'),
     ClientEngine: require('./src/ClientEngine'),
@@ -26,4 +26,4 @@ var Incheon = {
     }
 };
 
-module.exports = Incheon;
+module.exports = Lance;
