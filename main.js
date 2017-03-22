@@ -1,6 +1,7 @@
 var Lance = {
     GameEngine: require('./src/GameEngine'),
     ServerEngine: require('./src/ServerEngine'),
+    MatchMaker: require('./src/matchMaker/MatchMaker'),
     ClientEngine: require('./src/ClientEngine'),
     Synchronizer: require('./src/Synchronizer'),
     GameWorld: require('./src/GameWorld'),

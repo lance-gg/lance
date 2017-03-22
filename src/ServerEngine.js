@@ -65,7 +65,6 @@ class ServerEngine {
         this.gameEngine = gameEngine;
         this.gameEngine.registerClasses(this.serializer);
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
-
         this.networkMonitor = new NetworkMonitor();
 
         this.connectedPlayers = {};
@@ -312,6 +311,25 @@ class ServerEngine {
 
         this.queueInputForPlayer(data, socket.playerId);
     }
+
+    gameStatus() {
+        let gameStatus = {
+            numPlayers: Object.keys(this.connectedPlayers).length,
+            upTime: 0,
+            cpuLoad: 0,
+            memoryLoad: 0,
+            players: {}
+        };
+
+        for (let p of Object.keys(this.connectedPlayers)) {
+            gameStatus.players[p] = {
+                frameRate: 0,
+            };
+        }
+
+        return JSON.stringify(gameStatus);
+    }
+
 }
 
 module.exports = ServerEngine;
