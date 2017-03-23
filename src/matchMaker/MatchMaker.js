@@ -1,5 +1,7 @@
 'use strict';
 
+const http = require('http');
+
 class MatchMaker {
 
     constructor(expressServer, serverEngine, options) {
@@ -20,7 +22,8 @@ class MatchMaker {
     }
 
     serverName(serverNumber) {
-        return (String(1e15 + serverNumber)).slice(-6) + this.options.serverName;
+        const zeroPaddedNumber = (String(1e15 + serverNumber)).slice(-6);
+        return `${this.options.hostname}${zeroPaddedNumber}${this.options.domain}`;
     }
 
     matchmakerStatus() {
@@ -33,22 +36,22 @@ class MatchMaker {
     }
 
     pollNext(serverNumber) {
-        let request = new XMLHttpRequest();
-        request.open('GET', this.serverName(serverNumber), true);
-        request.onload = () => {
-            if (request.status >= 200 && request.status < 400) {
-                this.servers[serverNumber] = JSON.parse(request.responseText);
-                this.pollNext(serverNumber + 1);
-                return;
-            }
+
+        try {
+            http.get(this.serverName(serverNumber), (res) => {
+                let data = '';
+                if (res.statusCode !== 200) { throw new Error(`status=${res.statusCode}`); }
+                res.on('data', function(d) { data += d; });
+                res.on('end', function() {
+                    this.servers[serverNumber] = JSON.parse(data);
+                    this.pollNext(serverNumber + 1);
+                    return;
+                });
+            });
+        } catch (e) {
             this.pollingLoopRunning = false;
             this.numServers = serverNumber;
-        };
-        request.onerror = () => {
-            this.pollingLoopRunning = false;
-            this.numServers = serverNumber;
-        };
-        request.send();
+        }
     }
 
     pollGameServers() {
@@ -69,6 +72,9 @@ class MatchMaker {
             next();
             return;
         }
+
+        // set the serverName
+        if (!this.options.serverName) this.options.serverName = req.hostname;
 
         // choose an appropriate server
         for (let s = 0; s < this.numServers; s++) {
