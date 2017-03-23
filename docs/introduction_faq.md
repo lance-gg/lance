@@ -31,3 +31,22 @@ It’s preferred that non-real time communication is handled by a different serv
 
 ### 4. What is in the Incheon Roadmap?
 See the [Incheon Roadmap](http://docs.incheon.gg/develop/tutorial-introduction_roadmap.html).  Some of the major planned features include UDP support, and Visual Debugging.
+
+## Incheon Packaging / Transpiling
+
+### 1. Can I use incheon with babel?
+Yes! But since incheon exports es6 code, you might need to include it in your babel configuration so that it gets transpiled with the rest of your code. This can be done using the include option in your .babelrc or webpack.config file;
+```javascript
+  {
+      test: /\.js$/,
+      include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'node_modules/incheon'),
+          fs.realpathSync('./node_modules/incheon')
+      ],
+      loader: 'babel-loader',
+      query: {
+          presets: ['es2015']
+      }
+  }
+```
