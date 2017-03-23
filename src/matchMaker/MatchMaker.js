@@ -8,11 +8,11 @@ class MatchMaker {
 
         this.numServers = 0;
         this.options = Object.assign({
-            pollPeriod: 10,
-            playersPerServer: 6,
-            matchmakerPath: '/',
-            domain: 'awesomeShooter.com',
-            hostname: 'gameserver'
+            pollPeriod: 10000,              // milliseconds between server poll loops
+            playersPerServer: 6,            // max players per server
+            matchmakerPath: '/',            // path at which matchmaker is used
+            domain: 'awesomeShooter.com',   // domain name of game servers
+            hostname: 'gameserver'          // hostname prefix for servers
         }, options);
 
         // poll servers at fixed interval
@@ -26,7 +26,7 @@ class MatchMaker {
 
     serverName(serverNumber) {
         const zeroPaddedNumber = (String(1e15 + serverNumber)).slice(-6);
-        return `${this.options.hostname}${zeroPaddedNumber}${this.options.domain}`;
+        return `${this.options.hostname}${zeroPaddedNumber}.${this.options.domain}`;
     }
 
     matchmakerStatus() {
