@@ -9,16 +9,19 @@ class MatchMaker {
         this.numServers = 0;
         this.options = Object.assign({
             pollPeriod: 10,
-            playersPerServer: 6
+            playersPerServer: 6,
+            matchmakerPath: '/',
+            domain: 'awesomeShooter.com',
+            hostname: 'gameserver'
         }, options);
 
         // poll servers at fixed interval
         setTimeout(this.pollGameServers.bind(this), this.options.pollPeriod);
 
         // create status routes
+        expressServer.get('/gameStatus', (req, res) => { res.send(serverEngine.gameStatus()); });
+        expressServer.get('/matchmakerStatus', (req, res) => { res.send(this.matchmakerStatus()); });
         expressServer.use('/', (req, res, next) => { this.matchMake(req, res, next); });
-        expressServer.get('/gameStatus', (req, res) => { serverEngine.gameStatus(); });
-        expressServer.get('/matchmakerStatus', (req, res) => { this.matchmakerStatus(); });
     }
 
     serverName(serverNumber) {
@@ -67,8 +70,9 @@ class MatchMaker {
 
     matchMake(req, res, next) {
 
-        // if matchmaking already happened, let the game server running
-        if (req.query.matchFound) {
+        // check for matchmaker path
+        // also, if matchmaking already happened, let the game server running
+        if (req.path !== this.options.matchmakerPath || req.query.hasOwnProperty('matchFound')) {
             next();
             return;
         }
