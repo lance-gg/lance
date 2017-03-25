@@ -1,6 +1,8 @@
 'use strict';
 
 const http = require('http');
+const GAMESTATUS_PATH = '/gameStatus';
+const MATCHMAKERSTATUS_PATH = '/matchmakerStatus';
 const POST_MATCHMAKER_MARK = 'postMatchmaker';
 
 class MatchMaker {
@@ -8,20 +10,22 @@ class MatchMaker {
     constructor(expressServer, serverEngine, options) {
 
         this.numServers = 0;
+        this.gameServers = {};
         this.options = Object.assign({
             pollPeriod: 10000,              // milliseconds between server poll loops
             playersPerServer: 6,            // max players per server
             matchmakerPath: '/',            // path at which matchmaker is used
             domain: 'AwesomeShooter.com',   // domain name of game servers
-            hostname: 'gameserver'          // hostname prefix for servers
+            hostname: 'gameserver',          // hostname prefix for servers
+            verbose: false
         }, options);
 
         // poll servers at fixed interval
         setTimeout(this.pollGameServers.bind(this), this.options.pollPeriod);
 
         // create status routes
-        expressServer.get('/gameStatus', (req, res) => { res.send(serverEngine.gameStatus()); });
-        expressServer.get('/matchmakerStatus', (req, res) => { res.send(this.matchmakerStatus()); });
+        expressServer.get(GAMESTATUS_PATH, (req, res) => { res.send(serverEngine.gameStatus()); });
+        expressServer.get(MATCHMAKERSTATUS_PATH, (req, res) => { res.send(this.matchmakerStatus()); });
         expressServer.use('/', (req, res, next) => { this.matchMake(req, res, next); });
     }
 
@@ -33,29 +37,41 @@ class MatchMaker {
     matchmakerStatus() {
         let matchmakerStatus = {
             numServers: this.numServers,
-            gameServers: {}
+            gameServers: this.gameServers
         };
 
         return JSON.stringify(matchmakerStatus);
     }
 
+    pollEnd(serverNumber) {
+        this.pollingLoopRunning = false;
+        this.numServers = serverNumber;
+        if (this.options.verbose)
+            console.log(`total number of servers ${serverNumber}`);
+    }
+
     pollNext(serverNumber) {
 
+        const serverURL = `http://${this.serverName(serverNumber)}${GAMESTATUS_PATH}`;
+        let that = this;
         try {
-            http.get(this.serverName(serverNumber), (res) => {
+            console.log(`checking server ${serverURL}`);
+            http.get(serverURL, (res) => {
                 let data = '';
-                if (res.statusCode !== 200) { throw new Error(`status=${res.statusCode}`); }
+                if (res.statusCode !== 200) {
+                    that.pollEnd(serverNumber);
+                    return;
+                }
                 res.on('data', function(d) { data += d; });
                 res.on('end', function() {
-                    this.servers[serverNumber] = JSON.parse(data);
-                    this.pollNext(serverNumber + 1);
+                    if (that.options.verbose)
+                        console.log(`using server ${serverNumber} data = ${data}`);
+                    that.gameServers[serverNumber] = JSON.parse(data);
+                    that.pollNext(serverNumber + 1);
                     return;
                 });
             });
-        } catch (e) {
-            this.pollingLoopRunning = false;
-            this.numServers = serverNumber;
-        }
+        } catch (e) { that.pollEnd(serverNumber); }
     }
 
     pollGameServers() {
@@ -83,17 +99,20 @@ class MatchMaker {
 
         // choose an appropriate server
         for (let s = 0; s < this.numServers; s++) {
-            let server = this.servers[s];
-            if (server && server.numPlayers) {
+            let server = this.gameServers[s];
+            if (server && server.hasOwnProperty('numPlayers')) {
                 if (server.numPlayers < this.options.playersPerServer) {
-                    res.redirect(`${this.serverName(s)}?${POST_MATCHMAKER_MARK}=true`);
+                    const redirectURL = `http://${this.serverName(s)}?${POST_MATCHMAKER_MARK}=true`;
+                    if (this.options.verbose)
+                        console.log(`======> player redirected to server ${s} at [${redirectURL}]`);
+                    res.redirect(redirectURL);
                     return;
                 }
             }
         }
 
         console.log('ERROR! MATCHMAKER FAILURE! game server info:');
-        console.log(JSON.stringify(this.servers, null, 2));
+        console.log(JSON.stringify(this.gameServers, null, 2));
 
     }
 
