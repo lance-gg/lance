@@ -1,6 +1,7 @@
 'use strict';
 
 const http = require('http');
+const POST_MATCHMAKER_MARK = 'postMatchmaker';
 
 class MatchMaker {
 
@@ -72,7 +73,7 @@ class MatchMaker {
 
         // check for matchmaker path
         // also, if matchmaking already happened, let the game server running
-        if (req.path !== this.options.matchmakerPath || req.query.hasOwnProperty('matchFound')) {
+        if (req.path !== this.options.matchmakerPath || req.query.hasOwnProperty(POST_MATCHMAKER_MARK)) {
             next();
             return;
         }
@@ -85,7 +86,7 @@ class MatchMaker {
             let server = this.servers[s];
             if (server && server.numPlayers) {
                 if (server.numPlayers < this.options.playersPerServer) {
-                    res.redirect(this.serverName(s));
+                    res.redirect(`${this.serverName(s)}?${POST_MATCHMAKER_MARK}=true`);
                     return;
                 }
             }
