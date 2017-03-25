@@ -7,6 +7,9 @@ const POST_MATCHMAKER_MARK = 'postMatchmaker';
 
 class MatchMaker {
 
+    // TODO: add a shutdown method, which ensures GAMESTATUS is no longer
+    // served, and waits 2 time pollPeriod before returning (i.e. calling the callback)
+
     constructor(expressServer, serverEngine, options) {
 
         this.numServers = 0;
