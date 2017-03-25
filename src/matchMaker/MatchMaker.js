@@ -11,7 +11,7 @@ class MatchMaker {
             pollPeriod: 10000,              // milliseconds between server poll loops
             playersPerServer: 6,            // max players per server
             matchmakerPath: '/',            // path at which matchmaker is used
-            domain: 'awesomeShooter.com',   // domain name of game servers
+            domain: 'AwesomeShooter.com',   // domain name of game servers
             hostname: 'gameserver'          // hostname prefix for servers
         }, options);
 
