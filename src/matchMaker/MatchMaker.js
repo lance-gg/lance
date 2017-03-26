@@ -77,7 +77,10 @@ class MatchMaker {
         process.on('SIGINT', () => {
             this.shutDownStarted = true;
             console.log('SHUTTING DOWN - PLEASE WAIT - waiting game server poll interval');
-            setTimeout(() => { process.exit(); }, this.options.pollPeriod * 2);
+            setTimeout(() => {
+                console.log('SERVER SHUTDOWN COMPLETE');
+                process.exit();
+            }, this.options.pollPeriod * 1.5);
         });
     }
 
