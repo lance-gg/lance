@@ -312,6 +312,13 @@ class ServerEngine {
         this.queueInputForPlayer(data, socket.playerId);
     }
 
+    /**
+     * Report game status
+     * This method is only relevant if the game uses MatchMaker functionality.
+     * This method must return the game status.
+     *
+     * @return {String} Stringified game status object.
+     */
     gameStatus() {
         let gameStatus = {
             numPlayers: Object.keys(this.connectedPlayers).length,
