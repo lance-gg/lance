@@ -47,7 +47,7 @@ If you feel like learning by doing you can start with first tutorial, [My first 
 
 ## Something went wrong! I need help!
 
-If you're not exactly sure how to do something, [Stack Overflow](http://stackoverflow.com/questions/tagged/incheon) is your friend.
+If you're not exactly sure how to do something, [Stack Overflow](http://stackoverflow.com/questions/tagged/lance) is your friend.
 
 If you've encountered a bug and it's not already in the [issues page](https://github.com/lance-gg/lance/issues), open a new issue.
 
