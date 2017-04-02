@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/OpherV/Incheon.svg?branch=master)](https://travis-ci.org/OpherV/Incheon) [![Inline docs](http://inch-ci.org/github/opherv/incheon.svg?branch=develop)](http://inch-ci.org/github/opherv/incheon)
-[![Slack](http://incheongg-slack.herokuapp.com/badge.svg)](http://incheongg-slack.herokuapp.com)
+[![Slack](http://slack.lance.gg/badge.svg)](http://slack.lance.gg)
 
-<img src="https://cloud.githubusercontent.com/assets/3951311/21020499/6f125344-bd7d-11e6-86e4-a4bb16b32f2a.png" style="width: 100%" alt="Lance logo">
+<img src="https://cloud.githubusercontent.com/assets/3951311/24590344/0b7748b8-17f4-11e7-84fc-d24c44c7a27a.jpg" style="width: 100%" alt="Lance logo">
 
 # [Lance](http://lance.gg) is a real-time multiplayer game server
 
