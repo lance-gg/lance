@@ -3,7 +3,7 @@
         "destination": "./docs_out/",
         "encoding": "utf8",
         "readme": "docs/introduction.md",
-        "template": "node_modules/incheon-docs-template",
+        "template": "node_modules/lance-docs-template",
         "tutorials": "./docs"
     },
     "source": {
@@ -26,8 +26,8 @@
         "plugins/markdown"
     ],
     "templates": {
-        "systemName"            : "Incheon",
-        "copyright"             : "Incheon Copyright © 2016 The contributors to the Incheon project.",
+        "systemName"            : "Lance",
+        "copyright"             : "Lance Copyright © 2017 The contributors to the Lance project.",
         "includeDate"           : true,
         "navType"               : "vertical",
         "theme"                 : "spacelab",
