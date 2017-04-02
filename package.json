@@ -1,7 +1,7 @@
 {
-  "name": "incheon",
-  "version": "1.0.2",
-  "description": "A Node.js based real-time game server",
+  "name": "lance-gg",
+  "version": "1.0.3",
+  "description": "A Node.js based real-time multiplayer game server",
   "keywords": [
     "pixijs",
     "pixi",
@@ -31,9 +31,9 @@
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/OpherV/incheon/issues"
+    "url": "https://github.com/lance-gg/lance/issues"
   },
-  "homepage": "https://github.com/OpherV/incheon#readme",
+  "homepage": "https://github.com/lance-gg/lance#readme",
   "scripts": {
     "docs": "jsdoc -c jsdoc.conf.json",
     "test-all": "mocha test/EndToEnd/",

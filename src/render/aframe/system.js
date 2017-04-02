@@ -34,7 +34,9 @@ let AFrameSystem = {
         });
     },
 
-    setGameEngine: function(gameEngine){
+    // NOTE: webpack generated incorrect code if you use arrow notation below
+    //       it sets "this" to "undefined"
+    setGameEngine: function(gameEngine) {
         this.gameEngine = gameEngine;
     }
 };

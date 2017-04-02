@@ -1,6 +1,6 @@
 
 
-# Release Notes for Incheon
+# Release Notes for Lance
 
 ## Release 1.0.1
 

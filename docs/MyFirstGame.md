@@ -12,8 +12,8 @@ code, and game logic.
 The creation of a new game starts by cloning boilerplate code:
 
 ```shell
-git clone https://github.com/namel/incheongame.git
-cd incheongame
+git clone https://github.com/namel/lancegame.git
+cd lancegame
 yarn install
 ```
 
@@ -39,7 +39,7 @@ the sample `PlayerAvatar.js` object, except that it is called `Paddle` and it as
 ```javascript
 'use strict';
 
-const DynamicObject = require('incheon').serialize.DynamicObject;
+const DynamicObject = require('lance').serialize.DynamicObject;
 
 class Paddle extends DynamicObject {
 
@@ -70,7 +70,7 @@ We also give the Ball an initial velocity when it is created.
 ```javascript
 'use strict';
 
-const DynamicObject = require('incheon').serialize.DynamicObject;
+const DynamicObject = require('lance').serialize.DynamicObject;
 
 class Ball extends DynamicObject {
 
@@ -238,7 +238,7 @@ The server engine will initialize the game engine when the game is started, and 
 ```javascript
 'use strict';
 
-const ServerEngine = require('incheon').ServerEngine;
+const ServerEngine = require('lance').ServerEngine;
 
 class MyServerEngine extends ServerEngine {
 
@@ -338,7 +338,7 @@ the pong branch of the repository.
 
 If you prefer to get a clean working copy, run:
 ```shell
-git clone https://github.com/namel/incheongame.git pong
+git clone https://github.com/namel/lancegame.git pong
 cd pong
 git checkout pong
 yarn install
@@ -364,4 +364,4 @@ on a Mac.
 
 Your next steps might be to get a deeper understanding by going through
 the Spaceships Tutorial, which introduces the concepts and components
-of an Incheon networked game.
+of an Lance networked game.

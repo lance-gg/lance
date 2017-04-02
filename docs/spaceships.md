@@ -1,8 +1,8 @@
-# Incheon Game Tutorial
+# Lance Game Tutorial
 
 This 30-minute tutorial will guide you in the building of a relatively simple
 javascript networked game.  It is meant as a more advanced
-tutorial, a follow-up to [My First Incheon Game](https://incheon.gg/docs/tutorials/MyFirstIncheonGame.html).
+tutorial, a follow-up to [My First Lance Game](https://incheon.gg/docs/tutorials/MyFirstLanceGame.html).
 This tutorial repeats the environment setup, but goes further in-depth,
 introducing the concepts and basic components of a
 networked game,
@@ -26,7 +26,7 @@ The networked game is architected around the following components:
 * **The clients**.  Represented by the `ClientEngine` class.
 * **The game logic**.  Represented by the `GameEngine` class.
 * **Multiple game objects**.  The `DynamicObject` is the base class for all kinds of game objects.  Each game object will be associated with one or more render objects, as well as one or more physics objects.
-* **Synchronization**.  Incheon provides several ways to synchronize between the server and the clients.  The game developer must configure which synchronization method works best for any given game.
+* **Synchronization**.  Lance provides several ways to synchronize between the server and the clients.  The game developer must configure which synchronization method works best for any given game.
 
 As you write your game, you will need to implement
 your own extensions (sub-classes) of the classes above.  But most of the interesting
@@ -229,7 +229,7 @@ A trace message is usually recorded as follows:
 gameEngine.trace.info(`this just happened: ${foobar()}`);
 ```
 
-By default, Incheon already traces a lot of information, describing
+By default, Lance already traces a lot of information, describing
 the progress of the game and each step in detail.
 The traces are text files, written on the server side.  The server trace
 file is called **server.trace** and the client trace files are called **client._n_.trace**
