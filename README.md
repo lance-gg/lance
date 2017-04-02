@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/OpherV/Incheon.svg?branch=master)](https://travis-ci.org/OpherV/Incheon) [![Inline docs](http://inch-ci.org/github/opherv/incheon.svg?branch=develop)](http://inch-ci.org/github/opherv/incheon)
+[![Build Status](https://travis-ci.org/lance-gg/lance.svg?branch=master)](https://travis-ci.org/lance-gg/lance) [![Inline docs](http://inch-ci.org/github/lance-gg/lance.svg?branch=develop)](http://inch-ci.org/github/lance-gg/lance)
 [![Slack](http://slack.lance.gg/badge.svg)](http://slack.lance.gg)
 
 <img src="https://cloud.githubusercontent.com/assets/3951311/24590344/0b7748b8-17f4-11e7-84fc-d24c44c7a27a.jpg" style="width: 100%" alt="Lance logo">
