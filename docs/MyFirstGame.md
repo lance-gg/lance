@@ -12,7 +12,7 @@ code, and game logic.
 The creation of a new game starts by cloning boilerplate code:
 
 ```shell
-git clone https://github.com/namel/lancegame.git
+git clone https://github.com/lance-gg/lancegame.git
 cd lancegame
 yarn install
 ```
@@ -39,7 +39,7 @@ the sample `PlayerAvatar.js` object, except that it is called `Paddle` and it as
 ```javascript
 'use strict';
 
-const DynamicObject = require('lance').serialize.DynamicObject;
+const DynamicObject = require('lance-gg').serialize.DynamicObject;
 
 class Paddle extends DynamicObject {
 
@@ -70,7 +70,7 @@ We also give the Ball an initial velocity when it is created.
 ```javascript
 'use strict';
 
-const DynamicObject = require('lance').serialize.DynamicObject;
+const DynamicObject = require('lance-gg').serialize.DynamicObject;
 
 class Ball extends DynamicObject {
 
@@ -238,7 +238,7 @@ The server engine will initialize the game engine when the game is started, and 
 ```javascript
 'use strict';
 
-const ServerEngine = require('lance').ServerEngine;
+const ServerEngine = require('lance-gg').ServerEngine;
 
 class MyServerEngine extends ServerEngine {
 
@@ -301,8 +301,6 @@ Change the `draw()` method and add the `addSprite()` methods as shown here:
 draw() {
     super.draw();
 
-    // note - animating via the top attribute of a DOM element is a usually
-    // bad practice, but used here for code brevity
     for (let objId of Object.keys(this.sprites)) {
         if (this.sprites[objId].el) {
             this.sprites[objId].el.style.top = this.gameEngine.world.objects[objId].position.y + 'px';
@@ -322,7 +320,7 @@ addSprite(obj, objName) {
 ## Step 4: the Client Visuals
 
 The client visuals code are simple HTML so we don't discuss them in detail.
-Change the `<body>` DOM element contain just the following snippet.
+In file `index.html`, change the `<body>` DOM element contain just the following snippet.
 ```HTML
 <div style="width: 400px; height: 400px; background: black">
     <div style="position:absolute;width:10px;height:50px;background:white" class="paddle1"></div>
@@ -336,16 +334,16 @@ Change the `<body>` DOM element contain just the following snippet.
 Once everything has been put together the end result should look like
 the pong branch of the repository.
 
-If you prefer to get a clean working copy, run:
+NOTE: If you prefer to get a clean working copy, you can run:
 ```shell
-git clone https://github.com/namel/lancegame.git pong
+git clone https://github.com/lance-gg/lancegame.git pong
 cd pong
 git checkout pong
 yarn install
 ```
 
 To run the game you must first build the JavaScript bundle.  The `yarn install`
-command above already did this for you, but if you change code, you can rebuild by
+command above already did this for you, but we changed the code, so you must rebuild by
 executing:
 ```shell
 yarn run build
