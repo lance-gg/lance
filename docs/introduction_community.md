@@ -7,11 +7,11 @@ To get a bird's eye view on what's Lance all about and how to use it to make a m
 If you're more of the learning-by-doing type, you can start with the first tutorial, [My first game: Pong](http://docs.lance.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step instructions on how to implement a networked version of this classic game.
 
 ### Joining the discussion
-You're welcome to join the [Incehon Slack](http://slack.lance.gg) to hang out and engage in active discussion with the project maintainers and fellow game developers.
+You're welcome to join the [Lance Slack](http://slack.lance.gg) to hang out and engage in active discussion with the project maintainers and fellow game developers.
 
 ### Keeping in touch
 
-Follow [LanceGG](http://twitter.com/IncheonGG) on Twitter to hear the latest and see what others are doing with Lance
+Follow [LanceGG_](http://twitter.com/LanceGG_) on Twitter to hear the latest and see what others are doing with Lance
 
 ### Getting help
 Feel free to ask anything on [Stack Overflow](http://stackoverflow.com/questions/tagged/lance). We keep an eye out for questions!
@@ -20,7 +20,7 @@ Feel free to ask anything on [Stack Overflow](http://stackoverflow.com/questions
 
 Lance is an open source project, and as such we welcome any contribution.
 
- * Spreading the word, posting or tweeting about Lance in social media using the @incheongg tag. The larger the community, the more fun we have and the faster development can move!
+ * Spreading the word, posting or tweeting about Lance in social media using the @lancegg tag. The larger the community, the more fun we have and the faster development can move!
 
  * Improving the documentation: fixing typos, expanding, clarifying or writing new articles
 
