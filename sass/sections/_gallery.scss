@@ -1,0 +1,54 @@
+section#gallery{
+	background: #751a62;
+
+	.projects{
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-column-gap: 1rem;
+		grid-row-gap: 1rem;
+		width: 100%;
+		height: 18rem;
+
+		@include breakpoint-mobile(){
+			grid-template-columns: 1fr;
+			height: auto;
+
+			.project {
+				height: 14rem;
+			}
+		}
+
+		@include breakpoint-mobile-landscape(){
+			height: 30rem;
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	.project{
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: center;
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+
+		.caption{
+			position: absolute;
+			width: 100%;
+			bottom: 0;
+			padding: 0.5rem;
+			background-color: rgba(0,0,0,0.6);
+			box-sizing: border-box;
+		}
+
+		.title{
+			font-weight: bold;
+			font-size: 1.3rem;
+			margin-bottom: 0.2rem;
+		}
+	}
+
+	a{
+		color: white;
+	}
+}
