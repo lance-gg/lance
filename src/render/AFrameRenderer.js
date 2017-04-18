@@ -4,6 +4,10 @@
 const EventEmitter = require('eventemitter3');
 const networkedPhysics = require('./aframe/system');
 
+
+// TODO: this class should extend the base Renderer or explain why it doesn't
+
+
 /**
  * The A-Frame Renderer
  */
@@ -22,8 +26,12 @@ class AFrameRenderer {
         Object.assign(this, EventEmitter.prototype);
 
         // set up the networkedPhysics as an A-Frame system
-        networkedPhysics.setGameEngine(gameEngine);
+        networkedPhysics.setGlobals(gameEngine, this);
         AFRAME.registerSystem('networked-physics', networkedPhysics);
+    }
+
+    reportSlowFrameRate() {
+        this.gameEngine.emit('client__slowFrameRate');
     }
 
     /**

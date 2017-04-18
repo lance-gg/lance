@@ -36,6 +36,10 @@ class Renderer {
         return Promise.resolve(); // eslint-disable-line new-cap
     }
 
+    reportSlowFrameRate() {
+        this.gameEngine.emit('client__slowFrameRate');
+    }
+
     /**
      * The main draw function.  This method is called at high frequency,
      * at the rate of the render loop.  Typically this is 60Hz, in WebVR 90Hz.

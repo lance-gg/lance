@@ -40,6 +40,11 @@ class ExtrapolateStrategy extends SyncStrategy {
     // collect a sync and its events
     collectSync(e) {
 
+        // ignore syncs which are older than the latest
+        if (this.lastSync && this.lastSync.stepCount && this.lastSync.stepCount > e.stepCount)
+            return;
+
+        // build new sync object
         let lastSync = this.lastSync = {};
         lastSync.stepCount = e.stepCount;
 

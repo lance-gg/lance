@@ -1,5 +1,8 @@
 'use strict';
 
+const FRAME_HISTORY_SIZE = 20;
+const MAX_SLOW_FRAMES = 10;
+
 let AFrameSystem = {
     schema: {
         traceLevel: { default: 4 }
@@ -16,11 +19,24 @@ let AFrameSystem = {
         //       a class for each simple object type.
         //
         //       Remember to also remove them.
+        this.frameRateHistory = [];
+        for (let i=0; i<FRAME_HISTORY_SIZE; i++)
+            this.frameRateHistory.push(false);
+        this.frameRateTest = (1000 / 60) * 1.2;
     },
 
-    tick: function() {
+    tick: function(t, dt) {
         if (!this.gameEngine)
             return;
+
+        let frh = this.frameRateHistory;
+        frh.push(dt > this.frameRateTest);
+        frh.shift();
+        const slowFrames = frh.filter(x => x);
+        if (slowFrames.length > MAX_SLOW_FRAMES) {
+            this.frameRateHistory = frh.map(x => false);
+            this.renderer.reportSlowFrameRate();
+        }
 
         // for each object in the world, update the a-frame element
         this.gameEngine.world.forEachObject((id, o) => {
@@ -36,8 +52,9 @@ let AFrameSystem = {
 
     // NOTE: webpack generated incorrect code if you use arrow notation below
     //       it sets "this" to "undefined"
-    setGameEngine: function(gameEngine) {
+    setGlobals: function(gameEngine, renderer) {
         this.gameEngine = gameEngine;
+        this.renderer = renderer;
     }
 };
 
