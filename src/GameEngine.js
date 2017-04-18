@@ -179,6 +179,14 @@ class GameEngine {
      * @param {String} input.playerId - player that sent the input
      */
 
+     /**
+      * Report slow frame rate on the browser.
+      * The browser did not achieve a reasonable frame rate
+      *
+      * @event GameEngine#client__slowFrameRate
+      */
+
+
     /**
       * Create a game engine instance.  This needs to happen
       * once on the server, and once on each client.
