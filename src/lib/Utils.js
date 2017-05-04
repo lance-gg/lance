@@ -100,6 +100,19 @@ class Utils {
             .update(sorted)
             .digest(enc);
     }
+
+    static httpGetPromise(url) {
+        return new Promise((resolve, reject) => {
+            let req = new XMLHttpRequest();
+            req.open('GET', url, true);
+            req.onload = () => {
+                if (req.status >= 200 && req.status < 400) resolve(JSON.parse(req.responseText));
+                else reject();
+            };
+            req.onerror = () => { reject(); };
+            req.send();
+        });
+    }
 }
 
 module.exports = Utils;

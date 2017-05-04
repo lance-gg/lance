@@ -1,6 +1,6 @@
 {
   "name": "lance-gg",
-  "version": "1.0.6-rc.2",
+  "version": "1.0.6-rc.3",
   "description": "A Node.js based real-time multiplayer game server",
   "keywords": [
     "pixijs",
@@ -20,7 +20,8 @@
     "cannon": "^0.6.2",
     "eventemitter3": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "request-promise": "^4.2.0",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.3",
     "socket.io": "^1.4.6",
     "socket.io-client": "^1.4.6"
   },

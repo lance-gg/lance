@@ -1,10 +1,11 @@
 'use strict';
 let io = require('socket.io-client');
-let requestPromise = require('request-promise');
-const Serializer = require('./serialize/Serializer');
-const NetworkTransmitter = require('./network/NetworkTransmitter');
-const NetworkMonitor = require('./network/NetworkMonitor');
+const Utils = require('./lib/Utils');
 const Scheduler = require('./lib/Scheduler');
+const Synchronizer = require('./Synchronizer');
+const Serializer = require('./serialize/Serializer');
+const NetworkMonitor = require('./network/NetworkMonitor');
+const NetworkTransmitter = require('./network/NetworkTransmitter');
 
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
@@ -140,7 +141,7 @@ class ClientEngine {
         // TODO: consider removing request-promise as dependency
         let matchmaker = Promise.resolve({ serverURL: null });
         if (this.options.matchmaker)
-            matchmaker = requestPromise(this.options.matchmaker);
+            matchmaker = Utils.httpGetPromise(this.options.matchmaker);
 
         return matchmaker.then(connectSocket);
     }
