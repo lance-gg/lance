@@ -1,9 +1,9 @@
 'use strict';
-var io = require('socket.io-client');
+let io = require('socket.io-client');
+let requestPromise = require('request-promise');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
-const Synchronizer = require('./Synchronizer');
 const Scheduler = require('./lib/Scheduler');
 
 // externalizing these parameters as options would add confusion to game
@@ -113,27 +113,35 @@ class ClientEngine {
      * @return {Promise} Resolved when the connection is made to the server
      */
     connect() {
-        let connectionPromise = new Promise((resolve, reject) => {
-            this.socket = io(this.options.serverURL);
 
-            this.networkMonitor.registerClient(this);
+        let that = this;
+        function connectSocket(matchMakerAnswer) {
+            return new Promise((resolve, reject) => {
+                that.socket = io(matchMakerAnswer.serverURL);
 
-            this.socket.once('connect', () => {
-                console.log('connection made');
-                resolve();
+                that.networkMonitor.registerClient(that);
+
+                that.socket.once('connect', () => {
+                    console.log('connection made');
+                    resolve();
+                });
+
+                that.socket.on('playerJoined', (playerData) => {
+                    that.playerId = playerData.playerId;
+                    that.messageIndex = Number(that.playerId) * 10000;
+                });
+
+                that.socket.on('worldUpdate', (worldData) => {
+                    that.inboundMessages.push(worldData);
+                });
             });
+        }
 
-            this.socket.on('playerJoined', (playerData) => {
-                this.playerId = playerData.playerId;
-                this.messageIndex = Number(this.playerId) * 10000;
-            });
+        let matchmaker = Promise.resolve({ serverURL: null });
+        if (this.options.matchmaker)
+            matchmaker = requestPromise(this.options.matchmaker);
 
-            this.socket.on('worldUpdate', (worldData) => {
-                this.inboundMessages.push(worldData);
-            });
-        });
-
-        return connectionPromise;
+        return matchmaker.then(connectSocket);
     }
 
     /**
