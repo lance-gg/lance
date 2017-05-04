@@ -118,6 +118,7 @@ class ClientEngine {
         let that = this;
         function connectSocket(matchMakerAnswer) {
             return new Promise((resolve, reject) => {
+                console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
                 that.socket = io(matchMakerAnswer.serverURL);
 
                 that.networkMonitor.registerClient(that);
@@ -138,7 +139,6 @@ class ClientEngine {
             });
         }
 
-        // TODO: consider removing request-promise as dependency
         let matchmaker = Promise.resolve({ serverURL: null });
         if (this.options.matchmaker)
             matchmaker = Utils.httpGetPromise(this.options.matchmaker);

@@ -109,7 +109,7 @@ class Utils {
                 if (req.status >= 200 && req.status < 400) resolve(JSON.parse(req.responseText));
                 else reject();
             };
-            req.onerror = () => { reject(); };
+            req.onerror = () => {};
             req.send();
         });
     }
