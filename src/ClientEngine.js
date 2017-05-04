@@ -137,6 +137,7 @@ class ClientEngine {
             });
         }
 
+        // TODO: consider removing request-promise as dependency
         let matchmaker = Promise.resolve({ serverURL: null });
         if (this.options.matchmaker)
             matchmaker = requestPromise(this.options.matchmaker);
