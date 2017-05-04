@@ -224,7 +224,7 @@ class ServerEngine {
 
     // handle new player connection
     onPlayerConnected(socket) {
-        var that = this;
+        let that = this;
 
         console.log('Client connected');
 
@@ -235,16 +235,21 @@ class ServerEngine {
         };
         let playerId = socket.playerId = ++this.gameEngine.world.playerCount;
         socket.lastHandledInput = null;
+        socket.joinTime = (new Date()).getTime();
         this.resetIdleTimeout(socket);
 
         console.log('Client Connected', socket.id);
 
-        this.gameEngine.emit('server__playerJoined', { playerId });
-        socket.emit('playerJoined', { playerId });
+        let playerEvent = { id: socket.id, playerId, joinTime: socket.joinTime, disconnectTime: 0 };
+        this.gameEngine.emit('server__playerJoined', playerEvent);
+        this.gameEngine.emit('playerJoined', playerEvent);
+        socket.emit('playerJoined', playerEvent);
 
         socket.on('disconnect', function() {
+            playerEvent.disconnectTime = (new Date()).getTime();
             that.onPlayerDisconnected(socket.id, playerId);
-            that.gameEngine.emit('server__playerDisconnected', { playerId });
+            that.gameEngine.emit('server__playerDisconnected', playerEvent);
+            that.gameEngine.emit('playerDisconnected', playerEvent);
         });
 
         // todo rename, use number instead of name

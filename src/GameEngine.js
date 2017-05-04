@@ -62,6 +62,7 @@ class GameEngine {
      * A player has joined
      *
      * @event GameEngine#playerJoined
+     * @param {Number} joinTime - epoch of join time
      * @param {Object} playerDesc - player descriptor
      * @param {String} playerDesc.playerId - the player ID
      */
@@ -70,6 +71,8 @@ class GameEngine {
      * A player has left
      *
      * @event GameEngine#playerDisconnected
+     * @param {Number} joinTime - epoch of join time
+     * @param {Number} disconnectTime - epoch of disconnect time
      * @param {Object} playerDesc - player descriptor
      * @param {String} playerDesc.playerId - the player ID
      */
@@ -78,6 +81,7 @@ class GameEngine {
      * A player has joined on the server
      *
      * @event GameEngine#server__playerJoined
+     * @param {Number} joinTime - epoch of join time
      * @param {Object} playerDesc - player descriptor
      * @param {String} playerDesc.playerId - the player ID
      */
@@ -86,6 +90,8 @@ class GameEngine {
       * A player has left on the server
       *
       * @event GameEngine#server__playerDisconnected
+      * @param {Number} joinTime - epoch of join time
+      * @param {Number} disconnectTime - epoch of disconnect time
       * @param {Object} playerDesc - player descriptor
       * @param {String} playerDesc.playerId - the player ID
       */
@@ -186,6 +192,12 @@ class GameEngine {
       * @event GameEngine#client__slowFrameRate
       */
 
+      /**
+       * server has started
+       *
+       * @event GameEngine#server__start
+       * @param {Number} timestamp - UTC epoch of start time
+       */
 
     /**
       * Create a game engine instance.  This needs to happen
@@ -291,6 +303,7 @@ class GameEngine {
     start() {
         this.trace.info('========== game engine started ==========');
         this.initWorld();
+        this.emit('server__start', { timestamp: (new Date()).getTime() });
     }
 
     step(isReenact) {
