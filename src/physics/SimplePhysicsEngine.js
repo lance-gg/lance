@@ -14,6 +14,15 @@ class SimplePhysicsEngine extends PhysicsEngine {
         super.init(initOptions);
         this.collisionDetection = new CollisionDetection();
 
+        /**
+         * The actor's name.
+         * @member {TwoVector} constant gravity affecting all objects
+         */
+        this.gravity = new TwoVector(0,0);
+
+        if (initOptions.gravity)
+            this.gravity.copy(initOptions.gravity);
+
         let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, initOptions.collisionOptions);
         this.collisionDetection.init(collisionOptions);
     }
@@ -36,8 +45,8 @@ class SimplePhysicsEngine extends PhysicsEngine {
             o.velocity.add(dv);
         }
 
-        // o.velX = Math.round(o.velX * 100) / 100;
-        // o.velY = Math.round(o.velY * 100) / 100;
+        //apply gravity
+        if (o.affectedByGravity) o.velocity.add(this.gravity);
 
         let velMagnitude = o.velocity.length();
         if ((o.maxSpeed !== null) && (velMagnitude > o.maxSpeed)) {

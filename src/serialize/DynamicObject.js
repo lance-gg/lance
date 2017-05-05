@@ -73,6 +73,12 @@ class DynamicObject extends GameObject {
         this.velocity = new TwoVector(0, 0);
 
         /**
+         * Whether this object is affected by gravity. 
+         * @member {Boolean}
+         */
+        this.affectedByGravity = true;
+
+        /**
         * position
         * @member {TwoVector}
         */
