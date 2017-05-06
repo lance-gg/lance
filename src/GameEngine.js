@@ -215,12 +215,6 @@ class GameEngine {
             traceLevel: Trace.TRACE_NONE
         }, options);
 
-        // get the physics engine and initialize it
-        if (this.options.physicsEngine) {
-            this.physicsEngine = this.options.physicsEngine;
-            this.physicsEngine.init({ gameEngine: this });
-        }
-
         // set up event emitting and interface
         let eventEmitter = new EventEmitter();
 
