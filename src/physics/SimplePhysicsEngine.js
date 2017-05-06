@@ -57,8 +57,11 @@ class SimplePhysicsEngine extends PhysicsEngine {
         o.isRotatingLeft = false;
         o.isRotatingRight = false;
 
+
         o.position.add(o.velocity);
 
+        o.velocity.multiply(o.friction);
+        
         // wrap around the world edges
         if (worldSettings.worldWrap) {
             if (o.position.x >= worldSettings.width) { o.position.x -= worldSettings.width; }
