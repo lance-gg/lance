@@ -166,7 +166,8 @@ class ServerEngine {
         // add this sync header
         // currently this is just the sync step count
         this.networkTransmitter.addNetworkedEvent('syncHeader', {
-            stepCount: world.stepCount
+            stepCount: world.stepCount,
+            fullUpdate: Number(!diffUpdate)
         });
 
         for (let objId of Object.keys(world.objects)) {

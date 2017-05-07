@@ -302,7 +302,8 @@ class ClientEngine {
         this.gameEngine.serverStep = syncHeader.stepCount;
         this.gameEngine.emit('client__syncReceived', {
             syncEvents: syncEvents,
-            stepCount: syncHeader.stepCount
+            stepCount: syncHeader.stepCount,
+            fullUpdate: syncHeader.fullUpdate
         });
 
         this.gameEngine.trace.info(`========== inbound world update ${syncHeader.stepCount} ==========`);
