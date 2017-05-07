@@ -20,6 +20,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         super(clientEngine, options);
 
         this.lastSync = null;
+        this.needFirstSync = true;
         this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('client__postStep', this.extrapolate.bind(this));
@@ -40,9 +41,15 @@ class ExtrapolateStrategy extends SyncStrategy {
     // collect a sync and its events
     collectSync(e) {
 
-        // ignore syncs which are older than the latest
-        if (this.lastSync && this.lastSync.stepCount && this.lastSync.stepCount > e.stepCount)
-            return;
+        // on first connect we need to wait for a full world update
+        if (this.needFirstSync) {
+            if (!e.fullUpdate)
+                return;
+        } else {
+            // ignore syncs which are older than the latest
+            if (this.lastSync && this.lastSync.stepCount && this.lastSync.stepCount > e.stepCount)
+                return;
+        }
 
         // build new sync object
         let lastSync = this.lastSync = {};
@@ -113,6 +120,7 @@ class ExtrapolateStrategy extends SyncStrategy {
         //
         // 3. if the object is new, just create it
         //
+        this.needFirstSync = false;
         let world = this.gameEngine.world;
         let serverStep = this.lastSync.stepCount;
         for (let ids of Object.keys(this.lastSync.syncObjects)) {

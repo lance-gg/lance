@@ -40,7 +40,8 @@ class NetworkTransmitter {
 
         this.registerNetworkedEventFactory('syncHeader', {
             netScheme: {
-                stepCount: { type: Serializer.TYPES.INT32 }
+                stepCount: { type: Serializer.TYPES.INT32 },
+                fullUpdate: { type: Serializer.TYPES.UINT8 }
             }
         });
     }
