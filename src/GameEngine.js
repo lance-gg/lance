@@ -123,6 +123,7 @@ class GameEngine {
      * @param {Object} input - input descriptor object
      * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
      * @param {Number} input.messageIndex - input identifier
+     * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter 
      * @param {Number} input.step - input execution step
      * @param {Number} playerId - the player ID
      */
@@ -136,6 +137,7 @@ class GameEngine {
      * @param {Object} input - input descriptor object
      * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
      * @param {Number} input.messageIndex - input identifier
+     * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter 
      * @param {Number} input.step - input execution step
      * @param {Number} playerId - the player ID
      */
@@ -149,6 +151,7 @@ class GameEngine {
      * @param {Object} input - input descriptor object
      * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
      * @param {Number} input.messageIndex - input identifier
+     * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter 
      * @param {Number} input.step - input execution step
      * @param {Number} playerId - the player ID
      */
