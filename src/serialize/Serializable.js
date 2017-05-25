@@ -75,13 +75,17 @@ class Serializable {
                     serializer.writeDataView(dataView, this[property], bufferOffset + localBufferOffset, netScheme[property]);
                 }
 
-                // derive the size of the included class
-                if (netScheme[property].type == Serializer.TYPES.CLASSINSTANCE) {
+                if (netScheme[property].type === Serializer.TYPES.STRING) {
+                    // derive the size of the string
+                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                    if (this[property] !== null)
+                        localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
+                } else if (netScheme[property].type == Serializer.TYPES.CLASSINSTANCE) {
+                    // derive the size of the included class
                     let objectInstanceBufferOffset = this[property].serialize(serializer, { dry: true }).bufferOffset;
                     localBufferOffset += objectInstanceBufferOffset;
-                }
-                // derive the size of the list
-                else if (netScheme[property].type == Serializer.TYPES.LIST) {
+                } else if (netScheme[property].type == Serializer.TYPES.LIST) {
+                    // derive the size of the list
                     // list starts with number of elements
                     localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
