@@ -15,14 +15,16 @@ class Serializable {
      * @param {Object} options.dataBuffer [optional] - Data buffer to write to. If null a new data buffer will be created
      * @param {Number} options.bufferOffset [optional] - The buffer data offset to start writing at. Default: 0
      * @param {String} options.dry [optional] - Does not actually write to the buffer (useful to gather serializeable size)
-     * @returns {Object} the serialized object and the byte offset
+     * @returns {Object} the serialized object.  Contains attributes: dataBuffer - buffer which contains the serialized data;  bufferOffset - offset where the serialized data starts.
      */
     serialize(serializer, options) {
         options = Object.assign({
             bufferOffset: 0
         }, options);
 
-        let netScheme, dataBuffer, dataView;
+        let netScheme;
+        let dataBuffer;
+        let dataView;
         let classId = 0;
         let bufferOffset = options.bufferOffset;
         let localBufferOffset = 0; // used for counting the bufferOffset
@@ -44,6 +46,10 @@ class Serializable {
             console.warn('no netScheme defined! This will result in awful performance');
         }
 
+        // TODO: currently we serialize every node twice, once to calculate the size
+        //       of the buffers and once to write them out.  This can be reduced to
+        //       a single pass by starting with a large (and static) ArrayBuffer and
+        //       recursively building it up.
         // buffer has one Uint8Array for class id, then payload
         if (options.dataBuffer == null && options.dry != true) {
             let bufferSize = this.serialize(serializer, { dry: true }).bufferOffset;
@@ -63,19 +69,23 @@ class Serializable {
 
         if (netScheme) {
             for (let property of Object.keys(netScheme).sort()) {
-                // write the property to buffer
 
+                // write the property to buffer
                 if (options.dry != true) {
                     serializer.writeDataView(dataView, this[property], bufferOffset + localBufferOffset, netScheme[property]);
                 }
 
-                // derive the size of the included class
-                if (netScheme[property].type == Serializer.TYPES.CLASSINSTANCE) {
+                if (netScheme[property].type === Serializer.TYPES.STRING) {
+                    // derive the size of the string
+                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                    if (this[property] !== null)
+                        localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
+                } else if (netScheme[property].type == Serializer.TYPES.CLASSINSTANCE) {
+                    // derive the size of the included class
                     let objectInstanceBufferOffset = this[property].serialize(serializer, { dry: true }).bufferOffset;
                     localBufferOffset += objectInstanceBufferOffset;
-                }
-                // derive the size of the list
-                else if (netScheme[property].type == Serializer.TYPES.LIST) {
+                } else if (netScheme[property].type == Serializer.TYPES.LIST) {
+                    // derive the size of the list
                     // list starts with number of elements
                     localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
@@ -99,6 +109,46 @@ class Serializable {
         }
 
         return { dataBuffer, bufferOffset: localBufferOffset };
+    }
+
+    // build a clone of this object with pruned strings (if necessary)
+    prunedStringsClone(serializer, prevObject) {
+
+        if (!prevObject) return this;
+        prevObject = serializer.deserialize(prevObject).obj;
+
+        // get list of string properties which changed
+        let netScheme = this.constructor.netScheme;
+        let isString = p => netScheme[p].type === Serializer.TYPES.STRING;
+        let hasChanged = p => prevObject[p] !== this[p];
+        let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
+        if (!changedStrings) return this;
+
+        // build a clone with pruned strings
+        let prunedCopy = new this.constructor();
+        for (let p of Object.keys(netScheme))
+            prunedCopy[p] = changedStrings.indexOf(p) < 0 ? this[p] : null;
+
+        return prunedCopy;
+    }
+
+    syncTo(other) {
+        let netScheme = this.constructor.netScheme;
+        for (let p of Object.keys(netScheme)) {
+
+            // ignore classes and lists
+            if (netScheme[p].type === Serializer.TYPES.LIST || netScheme[p].type === Serializer.TYPES.CLASSINSTANCE)
+                continue;
+
+            // strings might be pruned
+            if (netScheme[p].type === Serializer.TYPES.STRING) {
+                if (typeof other[p] === 'string') this[p] = other[p];
+                continue;
+            }
+
+            // all other values are copied
+            this[p] = other[p];
+        }
     }
 
 }
