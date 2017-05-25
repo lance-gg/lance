@@ -159,13 +159,11 @@ class DynamicObject extends GameObject {
     get maxSpeed() { return null; }
 
     syncTo(other) {
-        this.id = other.id;
-        this.playerId = other.playerId;
+        super.syncTo(other);
         this.position.copy(other.position);
         this.velocity.copy(other.velocity);
         this.bending.copy(other.bending);
         this.bendingAngle = other.bendingAngle;
-        this.angle = other.angle;
         this.rotationSpeed = other.rotationSpeed;
         this.acceleration = other.acceleration;
         this.deceleration = other.deceleration;

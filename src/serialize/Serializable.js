@@ -132,6 +132,25 @@ class Serializable {
         return prunedCopy;
     }
 
+    syncTo(other) {
+        let netScheme = this.constructor.netScheme;
+        for (let p of Object.keys(netScheme)) {
+
+            // ignore classes and lists
+            if (netScheme[p].type === Serializer.TYPES.LIST || netScheme[p].type === Serializer.TYPES.CLASSINSTANCE)
+                continue;
+
+            // strings might be pruned
+            if (netScheme[p].type === Serializer.TYPES.STRING) {
+                if (typeof other[p] === 'string') this[p] = other[p];
+                continue;
+            }
+
+            // all other values are copied
+            this[p] = other[p];
+        }
+    }
+
 }
 
 module.exports = Serializable;
