@@ -114,18 +114,20 @@ class Serializable {
     // build a clone of this object with pruned strings (if necessary)
     prunedStringsClone(serializer, prevObject) {
 
-        prevObject = prevObject.deserialize(serializer);
+        prevObject = serializer.deserialize(prevObject).obj;
 
         // get list of string properties which changed
-        let isString = p => this.netScheme[p].type === Serializer.TYPES.STRING;
+        let netScheme = this.constructor.netScheme;
+        let isString = p => netScheme[p].type === Serializer.TYPES.STRING;
         let hasChanged = p => prevObject[p] !== this[p];
-        let changedStrings = Object.keys(this.netScheme).filter(isString).filter(hasChanged);
+        let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
         if (!changedStrings) return this;
 
         // build a clone with pruned strings
-        let prunedCopy = this.serialize(serializer);
-        for (let p of changedStrings)
-            prunedCopy[p] = null;
+        let prunedCopy = new this.constructor();
+        for (let p of Object.keys(netScheme))
+            prunedCopy[p] = changedStrings.indexOf(p) < 0 ? this[p] : null;
+
         return prunedCopy;
     }
 
