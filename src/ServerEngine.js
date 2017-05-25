@@ -159,6 +159,8 @@ class ServerEngine {
     }
 
     // create a serialized package of the game world
+    // TODO: this process could be made much much faster if the buffer creation and
+    //       size calculation are done in a single phase, along with string pruning.
     serializeUpdate(options) {
         let world = this.gameEngine.world;
         let diffUpdate = Boolean(options && options.diffUpdate);
@@ -173,8 +175,7 @@ class ServerEngine {
         for (let objId of Object.keys(world.objects)) {
             let obj = world.objects[objId];
 
-            // if the object (in serialized form)
-            // hasn't changed, move on to next object
+            // If the object (in serialized form) hasn't changed, move on
             if (diffUpdate) {
                 let s = obj.serialize(this.serializer);
                 if (this.objMemory[objId] && Utils.arrayBuffersEqual(s.dataBuffer, this.objMemory[objId])) {
@@ -183,6 +184,9 @@ class ServerEngine {
                     this.objMemory[objId] = s.dataBuffer;
                 }
             }
+
+            // prune strings which haven't changed
+            obj = obj.prunedStringsClone(this.serializer, this.objMemory[objId]);
 
             this.networkTransmitter.addNetworkedEvent('objectUpdate', {
                 stepCount: world.stepCount,

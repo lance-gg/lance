@@ -1,6 +1,7 @@
-"use strict";
+'use strict';
 
 const Utils = require('./../lib/Utils');
+const MAX_UINT_16 = 0xFFFF;
 
 /**
  * The Serializer is responsible for serializing the game world and its
@@ -43,7 +44,7 @@ class Serializer {
     /**
      * Registers a new class with the serializer, so it may be deserialized later
      * @param {Function} classObj reference to the class (not an instance!)
-     * @param [classId] Unit specifying a class ID
+     * @param {String} classId Unit specifying a class ID
      */
     registerClass(classObj, classId) {
         // if no classId is specified, hash one from the class name
@@ -92,6 +93,18 @@ class Serializer {
             dataView.setInt8(bufferOffset, value);
         } else if (netSchemProp.type == Serializer.TYPES.UINT8) {
             dataView.setUint8(bufferOffset, value);
+        } else if (netSchemProp.type == Serializer.TYPES.STRING) {
+
+            //   MAX_UINT_16 is a reserved (length) value which indicates string hasn't changed
+            if (value === null) {
+                dataView.setUint16(bufferOffset, MAX_UINT_16);
+            } else {
+                let strLen = value.length;
+                dataView.setUint16(bufferOffset, strLen);
+                let localBufferOffset = 2;
+                for (let i = 0; i < strLen; i++)
+                    dataView.setUint16(bufferOffset + localBufferOffset + i*2, value.charCodeAt(i));
+            }
         } else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE) {
             value.serialize(this, {
                 dataBuffer: dataView.buffer,
@@ -105,7 +118,7 @@ class Serializer {
             localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
             for (let item of value) {
-                // todo inelegant, currently doesn't support list of lists
+                // TODO: inelegant, currently doesn't support list of lists
                 if (netSchemProp.itemType == Serializer.TYPES.CLASSINSTANCE) {
                     let serializedObj = item.serialize(this, {
                         dataBuffer: dataView.buffer,
@@ -116,11 +129,9 @@ class Serializer {
                     this.writeDataView(dataView, item, bufferOffset + localBufferOffset, { type: netSchemProp.itemType });
                     localBufferOffset += this.getTypeByteSize(netSchemProp.itemType);
                 }
-
             }
-        }
-        // this is a custom data property which needs to define its own write method
-        else if (this.customTypes[netSchemProp.type] != null) {
+        } else if (this.customTypes[netSchemProp.type]) {
+            // this is a custom data property which needs to define its own write method
             this.customTypes[netSchemProp.type].writeDataView(dataView, value, bufferOffset);
         } else {
             console.error(`No custom property ${netSchemProp.type} found!`);
@@ -146,6 +157,16 @@ class Serializer {
         } else if (netSchemProp.type == Serializer.TYPES.UINT8) {
             data = dataView.getUint8(bufferOffset);
             bufferSize = this.getTypeByteSize(netSchemProp.type);
+        } else if (netSchemProp.type == Serializer.TYPES.STRING) {
+            let length = dataView.getUint16(bufferOffset);
+            let localBufferOffset = Uint16Array.BYTES_PER_ELEMENT;
+            bufferSize = localBufferOffset;
+            if (length === MAX_UINT_16) {
+                data = null;
+            } else {
+                data = String.fromCharCode.apply(null, dataView.buffer.slice(bufferOffset + localBufferOffset, length));
+                bufferSize += length * Uint16Array.BYTES_PER_ELEMENT;
+            }
         } else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE) {
             var deserializeData = this.deserialize(dataView.buffer, bufferOffset);
             data = deserializeData.obj;
@@ -211,18 +232,18 @@ class Serializer {
 }
 
 /**
-* The TYPES object defines the supported serialization types,
-* FLOAT32, INT32, INT16, INT8, UINT8, CLASSINSTANCE and LIST.
+* The TYPES object defines the supported serialization types
 * @constant
 */
 Serializer.TYPES = {
-    FLOAT32: "FLOAT32",
-    INT32: "INT32",
-    INT16: "INT16",
-    INT8: "INT8",
-    UINT8: "UINT8",
-    CLASSINSTANCE: "CLASSINSTANCE",
-    LIST: "LIST"
+    FLOAT32: 'FLOAT32',
+    INT32: 'INT32',
+    INT16: 'INT16',
+    INT8: 'INT8',
+    UINT8: 'UINT8',
+    STRING: 'STRING',
+    CLASSINSTANCE: 'CLASSINSTANCE',
+    LIST: 'LIST'
 };
 
 module.exports = Serializer;
