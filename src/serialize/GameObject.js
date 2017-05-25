@@ -111,12 +111,11 @@ class GameObject extends Serializable {
 
     /**
      * synchronize this object to the state of an other object
-     * @param {GameObject} other
+     * @param {GameObject} other the other object to synchronize to
      */
     syncTo(other) {
-        this.id = other.id;
+        super.syncTo(other);
     }
-
 
     // copy physical attributes to physics sub-object
     refreshToPhysics() {}
