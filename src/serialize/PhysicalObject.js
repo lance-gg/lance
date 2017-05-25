@@ -95,6 +95,8 @@ class PhysicalObject extends GameObject {
 
     syncTo(other, options) {
 
+        super.syncTo(other);
+
         this.position.copy(other.position);
         this.quaternion.copy(other.quaternion);
 
