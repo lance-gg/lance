@@ -114,6 +114,7 @@ class Serializable {
     // build a clone of this object with pruned strings (if necessary)
     prunedStringsClone(serializer, prevObject) {
 
+        if (!prevObject) return this;
         prevObject = serializer.deserialize(prevObject).obj;
 
         // get list of string properties which changed
