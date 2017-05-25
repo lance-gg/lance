@@ -164,7 +164,10 @@ class Serializer {
             if (length === MAX_UINT_16) {
                 data = null;
             } else {
-                data = String.fromCharCode.apply(null, dataView.buffer.slice(bufferOffset + localBufferOffset, length));
+                let a = [];
+                for (let i = 0; i < length; i++)
+                    a[i] = dataView.getUint16(bufferOffset + localBufferOffset + i * 2);
+                data = String.fromCharCode.apply(null, a);
                 bufferSize += length * Uint16Array.BYTES_PER_ELEMENT;
             }
         } else if (netSchemProp.type == Serializer.TYPES.CLASSINSTANCE) {
