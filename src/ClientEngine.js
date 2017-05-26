@@ -111,16 +111,15 @@ class ClientEngine {
     /**
      * Makes a connection to the game server
      *
-     * @param {Object} options socket.io options to be used when initializing the connection
      * @return {Promise} Resolved when the connection is made to the server
      */
-    connect(options = {}) {
+    connect() {
 
         let that = this;
         function connectSocket(matchMakerAnswer) {
             return new Promise((resolve, reject) => {
                 console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
-                that.socket = io(matchMakerAnswer.serverURL, options);
+                that.socket = io(matchMakerAnswer.serverURL);
 
                 that.networkMonitor.registerClient(that);
 
