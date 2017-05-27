@@ -20,7 +20,7 @@ Feel free to ask anything on [Stack Overflow](http://stackoverflow.com/questions
 
 Lance is an open source project, and as such we welcome any contribution.
 
- * Spreading the word, posting or tweeting about Lance in social media using the @lancegg tag. The larger the community, the more fun we have and the faster development can move!
+ * Spreading the word, posting or tweeting about Lance in social media using the (https://twitter.com/lancegg_)[@lancegg_ tag]. The larger the community, the more fun we have and the faster development can move!
 
  * Improving the documentation: fixing typos, expanding, clarifying or writing new articles
 

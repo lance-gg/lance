@@ -23,6 +23,9 @@ var Lance = {
         Renderer: require('./src/render/Renderer'),
         ThreeRenderer: require('./src/render/ThreeRenderer'),
         AFrameRenderer: require('./src/render/AFrameRenderer')
+    },
+    controls: {
+        Keyboard: require('./src/controls/KeyboardControls'),
     }
 };
 

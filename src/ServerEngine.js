@@ -36,14 +36,14 @@ class ServerEngine {
      * @param {Number} options.updateRate - number of steps in each update (sync)
      * @param {String} options.tracesPath - path where traces should go
      * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
-     * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
+     * @param {Number} options.timeoutInterval=40 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
      * @return {ServerEngine} serverEngine - self
      */
     constructor(io, gameEngine, options) {
         this.options = Object.assign({
             updateRate: 6,
             stepRate: 60,
-            timeoutInterval: 180,
+            timeoutInterval: 40,
             updateOnObjectCreation: true,
             tracesPath: '',
             debug: {
