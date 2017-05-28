@@ -303,9 +303,17 @@ class GameEngine {
         this.emit('server__start', { timestamp: (new Date()).getTime() });
     }
 
+    /**
+      * Single game step.
+      *
+      * @param {Boolean} isReenact - is this step a re-enactment of the past.
+      */
     step(isReenact) {
 
         // emit preStep event
+        if (isReenact === undefined)
+            throw new Error('game engine does not forward argument isReenact to super class');
+
         isReenact = Boolean(isReenact);
         let step = ++this.world.stepCount;
         let clientIDSpace = this.options.clientIDSpace;

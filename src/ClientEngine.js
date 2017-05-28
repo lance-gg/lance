@@ -224,7 +224,7 @@ class ClientEngine {
         // perform game engine step
         this.handleOutboundInput();
         this.applyDelayedInputs();
-        this.gameEngine.step();
+        this.gameEngine.step(false);
         this.gameEngine.emit('client__postStep');
 
         if (this.gameEngine.trace.length && this.socket) {
