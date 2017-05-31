@@ -44,6 +44,8 @@ class DynamicObject extends GameObject {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
+            width: { type: Serializer.TYPES.INT16 },
+            height: { type: Serializer.TYPES.INT16 },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
             angle: { type: Serializer.TYPES.FLOAT32 }
         }, super.netScheme);
@@ -72,6 +74,17 @@ class DynamicObject extends GameObject {
         this.position = new TwoVector(0, 0);
         this.velocity = new TwoVector(0, 0);
 
+        /**
+         * Object width for collision detection purposes. Default is 1
+         * @member {Number}
+         */
+        this.width = 1;
+
+        /**
+         * Object Height for collision detection purposes. Default is 1
+         * @member {Number}
+         */
+        this.height = 1;
 
         /**
          * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
@@ -80,7 +93,7 @@ class DynamicObject extends GameObject {
         this.friction = new TwoVector(1, 1);
 
         /**
-         * Whether this object is affected by gravity. 
+         * Whether this object is affected by gravity.
          * @member {Boolean}
          */
         this.affectedByGravity = true;
@@ -261,6 +274,13 @@ class DynamicObject extends GameObject {
         var shortestAngle = ((((nextObj.angle - angle) % 360) + 540) % 360) - 180;
         this.angle = angle + shortestAngle * playPercentage;
 
+    }
+
+    getAABB(){
+        return {
+            min: [ this.x, this.y],
+            max: [ this.x + this.width, this.y + this.height]
+        };
     }
 }
 

@@ -16,7 +16,7 @@ var Lance = {
     },
     physics: {
         PhysicsEngine: require('./src/physics/PhysicsEngine'),
-        SimplePhysicsEngine: require('./src/physics/SimplePhysicsEngine'),
+        SimplePhysicsEngine: require('./src/physics/SimplePhysics/SimplePhysicsEngine'),
         CannonPhysicsEngine: require('./src/physics/CannonPhysicsEngine')
     },
     render: {

@@ -1,7 +1,6 @@
 'use strict';
-const PhysicsEngine = require('./PhysicsEngine');
-const CollisionDetection = require('./SimplePhysics/CollisionDetection');
-const TwoVector = require('../serialize/TwoVector');
+const PhysicsEngine = require('../PhysicsEngine');
+const TwoVector = require('../../serialize/TwoVector');
 
 let dv = new TwoVector();
 /**
@@ -12,6 +11,13 @@ class SimplePhysicsEngine extends PhysicsEngine {
 
     init(initOptions) {
         super.init(initOptions);
+
+        let CollisionDetection;
+        if (initOptions.collisionOptions.type == 'HSHG'){
+            CollisionDetection = require('./HSHGCollisionDetection');
+        } else {
+            CollisionDetection = require('./BruteCollisionDetection');
+        }
         this.collisionDetection = new CollisionDetection();
 
         /**
