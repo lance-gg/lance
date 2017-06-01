@@ -14,7 +14,7 @@ class TestObject extends DynamicObject {
         };
     }
 
-    constructor(playerAges){
+    constructor(){
         super();
         this.width = 100;
         this.height = 100;
@@ -24,7 +24,7 @@ class TestObject extends DynamicObject {
 let grid = new HSHG(); 
 
 let obj1 = new TestObject(1);
-let obj2 = new TestObject(1);
+let obj2 = new TestObject(2);
 
 grid.addObject(obj1);
 grid.addObject(obj2);

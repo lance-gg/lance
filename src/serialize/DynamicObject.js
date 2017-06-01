@@ -276,10 +276,12 @@ class DynamicObject extends GameObject {
 
     }
 
-    getAABB(){
+    getAABB() {
+        // todo take rotation into account
+        // registration point is in the middle
         return {
-            min: [ this.x, this.y],
-            max: [ this.x + this.width, this.y + this.height]
+            min: [this.x - this.width / 2, this.y - this.height / 2],
+            max: [this.x + this.width / 2, this.y + this.height / 2]
         };
     }
 }

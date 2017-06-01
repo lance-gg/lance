@@ -4,7 +4,7 @@ const TwoVector = require('../../serialize/TwoVector');
 const HSHG = require('./HSHG');
 
 // The collision detection of SimplePhysicsEngine is a brute-force approach
-class CollisionDetection {
+class HSHGCollisionDetection {
 
     constructor(options) {
         this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);
@@ -14,6 +14,7 @@ class CollisionDetection {
         this.gameEngine = options.gameEngine;
         this.grid = new HSHG();
         this.previousCollisionPairs = {};
+        this.stepCollidingPairs = {};
 
         this.gameEngine.on('objectAdded', obj => {
             // add the gameEngine obj the the spatial grid
@@ -28,7 +29,7 @@ class CollisionDetection {
 
     detect() {
         this.grid.update();
-        let stepCollidingPairs = this.grid.queryForCollisionPairs().reduce((accumulator, currentValue, i) => {
+        this.stepCollidingPairs = this.grid.queryForCollisionPairs().reduce((accumulator, currentValue, i) => {
             let pairId = getArrayPairId(currentValue);
             accumulator[pairId] = { o1: currentValue[0], o2: currentValue[1] };
             return accumulator;
@@ -38,13 +39,13 @@ class CollisionDetection {
             let pairObj = this.previousCollisionPairs[pairId];
 
             // existed in previous pairs, but not during this step: this pair stopped colliding
-            if (pairId in stepCollidingPairs === false) {
+            if (pairId in this.stepCollidingPairs === false) {
                 this.gameEngine.emit('collisionStop', pairObj);
             }
         }
 
-        for (let pairId of Object.keys(stepCollidingPairs)) {
-            let pairObj = stepCollidingPairs[pairId];
+        for (let pairId of Object.keys(this.stepCollidingPairs)) {
+            let pairObj = this.stepCollidingPairs[pairId];
 
             // didn't exist in previous pairs, but exists now: this is a new colliding pair
             if (pairId in this.previousCollisionPairs === false) {
@@ -52,13 +53,25 @@ class CollisionDetection {
             }
         }
 
-        this.previousCollisionPairs = stepCollidingPairs;
+        this.previousCollisionPairs = this.stepCollidingPairs;
+    }
+
+    /**
+     * checks wheter two objects are currently colliding
+     * @param o1 {Object} first object
+     * @param o2 {Object} second object
+     * @returns {boolean} are the two objects colliding?
+     */
+    areObjectsColliding(o1, o2){
+        return getArrayPairId([o1,o2]) in this.stepCollidingPairs;
     }
 
 }
 
 function getArrayPairId(arrayPair){
-    return arrayPair[0].id + '-' + arrayPair[1].id;
+    // make sure to get the same id regardless of object order
+    let sortedArrayPair = arrayPair.slice(0).sort();
+    return sortedArrayPair[0].id + '-' + sortedArrayPair[1].id;
 }
 
-module.exports = CollisionDetection;
+module.exports = HSHGCollisionDetection ;
