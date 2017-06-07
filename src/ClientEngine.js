@@ -215,7 +215,13 @@ class ClientEngine {
         }
     }
 
-    step() {
+    step(t, dt, physicsOnly) {
+
+        // physics only case
+        if (physicsOnly) {
+            this.gameEngine.step(false, t, dt, physicsOnly);
+            return;
+        }
 
         // first update the trace state
         this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
@@ -238,7 +244,7 @@ class ClientEngine {
         // perform game engine step
         this.handleOutboundInput();
         this.applyDelayedInputs();
-        this.gameEngine.step(false);
+        this.gameEngine.step(false, t, dt);
         this.gameEngine.emit('client__postStep');
 
         if (this.gameEngine.trace.length && this.socket) {
@@ -326,6 +332,7 @@ class ClientEngine {
         // finally update the stepCount
         if (syncHeader.stepCount > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD__CLIENT_RESET) {
             this.gameEngine.trace.info(`========== world step count updated from ${this.gameEngine.world.stepCount} to  ${syncHeader.stepCount} ==========`);
+            this.gameEngine.emit('client__stepReset', { oldStep: this.gameEngine.world.stepCount, newStep: syncHeader.stepCount });
             this.gameEngine.world.stepCount = syncHeader.stepCount;
         }
     }
