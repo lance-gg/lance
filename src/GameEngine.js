@@ -133,8 +133,18 @@ class GameEngine {
       * Single game step.
       *
       * @param {Boolean} isReenact - is this step a re-enactment of the past.
+      * @param {Number} t - the current time (optional)
+      * @param {Number} dt - elapsed time since last step was called.  (optional)
+      * @param {Boolean} physicsOnly - do a physics step only, no game logic
       */
-    step(isReenact) {
+    step(isReenact, t, dt, physicsOnly) {
+
+        // physics-only step
+        if (physicsOnly) {
+            if (dt) dt /= 1000; // physics engines work in seconds
+            this.physicsEngine.step(dt, objectFilter);
+            return;
+        }
 
         // emit preStep event
         if (isReenact === undefined)
@@ -143,7 +153,7 @@ class GameEngine {
         isReenact = Boolean(isReenact);
         let step = ++this.world.stepCount;
         let clientIDSpace = this.options.clientIDSpace;
-        this.emit('preStep', { step, isReenact });
+        this.emit('preStep', { step, isReenact, dt });
 
         // skip physics for shadow objects during re-enactment
         function objectFilter(o) {
@@ -151,8 +161,10 @@ class GameEngine {
         }
 
         // physics step
-        if (this.physicsEngine)
-            this.physicsEngine.step(objectFilter);
+        if (this.physicsEngine) {
+            if (dt) dt /= 1000; // physics engines work in seconds
+            this.physicsEngine.step(dt, objectFilter);
+        }
 
         // for each object
         // - apply incremental bending
