@@ -15,7 +15,8 @@ const STEP_DRIFT_THRESHOLDS = {
 };
 const STEP_DRIFT_THRESHOLD__CLIENT_RESET = 20; // if we are behind this many steps, just reset the step counter
 const GAME_UPS = 60; // default number of game steps per second
-const STEP_DELAY_MSEC = 12; // if drift detected, delay next execution by this amount
+const STEP_DELAY_MSEC = 12; // if forward drift detected, delay next execution by this amount
+const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution by this amount
 
 /**
  * The client engine is the singleton which manages the client-side
@@ -32,9 +33,10 @@ class ClientEngine {
       * @param {Object} inputOptions - options object
       * @param {Boolean} inputOptions.autoConnect - if true, the client will automatically attempt connect to server.
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
-      * @param {Number} inputOptions.healthCheckInterval - health check message interval (millisec).  Default is 1000.
-      * @param {Number} inputOptions.healthCheckRTTSample - health check RTT calculation sample size.  Default is 10.
-      * @param {Object} inputOptions.syncOptions - an object describing the synchronization method.  If not set, will be set to extrapolate, with local object bending set to 0.0 and remote object bending set to 0.6.  If the query-string parameter "sync" is defined, then that value is passed to this object's sync attribute.
+      * @param {Number} inputOptions.healthCheckInterval - health check message interval (millisec). Default is 1000.
+      * @param {Number} inputOptions.healthCheckRTTSample - health check RTT calculation sample size. Default is 10.
+      * @param {Object} inputOptions.syncOptions - an object describing the synchronization method. If not set, will be set to extrapolate, with local object bending set to 0.0 and remote object bending set to 0.6. If the query-string parameter "sync" is defined, then that value is passed to this object's sync attribute.
+      * @param {String} inputOptions.scheduler - When set to "render-schedule" the game step scheduling is controlled by the renderer and step time is variable.  When set to "fixed" the game step is run independently with a fixed step time. Default is "fixed".
       * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
       * @param {Number} inputOptions.syncOptions.localObjBending - amount of bending towards original client position, after each sync, for local objects
       * @param {Number} inputOptions.syncOptions.remoteObjBending - amount of bending towards original client position, after each sync, for remote objects
@@ -46,7 +48,8 @@ class ClientEngine {
             autoConnect: true,
             healthCheckInterval: 1000,
             healthCheckRTTSample: 10,
-            stepPeriod: 1000 / GAME_UPS
+            stepPeriod: 1000 / GAME_UPS,
+            scheduler: 'fixed'
         }, inputOptions);
 
         /**
@@ -69,6 +72,11 @@ class ClientEngine {
 
         // create the renderer
         this.renderer = this.gameEngine.renderer = new Renderer(gameEngine, this);
+
+        // step scheduler
+        this.scheduler = null;
+        this.lastStepTime = 0;
+        this.correction = 0;
 
         /**
         * client's player ID, as a string.
@@ -155,14 +163,16 @@ class ClientEngine {
      */
     start() {
 
-        // schedule and start the game loop
-        this.scheduler = new Scheduler({
-            period: this.options.stepPeriod,
-            tick: this.step.bind(this),
-            delay: STEP_DELAY_MSEC
-        });
         this.gameEngine.start();
-        this.scheduler.start();
+        if (this.options.scheduler === 'fixed') {
+            // schedule and start the game loop
+            this.scheduler = new Scheduler({
+                period: this.options.stepPeriod,
+                tick: this.step.bind(this),
+                delay: STEP_DELAY_MSEC
+            });
+            this.scheduler.start();
+        }
 
         // initialize the renderer
         // the render loop waits for next animation frame
@@ -194,10 +204,14 @@ class ClientEngine {
         let serverStep = this.gameEngine.serverStep;
         if (clientStep > serverStep + maxLead) {
             this.gameEngine.trace.warn(`step drift ${checkType}. [${clientStep} > ${serverStep} + ${maxLead}] Client is ahead of server.  Delaying next step.`);
-            this.scheduler.delayTick();
+            if (this.scheduler) this.scheduler.delayTick();
+            this.lastStepTime += STEP_DELAY_MSEC;
+            this.correction += STEP_DELAY_MSEC;
         } else if (serverStep > clientStep + maxLag) {
             this.gameEngine.trace.warn(`step drift ${checkType}. [${serverStep} > ${clientStep} + ${maxLag}] Client is behind server.  Hurrying next step.`);
-            this.scheduler.hurryTick();
+            if (this.scheduler) this.scheduler.hurryTick();
+            this.lastStepTime -= STEP_HURRY_MSEC;
+            this.correction -= STEP_HURRY_MSEC;
         }
     }
 
