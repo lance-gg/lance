@@ -72,7 +72,6 @@ class DynamicObject extends GameObject {
         this.position = new TwoVector(0, 0);
         this.velocity = new TwoVector(0, 0);
 
-
         /**
          * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
          * @member {TwoVector}
@@ -80,7 +79,7 @@ class DynamicObject extends GameObject {
         this.friction = new TwoVector(1, 1);
 
         /**
-         * Whether this object is affected by gravity. 
+         * Whether this object is affected by gravity.
          * @member {Boolean}
          */
         this.affectedByGravity = true;

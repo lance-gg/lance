@@ -16,6 +16,28 @@ class PhysicalObject extends GameObject {
     // insead of creating new ones, less copying, and removing some redundancy
     // in calculations.
 
+    /**
+    * The netScheme is a dictionary of attributes in this game
+    * object.  The attributes listed in the netScheme are those exact
+    * attributes which will be serialized and sent from the server
+    * to each client on every server update.
+    * The netScheme member is implemented as a getter.
+    *
+    * You may choose not to implement this method, in which
+    * case your object only transmits the default attributes
+    * which are already part of {@link PhysicalObject}.
+    * But if you choose to add more attributes, make sure
+    * the return value includes the netScheme of the super class.
+    *
+    * @memberof PhysicalObject
+    * @member {Object} netScheme
+    * @example
+    *     static get netScheme() {
+    *       return Object.assign({
+    *           mojo: { type: Serializer.TYPES.UINT8 },
+    *         }, super.netScheme);
+    *     }
+    */
     static get netScheme() {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
@@ -26,6 +48,16 @@ class PhysicalObject extends GameObject {
         }, super.netScheme);
     }
 
+    /**
+    * Creates an instance of a physical object.
+    * Override to provide starting values for position, velocity, quaternion and angular velocity.
+    * The object ID should be the next value provided by `world.idCount`
+    * @param {String} id - the object id
+    * @param {ThreeVector} position - position vector
+    * @param {ThreeVector} velocity - velocity vector
+    * @param {Quaternion} quaternion - orientation quaternion
+    * @param {ThreeVector} angularVelocity - 3-vector representation of angular velocity
+    */
     constructor(id, position, velocity, quaternion, angularVelocity) {
         super(id);
         this.playerId = 0;
@@ -46,8 +78,13 @@ class PhysicalObject extends GameObject {
         this.class = PhysicalObject;
     }
 
-    // display object's physical attributes as a string
-    // for debugging purposes mostly
+    /**
+     * Formatted textual description of the dynamic object.
+     * The output of this method is used to describe each instance in the traces,
+     * which significantly helps in debugging.
+     *
+     * @return {String} description - a string describing the DynamicObject
+     */
     toString() {
         let p = this.position.toString();
         let v = this.velocity.toString();
