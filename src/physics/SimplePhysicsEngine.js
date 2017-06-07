@@ -75,7 +75,7 @@ class SimplePhysicsEngine extends PhysicsEngine {
 
         // specifying a specific dt is not allowed in this physics engine
         if (dt)
-            throw new Error('Simple Physics Engine does not support variable step times').
+            throw new Error('Simple Physics Engine does not support variable step times');
 
         // each object should advance
         let objects = this.gameEngine.world.objects;
