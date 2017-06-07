@@ -34,6 +34,10 @@ class GameEngine {
       */
     constructor(options) {
 
+        // place the game engine in the LANCE globals
+        const glob = (typeof window === 'undefined') ? global : window;
+        glob.LANCE = { gameEngine: this };
+
         // if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld,
