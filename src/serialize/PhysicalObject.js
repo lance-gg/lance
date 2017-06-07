@@ -125,19 +125,6 @@ class PhysicalObject extends GameObject {
         this.physicsObj.angularVelocity.copy(this.angularVelocity);
     }
 
-    // TODO: remove this.  It shouldn't be part of the
-    //    physical object, and it shouldn't be called by the ExtrapolationStrategy logic
-    //    Correct approach:
-    //       render object should be refreshed only at the next iteration of the renderer's
-    //       draw function.  And then it should be smart about positions (it should interpolate)
-    // refresh the renderable position
-    refreshRenderObject() {
-        if (this.renderObj) {
-            this.renderObj.position.copy(this.physicsObj.position);
-            this.renderObj.quaternion.copy(this.physicsObj.quaternion);
-        }
-    }
-
     // apply one increment of bending
     applyIncrementalBending() {
         if (this.bendingIncrements === 0)
