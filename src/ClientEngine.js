@@ -10,7 +10,7 @@ const NetworkTransmitter = require('./network/NetworkTransmitter');
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
 const STEP_DRIFT_THRESHOLDS = {
-    onServerSync: { MAX_LEAD: 1, MAX_LAG: 4 }, // max step lead/lag allowed after every server sync
+    onServerSync: { MAX_LEAD: 1, MAX_LAG: 3 }, // max step lead/lag allowed after every server sync
     onEveryStep: { MAX_LEAD: 10, MAX_LAG: 10 } // max step lead/lag allowed at every step
 };
 const STEP_DRIFT_THRESHOLD__CLIENT_RESET = 20; // if we are behind this many steps, just reset the step counter
