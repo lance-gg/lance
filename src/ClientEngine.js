@@ -128,7 +128,7 @@ class ClientEngine {
         function connectSocket(matchMakerAnswer) {
             return new Promise((resolve, reject) => {
 
-                if (!matchMakerAnswer || !matchMakerAnswer.serverURL)
+                if (matchMakerAnswer.status !== 'ok')
                     reject();
 
                 console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
@@ -152,7 +152,7 @@ class ClientEngine {
             });
         }
 
-        let matchmaker = Promise.resolve({ serverURL: null });
+        let matchmaker = Promise.resolve({ serverURL: null, status: 'ok' });
         if (this.options.matchmaker)
             matchmaker = Utils.httpGetPromise(this.options.matchmaker);
 
