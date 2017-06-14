@@ -127,6 +127,10 @@ class ClientEngine {
         let that = this;
         function connectSocket(matchMakerAnswer) {
             return new Promise((resolve, reject) => {
+
+                if (!matchMakerAnswer || !matchMakerAnswer.serverURL)
+                    reject();
+
                 console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
                 that.socket = io(matchMakerAnswer.serverURL, options);
 
