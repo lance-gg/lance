@@ -249,7 +249,7 @@ class ClientEngine {
         this.handleOutboundInput();
         this.applyDelayedInputs();
         this.gameEngine.step(false, t, dt);
-        this.gameEngine.emit('client__postStep');
+        this.gameEngine.emit('client__postStep', { dt });
 
         if (this.gameEngine.trace.length && this.socket) {
             // socket might not have been initialized at this point

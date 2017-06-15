@@ -226,13 +226,14 @@ class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // Perform client-side extrapolation.
-    extrapolate() {
+    extrapolate(stepDesc) {
 
         // apply incremental bending
         this.gameEngine.world.forEachObject((id, o) => {
             if (typeof o.applyIncrementalBending === 'function') {
-                o.applyIncrementalBending();
+                o.applyIncrementalBending(stepDesc);
                 o.refreshToPhysics();
+                // this.gameEngine.trace.trace(`object[${id}] after bending : ${o.toString()}`);
             }
         });
 
