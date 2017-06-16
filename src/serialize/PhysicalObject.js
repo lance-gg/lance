@@ -109,6 +109,11 @@ class PhysicalObject extends GameObject {
         this.bendingPositionDelta.subtract(original.position);
         this.bendingPositionDelta.multiplyScalar(this.incrementScale);
 
+        // get the incremental angular-velocity
+        this.bendingAVDelta = (new ThreeVector()).copy(this.angularVelocity);
+        this.bendingAVDelta.subtract(original.angularVelocity);
+        this.bendingAVDelta.multiplyScalar(this.incrementScale);
+
         // get the incremental quaternion rotation
         let currentConjugate = (new Quaternion()).copy(original.quaternion).conjugate();
         this.bendingQuaternionDelta = (new Quaternion()).copy(this.quaternion);
