@@ -46,6 +46,11 @@ class ExtrapolateStrategy extends SyncStrategy {
             if (!e.fullUpdate)
                 return;
         } else {
+
+            // TODO: there is a problem below in the case where the client is 10 steps behind the server,
+            // and the syncs that arrive are always in the future and never get processed.  To address this
+            // we may need to store more than one sync.
+
             // ignore syncs which are older than the latest
             if (this.lastSync && this.lastSync.stepCount && this.lastSync.stepCount > e.stepCount)
                 return;
