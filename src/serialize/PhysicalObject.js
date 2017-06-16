@@ -124,7 +124,7 @@ class PhysicalObject extends GameObject {
 
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
-        this.syncTo(original, { keepVelocities: true });
+        this.syncTo(original, { keepVelocity: true });
         this.bendingIncrements = bendingIncrements;
         this.bending = bending;
 
@@ -141,10 +141,10 @@ class PhysicalObject extends GameObject {
 
         this.position.copy(other.position);
         this.quaternion.copy(other.quaternion);
+        this.angularVelocity.copy(other.angularVelocity);
 
-        if (!options || !options.keepVelocities) {
+        if (!options || !options.keepVelocity) {
             this.velocity.copy(other.velocity);
-            this.angularVelocity.copy(other.angularVelocity);
         }
 
         if (this.physicsObj)
@@ -168,12 +168,29 @@ class PhysicalObject extends GameObject {
     }
 
     // apply one increment of bending
-    applyIncrementalBending() {
+    applyIncrementalBending(stepDesc) {
         if (this.bendingIncrements === 0)
             return;
 
-        this.position.add(this.bendingPositionDelta);
-        this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
+        if (stepDesc && stepDesc.dt) {
+            const timeFactor = stepDesc.dt / (1000 / 60);
+            const posDelta = (new ThreeVector()).copy(this.bendingPositionDelta).multiplyScalar(timeFactor);
+            const avDelta = (new ThreeVector()).copy(this.bendingAVDelta).multiplyScalar(timeFactor);
+            this.position.add(posDelta);
+            this.angularVelocity.add(avDelta);
+
+            // TODO: this is an unacceptable workaround that must be removed.  It solves the
+            // jitter problem by applying only three steps of slerp (thus avoiding slerp to back in time
+            // instead of solving the problem with a true differential quaternion
+            if (this.bendingIncrements > 3) {
+                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
+            }
+        } else {
+            this.position.add(this.bendingPositionDelta);
+            this.angularVelocity.add(this.bendingAVDelta);
+            this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
+        }
+
         // TODO: the following approach is encountering gimbal lock
         // this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;
