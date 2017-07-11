@@ -26,6 +26,9 @@ var Lance = {
     },
     controls: {
         Keyboard: require('./src/controls/KeyboardControls'),
+    },
+    game: {
+        Timer: require('./src/game/Timer')
     }
 };
 
