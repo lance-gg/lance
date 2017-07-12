@@ -49,7 +49,8 @@ class ClientEngine {
             healthCheckInterval: 1000,
             healthCheckRTTSample: 10,
             stepPeriod: 1000 / GAME_UPS,
-            scheduler: 'fixed'
+            scheduler: 'fixed',
+            clientIDSpace: 1000000, //todo add docs
         }, inputOptions);
 
         /**
