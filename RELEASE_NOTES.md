@@ -8,6 +8,12 @@
 
 1. Event `preInput` was renamed to `processInput`, `client__processInput`, `server__processInput`.  `postInput`. This is a breaking change but no one actually used these events.
 
+## Release 1.0.10
+
+### Breaking Change
+
+1. fix a breaking change that was introduced in 1.0.9 - which moved the initialization from the physics engine into the GameEngine
+
 ## Release 2.0.0 - June 2017
 
 ### New Features
