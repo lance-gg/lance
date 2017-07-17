@@ -12,16 +12,13 @@
 
 ### New Features
 
-* new netscheme data type: *STRING*.  Will only be broadcast if it changed since last broadcast
+* new netscheme data type: *STRING*.  Will only be broadcast if it changed since last broadcast.
 * PhysicsEngine no longer initialized in two places.  It is initialized in the GameEngine
-* full documentation added for the geometric object `ThreeVector` and `Quaternion`
-* render-driven scheduling of the client engine provides positions which match the exact render draw event time
-* new events `client__stepReset` and `client__slowFrameRate`
 
 
 ### Breaking Changes
 
-* `PhysicsEngine` should no longer be instantiated in the Server `main.js` and in the client entry point.  The `GameEngine` constructor is passed a `PhysicsEngine` constructor class, and the physics options are passed through the `GameEngine` options.
+* `PhysicsEngine` should no longer be instantiated in the Server `main.js` and in the client entry point.  Rather, it should be instantiated in the `GameEngine`.
 * `GameEngine` step method cannot be called without passing the `isReenact` argument.  Games which override the `step` method must pass this argument when calling the super method.
 
 

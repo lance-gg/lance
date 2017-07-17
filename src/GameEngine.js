@@ -28,13 +28,11 @@ class GameEngine {
       * Create a game engine instance.  This needs to happen
       * once on the server, and once on each client.
       *
-      * @param {Function} PhysicsEngine - a physics engine class, such as SimplePhysicsEngine or CannonPhysicsEngine.
       * @param {Object} options - options object
       * @param {Number} options.traceLevel - the trace level from 0 to 5.  Lower value traces more.
       * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
-      * @param {Object} options.physics - options object which will be passed to the physics engine constructor
       */
-    constructor(PhysicsEngine, options) {
+    constructor(options) {
 
         // place the game engine in the LANCE globals
         const glob = (typeof window === 'undefined') ? global : window;
@@ -43,14 +41,8 @@ class GameEngine {
         // if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld,
-            traceLevel: Trace.TRACE_NONE,
-            physics: {}
+            traceLevel: Trace.TRACE_NONE
         }, options);
-
-        // create and initialize the physics engine
-        this.physicsEngine = new PhysicsEngine();
-        this.options.physics.gameEngine = this;
-        this.physicsEngine.init(this.options.physics);
 
         // set up event emitting and interface
         let eventEmitter = new EventEmitter();
