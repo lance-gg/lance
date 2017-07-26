@@ -63,11 +63,10 @@ class SimplePhysicsEngine extends PhysicsEngine {
         o.isRotatingLeft = false;
         o.isRotatingRight = false;
 
-
         o.position.add(o.velocity);
 
         o.velocity.multiply(o.friction);
-        
+
         // wrap around the world edges
         if (worldSettings.worldWrap) {
             if (o.position.x >= worldSettings.width) { o.position.x -= worldSettings.width; }
@@ -78,7 +77,11 @@ class SimplePhysicsEngine extends PhysicsEngine {
     }
 
     // entry point for a single step of the Simple Physics
-    step(objectFilter) {
+    step(dt, objectFilter) {
+
+        // specifying a specific dt is not allowed in this physics engine
+        if (dt)
+            throw new Error('Simple Physics Engine does not support variable step times');
 
         // each object should advance
         let objects = this.gameEngine.world.objects;

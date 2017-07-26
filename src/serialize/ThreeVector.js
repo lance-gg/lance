@@ -42,6 +42,12 @@ class ThreeVector extends Serializable {
         return `(${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)})`;
     }
 
+    /**
+     * Multiply this ThreeVector by a scalar
+     *
+     * @param {Number} s the scale
+     * @return {ThreeVector} returns self
+     */
     multiplyScalar(s) {
         this.x *= s;
         this.y *= s;
@@ -49,10 +55,21 @@ class ThreeVector extends Serializable {
         return this;
     }
 
+    /**
+     * Get vector length
+     *
+     * @return {Number} length of this vector
+     */
     length() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
 
+    /**
+     * Add other vector to this vector
+     *
+     * @param {ThreeVector} other the other vector
+     * @return {ThreeVector} returns self
+     */
     add(other) {
         this.x += other.x;
         this.y += other.y;
@@ -60,6 +77,12 @@ class ThreeVector extends Serializable {
         return this;
     }
 
+    /**
+     * Subtract other vector from this vector
+     *
+     * @param {ThreeVector} other the other vector
+     * @return {ThreeVector} returns self
+     */
     subtract(other) {
         this.x -= other.x;
         this.y -= other.y;
@@ -67,11 +90,22 @@ class ThreeVector extends Serializable {
         return this;
     }
 
+    /**
+     * Normalize this vector, in-place
+     *
+     * @return {ThreeVector} returns self
+     */
     normalize() {
         this.multiplyScalar(1 / this.length());
         return this;
     }
 
+    /**
+     * Copy values from another ThreeVector into this ThreeVector
+     *
+     * @param {ThreeVector} sourceObj the other vector
+     * @return {ThreeVector} returns self
+     */
     copy(sourceObj) {
         this.x = sourceObj.x;
         this.y = sourceObj.y;
@@ -79,6 +113,14 @@ class ThreeVector extends Serializable {
         return this;
     }
 
+    /**
+     * Set ThreeVector values
+     *
+     * @param {Number} x x-value
+     * @param {Number} y y-value
+     * @param {Number} z z-value
+     * @return {ThreeVector} returns self
+     */
     set(x, y, z) {
         this.x = x;
         this.y = y;
@@ -86,6 +128,13 @@ class ThreeVector extends Serializable {
         return this;
     }
 
+    /**
+     * Apply in-place lerp (linear interpolation) to this ThreeVector
+     * towards another ThreeVector
+     * @param {ThreeVector} target the target vector
+     * @param {Number} p The percentage to interpolate
+     * @return {ThreeVector} returns self
+     */
     lerp(target, p) {
         this.x += (target.x - this.x) * p;
         this.y += (target.y - this.y) * p;

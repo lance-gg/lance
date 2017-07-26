@@ -16,6 +16,28 @@ class PhysicalObject extends GameObject {
     // insead of creating new ones, less copying, and removing some redundancy
     // in calculations.
 
+    /**
+    * The netScheme is a dictionary of attributes in this game
+    * object.  The attributes listed in the netScheme are those exact
+    * attributes which will be serialized and sent from the server
+    * to each client on every server update.
+    * The netScheme member is implemented as a getter.
+    *
+    * You may choose not to implement this method, in which
+    * case your object only transmits the default attributes
+    * which are already part of {@link PhysicalObject}.
+    * But if you choose to add more attributes, make sure
+    * the return value includes the netScheme of the super class.
+    *
+    * @memberof PhysicalObject
+    * @member {Object} netScheme
+    * @example
+    *     static get netScheme() {
+    *       return Object.assign({
+    *           mojo: { type: Serializer.TYPES.UINT8 },
+    *         }, super.netScheme);
+    *     }
+    */
     static get netScheme() {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
@@ -26,6 +48,16 @@ class PhysicalObject extends GameObject {
         }, super.netScheme);
     }
 
+    /**
+    * Creates an instance of a physical object.
+    * Override to provide starting values for position, velocity, quaternion and angular velocity.
+    * The object ID should be the next value provided by `world.idCount`
+    * @param {String} id - the object id
+    * @param {ThreeVector} position - position vector
+    * @param {ThreeVector} velocity - velocity vector
+    * @param {Quaternion} quaternion - orientation quaternion
+    * @param {ThreeVector} angularVelocity - 3-vector representation of angular velocity
+    */
     constructor(id, position, velocity, quaternion, angularVelocity) {
         super(id);
         this.playerId = 0;
@@ -46,8 +78,13 @@ class PhysicalObject extends GameObject {
         this.class = PhysicalObject;
     }
 
-    // display object's physical attributes as a string
-    // for debugging purposes mostly
+    /**
+     * Formatted textual description of the dynamic object.
+     * The output of this method is used to describe each instance in the traces,
+     * which significantly helps in debugging.
+     *
+     * @return {String} description - a string describing the DynamicObject
+     */
     toString() {
         let p = this.position.toString();
         let v = this.velocity.toString();
@@ -72,6 +109,11 @@ class PhysicalObject extends GameObject {
         this.bendingPositionDelta.subtract(original.position);
         this.bendingPositionDelta.multiplyScalar(this.incrementScale);
 
+        // get the incremental angular-velocity
+        this.bendingAVDelta = (new ThreeVector()).copy(this.angularVelocity);
+        this.bendingAVDelta.subtract(original.angularVelocity);
+        this.bendingAVDelta.multiplyScalar(this.incrementScale);
+
         // get the incremental quaternion rotation
         let currentConjugate = (new Quaternion()).copy(original.quaternion).conjugate();
         this.bendingQuaternionDelta = (new Quaternion()).copy(this.quaternion);
@@ -82,7 +124,7 @@ class PhysicalObject extends GameObject {
 
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
-        this.syncTo(original, { keepVelocities: true });
+        this.syncTo(original, { keepVelocity: true });
         this.bendingIncrements = bendingIncrements;
         this.bending = bending;
 
@@ -99,10 +141,10 @@ class PhysicalObject extends GameObject {
 
         this.position.copy(other.position);
         this.quaternion.copy(other.quaternion);
+        this.angularVelocity.copy(other.angularVelocity);
 
-        if (!options || !options.keepVelocities) {
+        if (!options || !options.keepVelocity) {
             this.velocity.copy(other.velocity);
-            this.angularVelocity.copy(other.angularVelocity);
         }
 
         if (this.physicsObj)
@@ -125,26 +167,30 @@ class PhysicalObject extends GameObject {
         this.physicsObj.angularVelocity.copy(this.angularVelocity);
     }
 
-    // TODO: remove this.  It shouldn't be part of the
-    //    physical object, and it shouldn't be called by the ExtrapolationStrategy logic
-    //    Correct approach:
-    //       render object should be refreshed only at the next iteration of the renderer's
-    //       draw function.  And then it should be smart about positions (it should interpolate)
-    // refresh the renderable position
-    refreshRenderObject() {
-        if (this.renderObj) {
-            this.renderObj.position.copy(this.physicsObj.position);
-            this.renderObj.quaternion.copy(this.physicsObj.quaternion);
-        }
-    }
-
     // apply one increment of bending
-    applyIncrementalBending() {
+    applyIncrementalBending(stepDesc) {
         if (this.bendingIncrements === 0)
             return;
 
-        this.position.add(this.bendingPositionDelta);
-        this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
+        if (stepDesc && stepDesc.dt) {
+            const timeFactor = stepDesc.dt / (1000 / 60);
+            const posDelta = (new ThreeVector()).copy(this.bendingPositionDelta).multiplyScalar(timeFactor);
+            const avDelta = (new ThreeVector()).copy(this.bendingAVDelta).multiplyScalar(timeFactor);
+            this.position.add(posDelta);
+            this.angularVelocity.add(avDelta);
+
+            // TODO: this is an unacceptable workaround that must be removed.  It solves the
+            // jitter problem by applying only three steps of slerp (thus avoiding slerp to back in time
+            // instead of solving the problem with a true differential quaternion
+            if (this.bendingIncrements > 3) {
+                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
+            }
+        } else {
+            this.position.add(this.bendingPositionDelta);
+            this.angularVelocity.add(this.bendingAVDelta);
+            this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
+        }
+
         // TODO: the following approach is encountering gimbal lock
         // this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;

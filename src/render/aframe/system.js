@@ -29,6 +29,8 @@ let AFrameSystem = {
         if (!this.gameEngine)
             return;
 
+        this.renderer.tick(t, dt);
+
         let frh = this.frameRateHistory;
         frh.push(dt > this.frameRateTest);
         frh.shift();

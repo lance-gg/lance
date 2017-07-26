@@ -46,6 +46,11 @@ class ExtrapolateStrategy extends SyncStrategy {
             if (!e.fullUpdate)
                 return;
         } else {
+
+            // TODO: there is a problem below in the case where the client is 10 steps behind the server,
+            // and the syncs that arrive are always in the future and never get processed.  To address this
+            // we may need to store more than one sync.
+
             // ignore syncs which are older than the latest
             if (this.lastSync && this.lastSync.stepCount && this.lastSync.stepCount > e.stepCount)
                 return;
@@ -226,20 +231,22 @@ class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // Perform client-side extrapolation.
-    extrapolate() {
+    extrapolate(stepDesc) {
 
         // apply incremental bending
         this.gameEngine.world.forEachObject((id, o) => {
             if (typeof o.applyIncrementalBending === 'function') {
-                o.applyIncrementalBending();
+                o.applyIncrementalBending(stepDesc);
                 o.refreshToPhysics();
+                // this.gameEngine.trace.trace(`object[${id}] after bending : ${o.toString()}`);
             }
         });
 
-        // if there is a sync from the server, apply it now
-        if (this.lastSync)
+        // if there is a sync from the server, from the past or present, apply it now
+        if (this.lastSync && this.lastSync.stepCount <= this.gameEngine.world.stepCount) {
             this.applySync();
-        this.lastSync = null;
+            this.lastSync = null;
+        }
     }
 }
 

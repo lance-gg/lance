@@ -1,17 +1,13 @@
 'use strict';
 /* globals AFRAME */
 
-const EventEmitter = require('eventemitter3');
+const Renderer = require('./Renderer');
 const networkedPhysics = require('./aframe/system');
-
-
-// TODO: this class should extend the base Renderer or explain why it doesn't
-
 
 /**
  * The A-Frame Renderer
  */
-class AFrameRenderer {
+class AFrameRenderer extends Renderer {
 
     /**
     * Constructor of the Renderer singleton.
@@ -19,11 +15,7 @@ class AFrameRenderer {
     * @param {ClientEngine} clientEngine - Reference to the ClientEngine instance.
     */
     constructor(gameEngine, clientEngine) {
-        this.gameEngine = gameEngine;
-        this.clientEngine = clientEngine;
-
-        // mixin for EventEmitter
-        Object.assign(this, EventEmitter.prototype);
+        super(gameEngine, clientEngine);
 
         // set up the networkedPhysics as an A-Frame system
         networkedPhysics.setGlobals(gameEngine, this);
@@ -39,9 +31,8 @@ class AFrameRenderer {
      * @return {Promise} Resolves when renderer is ready.
     */
     init() {
-        if ((typeof window === 'undefined') || !document) {
-            console.log('renderer invoked on server side.');
-        }
+
+        let p = super.init();
 
         let sceneElArray = document.getElementsByTagName('a-scene');
         if (sceneElArray.length !== 1) {
@@ -53,18 +44,17 @@ class AFrameRenderer {
             o.renderObj.remove();
         });
 
-        return Promise.resolve(); // eslint-disable-line new-cap
+        return p; // eslint-disable-line new-cap
     }
 
     /**
-     * The main draw function.  This method is called at high frequency,
-     * at the rate of the render loop.  Typically this is 60Hz, in WebVR 90Hz.
+     * In AFrame, we set the draw method (which is called at requestAnimationFrame)
+     * to a NO-OP. See tick() instead
      */
-    draw() {
-        this.gameEngine.world.forEachObject((id, o) => {
-            if (typeof o.refreshRenderObject === 'function')
-                o.refreshRenderObject();
-        });
+    draw() {}
+
+    tick(t, dt) {
+        super.draw(t, dt);
     }
 
 }

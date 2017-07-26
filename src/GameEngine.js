@@ -25,198 +25,32 @@ const Trace = require('./lib/Trace');
 class GameEngine {
 
     /**
-     * EVENTS
-     */
-
-    /**
-     * Marks the beginning of a new game step
-     *
-     * @event GameEngine#preStep
-     * @param {Number} stepNumber - the step number
-     * @param {Boolean} isReenact - is this step a re-enactment
-     */
-
-    /**
-     * Marks the end of a game step
-     *
-     * @event GameEngine#postStep
-     * @param {Number} stepNumber - the step number
-     * @param {Boolean} isReenact - is this step a re-enactment
-     */
-
-    /**
-     * An object has been added to the world
-     *
-     * @event GameEngine#objectAdded
-     * @param {Object} obj - the new object
-     */
-
-    /**
-     * An object has been removed from the world
-     *
-     * @event GameEngine#objectDestroyed
-     * @param {Object} obj - the object
-     */
-
-    /**
-     * A player has joined
-     *
-     * @event GameEngine#playerJoined
-     * @param {Number} joinTime - epoch of join time
-     * @param {Object} playerDesc - player descriptor
-     * @param {String} playerDesc.playerId - the player ID
-     */
-
-    /**
-     * A player has left
-     *
-     * @event GameEngine#playerDisconnected
-     * @param {Number} joinTime - epoch of join time
-     * @param {Number} disconnectTime - epoch of disconnect time
-     * @param {Object} playerDesc - player descriptor
-     * @param {String} playerDesc.playerId - the player ID
-     */
-
-    /**
-     * A player has joined on the server
-     *
-     * @event GameEngine#server__playerJoined
-     * @param {Number} joinTime - epoch of join time
-     * @param {Object} playerDesc - player descriptor
-     * @param {String} playerDesc.playerId - the player ID
-     */
-
-    /**
-      * A player has left on the server
-      *
-      * @event GameEngine#server__playerDisconnected
-      * @param {Number} joinTime - epoch of join time
-      * @param {Number} disconnectTime - epoch of disconnect time
-      * @param {Object} playerDesc - player descriptor
-      * @param {String} playerDesc.playerId - the player ID
-      */
-
-    /**
-     * A synchronization update arrived from the server
-     *
-     * @event GameEngine#syncReceived
-     * @param {Object} sync - the synchronization object
-     */
-
-     /**
-      * Marks the beginning of a game step on the client
-      *
-      * @event GameEngine#client__preStep
-      */
-
-     /**
-      * Marks the end of a game step on the client
-      *
-      * @event GameEngine#client__postStep
-      */
-
-    /**
-     * An input needs to be handled.  Emitted just before the GameEngine
-     * method processInput is invoked.
-     *
-     * @event GameEngine#processInput
-     * @param {Object} input - input descriptor object
-     * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
-     * @param {Number} input.messageIndex - input identifier
-     * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter 
-     * @param {Number} input.step - input execution step
-     * @param {Number} playerId - the player ID
-     */
-
-    /**
-     * An input needs to be handled.
-     * This event is emitted on the server only, just before the
-     * general processInput event.
-     *
-     * @event GameEngine#server__processInput
-     * @param {Object} input - input descriptor object
-     * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
-     * @param {Number} input.messageIndex - input identifier
-     * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter 
-     * @param {Number} input.step - input execution step
-     * @param {Number} playerId - the player ID
-     */
-
-    /**
-     * An input needs to be handled.
-     * This event is emitted on the client only, just before the
-     * general processInput event.
-     *
-     * @event GameEngine#client__processInput
-     * @param {Object} input - input descriptor object
-     * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
-     * @param {Number} input.messageIndex - input identifier
-     * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter 
-     * @param {Number} input.step - input execution step
-     * @param {Number} playerId - the player ID
-     */
-
-    /**
-     * Client received a sync from the server
-     *
-     * @event GameEngine#client__syncReceived
-     * @param {Object} sync - sync from the server
-     * @param {Array} syncEvents - array of events in the sync
-     * @param {Number} maxStepCount - highest step in the sync
-     */
-
-    /**
-     * Marks the beginning of a game step on the server
-     *
-     * @event GameEngine#server__preStep
-     * @param {Number} stepNumber - the step number
-     */
-
-    /**
-     * Marks the end of a game step on the server
-     *
-     * @event GameEngine#server__postStep
-     * @param {Number} stepNumber - the step number
-     */
-
-    /**
-     * User input received on the server
-     *
-     * @event GameEngine#server__inputReceived
-     * @param {Object} input - input descriptor
-     * @param {Object} input.data - input descriptor
-     * @param {String} input.playerId - player that sent the input
-     */
-
-     /**
-      * Report slow frame rate on the browser.
-      * The browser did not achieve a reasonable frame rate
-      *
-      * @event GameEngine#client__slowFrameRate
-      */
-
-      /**
-       * server has started
-       *
-       * @event GameEngine#server__start
-       * @param {Number} timestamp - UTC epoch of start time
-       */
-
-    /**
       * Create a game engine instance.  This needs to happen
       * once on the server, and once on each client.
       *
+      * @param {Function} PhysicsEngine - a physics engine class, such as SimplePhysicsEngine or CannonPhysicsEngine.
       * @param {Object} options - options object
       * @param {Number} options.traceLevel - the trace level from 0 to 5.  Lower value traces more.
       * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
+      * @param {Object} options.physics - options object which will be passed to the physics engine constructor
       */
-    constructor(options) {
+    constructor(PhysicsEngine, options) {
+
+        // place the game engine in the LANCE globals
+        const glob = (typeof window === 'undefined') ? global : window;
+        glob.LANCE = { gameEngine: this };
 
         // if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld,
-            traceLevel: Trace.TRACE_NONE
+            traceLevel: Trace.TRACE_NONE,
+            physics: {}
         }, options);
+
+        // create and initialize the physics engine
+        this.physicsEngine = new PhysicsEngine();
+        this.options.physics.gameEngine = this;
+        this.physicsEngine.init(this.options.physics);
 
         // set up event emitting and interface
         let eventEmitter = new EventEmitter();
@@ -307,8 +141,18 @@ class GameEngine {
       * Single game step.
       *
       * @param {Boolean} isReenact - is this step a re-enactment of the past.
+      * @param {Number} t - the current time (optional)
+      * @param {Number} dt - elapsed time since last step was called.  (optional)
+      * @param {Boolean} physicsOnly - do a physics step only, no game logic
       */
-    step(isReenact) {
+    step(isReenact, t, dt, physicsOnly) {
+
+        // physics-only step
+        if (physicsOnly) {
+            if (dt) dt /= 1000; // physics engines work in seconds
+            this.physicsEngine.step(dt, objectFilter);
+            return;
+        }
 
         // emit preStep event
         if (isReenact === undefined)
@@ -317,7 +161,7 @@ class GameEngine {
         isReenact = Boolean(isReenact);
         let step = ++this.world.stepCount;
         let clientIDSpace = this.options.clientIDSpace;
-        this.emit('preStep', { step, isReenact });
+        this.emit('preStep', { step, isReenact, dt });
 
         // skip physics for shadow objects during re-enactment
         function objectFilter(o) {
@@ -325,8 +169,10 @@ class GameEngine {
         }
 
         // physics step
-        if (this.physicsEngine)
-            this.physicsEngine.step(objectFilter);
+        if (this.physicsEngine) {
+            if (dt) dt /= 1000; // physics engines work in seconds
+            this.physicsEngine.step(dt, objectFilter);
+        }
 
         // for each object
         // - apply incremental bending
@@ -433,5 +279,192 @@ class GameEngine {
     }
 
 }
+
+/**
+ * EVENTS
+ */
+
+/**
+ * Marks the beginning of a new game step
+ *
+ * @event GameEngine#preStep
+ * @param {Number} stepNumber - the step number
+ * @param {Boolean} isReenact - is this step a re-enactment
+ */
+
+/**
+ * Marks the end of a game step
+ *
+ * @event GameEngine#postStep
+ * @param {Number} stepNumber - the step number
+ * @param {Boolean} isReenact - is this step a re-enactment
+ */
+
+/**
+ * An object has been added to the world
+ *
+ * @event GameEngine#objectAdded
+ * @param {Object} obj - the new object
+ */
+
+/**
+ * An object has been removed from the world
+ *
+ * @event GameEngine#objectDestroyed
+ * @param {Object} obj - the object
+ */
+
+/**
+ * A player has joined
+ *
+ * @event GameEngine#playerJoined
+ * @param {Number} joinTime - epoch of join time
+ * @param {Object} playerDesc - player descriptor
+ * @param {String} playerDesc.playerId - the player ID
+ */
+
+/**
+ * A player has left
+ *
+ * @event GameEngine#playerDisconnected
+ * @param {Number} joinTime - epoch of join time
+ * @param {Number} disconnectTime - epoch of disconnect time
+ * @param {Object} playerDesc - player descriptor
+ * @param {String} playerDesc.playerId - the player ID
+ */
+
+/**
+ * A player has joined on the server
+ *
+ * @event GameEngine#server__playerJoined
+ * @param {Number} joinTime - epoch of join time
+ * @param {Object} playerDesc - player descriptor
+ * @param {String} playerDesc.playerId - the player ID
+ */
+
+/**
+  * A player has left on the server
+  *
+  * @event GameEngine#server__playerDisconnected
+  * @param {Number} joinTime - epoch of join time
+  * @param {Number} disconnectTime - epoch of disconnect time
+  * @param {Object} playerDesc - player descriptor
+  * @param {String} playerDesc.playerId - the player ID
+  */
+
+/**
+ * A synchronization update arrived from the server
+ *
+ * @event GameEngine#syncReceived
+ * @param {Object} sync - the synchronization object
+ */
+
+ /**
+  * Marks the beginning of a game step on the client
+  *
+  * @event GameEngine#client__preStep
+  */
+
+ /**
+  * Marks the end of a game step on the client
+  *
+  * @event GameEngine#client__postStep
+  */
+
+/**
+ * An input needs to be handled.  Emitted just before the GameEngine
+ * method processInput is invoked.
+ *
+ * @event GameEngine#processInput
+ * @param {Object} input - input descriptor object
+ * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
+ * @param {Number} input.messageIndex - input identifier
+ * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter
+ * @param {Number} input.step - input execution step
+ * @param {Number} playerId - the player ID
+ */
+
+/**
+ * An input needs to be handled.
+ * This event is emitted on the server only, just before the
+ * general processInput event.
+ *
+ * @event GameEngine#server__processInput
+ * @param {Object} input - input descriptor object
+ * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
+ * @param {Number} input.messageIndex - input identifier
+ * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter
+ * @param {Number} input.step - input execution step
+ * @param {Number} playerId - the player ID
+ */
+
+/**
+ * An input needs to be handled.
+ * This event is emitted on the client only, just before the
+ * general processInput event.
+ *
+ * @event GameEngine#client__processInput
+ * @param {Object} input - input descriptor object
+ * @param {String} input.input - describe the input (e.g. "up", "down", "fire")
+ * @param {Number} input.messageIndex - input identifier
+ * @param {Object} input.options - the object which was passed as SendInput's InputOptions parameter
+ * @param {Number} input.step - input execution step
+ * @param {Number} playerId - the player ID
+ */
+
+/**
+ * Client received a sync from the server
+ *
+ * @event GameEngine#client__syncReceived
+ * @param {Object} sync - sync from the server
+ * @param {Array} syncEvents - array of events in the sync
+ * @param {Number} maxStepCount - highest step in the sync
+ */
+
+ /**
+  * Client reset the world step
+  *
+  * @event GameEngine#client__stepReset
+  * @param {Object} resetDesc - sync from the server
+  * @param {Number} oldStep - the old step count
+  * @param {Number} newStep - the new step count
+  */
+
+/**
+ * Marks the beginning of a game step on the server
+ *
+ * @event GameEngine#server__preStep
+ * @param {Number} stepNumber - the step number
+ */
+
+/**
+ * Marks the end of a game step on the server
+ *
+ * @event GameEngine#server__postStep
+ * @param {Number} stepNumber - the step number
+ */
+
+/**
+ * User input received on the server
+ *
+ * @event GameEngine#server__inputReceived
+ * @param {Object} input - input descriptor
+ * @param {Object} input.data - input descriptor
+ * @param {String} input.playerId - player that sent the input
+ */
+
+ /**
+  * Report slow frame rate on the browser.
+  * The browser did not achieve a reasonable frame rate
+  *
+  * @event GameEngine#client__slowFrameRate
+  */
+
+  /**
+   * server has started
+   *
+   * @event GameEngine#server__start
+   * @param {Number} timestamp - UTC epoch of start time
+   */
 
 module.exports = GameEngine;
