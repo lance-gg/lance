@@ -2,12 +2,6 @@
 
 # Release Notes for Lance
 
-## Release 1.0.1
-
-### Breaking Changes
-
-1. Event `preInput` was renamed to `processInput`, `client__processInput`, `server__processInput`.  `postInput`. This is a breaking change but no one actually used these events.
-
 ## Release 2.0.0 - TBD
 
 ### New Features
@@ -18,7 +12,11 @@
 * Implemented ClientEngine standaloneMode for network-less testing of game engines
 
 
+## Release 1.0.1
 
+### Breaking Changes
+
+1. Event `preInput` was renamed to `processInput`, `client__processInput`, `server__processInput`.  `postInput`. This is a breaking change but no one actually used these events.
 
 ### Breaking Changes
 
