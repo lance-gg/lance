@@ -171,8 +171,6 @@ class ClientEngine {
      * ready to connect
      */
     start() {
-
-        this.gameEngine.start();
         if (this.options.scheduler === 'fixed') {
             // schedule and start the game loop
             this.scheduler = new Scheduler({
@@ -192,6 +190,7 @@ class ClientEngine {
         };
 
         return this.renderer.init().then(() => {
+            this.gameEngine.start();
             if (typeof window !== 'undefined')
                 window.requestAnimationFrame(renderLoop);
             if (this.options.autoConnect && this.options.standaloneMode === false) {
