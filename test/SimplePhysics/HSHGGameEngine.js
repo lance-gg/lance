@@ -23,8 +23,7 @@ class TestObject extends DynamicObject {
 }
 
 let gameEngine = new GameEngine();
-gameEngine.physicsEngine = new SimplePhysicsEngine();
-gameEngine.physicsEngine.init({
+gameEngine.physicsEngine = new SimplePhysicsEngine({
     gameEngine: gameEngine,
     collisionOptions: {
         type: 'HSHG'

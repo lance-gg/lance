@@ -126,7 +126,7 @@ class GameEngine {
     start() {
         this.trace.info('========== game engine started ==========');
         this.initWorld();
-        this.emit('server__start', { timestamp: (new Date()).getTime() });
+        this.emit('server__start', { timestamp: (new Date()).getTime() }); // todo docs say server & client but event name?
     }
 
     /**

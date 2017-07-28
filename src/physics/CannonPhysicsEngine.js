@@ -7,8 +7,8 @@ const CANNON = require('cannon');
  */
 class CannonPhysicsEngine extends PhysicsEngine {
 
-    init(options) {
-        super.init(options);
+    constructor(options) {
+        super(options);
 
         this.options.dt = this.options.dt || (1 / 60);
         let world = this.world = new CANNON.World();

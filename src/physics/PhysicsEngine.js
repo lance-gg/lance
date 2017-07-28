@@ -4,9 +4,13 @@
 // for all physics engines
 class PhysicsEngine {
 
-    init(options) {
+    constructor(options) {
         this.options = options;
         this.gameEngine = options.gameEngine;
+
+        if (!options.gameEngine) {
+            console.warn('Physics engine initialized without gameEngine!');
+        }
     }
 
     /**

@@ -9,8 +9,8 @@ let dv = new TwoVector();
  */
 class SimplePhysicsEngine extends PhysicsEngine {
 
-    init(initOptions) {
-        super.init(initOptions);
+    constructor(initOptions) {
+        super(initOptions);
 
         let CollisionDetection;
         if (initOptions.collisionOptions.type == 'HSHG'){
