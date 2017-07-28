@@ -15,6 +15,7 @@
 * new netscheme data type: *STRING*.  Will only be broadcast if it changed since last broadcast.
 * PhysicsEngine no longer initialized in two places.  It is initialized in the GameEngine
 * Implemented HSHG collision detection for SimplePhysics
+* Implemented ClientEngine standaloneMode for network-less testing of game engines
 
 
 

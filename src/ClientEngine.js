@@ -32,6 +32,7 @@ class ClientEngine {
       * @param {GameEngine} gameEngine - a game engine
       * @param {Object} inputOptions - options object
       * @param {Boolean} inputOptions.autoConnect - if true, the client will automatically attempt connect to server.
+      * @param {Boolean} inputOptions.standaloneMode - if true, the client will never try to connect to a server
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
       * @param {Number} inputOptions.healthCheckInterval - health check message interval (millisec). Default is 1000.
       * @param {Number} inputOptions.healthCheckRTTSample - health check RTT calculation sample size. Default is 10.
@@ -85,7 +86,9 @@ class ClientEngine {
         */
         this.playerId = NaN;
 
-        this.configureSynchronization();
+        if (this.options.standaloneMode === false) {
+            this.configureSynchronization();
+        }
 
         // create a buffer of delayed inputs (fifo)
         if (inputOptions && inputOptions.delayInputCount) {
@@ -110,10 +113,11 @@ class ClientEngine {
         // the reflect syncronizer is just interpolate strategy,
         // configured to show server syncs
         let syncOptions = this.options.syncOptions;
-        if (syncOptions.sync === 'reflect') {
+        if (syncOptions.sync === 'reflect') { //todo would be nicer to use an enum
             syncOptions.sync = 'interpolate';
             syncOptions.reflect = true;
         }
+
         const synchronizer = new Synchronizer(this, syncOptions);
     }
 
@@ -190,7 +194,7 @@ class ClientEngine {
         return this.renderer.init().then(() => {
             if (typeof window !== 'undefined')
                 window.requestAnimationFrame(renderLoop);
-            if (this.options.autoConnect) {
+            if (this.options.autoConnect && this.options.standaloneMode === false) {
                 this.connect();
             }
         });
@@ -247,12 +251,14 @@ class ClientEngine {
         this.checkDrift('onEveryStep');
 
         // perform game engine step
-        this.handleOutboundInput();
+        if (this.options.standaloneMode === false) {
+            this.handleOutboundInput();
+        }
         this.applyDelayedInputs();
         this.gameEngine.step(false, t, dt);
         this.gameEngine.emit('client__postStep', { dt });
 
-        if (this.gameEngine.trace.length && this.socket) {
+        if (this.options.standaloneMode === false && this.gameEngine.trace.length && this.socket) {
             // socket might not have been initialized at this point
             this.socket.emit('trace', JSON.stringify(this.gameEngine.trace.rotate()));
         }
@@ -314,7 +320,10 @@ class ClientEngine {
         } else {
             this.doInputLocal(message);
         }
-        this.outboundMessages.push(message);
+
+        if (this.options.standaloneMode === false) {
+            this.outboundMessages.push(message);
+        }
 
         this.messageIndex++;
     }
