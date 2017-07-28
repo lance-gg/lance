@@ -8,12 +8,15 @@
 
 1. Event `preInput` was renamed to `processInput`, `client__processInput`, `server__processInput`.  `postInput`. This is a breaking change but no one actually used these events.
 
-## Release 2.0.0 - June 2017
+## Release 2.0.0 - TBD
 
 ### New Features
 
 * new netscheme data type: *STRING*.  Will only be broadcast if it changed since last broadcast.
 * PhysicsEngine no longer initialized in two places.  It is initialized in the GameEngine
+* Implemented HSHG collision detection for SimplePhysics
+
+
 
 
 ### Breaking Changes
