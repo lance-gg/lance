@@ -3,7 +3,8 @@
 const TwoVector = require('../../serialize/TwoVector');
 const HSHG = require('./HSHG');
 
-// The collision detection of SimplePhysicsEngine is a brute-force approach
+// Collision detection based on Hierarchical Spatial Hash Grid
+// uses this implementation https://gist.github.com/kirbysayshi/1760774
 class HSHGCollisionDetection {
 
     constructor(options) {
