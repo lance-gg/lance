@@ -1,7 +1,5 @@
-'use strict';
-
-const Serializable = require('./Serializable');
-const Serializer = require('./Serializer');
+import Serializable from './Serializable';
+import Serializer from './Serializer';
 
 /**
  * GameObject is the base class of all game objects.
@@ -10,7 +8,7 @@ const Serializer = require('./Serializer');
  * Game developers will use one of the subclasses such as DynamicObject,
  * or PhysicalObject.
  */
-class GameObject extends Serializable {
+export default class GameObject extends Serializable {
 
     static get netScheme() {
         return {
@@ -128,6 +126,4 @@ class GameObject extends Serializable {
 
     // apply a single bending increment
     applyIncrementalBending() { }
-};
-
-module.exports = GameObject;
+}

@@ -1,8 +1,6 @@
-'use strict';
-
 // The base Physics Engine class defines the expected interface
 // for all physics engines
-class PhysicsEngine {
+export default class PhysicsEngine {
 
     constructor(options) {
         this.options = options;
@@ -22,5 +20,3 @@ class PhysicsEngine {
     step(dt, objectFilter) {}
 
 }
-
-module.exports = PhysicsEngine;

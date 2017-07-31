@@ -1,5 +1,4 @@
-'use strict';
-const EventEmitter = require('eventemitter3');
+import EventEmitter from 'eventemitter3';
 
 const SIXTY_PER_SEC = 1000 / 60;
 const LOOP_SLOW_THRESH = 0.3;
@@ -9,7 +8,7 @@ const LOOP_SLOW_COUNT = 10;
  * Scheduler class
  *
  */
-class Scheduler {
+export default class Scheduler {
 
     /**
      * schedule a function to be called
@@ -96,5 +95,3 @@ class Scheduler {
         this.requestedDelay -= this.options.delay;
     }
 }
-
-module.exports = Scheduler;

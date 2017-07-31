@@ -4,7 +4,7 @@ const should = require('should');
 const Serializer = require('../../src/serialize/Serializer');
 const DynamicObject = require('../../src/serialize/DynamicObject');
 const GameEngine = require('../../src/GameEngine');
-const SimplePhysicsEngine = require('../../src/physics/SimplePhysics/SimplePhysicsEngine');
+const SimplePhysicsEngine = require('../../src/physics/SimplePhysicsEngine');
 
 class TestObject extends DynamicObject {
 

@@ -1,9 +1,6 @@
-"use strict";
+import PhysicalObject from './PhysicalObject';
 
-const PhysicalObject = require('./PhysicalObject');
-
-
-class THREEPhysicalObject extends PhysicalObject {
+export default class THREEPhysicalObject extends PhysicalObject {
 
     static get properties() {
         return {
@@ -49,5 +46,3 @@ class THREEPhysicalObject extends PhysicalObject {
     }
 
 }
-
-module.exports = THREEPhysicalObject;

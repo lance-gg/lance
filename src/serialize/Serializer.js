@@ -1,6 +1,4 @@
-'use strict';
-
-const Utils = require('./../lib/Utils');
+import Utils from './../lib/Utils';
 const MAX_UINT_16 = 0xFFFF;
 
 /**
@@ -10,7 +8,7 @@ const MAX_UINT_16 = 0xFFFF;
  *
  * The Serializer defines the data types which can be serialized.
  */
-class Serializer {
+export default class Serializer {
 
     constructor() {
         this.registeredClasses = {};
@@ -248,5 +246,3 @@ Serializer.TYPES = {
     CLASSINSTANCE: 'CLASSINSTANCE',
     LIST: 'LIST'
 };
-
-module.exports = Serializer;

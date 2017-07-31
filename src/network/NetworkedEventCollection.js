@@ -1,12 +1,10 @@
-'use strict';
-
-const Serializer = require('./../serialize/Serializer');
-const Serializable = require('./../serialize/Serializable');
+import Serializer from './../serialize/Serializer';
+import Serializable from './../serialize/Serializable';
 
 /**
  * Defines a collection of NetworkEvents to be transmitted over the wire
  */
-class NetworkedEventCollection extends Serializable {
+export default class NetworkedEventCollection extends Serializable {
 
     static get netScheme() {
         return {
@@ -23,5 +21,3 @@ class NetworkedEventCollection extends Serializable {
     }
 
 }
-
-module.exports = NetworkedEventCollection;

@@ -1,11 +1,8 @@
-'use strict';
-
-const TwoVector = require('../../serialize/TwoVector');
-
+import TwoVector from '../../serialize/TwoVector';
 let differenceVector = new TwoVector();
 
 // The collision detection of SimplePhysicsEngine is a brute-force approach
-class CollisionDetection {
+export default class CollisionDetection {
 
     constructor(options) {
         this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);
@@ -47,5 +44,3 @@ class CollisionDetection {
     }
 
 }
-
-module.exports = CollisionDetection;

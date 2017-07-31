@@ -1,12 +1,10 @@
-'use strict';
+import Serializer from './../serialize/Serializer';
 
-const Serializer = require('./../serialize/Serializer');
+import NetworkedEventFactory from './NetworkedEventFactory';
+import NetworkedEventCollection from './NetworkedEventCollection';
+import Utils from './../lib/Utils';
 
-const NetworkedEventFactory = require('./NetworkedEventFactory');
-const NetworkedEventCollection = require('./NetworkedEventCollection');
-const Utils = require('./../lib/Utils');
-
-class NetworkTransmitter {
+export default class NetworkTransmitter {
 
     constructor(serializer) {
         this.serializer = serializer;
@@ -92,5 +90,3 @@ class NetworkTransmitter {
     }
 
 }
-
-module.exports = NetworkTransmitter;

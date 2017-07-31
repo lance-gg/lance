@@ -1,11 +1,9 @@
-'use strict';
-
 /**
  * This class represents an instance of the game world,
  * where all data pertaining to the current state of the
  * world is saved.
  */
-class GameWorld {
+export default class GameWorld {
 
     /**
      * Constructor of the World instance
@@ -59,5 +57,3 @@ class GameWorld {
     }
 
 }
-
-module.exports = GameWorld;

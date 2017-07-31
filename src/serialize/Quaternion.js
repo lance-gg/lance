@@ -1,14 +1,12 @@
-'use strict';
-
-const Serializable = require('./Serializable');
-const Serializer = require('./Serializer');
-const ThreeVector = require('./ThreeVector');
+import Serializable from './Serializable';
+import Serializer from './Serializer';
+import ThreeVector from './ThreeVector';
 
 /**
  * A Quaternion is a geometric object which can be used to
  * represent a three-dimensional rotation.
  */
-class Quaternion extends Serializable {
+export default class Quaternion extends Serializable {
 
     static get netScheme() {
         return {
@@ -192,5 +190,3 @@ class Quaternion extends Serializable {
     }
     /* eslint-enable */
 }
-
-module.exports = Quaternion;

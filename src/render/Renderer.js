@@ -1,6 +1,4 @@
-'use strict';
-
-const EventEmitter = require('eventemitter3');
+import EventEmitter from 'eventemitter3';
 
 const TIME_RESET_THRESHOLD = 100;
 
@@ -10,7 +8,7 @@ const TIME_RESET_THRESHOLD = 100;
  * method.  The draw method will be invoked on every iteration of the browser's
  * render loop.
  */
-class Renderer {
+export default class Renderer {
 
     /**
     * Constructor of the Renderer singleton.
@@ -125,5 +123,3 @@ this.clientEngine.gameEngine.trace.trace(`============RENDERER DONE t=${t} LST=$
     removeObject(obj) {
     }
 }
-
-module.exports = Renderer;

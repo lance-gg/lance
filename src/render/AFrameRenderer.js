@@ -1,13 +1,12 @@
-'use strict';
 /* globals AFRAME */
 
-const Renderer = require('./Renderer');
-const networkedPhysics = require('./aframe/system');
+import Renderer from './Renderer';
+import networkedPhysics from './aframe/system';
 
 /**
  * The A-Frame Renderer
  */
-class AFrameRenderer extends Renderer {
+export default class AFrameRenderer extends Renderer {
 
     /**
     * Constructor of the Renderer singleton.
@@ -58,5 +57,3 @@ class AFrameRenderer extends Renderer {
     }
 
 }
-
-module.exports = AFrameRenderer;

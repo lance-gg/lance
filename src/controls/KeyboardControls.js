@@ -1,4 +1,4 @@
-const EventEmitter = require('eventemitter3');
+import EventEmitter from 'eventemitter3';
 
 //todo add all keyboard keys
 
@@ -18,7 +18,7 @@ const keyCodeTable = {
 /**
  * This class allows easy usage of device keyboard controls
  */
-class KeyboardControls{
+export default class KeyboardControls{
 
     constructor(clientEngine){
         Object.assign(this, EventEmitter.prototype);
@@ -89,5 +89,3 @@ class KeyboardControls{
         }
     }
 }
-
-module.exports = KeyboardControls;

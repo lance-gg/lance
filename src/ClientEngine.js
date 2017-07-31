@@ -1,11 +1,10 @@
-'use strict';
-let io = require('socket.io-client');
-const Utils = require('./lib/Utils');
-const Scheduler = require('./lib/Scheduler');
-const Synchronizer = require('./Synchronizer');
-const Serializer = require('./serialize/Serializer');
-const NetworkMonitor = require('./network/NetworkMonitor');
-const NetworkTransmitter = require('./network/NetworkTransmitter');
+import io from 'socket.io-client';
+import Utils from './lib/Utils';
+import Scheduler from './lib/Scheduler';
+import Synchronizer from './Synchronizer';
+import Serializer from './serialize/Serializer';
+import NetworkMonitor from './network/NetworkMonitor';
+import NetworkTransmitter from './network/NetworkTransmitter';
 
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
@@ -24,7 +23,7 @@ const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution b
  * starting client steps, and handling world updates which arrive from
  * the server.
  */
-class ClientEngine {
+export default class ClientEngine {
 
     /**
       * Create a client engine instance.
@@ -358,5 +357,3 @@ class ClientEngine {
     }
 
 }
-
-module.exports = ClientEngine;

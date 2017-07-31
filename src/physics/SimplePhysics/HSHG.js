@@ -575,4 +575,4 @@ HSHG._private = {
     getLongestAABBEdge: getLongestAABBEdge
 };
 
-module.exports = HSHG;
+export default HSHG;

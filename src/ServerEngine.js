@@ -1,11 +1,11 @@
 'use strict';
 
-const fs = require('fs');
-const Utils = require('./lib/Utils');
-const Scheduler = require('./lib/Scheduler');
-const Serializer = require('./serialize/Serializer');
-const NetworkTransmitter = require('./network/NetworkTransmitter');
-const NetworkMonitor = require('./network/NetworkMonitor');
+import fs from 'fs';
+import Utils from './lib/Utils';
+import Scheduler from './lib/Scheduler';
+import Serializer from './serialize/Serializer';
+import NetworkTransmitter from './network/NetworkTransmitter';
+import NetworkMonitor from './network/NetworkMonitor';
 
 /**
  * ServerEngine is the main server-side singleton code.
@@ -24,7 +24,7 @@ const NetworkMonitor = require('./network/NetworkMonitor');
  * connections and dis-connections, emitting periodic game-state
  * updates, and capturing remote user inputs.
  */
-class ServerEngine {
+export default class ServerEngine {
 
     /**
      * create a ServerEngine instance
@@ -349,5 +349,3 @@ class ServerEngine {
     }
 
 }
-
-module.exports = ServerEngine;

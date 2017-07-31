@@ -1,6 +1,4 @@
-"use strict";
-
-class MathUtils {
+export default class MathUtils {
 
     // interpolate from start to end, advancing "percent" of the way
     static interpolate(start, end, percent) {
@@ -36,5 +34,3 @@ class MathUtils {
         return interpolatedVal;
     }
 }
-
-module.exports = MathUtils;

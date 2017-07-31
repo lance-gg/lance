@@ -1,9 +1,7 @@
-'use strict';
-
-const TwoVector = require('./TwoVector');
-const GameObject = require('./GameObject');
-const Serializer = require('./Serializer');
-const MathUtils = require('../lib/MathUtils');
+import TwoVector from './TwoVector';
+import GameObject from './GameObject';
+import Serializer from './Serializer';
+import MathUtils from '../lib/MathUtils';
 
 /**
  * DynamicObject is the base class of the game's objects, for games which
@@ -16,7 +14,7 @@ const MathUtils = require('../lib/MathUtils');
  * allow the client to extrapolate the position
  * of dynamic objects in-between server updates.
  */
-class DynamicObject extends GameObject {
+export default class DynamicObject extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -285,5 +283,3 @@ class DynamicObject extends GameObject {
         };
     }
 }
-
-module.exports = DynamicObject;

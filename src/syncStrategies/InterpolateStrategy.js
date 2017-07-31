@@ -1,6 +1,4 @@
-'use strict';
-
-const SyncStrategy = require('./SyncStrategy');
+import SyncStrategy from './SyncStrategy';
 
 const defaults = {
     syncsBufferLength: 6,
@@ -8,7 +6,7 @@ const defaults = {
     reflect: false
 };
 
-class InterpolateStrategy extends SyncStrategy {
+export default class InterpolateStrategy extends SyncStrategy {
 
     constructor(clientEngine, inputOptions) {
 
@@ -200,5 +198,3 @@ class InterpolateStrategy extends SyncStrategy {
         }
     }
 }
-
-module.exports = InterpolateStrategy;

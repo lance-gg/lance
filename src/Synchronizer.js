@@ -1,16 +1,14 @@
-"use strict";
+import InterpolateStrategy from './syncStrategies/InterpolateStrategy';
+import ExtrapolateStrategy from './syncStrategies/ExtrapolateStrategy';
+import FrameSyncStrategy from './syncStrategies/FrameSyncStrategy';
 
-const InterpolateStrategy = require('./syncStrategies/InterpolateStrategy');
-const ExtrapolateStrategy = require('./syncStrategies/ExtrapolateStrategy');
-const FrameSyncStrategy = require('./syncStrategies/FrameSyncStrategy');
 const strategies = {
     extrapolate: ExtrapolateStrategy,
     interpolate: InterpolateStrategy,
     frameSync: FrameSyncStrategy
 };
 
-class Synchronizer {
-
+export default class Synchronizer {
     // create a synchronizer instance
     constructor(clientEngine, options) {
         this.clientEngine = clientEngine;
@@ -21,5 +19,3 @@ class Synchronizer {
         this.syncStrategy = new strategies[this.options.sync](this.clientEngine, this.options);
     }
 }
-
-module.exports = Synchronizer;

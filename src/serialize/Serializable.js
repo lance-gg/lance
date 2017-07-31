@@ -1,9 +1,7 @@
-'use strict';
+import Utils from './../lib/Utils';
+import Serializer from './Serializer';
 
-const Utils = require('./../lib/Utils');
-const Serializer = require('./Serializer');
-
-class Serializable {
+export default class Serializable {
     /**
      *  Class can be serialized using either:
          - a class based netScheme
@@ -152,5 +150,3 @@ class Serializable {
     }
 
 }
-
-module.exports = Serializable;

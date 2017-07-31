@@ -1,4 +1,4 @@
-class Timer {
+export default class Timer {
 
     constructor() {
         this.currentTime = 0;
@@ -99,5 +99,3 @@ TimerEvent.TYPES = {
     repeat: 'repeat',
     single: 'single'
 };
-
-module.exports = Timer;

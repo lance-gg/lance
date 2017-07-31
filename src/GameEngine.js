@@ -1,7 +1,6 @@
-'use strict';
-const GameWorld = require('./GameWorld');
-const EventEmitter = require('eventemitter3');
-const Trace = require('./lib/Trace');
+import GameWorld from './GameWorld';
+import EventEmitter from 'eventemitter3';
+import Trace from './lib/Trace';
 
 /**
  * The GameEngine contains the game logic.  Extend this class
@@ -22,7 +21,7 @@ const Trace = require('./lib/Trace');
  * and therefore clients must resolve server updates which conflict
  * with client-side predictions.
  */
-class GameEngine {
+export default class GameEngine {
 
     /**
       * Create a game engine instance.  This needs to happen
@@ -458,5 +457,3 @@ class GameEngine {
    * @event GameEngine#server__start
    * @param {Number} timestamp - UTC epoch of start time
    */
-
-module.exports = GameEngine;

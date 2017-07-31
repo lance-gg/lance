@@ -1,4 +1,4 @@
-class Utils {
+export default class Utils {
 
     static hashStr(str, bits) {
         let hash = 5381;
@@ -40,5 +40,3 @@ class Utils {
         });
     }
 }
-
-module.exports = Utils;

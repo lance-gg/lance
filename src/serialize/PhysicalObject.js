@@ -1,14 +1,12 @@
-'use strict';
-
-const GameObject = require('./GameObject');
-const Serializer = require('./Serializer');
-const ThreeVector = require('./ThreeVector');
-const Quaternion = require('./Quaternion');
+import GameObject from './GameObject';
+import Serializer from './Serializer';
+import ThreeVector from './ThreeVector';
+import Quaternion from './Quaternion';
 
 /**
  * The PhysicalObject is the base class for physical game objects
  */
-class PhysicalObject extends GameObject {
+export default class PhysicalObject extends GameObject {
 
     // TODO:
     // this code is not performance optimized, generally speaking.
@@ -196,5 +194,3 @@ class PhysicalObject extends GameObject {
         this.bendingIncrements--;
     }
 }
-
-module.exports = PhysicalObject;

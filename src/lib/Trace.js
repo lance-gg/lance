@@ -1,6 +1,4 @@
-'use strict';
-
-class Trace {
+export default class Trace {
 
     constructor(options) {
 
@@ -47,5 +45,3 @@ class Trace {
         this.step = s;
     }
 }
-
-module.exports = Trace;

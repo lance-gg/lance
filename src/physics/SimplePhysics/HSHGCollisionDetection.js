@@ -1,11 +1,8 @@
-'use strict';
-
-const TwoVector = require('../../serialize/TwoVector');
-const HSHG = require('./HSHG');
+import HSHG from './HSHG';
 
 // Collision detection based on Hierarchical Spatial Hash Grid
 // uses this implementation https://gist.github.com/kirbysayshi/1760774
-class HSHGCollisionDetection {
+export default class HSHGCollisionDetection {
 
     constructor(options) {
         this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);

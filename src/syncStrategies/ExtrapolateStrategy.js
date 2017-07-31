@@ -1,6 +1,4 @@
-'use strict';
-
-const SyncStrategy = require('./SyncStrategy');
+import SyncStrategy from './SyncStrategy'
 
 const defaults = {
     syncsBufferLength: 5,
@@ -12,7 +10,7 @@ const defaults = {
     bendingIncrements: 10   // the bending should be applied increments (how many steps for entire bend)
 };
 
-class ExtrapolateStrategy extends SyncStrategy {
+export default class ExtrapolateStrategy extends SyncStrategy {
 
     constructor(clientEngine, inputOptions) {
 
@@ -249,5 +247,3 @@ class ExtrapolateStrategy extends SyncStrategy {
         }
     }
 }
-
-module.exports = ExtrapolateStrategy;

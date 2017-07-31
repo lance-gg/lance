@@ -1,13 +1,11 @@
-"use strict";
-
-const SyncStrategy = require("./SyncStrategy");
+import SyncStrategy from './SyncStrategy'
 
 const defaults = {
     worldBufferLength: 60,
     clientStepLag: 0
 };
 
-class FrameSyncStrategy extends SyncStrategy {
+export default class FrameSyncStrategy extends SyncStrategy {
 
     constructor(clientEngine, inputOptions) {
 
@@ -77,5 +75,3 @@ class FrameSyncStrategy extends SyncStrategy {
         }
     }
 }
-
-module.exports = FrameSyncStrategy;
