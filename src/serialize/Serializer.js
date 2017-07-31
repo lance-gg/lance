@@ -1,4 +1,8 @@
 import Utils from './../lib/Utils';
+import TwoVector from './TwoVector';
+import ThreeVector from './ThreeVector';
+import Quaternion from './Quaternion';
+
 const MAX_UINT_16 = 0xFFFF;
 
 /**
@@ -13,10 +17,9 @@ export default class Serializer {
     constructor() {
         this.registeredClasses = {};
         this.customTypes = {};
-        this.netSchemeSizeCache = {}; // used to cache calculated netSchemes sizes
-        this.registerClass(require('./TwoVector'));
-        this.registerClass(require('./ThreeVector'));
-        this.registerClass(require('./Quaternion'));
+        this.registerClass(TwoVector);
+        this.registerClass(ThreeVector);
+        this.registerClass(Quaternion);
     }
 
     /**

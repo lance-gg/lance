@@ -1,19 +1,18 @@
-"use strict";
+import should from 'should';
 
-const should = require('should');
-
-const Serializable = require('../../src/serialize/Serializable');
-const Serializer = require('../../src/serialize//Serializer');
+// Serializer must be loaded first before Serializable because of circular deps
+import Serializer from '../../src/serialize/Serializer';
+import Serializable from '../../src/serialize/Serializable';
 
 class TestObject extends Serializable {
 
-    static get netScheme(){
+    static get netScheme() {
         return {
             playerAges: {
                 type: Serializer.TYPES.LIST,
                 itemType: Serializer.TYPES.UINT8
             },
-        }
+        };
     }
 
     constructor(playerAges){
@@ -30,7 +29,6 @@ testObject.class = TestObject;
 
 describe('List serialization/deserialization', function() {
     let serializedTestObject, deserializedTestObject;
-
 
     describe('primitives', function() {
 

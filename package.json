@@ -46,9 +46,10 @@
     "docs": "jsdoc -c jsdoc.conf.json",
     "test-all": "mocha test/EndToEnd/",
     "test-serializer": "mocha ./test/serializer/",
-    "test": "mocha ./test/serializer/"
+    "test": "mocha ./test/serializer/ --compilers js:babel-core/register"
   },
   "devDependencies": {
+    "babel-core": "^6.25.0",
     "babel-preset-es2015": "^6.22.0",
     "chai": "^3.5.0",
     "docmeta": "OpherV/docmeta",
