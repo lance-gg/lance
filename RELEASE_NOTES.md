@@ -10,9 +10,11 @@
 * PhysicsEngine no longer initialized in two places.  It is initialized in the GameEngine
 * Implemented HSHG collision detection for SimplePhysics
 * Implemented ClientEngine standaloneMode for network-less testing of game engines
+* New KeyboardControls class to help with sending key-based input 
 
 ### Breaking Changes
 
+* All classes are now in ES6 format instead of CommonJS
 * `PhysicsEngine` should no longer be instantiated in the Server `main.js` and in the client entry point.  Rather, it should be instantiated in the `GameEngine`.
 * `PhysicsEngine` constructor now does initialization instead of the `init` function
 * `GameEngine` step method cannot be called without passing the `isReenact` argument.  Games which override the `step` method must pass this argument when calling the super method.
