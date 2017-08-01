@@ -170,16 +170,6 @@ export default class ClientEngine {
      * ready to connect
      */
     start() {
-        if (this.options.scheduler === 'fixed') {
-            // schedule and start the game loop
-            this.scheduler = new Scheduler({
-                period: this.options.stepPeriod,
-                tick: this.step.bind(this),
-                delay: STEP_DELAY_MSEC
-            });
-            this.scheduler.start();
-        }
-
         // initialize the renderer
         // the render loop waits for next animation frame
         if (!this.renderer) alert('ERROR: game has not defined a renderer');
@@ -190,6 +180,17 @@ export default class ClientEngine {
 
         return this.renderer.init().then(() => {
             this.gameEngine.start();
+
+            if (this.options.scheduler === 'fixed') {
+                // schedule and start the game loop
+                this.scheduler = new Scheduler({
+                    period: this.options.stepPeriod,
+                    tick: this.step.bind(this),
+                    delay: STEP_DELAY_MSEC
+                });
+                this.scheduler.start();
+            }
+
             if (typeof window !== 'undefined')
                 window.requestAnimationFrame(renderLoop);
             if (this.options.autoConnect && this.options.standaloneMode === false) {
