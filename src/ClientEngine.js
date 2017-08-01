@@ -85,7 +85,7 @@ export default class ClientEngine {
         */
         this.playerId = NaN;
 
-        if (this.options.standaloneMode === false) {
+        if (this.options.standaloneMode !== true) {
             this.configureSynchronization();
         }
 
@@ -193,7 +193,7 @@ export default class ClientEngine {
 
             if (typeof window !== 'undefined')
                 window.requestAnimationFrame(renderLoop);
-            if (this.options.autoConnect && this.options.standaloneMode === false) {
+            if (this.options.autoConnect && this.options.standaloneMode !== true) {
                 this.connect();
             }
         });
@@ -250,14 +250,14 @@ export default class ClientEngine {
         this.checkDrift('onEveryStep');
 
         // perform game engine step
-        if (this.options.standaloneMode === false) {
+        if (this.options.standaloneMode !== true) {
             this.handleOutboundInput();
         }
         this.applyDelayedInputs();
         this.gameEngine.step(false, t, dt);
         this.gameEngine.emit('client__postStep', { dt });
 
-        if (this.options.standaloneMode === false && this.gameEngine.trace.length && this.socket) {
+        if (this.options.standaloneMode !== true && this.gameEngine.trace.length && this.socket) {
             // socket might not have been initialized at this point
             this.socket.emit('trace', JSON.stringify(this.gameEngine.trace.rotate()));
         }
@@ -320,7 +320,7 @@ export default class ClientEngine {
             this.doInputLocal(message);
         }
 
-        if (this.options.standaloneMode === false) {
+        if (this.options.standaloneMode !== true) {
             this.outboundMessages.push(message);
         }
 
