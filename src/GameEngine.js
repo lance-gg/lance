@@ -1,5 +1,6 @@
 import GameWorld from './GameWorld';
 import EventEmitter from 'eventemitter3';
+import Timer from './game/Timer';
 import Trace from './lib/Trace';
 
 /**
@@ -125,6 +126,14 @@ export default class GameEngine {
     start() {
         this.trace.info('========== game engine started ==========');
         this.initWorld();
+
+        // create the default timer
+        this.timer = new Timer();
+        this.timer.play();
+        this.on('server__postStep', ()=>{
+            this.timer.tick();
+        });
+
         this.emit('start', { timestamp: (new Date()).getTime() });
     }
 
