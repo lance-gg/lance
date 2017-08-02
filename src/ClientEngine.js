@@ -50,7 +50,6 @@ export default class ClientEngine {
             healthCheckRTTSample: 10,
             stepPeriod: 1000 / GAME_UPS,
             scheduler: 'fixed',
-            clientIDSpace: 1000000, //todo add docs
         }, inputOptions);
 
         /**
