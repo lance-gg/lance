@@ -15,10 +15,10 @@ export default class SimplePhysicsEngine extends PhysicsEngine {
         super(initOptions);
 
         // todo does this mean both modules always get loaded?
-        if (initOptions.collisionOptions.type == 'HSHG'){
+        if (initOptions.collisions.type == 'HSHG'){
             this.collisionDetection = new HSHGCollisionDetection();
         } else {
-            this.collisionDetection = BruteCollisionDetection;
+            this.collisionDetection = new BruteCollisionDetection();
         }
 
         /**
