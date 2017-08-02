@@ -97,7 +97,7 @@ export default class GameEngine {
         return null;
     }
 
-    initWorld() {
+    initWorld(worldSettings) {
 
         this.world = new GameWorld();
 
@@ -113,7 +113,7 @@ export default class GameEngine {
         * @member {Object} worldSettings
         * @memberof GameEngine
         */
-        this.worldSettings = {};
+        this.worldSettings = Object.assign({}, worldSettings);
     }
 
     /**
