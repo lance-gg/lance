@@ -125,7 +125,7 @@ export default class GameEngine {
     start() {
         this.trace.info('========== game engine started ==========');
         this.initWorld();
-        this.emit('server__start', { timestamp: (new Date()).getTime() }); // todo docs say server & client but event name?
+        this.emit('start', { timestamp: (new Date()).getTime() });
     }
 
     /**
@@ -137,7 +137,6 @@ export default class GameEngine {
       * @param {Boolean} physicsOnly - do a physics step only, no game logic
       */
     step(isReenact, t, dt, physicsOnly) {
-
         // physics-only step
         if (physicsOnly) {
             if (dt) dt /= 1000; // physics engines work in seconds
@@ -159,6 +158,7 @@ export default class GameEngine {
             return !isReenact || o.id < clientIDSpace;
         }
 
+        
         // physics step
         if (this.physicsEngine) {
             if (dt) dt /= 1000; // physics engines work in seconds
@@ -454,6 +454,6 @@ export default class GameEngine {
   /**
    * server has started
    *
-   * @event GameEngine#server__start
+   * @event GameEngine#start
    * @param {Number} timestamp - UTC epoch of start time
    */
