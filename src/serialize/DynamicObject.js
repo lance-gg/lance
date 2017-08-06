@@ -162,7 +162,7 @@ export default class DynamicObject extends GameObject {
      */
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
-        return `dObj[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
+        return `${this.constructor.name}[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
     }
 
     /**
