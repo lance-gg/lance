@@ -5,7 +5,7 @@ import Serializer from './Serializer';
  * A TwoVector is a geometric object which is completely described
  * by two values.
  */
-class TwoVector extends Serializable {
+export default class TwoVector extends Serializable {
 
     static get netScheme() {
         return {
@@ -96,5 +96,3 @@ class TwoVector extends Serializable {
         this.y += (target.y - this.y) * p;
     }
 }
-
-module.exports = TwoVector;
