@@ -18,11 +18,17 @@ export default class GameObject extends Serializable {
 
     /**
     * Creates an instance of a game object.
-    * @param {String} id - the object id
+    * @param {GameEngine} gameEngine - the gameEngine this object will be used in
+    * @param {Object} options - options for instantiation of the GameObject
+    * @param {Number} id - if set, the new instantiated object will be set to this id instead of being generated a new one. Use with caution!
     */
-    constructor(id) {
-
+    constructor(gameEngine, options) {
         super();
+        /**
+         * The gameEngine this object will be used in
+         * @member {GameEngine}
+         */
+        this.gameEngine = gameEngine;
 
         /**
         * ID of this object's instance.  Each instance has an ID which is unique across the entire
@@ -31,7 +37,10 @@ export default class GameObject extends Serializable {
         * these objects are known as shadow objects.
         * @member {Number}
         */
-        this.id = id;
+        if (options && 'id' in options)
+            this.id = options.id;
+        else
+            this.id = this.gameEngine.world.getNewId();
     }
 
     /**
@@ -67,7 +76,7 @@ export default class GameObject extends Serializable {
     }
 
     saveState(other) {
-        this.savedCopy = (new this.constructor());
+        this.savedCopy = (new this.constructor(this.gameEngine, {id: null}));
         this.savedCopy.syncTo(other ? other : this);
     }
 

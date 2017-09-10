@@ -16,6 +16,20 @@ export default class GameWorld {
     }
 
     /**
+     * Gets a new, fresh and unused id that can be used for a new object
+     * @return {Number} the new id
+     */
+    getNewId() {
+        let possibleId = this.idCount;
+        // find a free id
+        while (possibleId in this.objects)
+            possibleId++;
+
+        this.idCount = possibleId;
+        return possibleId;
+    }
+
+    /**
      * World object iterator.
      * Invoke callback(objId, obj) for each object
      *

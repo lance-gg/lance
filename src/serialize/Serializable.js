@@ -123,7 +123,7 @@ export default class Serializable {
         if (!changedStrings) return this;
 
         // build a clone with pruned strings
-        let prunedCopy = new this.constructor();
+        let prunedCopy = new this.constructor(null, { id: null });
         for (let p of Object.keys(netScheme))
             prunedCopy[p] = changedStrings.indexOf(p) < 0 ? this[p] : null;
 

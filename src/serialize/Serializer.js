@@ -73,7 +73,8 @@ export default class Serializer {
 
         localByteOffset += Uint8Array.BYTES_PER_ELEMENT; // advance the byteOffset after the classId
 
-        let obj = new objectClass();
+        // create de-referenced instance of the class. gameEngine and id will be 'tacked on' later at the sync strategies
+        let obj = new objectClass(null, {id: null});
         for (let property of Object.keys(objectClass.netScheme).sort()) {
             let read = this.readDataView(dataView, byteOffset + localByteOffset, objectClass.netScheme[property]);
             obj[property] = read.data;

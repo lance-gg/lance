@@ -64,7 +64,9 @@ export default class InterpolateStrategy extends SyncStrategy {
     // add an object to our world
     addNewObject(objId, newObj, stepCount) {
 
-        let curObj = new newObj.constructor();
+        let curObj = new newObj.constructor(this.gameEngine, {
+            id: objId
+        });
         curObj.syncTo(newObj);
         curObj.passive = true;
         this.gameEngine.addObjectToWorld(curObj);

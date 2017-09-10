@@ -53,15 +53,14 @@ export default class DynamicObject extends GameObject {
     * Creates an instance of a dynamic object.
     * Override to provide starting values for position, velocity, etc.
     * The object ID should be the next value provided by `world.idCount`
-    * @param {String} id - the object id
-    * @param {TwoVector} position - position vector
-    * @param {TwoVector} velocity - velocity vector
-    * @example
-    *    // Ship is a subclass of DynamicObject:
-    *    Ship(++this.world.idCount);
+    * @param {GameEngine} gameEngine - the gameEngine this object will be used in
+    * @param {Object} options - options for the new object. See {@link GameObject}
+    * @param {Object} props - properties to be set in the new object
+    * @param {TwoVector} props.position - position vector
+    * @param {TwoVector} props.velocity - velocity vector
     */
-    constructor(id, position, velocity) {
-        super(id);
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options);
 
         /**
         * ID of player who created this object
@@ -100,13 +99,13 @@ export default class DynamicObject extends GameObject {
         * position
         * @member {TwoVector}
         */
-        if (position) this.position.copy(position);
+        if (props && props.position) this.position.copy(props.position);
 
         /**
         * velocity
         * @member {TwoVector}
         */
-        if (velocity) this.velocity.copy(velocity);
+        if (props && props.velocity) this.velocity.copy(props.velocity);
 
         /**
         * object orientation angle in degrees
