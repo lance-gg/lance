@@ -18,8 +18,7 @@
             "src/serialize/ThreeVector.js",
             "src/serialize/Quaternion.js",
             "src/render/Renderer.js",
-            "src/render/AFrameRenderer.js",
-            "src/matchMaker/MatchMaker.js"
+            "src/render/AFrameRenderer.js"
         ]
     },
     "plugins": [
