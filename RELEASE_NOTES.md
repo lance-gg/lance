@@ -21,6 +21,7 @@
 * `PhysicsEngine` constructor now does initialization instead of the `init` function
 * `GameEngine` step method cannot be called without passing the `isReenact` argument.  Games which override the `step` method must pass this argument when calling the super method.
 * Objects are now instantiated with a reference to the gameEngine, and get and ID automatically
+* isOwnedByPlayer moved from clientEngine to GameEngine, and the clientEngine now sets the playerId in the gameEngine
 
 ## Release 1.0.1
 
