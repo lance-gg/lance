@@ -8,6 +8,8 @@
 
 * new netscheme data type: *STRING*.  Will only be broadcast if it changed since last broadcast.
 * PhysicsEngine no longer initialized in two places.  It is initialized in the GameEngine
+* Initial implementation of an Entity-Component-System. This currently includes the PixiRenderableComponent
+* The structure of PixiRenderer has changed to allow objects to control their own rendering via this component. See the Simple-Spaaace example for reference
 * Implemented HSHG collision detection for SimplePhysics
 * Implemented ClientEngine standaloneMode for network-less testing of game engines
 * New KeyboardControls class to help with sending key-based input 

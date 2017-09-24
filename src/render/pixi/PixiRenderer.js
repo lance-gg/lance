@@ -1,4 +1,5 @@
-import Renderer from './Renderer';
+import Renderer from '../Renderer';
+import PixiRenderableComponent from './PixiRenderableComponent';
 
 /**
  * Pixi Renderer
@@ -31,6 +32,13 @@ export default class PixiRenderer extends Renderer {
         this.viewportWidth = window.innerWidth;
         this.viewportHeight = window.innerHeight;
         this.stage = new PIXI.Container();
+
+        // default layers
+        this.layers = {
+            base: new PIXI.Container()
+        };
+
+        this.stage.addChild(this.layers.base);
 
         if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') {
             this.onDOMLoaded();
@@ -87,8 +95,24 @@ export default class PixiRenderer extends Renderer {
         this.renderer.render(this.stage);
     }
 
-    addObject(objData) {}
+    addObject(obj) {
+        if (obj.hasComponent(PixiRenderableComponent)){
+            let renderable = obj.getComponent(PixiRenderableComponent);
+            let sprite = this.sprites[obj.id] = renderable.createRenderable();
+            sprite.anchor.set(0.5, 0.5);
+            sprite.position.set(obj.position.x, obj.position.y);
+            this.layers.base.addChild(sprite);
+        }
+    }
 
-    removeObject(objData) {}
+    removeObject(obj) {
+        if (obj.hasComponent(PixiRenderableComponent)){
+            let sprite = this.sprites[obj.id];
+            if (sprite) {
+                this.sprites[obj.id].destroy();
+                delete this.sprites[obj.id];
+            }
+        }
+    }
 
 }

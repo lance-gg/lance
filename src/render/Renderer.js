@@ -113,13 +113,11 @@ this.clientEngine.gameEngine.trace.trace(`============RENDERER DONE t=${t} LST=$
      * Handle the addition of a new object to the world.
      * @param {Object} obj - The object to be added.
      */
-    addObject(obj) {
-    }
+    addObject(obj) {}
 
     /**
      * Handle the removal of an old object from the world.
      * @param {Object} obj - The object to be removed.
      */
-    removeObject(obj) {
-    }
+    removeObject(obj) {}
 }

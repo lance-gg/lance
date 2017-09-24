@@ -41,15 +41,8 @@ export default class GameObject extends Serializable {
             this.id = options.id;
         else
             this.id = this.gameEngine.world.getNewId();
-    }
 
-    /**
-     * Initialize the object.
-     * Extend this method if you have object initialization logic.
-     * @param {Object} options Your object's options
-     */
-    init(options) {
-        Object.assign(this, options);
+        this.components = {};
     }
 
     /**
@@ -130,9 +123,44 @@ export default class GameObject extends Serializable {
     // copy physical attributes from physics sub-object
     refreshFromPhysics() {}
 
-    // clean up resources
-    destroy() {}
 
     // apply a single bending increment
     applyIncrementalBending() { }
+
+    // clean up resources
+    destroy() {}
+
+    addComponent(componentInstance){
+        componentInstance.parentObject = this;
+        this.components[componentInstance.constructor.name] = componentInstance;
+
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentAdded', this, componentInstance);
+        }
+    }
+
+    removeComponent(componentName){
+        // todo cleanup of the component ?
+        delete this.components[componentName];
+
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentRemoved', this, componentName);
+        }
+    }
+
+    /**
+     * Check whether this game object has a certain component
+     * @param componentClass the comp
+     * @returns {Boolean} true if the gameObject contains this component
+     */
+    hasComponent(componentClass){
+        return componentClass.name in this.components;
+    }
+
+    getComponent(componentClass){
+        return this.components[componentClass.name];
+    }
+    
 }

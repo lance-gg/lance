@@ -29,6 +29,44 @@ export default class GameWorld {
         return possibleId;
     }
 
+    // todo document
+    queryObjects(query){
+        let queriedObjects = [];
+
+        // todo this is currently a very inefficient implementation for API testing purposes.
+        // It should be implemented with dictionaries like in nano-ecs
+        this.forEachObject( object => {
+            let conditions = [];
+
+            // id condition
+            conditions.push( !('id' in query) || query.id && object.id === query.id );
+
+            // components conditions
+            if ('components' in query) {
+                query.components.forEach(componentClass => {
+                    conditions.push(object.hasComponent(componentClass));
+                });
+            }
+
+            // all conditions are true, object is qualified for the query
+            if (conditions.every( value => value )){
+                queriedObjects.push(object);
+            }
+        });
+
+        return queriedObjects;
+    }
+
+    // todo document
+    addObject(object){
+        this.objects[object.id] = object;
+    }
+
+    // todo document
+    removeObject(id){
+        delete this.objects[id];
+    }
+
     /**
      * World object iterator.
      * Invoke callback(objId, obj) for each object

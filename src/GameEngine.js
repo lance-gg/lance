@@ -44,6 +44,12 @@ export default class GameEngine {
             traceLevel: Trace.TRACE_NONE
         }, options);
 
+        /**
+         * client's player ID, as a string. If running on the client, this is set at runtime by the clientEngine
+         * @member {String}
+         */
+        this.playerId = NaN;
+
         // set up event emitting and interface
         let eventEmitter = new EventEmitter();
 
@@ -212,7 +218,7 @@ export default class GameEngine {
             }
         }
 
-        this.world.objects[object.id] = object;
+        this.world.addObject(object);
 
         // tell the object to join the game, by creating
         // its corresponding physical entities and renderer entities.
@@ -260,8 +266,18 @@ export default class GameEngine {
             throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${id}`);
         this.trace.info(`========== destroying object ${ob.toString()} ==========`);
         this.emit('objectDestroyed', ob);
+        this.world.removeObject(id);
         ob.destroy();
-        delete this.world.objects[id];
+    }
+
+    /**
+     * Check if a given object is owned by the player on this client
+     *
+     * @param {Object} object the game object to check
+     * @return {Boolean} true if the game object is owned by the player on this client
+     */
+    isOwnedByPlayer(object) {
+        return (object.playerId == this.playerId);
     }
 
     /**

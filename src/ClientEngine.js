@@ -77,13 +77,7 @@ export default class ClientEngine {
         this.scheduler = null;
         this.lastStepTime = 0;
         this.correction = 0;
-
-        /**
-        * client's player ID, as a string.
-        * @member {String}
-        */
-        this.playerId = NaN;
-
+        
         if (this.options.standaloneMode !== true) {
             this.configureSynchronization();
         }
@@ -94,16 +88,6 @@ export default class ClientEngine {
             for (let i = 0; i < inputOptions.delayInputCount; i++)
                 this.delayedInputs[i] = [];
         }
-    }
-
-    /**
-     * Check if a given object is owned by the player on this client
-     *
-     * @param {Object} object the game object to check
-     * @return {Boolean} true if the game object is owned by the player on this client
-     */
-    isOwnedByPlayer(object) {
-        return (object.playerId == this.playerId);
     }
 
     configureSynchronization() {
@@ -126,6 +110,7 @@ export default class ClientEngine {
      * @return {Promise} Resolved when the connection is made to the server
      */
     connect(options = {}) {
+        // todo get rid of 'that' nonsense. ES6 baby!
 
         let that = this;
         function connectSocket(matchMakerAnswer) {
@@ -145,7 +130,7 @@ export default class ClientEngine {
                 });
 
                 that.socket.on('playerJoined', (playerData) => {
-                    that.playerId = playerData.playerId;
+                    that.gameEngine.playerId = playerData.playerId;
                     that.messageIndex = Number(that.playerId) * 10000;
                 });
 
