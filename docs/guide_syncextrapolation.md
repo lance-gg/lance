@@ -34,4 +34,4 @@ Notes for the game developer: Multiple complications arise from the extrapolatio
 
 To select this synchronization method, the Client Engine syncOptions must be set to "extrapolate".  The option "localObjBending" describes the amount of bending (0.0 to 1.0) for local objects, and "remoteObjBending" describes the amount of bending (0.0 to 1.0) for remote objects.  See the client engine options as described in the API Reference: {@link ClientEngine}.
 
-Next: {@tutorial tutorials}
+Next: {@tutorial MyFirstGame}
