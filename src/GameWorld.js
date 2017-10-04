@@ -25,7 +25,7 @@ export default class GameWorld {
         while (possibleId in this.objects)
             possibleId++;
 
-        this.idCount = possibleId;
+        this.idCount = possibleId + 1;
         return possibleId;
     }
 
