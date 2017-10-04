@@ -136,8 +136,8 @@ export default class GameEngine {
         // create the default timer
         this.timer = new Timer();
         this.timer.play();
-        this.on('server__postStep', ()=>{
-            this.timer.tick();
+        this.on('postStep', (step, isReenact) => {
+            if (!isReenact) this.timer.tick();
         });
 
         this.emit('start', { timestamp: (new Date()).getTime() });
