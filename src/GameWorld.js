@@ -29,17 +29,32 @@ export default class GameWorld {
         return possibleId;
     }
 
-    // todo document
+    /**
+     * Returns all the game world objects which match a criteria
+     * @param {Object} query The query object
+     * @param {Object} [query.id] object id
+     * @param {Object} [query.playerId] player id
+     * @param {Class} [query.instanceType] matches whether `object instanceof instanceType`
+     * @param {Array} [query.components] An array of component names
+     * @param {Boolean} [query.returnSingle] Return the first object matched
+     * @returns {Array | Object} All game objects which match all the query parameters, or the first match if returnSingle was specified
+     */
     queryObjects(query){
         let queriedObjects = [];
 
-        // todo this is currently a very inefficient implementation for API testing purposes.
-        // It should be implemented with dictionaries like in nano-ecs
-        this.forEachObject( object => {
+        // todo this is currently a somewhat inefficient implementation for API testing purposes.
+        // It should be implemented with cached dictionaries like in nano-ecs
+        this.forEachObject( (id, object) => {
             let conditions = [];
 
-            // id condition
+            // object id condition
             conditions.push( !('id' in query) || query.id && object.id === query.id );
+
+            // player id condition
+            conditions.push( !('playerId' in query) || query.playerId && object.playerId === query.playerId );
+
+            // instance type conditio
+            conditions.push( !('instanceType' in query) || query.instanceType && object instanceof query.instanceType );
 
             // components conditions
             if ('components' in query) {
@@ -51,18 +66,42 @@ export default class GameWorld {
             // all conditions are true, object is qualified for the query
             if (conditions.every( value => value )){
                 queriedObjects.push(object);
+                if (query.returnSingle) return false;
             }
         });
+
+        // return a single object or null
+        if (query.returnSingle) {
+            return queriedObjects.length>0 ? queriedObjects[0] : null;
+        }
 
         return queriedObjects;
     }
 
-    // todo document
+    /**
+     * Returns The first game object encountered which matches a criteria.
+     * Syntactic sugar for {@link queryObject} with `returnSingle: true`
+     * @param query See queryObjects
+     * @returns {Object}
+     */
+    queryObject(query){
+        return this.queryObjects(Object.assign(query, {
+            returnSingle: true
+        }));
+    }
+
+    /**
+     * Remove an object from the game world
+     * @param object
+     */
     addObject(object){
         this.objects[object.id] = object;
     }
 
-    // todo document
+    /**
+     * Add an object to the game world
+     * @param id
+     */
     removeObject(id){
         delete this.objects[id];
     }
@@ -71,41 +110,13 @@ export default class GameWorld {
      * World object iterator.
      * Invoke callback(objId, obj) for each object
      *
-     * @param {function} callback function receives id and object
+     * @param {function} callback function receives id and object. If callback returns false, the iteration will cease
      */
     forEachObject(callback) {
-        for (let id of Object.keys(this.objects))
-            callback(id, this.objects[id]);  // TODO: the key should be Number(id)
-    }
-
-    /**
-     * Return the primary game object for a specific player
-     *
-     * @param {Number} playerId the player ID
-     * @return {Object} game object for this player
-     */
-    getPlayerObject(playerId) {
-        for (let objId of Object.keys(this.objects)) {
-            let o = this.objects[objId];
-            if (o.playerId === playerId)
-                return o;
+        for (let id of Object.keys(this.objects)) {
+            let returnValue = callback(id, this.objects[id]);  // TODO: the key should be Number(id)
+            if (!returnValue) break;
         }
     }
-
-    /**
-     * Return an array of all the game objects owned by a specific player
-     *
-     * @param {Number} playerId the player ID
-     * @return {Array} game objects owned by this player
-     */
-    getOwnedObject(playerId) {
-        let owned = [];
-        for (let objId of Object.keys(this.objects)) {
-            let o = this.objects[objId];
-            if (o.ownerId === playerId)
-                owned.push(o);
-        }
-        return owned;
-    }
-
+    
 }
