@@ -137,7 +137,6 @@ export default class ExtrapolateStrategy extends SyncStrategy {
 
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
             if (localShadowObj) {
-
                 // case 1: this object has a local shadow object on the client
                 this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
 
@@ -181,7 +180,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
                     if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
 
                     this.gameEngine.trace.trace(`extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
-                    this.gameEngine.processInput(inputData, this.clientEngine.playerId);
+                    this.gameEngine.processInput(inputData, this.gameEngine.playerId);
                 });
             }
 
@@ -203,7 +202,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
             //       Reminder: the reason we use a string is that these
             //       values are sometimes used as object keys
             let obj = world.objects[objId];
-            let isLocal = (obj.playerId == this.clientEngine.playerId); // eslint-disable-line eqeqeq
+            let isLocal = (obj.playerId == this.gameEngine.playerId); // eslint-disable-line eqeqeq
             let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
             if (typeof obj.refreshRenderObject === 'function')
