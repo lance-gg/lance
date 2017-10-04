@@ -48,10 +48,10 @@ export default class GameWorld {
             let conditions = [];
 
             // object id condition
-            conditions.push( !('id' in query) || query.id && object.id === query.id );
+            conditions.push( !('id' in query) || query.id && object.id == query.id );
 
             // player id condition
-            conditions.push( !('playerId' in query) || query.playerId && object.playerId === query.playerId );
+            conditions.push( !('playerId' in query) || query.playerId && object.playerId == query.playerId );
 
             // instance type conditio
             conditions.push( !('instanceType' in query) || query.instanceType && object instanceof query.instanceType );
@@ -115,7 +115,7 @@ export default class GameWorld {
     forEachObject(callback) {
         for (let id of Object.keys(this.objects)) {
             let returnValue = callback(id, this.objects[id]);  // TODO: the key should be Number(id)
-            if (!returnValue) break;
+            if (returnValue === false) break;
         }
     }
     
