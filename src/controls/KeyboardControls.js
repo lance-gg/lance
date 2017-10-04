@@ -225,7 +225,7 @@ export default class KeyboardControls{
         e = e || window.event;
 
         let keyName = keyCodeTable[e.keyCode];
-        if (keyName) {
+        if (keyName && this.boundKeys[keyName]) {
             if (this.keyState[keyName] == null){
                 this.keyState[keyName] = {
                     count: 0
