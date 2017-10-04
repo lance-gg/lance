@@ -208,7 +208,6 @@ export default class ServerEngine {
 
     // handle the object creation
     onObjectAdded(obj) {
-        console.log('object created event');
         this.networkTransmitter.addNetworkedEvent('objectCreate', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
@@ -220,7 +219,6 @@ export default class ServerEngine {
 
     // handle the object creation
     onObjectDestroyed(obj) {
-        console.log('object destroyed event');
         this.networkTransmitter.addNetworkedEvent('objectDestroy', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
