@@ -110,35 +110,33 @@ export default class ClientEngine {
      * @return {Promise} Resolved when the connection is made to the server
      */
     connect(options = {}) {
-        // todo get rid of 'that' nonsense. ES6 baby!
 
-        let that = this;
-        function connectSocket(matchMakerAnswer) {
+        let connectSocket = matchMakerAnswer => {
             return new Promise((resolve, reject) => {
 
                 if (matchMakerAnswer.status !== 'ok')
                     reject();
 
                 console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
-                that.socket = io(matchMakerAnswer.serverURL, options);
+                this.socket = io(matchMakerAnswer.serverURL, options);
 
-                that.networkMonitor.registerClient(that);
+                this.networkMonitor.registerClient(this);
 
-                that.socket.once('connect', () => {
+                this.socket.once('connect', () => {
                     console.log('connection made');
                     resolve();
                 });
 
-                that.socket.on('playerJoined', (playerData) => {
-                    that.gameEngine.playerId = playerData.playerId;
-                    that.messageIndex = Number(that.playerId) * 10000;
+                this.socket.on('playerJoined', (playerData) => {
+                    this.gameEngine.playerId = playerData.playerId;
+                    this.messageIndex = Number(this.gameEngine.playerId) * 10000; //todo magic number
                 });
 
-                that.socket.on('worldUpdate', (worldData) => {
-                    that.inboundMessages.push(worldData);
+                this.socket.on('worldUpdate', (worldData) => {
+                    this.inboundMessages.push(worldData);
                 });
             });
-        }
+        };
 
         let matchmaker = Promise.resolve({ serverURL: null, status: 'ok' });
         if (this.options.matchmaker)
