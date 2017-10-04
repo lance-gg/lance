@@ -252,10 +252,10 @@ export default class ClientEngine {
             return;
         }
 
-        const inputEvent = { input: message.data, playerId: this.playerId };
+        const inputEvent = { input: message.data, playerId: this.gameEngine.playerId };
         this.gameEngine.emit('client__processInput', inputEvent);
         this.gameEngine.emit('processInput', inputEvent);
-        this.gameEngine.processInput(message.data, this.playerId, false);
+        this.gameEngine.processInput(message.data, this.gameEngine.playerId, false);
 
     }
 
