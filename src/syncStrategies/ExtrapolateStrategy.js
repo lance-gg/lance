@@ -82,7 +82,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         let objCount = (Object.keys(lastSync.syncObjects)).length;
         let eventCount = e.syncEvents.length;
         let stepCount = (Object.keys(lastSync.syncSteps)).length;
-        this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
+        this.gameEngine.trace.debug(() => `sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
     }
 
     // add an object to our world
@@ -111,7 +111,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
     // apply a new sync
     applySync() {
 
-        this.gameEngine.trace.debug('extrapolate applying sync');
+        this.gameEngine.trace.debug(() => 'extrapolate applying sync');
 
         //
         //    scan all the objects in the sync
@@ -138,7 +138,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
             if (localShadowObj) {
                 // case 1: this object has a local shadow object on the client
-                this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
+                this.gameEngine.trace.debug(() => `object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
 
                 if (!world.objects.hasOwnProperty(ev.objectInstance.id)) {
                     let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
@@ -149,10 +149,10 @@ export default class ExtrapolateStrategy extends SyncStrategy {
             } else if (curObj) {
 
                 // case 2: this object already exists locally
-                this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
+                this.gameEngine.trace.trace(() => `object before syncTo: ${curObj.toString()}`);
                 curObj.saveState();
                 curObj.syncTo(ev.objectInstance);
-                this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
+                this.gameEngine.trace.trace(() => `object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
 
             } else {
 
@@ -165,10 +165,10 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         // reenact the steps that we want to extrapolate forwards
         //
         this.cleanRecentInputs();
-        this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
+        this.gameEngine.trace.debug(() => `extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
         if (serverStep < world.stepCount - this.options.maxReEnactSteps) {
             serverStep = world.stepCount - this.options.maxReEnactSteps;
-            this.gameEngine.trace.info(`too many steps to re-enact.  Starting from [${serverStep}] to [${world.stepCount}]`);
+            this.gameEngine.trace.info(() => `too many steps to re-enact.  Starting from [${serverStep}] to [${world.stepCount}]`);
         }
 
         let clientStep = world.stepCount;
@@ -179,7 +179,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
                     // only movement inputs are re-enacted
                     if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
 
-                    this.gameEngine.trace.trace(`extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
+                    this.gameEngine.trace.trace(() => `extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
                     this.gameEngine.processInput(inputData, this.gameEngine.playerId);
                 });
             }
@@ -207,12 +207,12 @@ export default class ExtrapolateStrategy extends SyncStrategy {
             obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
             if (typeof obj.refreshRenderObject === 'function')
                 obj.refreshRenderObject();
-            this.gameEngine.trace.trace(`object[${objId}] ${obj.bendingToString()}`);
+            this.gameEngine.trace.trace(() => `object[${objId}] ${obj.bendingToString()}`);
         }
 
         // trace object state after sync
         for (let objId of Object.keys(world.objects)) {
-            this.gameEngine.trace.trace(`object after extrapolate replay: ${world.objects[objId].toString()}`);
+            this.gameEngine.trace.trace(() => `object after extrapolate replay: ${world.objects[objId].toString()}`);
         }
 
         // destroy objects
@@ -237,7 +237,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
             if (typeof o.applyIncrementalBending === 'function') {
                 o.applyIncrementalBending(stepDesc);
                 o.refreshToPhysics();
-                // this.gameEngine.trace.trace(`object[${id}] after bending : ${o.toString()}`);
+                // this.gameEngine.trace.trace(() => `object[${id}] after bending : ${o.toString()}`);
             }
         });
 

@@ -139,7 +139,7 @@ export default class ServerEngine {
             }
 
             let payload = this.serializeUpdate({ diffUpdate });
-            this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} is delta update: ${diffUpdate} ==========`);
+            this.gameEngine.trace.info(() => `========== sending world update ${this.gameEngine.world.stepCount} is delta update: ${diffUpdate} ==========`);
             // TODO: implement server lag by queuing the emit to a future step
             for (let socketId of Object.keys(this.connectedPlayers))
                 this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);

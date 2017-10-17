@@ -53,7 +53,7 @@ export default class InterpolateStrategy extends SyncStrategy {
         let objCount = (Object.keys(lastSync.syncObjects)).length;
         let eventCount = e.syncEvents.length;
         let stepCount = (Object.keys(lastSync.syncSteps)).length;
-        this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
+        this.gameEngine.trace.debug(() => `sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
 
         this.syncsBuffer.push(lastSync);
         if (this.syncsBuffer.length >= this.options.syncsBufferLength) {
@@ -105,12 +105,12 @@ export default class InterpolateStrategy extends SyncStrategy {
 
         // we requires a sync before we proceed
         if (!nextSync) {
-            this.gameEngine.trace.debug('interpolate lacks future sync - requesting step skip');
+            this.gameEngine.trace.debug(() => 'interpolate lacks future sync - requesting step skip');
             this.clientEngine.skipOneStep = true;
             return;
         }
 
-        this.gameEngine.trace.debug(`interpolate past step [${stepToPlay}] using sync from step ${nextSync.stepCount}`);
+        this.gameEngine.trace.debug(() => `interpolate past step [${stepToPlay}] using sync from step ${nextSync.stepCount}`);
 
         // create objects which are created at this step
         let stepEvents = nextSync.syncSteps[stepToPlay];
@@ -188,9 +188,9 @@ export default class InterpolateStrategy extends SyncStrategy {
         if (typeof curObj.interpolate === 'function') {
 
             // update positions with interpolation
-            this.gameEngine.trace.trace(`object ${objId} before ${playPercentage} interpolate: ${curObj.toString()}`);
+            this.gameEngine.trace.trace(() => `object ${objId} before ${playPercentage} interpolate: ${curObj.toString()}`);
             curObj.interpolate(nextObj, playPercentage, this.gameEngine.worldSettings);
-            this.gameEngine.trace.trace(`object ${objId} after interpolate: ${curObj.toString()}`);
+            this.gameEngine.trace.trace(() => `object ${objId} after interpolate: ${curObj.toString()}`);
 
             // if this object has a physics sub-object, it must inherit
             // the position now.

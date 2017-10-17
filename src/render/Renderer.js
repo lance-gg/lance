@@ -70,13 +70,13 @@ export default class Renderer {
             this.clientEngine.lastStepTime = t - p / 2;
             this.clientEngine.correction = p / 2;
 // HACK: remove next line
-            this.clientEngine.gameEngine.trace.trace(`============RESETTING lastTime=${this.clientEngine.lastStepTime} period=${p}`);
+            this.clientEngine.gameEngine.trace.trace(() => `============RESETTING lastTime=${this.clientEngine.lastStepTime} period=${p}`);
         }
 
         // catch-up missed steps
         while (t > this.clientEngine.lastStepTime + p) {
 // HACK: remove next line
-this.clientEngine.gameEngine.trace.trace(`============RENDERER DRAWING EXTRA t=${t} LST=${this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
+this.clientEngine.gameEngine.trace.trace(() => `============RENDERER DRAWING EXTRA t=${t} LST=${this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
             this.clientEngine.step(this.clientEngine.lastStepTime + p, p + this.clientEngine.correction);
             this.clientEngine.lastStepTime += p;
             this.clientEngine.correction = 0;
@@ -86,7 +86,7 @@ this.clientEngine.gameEngine.trace.trace(`============RENDERER DRAWING EXTRA t=$
         // might happen after catch up above
         if (t < this.clientEngine.lastStepTime) {
 // HACK: remove next line
-            this.clientEngine.gameEngine.trace.trace(`============RENDERER DRAWING NOSTEP t=${t} dt=${t - this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
+            this.clientEngine.gameEngine.trace.trace(() => `============RENDERER DRAWING NOSTEP t=${t} dt=${t - this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
 
             dt = t - this.clientEngine.lastStepTime + this.clientEngine.correction;
             if (dt < 0) dt = 0;
@@ -98,7 +98,7 @@ this.clientEngine.gameEngine.trace.trace(`============RENDERER DRAWING EXTRA t=$
         // render-controlled step
 
 // HACK: remove next line
-        this.clientEngine.gameEngine.trace.trace(`============RENDERER DRAWING t=${t} LST=${this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
+        this.clientEngine.gameEngine.trace.trace(() => `============RENDERER DRAWING t=${t} LST=${this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
 
         dt = t - this.clientEngine.lastStepTime + this.clientEngine.correction;
         this.clientEngine.lastStepTime += p;
@@ -106,7 +106,7 @@ this.clientEngine.gameEngine.trace.trace(`============RENDERER DRAWING EXTRA t=$
         this.clientEngine.step(t, dt);
 
 // HACK: remove next line
-this.clientEngine.gameEngine.trace.trace(`============RENDERER DONE t=${t} LST=${this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
+this.clientEngine.gameEngine.trace.trace(() => `============RENDERER DONE t=${t} LST=${this.clientEngine.lastStepTime} correction = ${this.clientEngine.correction} period=${p}`);
     }
 
     /**

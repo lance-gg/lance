@@ -193,12 +193,12 @@ export default class ClientEngine {
         let clientStep = this.gameEngine.world.stepCount;
         let serverStep = this.gameEngine.serverStep;
         if (clientStep > serverStep + maxLead) {
-            this.gameEngine.trace.warn(`step drift ${checkType}. [${clientStep} > ${serverStep} + ${maxLead}] Client is ahead of server.  Delaying next step.`);
+            this.gameEngine.trace.warn(() => `step drift ${checkType}. [${clientStep} > ${serverStep} + ${maxLead}] Client is ahead of server.  Delaying next step.`);
             if (this.scheduler) this.scheduler.delayTick();
             this.lastStepTime += STEP_DELAY_MSEC;
             this.correction += STEP_DELAY_MSEC;
         } else if (serverStep > clientStep + maxLag) {
-            this.gameEngine.trace.warn(`step drift ${checkType}. [${serverStep} > ${clientStep} + ${maxLag}] Client is behind server.  Hurrying next step.`);
+            this.gameEngine.trace.warn(() => `step drift ${checkType}. [${serverStep} > ${clientStep} + ${maxLag}] Client is behind server.  Hurrying next step.`);
             if (this.scheduler) this.scheduler.hurryTick();
             this.lastStepTime -= STEP_HURRY_MSEC;
             this.correction -= STEP_HURRY_MSEC;
@@ -292,7 +292,7 @@ export default class ClientEngine {
             }
         };
 
-        this.gameEngine.trace.info(`USER INPUT[${this.messageIndex}]: ${input} ${inputOptions ? JSON.stringify(inputOptions) : '{}'}`);
+        this.gameEngine.trace.info(() => `USER INPUT[${this.messageIndex}]: ${input} ${inputOptions ? JSON.stringify(inputOptions) : '{}'}`);
 
         // if we delay input application on client, then queue it
         // otherwise apply it now
@@ -322,11 +322,11 @@ export default class ClientEngine {
             fullUpdate: syncHeader.fullUpdate
         });
 
-        this.gameEngine.trace.info(`========== inbound world update ${syncHeader.stepCount} ==========`);
+        this.gameEngine.trace.info(() => `========== inbound world update ${syncHeader.stepCount} ==========`);
 
         // finally update the stepCount
         if (syncHeader.stepCount > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD__CLIENT_RESET) {
-            this.gameEngine.trace.info(`========== world step count updated from ${this.gameEngine.world.stepCount} to  ${syncHeader.stepCount} ==========`);
+            this.gameEngine.trace.info(() => `========== world step count updated from ${this.gameEngine.world.stepCount} to  ${syncHeader.stepCount} ==========`);
             this.gameEngine.emit('client__stepReset', { oldStep: this.gameEngine.world.stepCount, newStep: syncHeader.stepCount });
             this.gameEngine.world.stepCount = syncHeader.stepCount;
         }

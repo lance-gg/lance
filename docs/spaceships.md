@@ -228,7 +228,7 @@ will be ignored.
 
 A trace message is usually recorded as follows:
 ```javascript
-gameEngine.trace.info(`this just happened: ${foobar()}`);
+gameEngine.trace.info(() => `this just happened: ${foobar()}`);
 ```
 
 By default, Lance already traces a lot of information, describing

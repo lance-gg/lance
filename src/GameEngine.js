@@ -130,7 +130,7 @@ export default class GameEngine {
       * and registering methods on the event handler.
       */
     start() {
-        this.trace.info('========== game engine started ==========');
+        this.trace.info(() => '========== game engine started ==========');
         this.initWorld();
 
         // create the default timer
@@ -173,7 +173,6 @@ export default class GameEngine {
             return !isReenact || o.id < clientIDSpace;
         }
 
-        
         // physics step
         if (this.physicsEngine) {
             if (dt) dt /= 1000; // physics engines work in seconds
@@ -186,7 +185,7 @@ export default class GameEngine {
         this.world.forEachObject((id, o) => {
             if (typeof o.refreshFromPhysics === 'function')
                 o.refreshFromPhysics();
-            this.trace.trace(`object[${id}] after ${isReenact ? 'reenact' : 'step'} : ${o.toString()}`);
+            this.trace.trace(() => `object[${id}] after ${isReenact ? 'reenact' : 'step'} : ${o.toString()}`);
         });
 
         // emit postStep event
@@ -213,7 +212,7 @@ export default class GameEngine {
                     serverCopyArrived = true;
             });
             if (serverCopyArrived) {
-                this.trace.info(`========== shadow object NOT added ${object.toString()} ==========`);
+                this.trace.info(() => `========== shadow object NOT added ${object.toString()} ==========`);
                 return null;
             }
         }
@@ -226,7 +225,7 @@ export default class GameEngine {
             object.onAddToWorld(this);
 
         this.emit('objectAdded', object);
-        this.trace.info(`========== object added ${object.toString()} ==========`);
+        this.trace.info(() => `========== object added ${object.toString()} ==========`);
 
         return object;
     }
@@ -252,7 +251,7 @@ export default class GameEngine {
      * @param {Boolean} isServer - indicate if this function is being called on the server side
      */
     processInput(inputMsg, playerId, isServer) {
-        this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
+        this.trace.info(() => `game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 
     /**
@@ -264,7 +263,7 @@ export default class GameEngine {
         let ob = this.world.objects[id];
         if (!ob)
             throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${id}`);
-        this.trace.info(`========== destroying object ${ob.toString()} ==========`);
+        this.trace.info(() => `========== destroying object ${ob.toString()} ==========`);
         this.emit('objectDestroyed', ob);
         this.world.removeObject(id);
         ob.destroy();
