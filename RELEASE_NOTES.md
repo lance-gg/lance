@@ -26,7 +26,7 @@
 * `GameEngine` step method cannot be called without passing the `isReenact` argument.  Games which override the `step` method must pass this argument when calling the super method.
 * Objects are now instantiated with a reference to the gameEngine, and get and ID automatically
 * Method `isOwnedByPlayer` moved from `clientEngine` to `GameEngine`, and the `clientEngine` now sets the `playerId` in the `gameEngine`. `GameObject` constructor is therefore: constructor(gameEngine, options, props) and must call the super constructor correspondingly
-* The `GameWorld.getPlayerObject()` method has been removed, you can get the player objects ysing the `GameWorld.query()` method, passing a `playerId` attribute.
+* The `GameWorld.getPlayerObject()` method has been removed, you can get the player objects using the `GameWorld.query()` method, passing a `playerId` attribute.
 * constructors of `DynamicObject` and `PhysicalObject` have changed to the following: gameEngine, options, and props.
 
 ## Release 1.0.1
