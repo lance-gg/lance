@@ -31,15 +31,22 @@ export default class GameObject extends Serializable {
         this.gameEngine = gameEngine;
 
         /**
-        * ID of this object's instance.  Each instance has an ID which is unique across the entire
-        * game world, including the server and all the clients.  In extrapolation mode,
-        * the client may have an object instance which does not yet exist on the server,
-        * these objects are known as shadow objects.
+        * ID of this object's instance.
+        * There are three cases of instance creation which can occur:
+        * 1. In the normal case, the constructor is asked to assign an ID which is unique
+        * across the entire game world, including the server and all the clients.
+        * 2. In extrapolation mode, the client may have an object instance which does not
+        * yet exist on the server, these objects are known as shadow objects.  Their IDs must
+        * be allocated from a different range.
+        * 3. Also, temporary objects are created on the client side each time a sync is received.
+        * These are used for interpolation purposes and as bending targets of position, velocity,
+        * angular velocity, and orientation.  In this case the id will be set to null.
         * @member {Number}
         */
+        this.id = null;
         if (options && 'id' in options)
             this.id = options.id;
-        else
+        else if (this.gameEngine)
             this.id = this.gameEngine.world.getNewId();
 
         this.components = {};
@@ -162,5 +169,5 @@ export default class GameObject extends Serializable {
     getComponent(componentClass){
         return this.components[componentClass.name];
     }
-    
+
 }

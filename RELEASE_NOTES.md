@@ -12,16 +12,22 @@
 * The structure of PixiRenderer has changed to allow objects to control their own rendering via this component. See the Simple-Spaaace example for reference
 * Implemented HSHG collision detection for SimplePhysics
 * Implemented ClientEngine standaloneMode for network-less testing of game engines
-* New KeyboardControls class to help with sending key-based input 
+* New KeyboardControls class to help with sending key-based input
+* Moved to es6 modules on all games.
+* ES6 Modules: Modules are imported using the "import from" construct.  For example import GameEngine from 'lance/GameEngine' instead of const GameEngine = require(...)
+* ES6 Modules: Games must configure webpack.config.js.  See sample game
+* ES6 Modules: Babel must be configured in order to run es6 modules on node server-side, by creating a .babelrc file.  See sample game.
 
 ### Breaking Changes
 
 * All classes are now in ES6 format instead of CommonJS
-* `PhysicsEngine` should no longer be instantiated in the Server `main.js` and in the client entry point.  Rather, it should be instantiated in the `GameEngine`.
-* `PhysicsEngine` constructor now does initialization instead of the `init` function
+* `PhysicsEngine` should no longer be instantiated in the Server `main.js` and in the client entry point.  Rather, it should be instantiated in the `GameEngine` subclass for your game.
+* `PhysicsEngine` constructor now does all initialization. Use of `init` function is deprecated.
 * `GameEngine` step method cannot be called without passing the `isReenact` argument.  Games which override the `step` method must pass this argument when calling the super method.
 * Objects are now instantiated with a reference to the gameEngine, and get and ID automatically
-* isOwnedByPlayer moved from clientEngine to GameEngine, and the clientEngine now sets the playerId in the gameEngine
+* Method `isOwnedByPlayer` moved from `clientEngine` to `GameEngine`, and the `clientEngine` now sets the `playerId` in the `gameEngine`. `GameObject` constructor is therefore: constructor(gameEngine, options, props) and must call the super constructor correspondingly
+* The `GameWorld.getPlayerObject()` method has been removed, you can get the player objects ysing the `GameWorld.query()` method, passing a `playerId` attribute.
+* constructors of `DynamicObject` and `PhysicalObject` have changed to the following: gameEngine, options, and props.
 
 ## Release 1.0.1
 

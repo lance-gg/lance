@@ -51,8 +51,6 @@ export default class DynamicObject extends GameObject {
 
     /**
     * Creates an instance of a dynamic object.
-    * Override to provide starting values for position, velocity, etc.
-    * The object ID should be the next value provided by `world.idCount`
     * @param {GameEngine} gameEngine - the gameEngine this object will be used in
     * @param {Object} options - options for the new object. See {@link GameObject}
     * @param {Object} props - properties to be set in the new object

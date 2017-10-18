@@ -39,22 +39,22 @@ export default class GameWorld {
      * @param {Boolean} [query.returnSingle] Return the first object matched
      * @returns {Array | Object} All game objects which match all the query parameters, or the first match if returnSingle was specified
      */
-    queryObjects(query){
+    queryObjects(query) {
         let queriedObjects = [];
 
         // todo this is currently a somewhat inefficient implementation for API testing purposes.
         // It should be implemented with cached dictionaries like in nano-ecs
-        this.forEachObject( (id, object) => {
+        this.forEachObject((id, object) => {
             let conditions = [];
 
             // object id condition
-            conditions.push( !('id' in query) || query.id && object.id == query.id );
+            conditions.push(!('id' in query) || query.id && object.id === query.id);
 
             // player id condition
-            conditions.push( !('playerId' in query) || query.playerId && object.playerId == query.playerId );
+            conditions.push(!('playerId' in query) || query.playerId && object.playerId === query.playerId);
 
             // instance type conditio
-            conditions.push( !('instanceType' in query) || query.instanceType && object instanceof query.instanceType );
+            conditions.push(!('instanceType' in query) || query.instanceType && object instanceof query.instanceType);
 
             // components conditions
             if ('components' in query) {
@@ -64,7 +64,7 @@ export default class GameWorld {
             }
 
             // all conditions are true, object is qualified for the query
-            if (conditions.every( value => value )){
+            if (conditions.every(value => value)) {
                 queriedObjects.push(object);
                 if (query.returnSingle) return false;
             }
@@ -72,7 +72,7 @@ export default class GameWorld {
 
         // return a single object or null
         if (query.returnSingle) {
-            return queriedObjects.length>0 ? queriedObjects[0] : null;
+            return queriedObjects.length > 0 ? queriedObjects[0] : null;
         }
 
         return queriedObjects;
@@ -84,7 +84,7 @@ export default class GameWorld {
      * @param query See queryObjects
      * @returns {Object}
      */
-    queryObject(query){
+    queryObject(query) {
         return this.queryObjects(Object.assign(query, {
             returnSingle: true
         }));
@@ -94,7 +94,7 @@ export default class GameWorld {
      * Remove an object from the game world
      * @param object
      */
-    addObject(object){
+    addObject(object) {
         this.objects[object.id] = object;
     }
 
@@ -102,7 +102,7 @@ export default class GameWorld {
      * Add an object to the game world
      * @param id
      */
-    removeObject(id){
+    removeObject(id) {
         delete this.objects[id];
     }
 
@@ -118,5 +118,5 @@ export default class GameWorld {
             if (returnValue === false) break;
         }
     }
-    
+
 }
