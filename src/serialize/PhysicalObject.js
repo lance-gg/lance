@@ -50,14 +50,16 @@ export default class PhysicalObject extends GameObject {
     * Creates an instance of a physical object.
     * Override to provide starting values for position, velocity, quaternion and angular velocity.
     * The object ID should be the next value provided by `world.idCount`
-    * @param {String} id - the object id
-    * @param {ThreeVector} position - position vector
-    * @param {ThreeVector} velocity - velocity vector
-    * @param {Quaternion} quaternion - orientation quaternion
-    * @param {ThreeVector} angularVelocity - 3-vector representation of angular velocity
+    * @param {GameEngine} gameEngine - the gameEngine this object will be used in
+    * @param {Object} options - options for the new object. See {@link GameObject}
+    * @param {Object} props - properties to be set in the new object
+    * @param {ThreeVector} props.position - position vector
+    * @param {ThreeVector} props.velocity - velocity vector
+    * @param {Quaternion} props.quaternion - orientation quaternion
+    * @param {ThreeVector} props.angularVelocity - 3-vector representation of angular velocity
     */
-    constructor(id, position, velocity, quaternion, angularVelocity) {
-        super(id);
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options);
         this.playerId = 0;
         this.bendingIncrements = 0;
 
@@ -68,10 +70,11 @@ export default class PhysicalObject extends GameObject {
         this.angularVelocity = new ThreeVector(0, 0, 0);
 
         // use values if provided
-        if (position) this.position.copy(position);
-        if (velocity) this.velocity.copy(velocity);
-        if (quaternion) this.quaternion.copy(quaternion);
-        if (angularVelocity) this.angularVelocity.copy(angularVelocity);
+        props = props || {};
+        if (props.position) this.position.copy(props.position);
+        if (props.velocity) this.velocity.copy(props.velocity);
+        if (props.quaternion) this.quaternion.copy(props.quaternion);
+        if (props.angularVelocity) this.angularVelocity.copy(props.angularVelocity);
 
         this.class = PhysicalObject;
     }
