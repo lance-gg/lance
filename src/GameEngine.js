@@ -41,6 +41,7 @@ export default class GameEngine {
         // if no GameWorld is specified, use the default one
         this.options = Object.assign({
             GameWorld: GameWorld,
+            clientIDSpace: 1000000,
             traceLevel: Trace.TRACE_NONE
         }, options);
 
