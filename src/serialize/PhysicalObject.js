@@ -50,6 +50,9 @@ export default class PhysicalObject extends GameObject {
     * Creates an instance of a physical object.
     * Override to provide starting values for position, velocity, quaternion and angular velocity.
     * The object ID should be the next value provided by `world.idCount`
+    * NOTE: all subclasses of this class must comply with this constructor signature.
+    *       This is required because the engine will create temporary instances when
+    *       syncs arrive on the clients.
     * @param {GameEngine} gameEngine - the gameEngine this object will be used in
     * @param {Object} options - options for the new object. See {@link GameObject}
     * @param {Object} props - properties to be set in the new object
