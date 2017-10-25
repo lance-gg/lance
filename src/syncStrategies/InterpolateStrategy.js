@@ -148,20 +148,12 @@ export default class InterpolateStrategy extends SyncStrategy {
     //       so the code below should be easy to simplify now
     interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
 
-        // handle step for this object
+        // update position and orientation with interpolation
         let curObj = this.gameEngine.world.objects[objId];
         if (typeof curObj.interpolate === 'function') {
-
-            // update positions with interpolation
             this.gameEngine.trace.trace(() => `object ${objId} before ${playPercentage} interpolate: ${curObj.toString()}`);
             curObj.interpolate(nextObj, playPercentage, this.gameEngine.worldSettings);
             this.gameEngine.trace.trace(() => `object ${objId} after interpolate: ${curObj.toString()}`);
-
-            // if this object has a physics sub-object, it must inherit
-            // the position now.
-            if (curObj.physicalObject && typeof curObj.updatePhysicsObject === 'function') {
-                curObj.updatePhysicsObject();
-            }
         }
     }
 }

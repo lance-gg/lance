@@ -201,13 +201,17 @@ export default class PhysicalObject extends GameObject {
     }
 
     // interpolate implementation
-    interpolate(nextObj, playPercentage, worldSettings) {
+    interpolate(nextObj, percent, worldSettings) {
 
         // get the incremental delta position
-        const positionDelta = (new ThreeVector())
-            .copy(nextObj.position)
-            .subtract(this.position)
-            .multiplyScalar(playPercentage);
-        this.position.add(positionDelta);
+        // const positionDelta = (new ThreeVector())
+        //     .copy(nextObj.position)
+        //     .subtract(this.position)
+        //     .multiplyScalar(playPercentage);
+        // this.position.add(positionDelta);
+
+        // slerp to target position
+        this.position.lerp(nextObj.position, percent);
+        this.quaternion.slerp(nextObj.quaternion, percent);
     }
 }
