@@ -36,13 +36,13 @@ export default class GameEngine {
 
         // TODO I think we should discuss this whole globals issues
         // place the game engine in the LANCE globals
-        const isServerSide = typeof window === 'undefined';
+        const isServerSide = (typeof window === 'undefined');
         const glob = isServerSide ? global : window;
         glob.LANCE = { gameEngine: this };
 
         // set options
         const defaultOpts = { GameWorld: GameWorld, traceLevel: Trace.TRACE_NONE };
-        if (isServerSide) defaultOpts.clientIDSpace = 1000000;
+        if (!isServerSide) defaultOpts.clientIDSpace = 1000000;
         this.options = Object.assign(defaultOpts, options);
 
         /**
