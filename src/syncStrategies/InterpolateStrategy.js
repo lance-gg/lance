@@ -17,45 +17,16 @@ export default class InterpolateStrategy extends SyncStrategy {
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.passive = true; // client side engine ignores inputs
         this.gameEngine.on('client__postStep', this.interpolate.bind(this));
-        this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
     }
 
     collectSync(e) {
 
-        // TODO the event sorting code below is used in one way or another
-        //    by interpolate, extrapolate and reflect.  Consider placing
-        //    it in the base class.
+        super.collectSync(e);
 
-        let lastSync = this.lastSync = {};
-        lastSync.stepCount = e.stepCount;
+        if (!this.lastSync)
+            return;
 
-        // keep a reference of events by object id
-        lastSync.syncObjects = {};
-        e.syncEvents.forEach(sEvent => {
-            let o = sEvent.objectInstance;
-            if (!o) return;
-            if (!lastSync.syncObjects[o.id]) {
-                lastSync.syncObjects[o.id] = [];
-            }
-            lastSync.syncObjects[o.id].push(sEvent);
-        });
-
-        // keep a reference of events by step
-        lastSync.syncSteps = {};
-        e.syncEvents.forEach(sEvent => {
-
-            // add an entry for this step and event-name
-            if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
-            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
-        });
-
-        let objCount = (Object.keys(lastSync.syncObjects)).length;
-        let eventCount = e.syncEvents.length;
-        let stepCount = (Object.keys(lastSync.syncSteps)).length;
-        this.gameEngine.trace.debug(() => `sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
-
-        this.syncsBuffer.push(lastSync);
+        this.syncsBuffer.push(this.lastSync);
         if (this.syncsBuffer.length >= this.options.syncsBufferLength) {
             this.syncsBuffer.shift();
         }
@@ -71,12 +42,6 @@ export default class InterpolateStrategy extends SyncStrategy {
         curObj.passive = true;
         this.gameEngine.addObjectToWorld(curObj);
         console.log(`adding new object ${curObj}`);
-
-        // if this game keeps a physics engine on the client side,
-        // we need to update it as well
-        if (this.gameEngine.physicsEngine && typeof curObj.initPhysicsObject === 'function') {
-            curObj.initPhysicsObject(this.gameEngine.physicsEngine);
-        }
 
         if (stepCount) {
             curObj.lastUpdateStep = stepCount;

@@ -199,4 +199,15 @@ export default class PhysicalObject extends GameObject {
         // this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;
     }
+
+    // interpolate implementation
+    interpolate(nextObj, playPercentage, worldSettings) {
+
+        // get the incremental delta position
+        const positionDelta = (new ThreeVector())
+            .copy(nextObj.position)
+            .subtract(this.position)
+            .multiplyScalar(playPercentage);
+        this.position.add(positionDelta);
+    }
 }

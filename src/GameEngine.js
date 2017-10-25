@@ -33,17 +33,17 @@ export default class GameEngine {
       * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
       */
     constructor(options) {
+
         // TODO I think we should discuss this whole globals issues
         // place the game engine in the LANCE globals
-        const glob = (typeof window === 'undefined') ? global : window;
+        const isServerSide = typeof window === 'undefined';
+        const glob = isServerSide ? global : window;
         glob.LANCE = { gameEngine: this };
 
-        // if no GameWorld is specified, use the default one
-        this.options = Object.assign({
-            GameWorld: GameWorld,
-            clientIDSpace: 1000000,
-            traceLevel: Trace.TRACE_NONE
-        }, options);
+        // set options
+        const defaultOpts = { GameWorld: GameWorld, traceLevel: Trace.TRACE_NONE };
+        if (isServerSide) defaultOpts.clientIDSpace = 1000000;
+        this.options = Object.assign(defaultOpts, options);
 
         /**
          * client's player ID, as a string. If running on the client, this is set at runtime by the clientEngine
