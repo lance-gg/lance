@@ -28,6 +28,8 @@ export default class CollisionDetection {
             if (!(pairId in this.collisionPairs)) {
                 this.collisionPairs[pairId] = true;
                 this.gameEngine.emit('collisionStart', { o1, o2 });
+            } else {
+                this.gameEngine.emit('collisionStay', { o1, o2 });
             }
         } else if (pairId in this.collisionPairs) {
             this.gameEngine.emit('collisionStop', { o1, o2 });
