@@ -220,7 +220,7 @@ class ExtrapolateStrategy extends SyncStrategy {
                 continue;
 
             objEvents.forEach((e) => {
-                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
+                if (e.constructor.name === 'ObjectDestroy') this.gameEngine.removeObjectFromWorld(objId);
             });
         }
     }

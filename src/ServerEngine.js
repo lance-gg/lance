@@ -6,6 +6,7 @@ const Scheduler = require('./lib/Scheduler');
 const Serializer = require('./serialize/Serializer');
 const NetworkTransmitter = require('./network/NetworkTransmitter');
 const NetworkMonitor = require('./network/NetworkMonitor');
+const NetworkedEvents = require('./network/NetworkedEvents');
 
 /**
  * ServerEngine is the main server-side singleton code.
@@ -167,10 +168,7 @@ class ServerEngine {
 
         // add this sync header
         // currently this is just the sync step count
-        this.networkTransmitter.addNetworkedEvent('syncHeader', {
-            stepCount: world.stepCount,
-            fullUpdate: Number(!diffUpdate)
-        });
+        this.networkTransmitter.addNetworkedEvent(new NetworkedEvents.SyncHeader(world.stepCount, Number(!diffUpdate)));
 
         for (let objId of Object.keys(world.objects)) {
             let obj = world.objects[objId];
@@ -188,10 +186,7 @@ class ServerEngine {
                 obj = obj.prunedStringsClone(this.serializer, prevObject);
             }
 
-            this.networkTransmitter.addNetworkedEvent('objectUpdate', {
-                stepCount: world.stepCount,
-                objectInstance: obj
-            });
+            this.networkTransmitter.addNetworkedEvent(new NetworkedEvents.ObjectUpdate(world.stepCount, obj));
         }
 
         // remove memory objects which no longer exist
@@ -209,10 +204,7 @@ class ServerEngine {
     // handle the object creation
     onObjectAdded(obj) {
         console.log('object created event');
-        this.networkTransmitter.addNetworkedEvent('objectCreate', {
-            stepCount: this.gameEngine.world.stepCount,
-            objectInstance: obj
-        });
+        this.networkTransmitter.addNetworkedEvent(new NetworkedEvents.ObjectCreate(this.gameEngine.world.stepCount, obj));
 
         if (this.options.updateOnObjectCreation)
             this.requestImmediateUpdate = true;
@@ -221,10 +213,7 @@ class ServerEngine {
     // handle the object creation
     onObjectDestroyed(obj) {
         console.log('object destroyed event');
-        this.networkTransmitter.addNetworkedEvent('objectDestroy', {
-            stepCount: this.gameEngine.world.stepCount,
-            objectInstance: obj
-        });
+        this.networkTransmitter.addNetworkedEvent(new NetworkedEvents.ObjectDestroy(this.gameEngine.world.stepCount, obj));
     }
 
     // handle new player connection
