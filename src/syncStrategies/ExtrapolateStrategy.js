@@ -72,8 +72,8 @@ class ExtrapolateStrategy extends SyncStrategy {
 
             // add an entry for this step and event-name
             if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
-            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
+            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.constructor.name]) lastSync.syncSteps[sEvent.stepCount][sEvent.constructor.name] = [];
+            lastSync.syncSteps[sEvent.stepCount][sEvent.constructor.name].push(sEvent);
         });
 
         let objCount = (Object.keys(lastSync.syncObjects)).length;

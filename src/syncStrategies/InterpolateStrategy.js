@@ -48,8 +48,8 @@ class InterpolateStrategy extends SyncStrategy {
 
             // add an entry for this step and event-name
             if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
-            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
+            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.constructor.name]) lastSync.syncSteps[sEvent.stepCount][sEvent.constructor.name] = [];
+            lastSync.syncSteps[sEvent.stepCount][sEvent.constructor.name].push(sEvent);
         });
 
         let objCount = (Object.keys(lastSync.syncObjects)).length;
@@ -172,7 +172,7 @@ class InterpolateStrategy extends SyncStrategy {
             if (!objEvents || Number(id) >= this.gameEngine.options.clientIDSpace) return;
 
             objEvents.forEach((e) => {
-                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(id);
+                if (e.constructor.name === 'ObjectDestroy') this.gameEngine.removeObjectFromWorld(id);
             });
         });
 
