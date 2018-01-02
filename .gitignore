@@ -46,6 +46,8 @@ docs_out
 # yarn files
 yarn.lock
 
+# package lock
+package-lock.json
 
 deploy_key
 docmeta_temp
