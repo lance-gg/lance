@@ -155,8 +155,8 @@ export default class ClientEngine {
         // initialize the renderer
         // the render loop waits for next animation frame
         if (!this.renderer) alert('ERROR: game has not defined a renderer');
-        let renderLoop = () => {
-            this.renderer.draw();
+        let renderLoop = (timestamp) => {
+            this.renderer.draw(timestamp);
             window.requestAnimationFrame(renderLoop);
         };
 
