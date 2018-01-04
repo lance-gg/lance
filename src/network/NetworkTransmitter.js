@@ -11,8 +11,6 @@ export default class NetworkTransmitter {
 
         this.registeredEvents = [];
 
-        this.payload = [];
-
         this.serializer.registerClass(NetworkedEventCollection);
 
         this.registerNetworkedEventFactory('objectUpdate', {
@@ -42,6 +40,8 @@ export default class NetworkTransmitter {
                 fullUpdate: { type: Serializer.TYPES.UINT8 }
             }
         });
+
+        this.networkedEventCollection = new NetworkedEventCollection();
     }
 
     registerNetworkedEventFactory(eventName, options) {
@@ -66,17 +66,16 @@ export default class NetworkTransmitter {
         }
 
         let stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
-        this.payload.push(stagedNetworkedEvent);
+        this.networkedEventCollection.events.push(stagedNetworkedEvent);
 
         return stagedNetworkedEvent;
     }
 
     serializePayload() {
-        if (this.payload.length === 0)
+        if (this.networkedEventCollection.events.length === 0)
             return null;
 
-        let networkedEventCollection = new NetworkedEventCollection(this.payload);
-        let dataBuffer = networkedEventCollection.serialize(this.serializer);
+        let dataBuffer = this.networkedEventCollection.serialize(this.serializer);
 
         return dataBuffer;
     }
@@ -86,7 +85,7 @@ export default class NetworkTransmitter {
     }
 
     clearPayload() {
-        this.payload = [];
+        this.networkedEventCollection.events = [];
     }
 
 }
