@@ -52,7 +52,7 @@ export default class SyncStrategy {
 
             // keep a reference of events by step
             let stepCount = sEvent.stepCount,
-                eventName = this.serializer.getClassName(sEvent.classId);
+                eventName = sEvent.eventName;
 
             if (!lastSync.syncSteps[stepCount]) lastSync.syncSteps[stepCount] = {};
             if (!lastSync.syncSteps[stepCount][eventName]) lastSync.syncSteps[stepCount][eventName] = [];
