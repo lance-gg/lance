@@ -62,6 +62,6 @@ export default class SyncStrategy {
         let eventCount = e.syncEvents.length;
         let objCount = (Object.keys(lastSync.syncObjects)).length;
         let stepCount = (Object.keys(lastSync.syncSteps)).length;
-        this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
+        this.gameEngine.trace.debug(() => `sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
     }
 }
