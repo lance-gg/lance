@@ -53,11 +53,19 @@ export default class GameObject extends Serializable {
     }
 
     /**
-     * Add this object to the game-world by creating physics sub-objects
-     * renderer sub-objects and any other resources
+     * Called after the object is added to to the game world.
+     * This is where renderer renderer sub-objects, physics sub-objects
+     * and any other resources should be created
      * @param {GameEngine} gameEngine the game engine
      */
     onAddToWorld(gameEngine) {}
+
+    /**
+     * Called after the object is removed from game-world.
+     * This is where renderer sub-objects and any other resources should be freed
+     * @param {GameEngine} gameEngine the game engine
+     */
+    onRemoveFromWorld(gameEngine) {}
 
     /**
      * Formatted textual description of the game object.
@@ -76,7 +84,7 @@ export default class GameObject extends Serializable {
     }
 
     saveState(other) {
-        this.savedCopy = (new this.constructor(this.gameEngine, {id: null}));
+        this.savedCopy = (new this.constructor(this.gameEngine, { id: null }));
         this.savedCopy.syncTo(other ? other : this);
     }
 
@@ -130,14 +138,13 @@ export default class GameObject extends Serializable {
     // copy physical attributes from physics sub-object
     refreshFromPhysics() {}
 
-
     // apply a single bending increment
     applyIncrementalBending() { }
 
     // clean up resources
     destroy() {}
 
-    addComponent(componentInstance){
+    addComponent(componentInstance) {
         componentInstance.parentObject = this;
         this.components[componentInstance.constructor.name] = componentInstance;
 
@@ -147,7 +154,7 @@ export default class GameObject extends Serializable {
         }
     }
 
-    removeComponent(componentName){
+    removeComponent(componentName) {
         // todo cleanup of the component ?
         delete this.components[componentName];
 
@@ -162,11 +169,11 @@ export default class GameObject extends Serializable {
      * @param componentClass the comp
      * @returns {Boolean} true if the gameObject contains this component
      */
-    hasComponent(componentClass){
+    hasComponent(componentClass) {
         return componentClass.name in this.components;
     }
 
-    getComponent(componentClass){
+    getComponent(componentClass) {
         return this.components[componentClass.name];
     }
 
