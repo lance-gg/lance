@@ -120,7 +120,7 @@ export default class Serializable {
         let isString = p => netScheme[p].type === Serializer.TYPES.STRING;
         let hasChanged = p => prevObject[p] !== this[p];
         let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
-        if (!changedStrings) return this;
+        if (changedStrings.length == 0) return this;
 
         // build a clone with pruned strings
         let prunedCopy = new this.constructor(null, { id: null });

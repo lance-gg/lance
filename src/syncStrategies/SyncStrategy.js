@@ -35,32 +35,32 @@ export default class SyncStrategy {
         }
 
         // build new sync object
-        let lastSync = this.lastSync = {};
-        lastSync.stepCount = e.stepCount;
+        let lastSync = this.lastSync = {
+            stepCount: e.stepCount,
+            syncObjects: {},
+            syncSteps: {}
+        };
 
-        // keep a reference of events by object id
-        lastSync.syncObjects = {};
         e.syncEvents.forEach(sEvent => {
-            let o = sEvent.objectInstance;
-            if (!o) return;
-            if (!lastSync.syncObjects[o.id]) {
-                lastSync.syncObjects[o.id] = [];
+
+            // keep a reference of events by object id
+            if (sEvent.objectInstance){
+                let objectId = sEvent.objectInstance.id;
+                if (!lastSync.syncObjects[objectId]) lastSync.syncObjects[objectId] = [];
+                lastSync.syncObjects[objectId].push(sEvent);
             }
-            lastSync.syncObjects[o.id].push(sEvent);
+
+            // keep a reference of events by step
+            let stepCount = sEvent.stepCount,
+                eventName = sEvent.eventName;
+
+            if (!lastSync.syncSteps[stepCount]) lastSync.syncSteps[stepCount] = {};
+            if (!lastSync.syncSteps[stepCount][eventName]) lastSync.syncSteps[stepCount][eventName] = [];
+            lastSync.syncSteps[stepCount][eventName].push(sEvent);
         });
 
-        // keep a reference of events by step
-        lastSync.syncSteps = {};
-        e.syncEvents.forEach(sEvent => {
-
-            // add an entry for this step and event-name
-            if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
-            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
-        });
-
-        let objCount = (Object.keys(lastSync.syncObjects)).length;
         let eventCount = e.syncEvents.length;
+        let objCount = (Object.keys(lastSync.syncObjects)).length;
         let stepCount = (Object.keys(lastSync.syncSteps)).length;
         this.gameEngine.trace.debug(() => `sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
     }
