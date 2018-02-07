@@ -274,7 +274,7 @@ export default class GameEngine {
             object.onRemoveFromWorld(this);
 
         this.emit('objectDestroyed', object);
-        this.world.removeObject(object);
+        this.world.removeObject(objectId);
     }
 
     /**
