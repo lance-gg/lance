@@ -1,13 +1,11 @@
-'use strict';
-
-const Serializable = require('./Serializable');
-const Serializer = require('./Serializer');
+import Serializable from './Serializable';
+import Serializer from './Serializer';
 
 /**
  * A ThreeVector is a geometric object which is completely described
  * by three values.
  */
-class ThreeVector extends Serializable {
+export default class ThreeVector extends Serializable {
 
     static get netScheme() {
         return {
@@ -142,5 +140,3 @@ class ThreeVector extends Serializable {
         return this;
     }
 }
-
-module.exports = ThreeVector;

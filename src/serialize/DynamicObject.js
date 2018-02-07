@@ -1,9 +1,7 @@
-'use strict';
-
-const TwoVector = require('./TwoVector');
-const GameObject = require('./GameObject');
-const Serializer = require('./Serializer');
-const MathUtils = require('../lib/MathUtils');
+import TwoVector from './TwoVector';
+import GameObject from './GameObject';
+import Serializer from './Serializer';
+import MathUtils from '../lib/MathUtils';
 
 /**
  * DynamicObject is the base class of the game's objects, for games which
@@ -16,7 +14,7 @@ const MathUtils = require('../lib/MathUtils');
  * allow the client to extrapolate the position
  * of dynamic objects in-between server updates.
  */
-class DynamicObject extends GameObject {
+export default class DynamicObject extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -44,6 +42,8 @@ class DynamicObject extends GameObject {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
+            width: { type: Serializer.TYPES.INT16 },
+            height: { type: Serializer.TYPES.INT16 },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
             angle: { type: Serializer.TYPES.FLOAT32 }
         }, super.netScheme);
@@ -51,17 +51,17 @@ class DynamicObject extends GameObject {
 
     /**
     * Creates an instance of a dynamic object.
-    * Override to provide starting values for position, velocity, etc.
-    * The object ID should be the next value provided by `world.idCount`
-    * @param {String} id - the object id
-    * @param {TwoVector} position - position vector
-    * @param {TwoVector} velocity - velocity vector
-    * @example
-    *    // Ship is a subclass of DynamicObject:
-    *    Ship(++this.world.idCount);
+    * NOTE: all subclasses of this class must comply with this constructor signature.
+    *       This is required because the engine will create temporary instances when
+    *       syncs arrive on the clients.
+    * @param {GameEngine} gameEngine - the gameEngine this object will be used in
+    * @param {Object} options - options for the new object. See {@link GameObject}
+    * @param {Object} props - properties to be set in the new object
+    * @param {TwoVector} props.position - position vector
+    * @param {TwoVector} props.velocity - velocity vector
     */
-    constructor(id, position, velocity) {
-        super(id);
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options);
 
         /**
         * ID of player who created this object
@@ -71,6 +71,18 @@ class DynamicObject extends GameObject {
 
         this.position = new TwoVector(0, 0);
         this.velocity = new TwoVector(0, 0);
+
+        /**
+         * Object width for collision detection purposes. Default is 1
+         * @member {Number}
+         */
+        this.width = 1;
+
+        /**
+         * Object Height for collision detection purposes. Default is 1
+         * @member {Number}
+         */
+        this.height = 1;
 
         /**
          * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
@@ -88,13 +100,13 @@ class DynamicObject extends GameObject {
         * position
         * @member {TwoVector}
         */
-        if (position) this.position.copy(position);
+        if (props && props.position) this.position.copy(props.position);
 
         /**
         * velocity
         * @member {TwoVector}
         */
-        if (velocity) this.velocity.copy(velocity);
+        if (props && props.velocity) this.velocity.copy(props.velocity);
 
         /**
         * object orientation angle in degrees
@@ -150,7 +162,7 @@ class DynamicObject extends GameObject {
      */
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
-        return `dObj[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
+        return `${this.constructor.name}[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
     }
 
     /**
@@ -261,6 +273,13 @@ class DynamicObject extends GameObject {
         this.angle = angle + shortestAngle * playPercentage;
 
     }
-}
 
-module.exports = DynamicObject;
+    getAABB() {
+        // todo take rotation into account
+        // registration point is in the middle
+        return {
+            min: [this.x - this.width / 2, this.y - this.height / 2],
+            max: [this.x + this.width / 2, this.y + this.height / 2]
+        };
+    }
+}

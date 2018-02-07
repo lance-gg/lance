@@ -1,24 +1,31 @@
 'use strict';
-const PhysicsEngine = require('./PhysicsEngine');
-const CollisionDetection = require('./SimplePhysics/CollisionDetection');
-const TwoVector = require('../serialize/TwoVector');
+import PhysicsEngine from './PhysicsEngine';
+import TwoVector from '../serialize/TwoVector';
+import HSHGCollisionDetection from './SimplePhysics/HSHGCollisionDetection';
+import BruteCollisionDetection from './SimplePhysics/BruteCollisionDetection';
 
 let dv = new TwoVector();
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
  */
-class SimplePhysicsEngine extends PhysicsEngine {
+export default class SimplePhysicsEngine extends PhysicsEngine {
 
-    init(initOptions) {
-        super.init(initOptions);
-        this.collisionDetection = new CollisionDetection();
+    constructor(initOptions) {
+        super(initOptions);
+
+        // todo does this mean both modules always get loaded?
+        if (initOptions.collisions && initOptions.collisions.type === 'HSHG') {
+            this.collisionDetection = new HSHGCollisionDetection();
+        } else {
+            this.collisionDetection = new BruteCollisionDetection();
+        }
 
         /**
          * The actor's name.
          * @member {TwoVector} constant gravity affecting all objects
          */
-        this.gravity = new TwoVector(0,0);
+        this.gravity = new TwoVector(0, 0);
 
         if (initOptions.gravity)
             this.gravity.copy(initOptions.gravity);
@@ -45,7 +52,7 @@ class SimplePhysicsEngine extends PhysicsEngine {
             o.velocity.add(dv);
         }
 
-        //apply gravity
+        // apply gravity
         if (o.affectedByGravity) o.velocity.add(this.gravity);
 
         let velMagnitude = o.velocity.length();
@@ -94,5 +101,3 @@ class SimplePhysicsEngine extends PhysicsEngine {
         this.collisionDetection.detect(this.gameEngine);
     }
 }
-
-module.exports = SimplePhysicsEngine;

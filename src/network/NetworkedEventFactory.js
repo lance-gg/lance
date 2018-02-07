@@ -1,9 +1,7 @@
-'use strict';
+import Serializable from './../serialize/Serializable';
+import Utils from './../lib/Utils';
 
-const Serializable = require('./../serialize/Serializable');
-const Utils = require('./../lib/Utils');
-
-class NetworkedEventFactory {
+export default class NetworkedEventFactory {
 
     constructor(serializer, eventName, options) {
         options = Object.assign({}, options);
@@ -41,5 +39,3 @@ class NetworkedEventFactory {
     }
 
 }
-
-module.exports = NetworkedEventFactory;

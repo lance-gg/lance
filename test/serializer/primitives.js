@@ -1,9 +1,7 @@
-"use strict";
+import should from 'should';
 
-const should = require('should');
-
-const Serializable = require('../../src/serialize/Serializable');
-const Serializer = require('../../src/serialize//Serializer');
+import Serializer from '../../src/serialize//Serializer';
+import Serializable from '../../src/serialize/Serializable';
 
 class TestObject extends Serializable {
 

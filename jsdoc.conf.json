@@ -11,6 +11,7 @@
             "src/ServerEngine.js",
             "src/ClientEngine.js",
             "src/GameEngine.js",
+            "src/serialize/GameObject.js",
             "src/serialize/DynamicObject.js",
             "src/serialize/Serializer.js",
             "src/serialize/PhysicalObject.js",
@@ -19,7 +20,7 @@
             "src/serialize/Quaternion.js",
             "src/render/Renderer.js",
             "src/render/AFrameRenderer.js",
-            "src/matchMaker/MatchMaker.js"
+            "src/lib/Trace.js"
         ]
     },
     "plugins": [

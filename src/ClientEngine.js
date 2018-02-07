@@ -1,17 +1,16 @@
-'use strict';
-let io = require('socket.io-client');
-const Utils = require('./lib/Utils');
-const Scheduler = require('./lib/Scheduler');
-const Synchronizer = require('./Synchronizer');
-const Serializer = require('./serialize/Serializer');
-const NetworkMonitor = require('./network/NetworkMonitor');
-const NetworkTransmitter = require('./network/NetworkTransmitter');
+import io from 'socket.io-client';
+import Utils from './lib/Utils';
+import Scheduler from './lib/Scheduler';
+import Synchronizer from './Synchronizer';
+import Serializer from './serialize/Serializer';
+import NetworkMonitor from './network/NetworkMonitor';
+import NetworkTransmitter from './network/NetworkTransmitter';
 
 // externalizing these parameters as options would add confusion to game
 // developers, and provide no real benefit.
 const STEP_DRIFT_THRESHOLDS = {
     onServerSync: { MAX_LEAD: 1, MAX_LAG: 3 }, // max step lead/lag allowed after every server sync
-    onEveryStep: { MAX_LEAD: 10, MAX_LAG: 10 } // max step lead/lag allowed at every step
+    onEveryStep: { MAX_LEAD: 7, MAX_LAG: 8 } // max step lead/lag allowed at every step
 };
 const STEP_DRIFT_THRESHOLD__CLIENT_RESET = 20; // if we are behind this many steps, just reset the step counter
 const GAME_UPS = 60; // default number of game steps per second
@@ -24,7 +23,7 @@ const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution b
  * starting client steps, and handling world updates which arrive from
  * the server.
  */
-class ClientEngine {
+export default class ClientEngine {
 
     /**
       * Create a client engine instance.
@@ -32,6 +31,7 @@ class ClientEngine {
       * @param {GameEngine} gameEngine - a game engine
       * @param {Object} inputOptions - options object
       * @param {Boolean} inputOptions.autoConnect - if true, the client will automatically attempt connect to server.
+      * @param {Boolean} inputOptions.standaloneMode - if true, the client will never try to connect to a server
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
       * @param {Number} inputOptions.healthCheckInterval - health check message interval (millisec). Default is 1000.
       * @param {Number} inputOptions.healthCheckRTTSample - health check RTT calculation sample size. Default is 10.
@@ -49,7 +49,7 @@ class ClientEngine {
             healthCheckInterval: 1000,
             healthCheckRTTSample: 10,
             stepPeriod: 1000 / GAME_UPS,
-            scheduler: 'fixed'
+            scheduler: 'fixed',
         }, inputOptions);
 
         /**
@@ -77,14 +77,10 @@ class ClientEngine {
         this.scheduler = null;
         this.lastStepTime = 0;
         this.correction = 0;
-
-        /**
-        * client's player ID, as a string.
-        * @member {String}
-        */
-        this.playerId = NaN;
-
-        this.configureSynchronization();
+        
+        if (this.options.standaloneMode !== true) {
+            this.configureSynchronization();
+        }
 
         // create a buffer of delayed inputs (fifo)
         if (inputOptions && inputOptions.delayInputCount) {
@@ -94,25 +90,16 @@ class ClientEngine {
         }
     }
 
-    /**
-     * Check if a given object is owned by the player on this client
-     *
-     * @param {Object} object the game object to check
-     * @return {Boolean} true if the game object is owned by the player on this client
-     */
-    isOwnedByPlayer(object) {
-        return (object.playerId == this.playerId);
-    }
-
     configureSynchronization() {
 
         // the reflect syncronizer is just interpolate strategy,
         // configured to show server syncs
         let syncOptions = this.options.syncOptions;
-        if (syncOptions.sync === 'reflect') {
+        if (syncOptions.sync === 'reflect') { //todo would be nicer to use an enum
             syncOptions.sync = 'interpolate';
             syncOptions.reflect = true;
         }
+
         const synchronizer = new Synchronizer(this, syncOptions);
     }
 
@@ -124,33 +111,32 @@ class ClientEngine {
      */
     connect(options = {}) {
 
-        let that = this;
-        function connectSocket(matchMakerAnswer) {
+        let connectSocket = matchMakerAnswer => {
             return new Promise((resolve, reject) => {
 
                 if (matchMakerAnswer.status !== 'ok')
                     reject();
 
                 console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
-                that.socket = io(matchMakerAnswer.serverURL, options);
+                this.socket = io(matchMakerAnswer.serverURL, options);
 
-                that.networkMonitor.registerClient(that);
+                this.networkMonitor.registerClient(this);
 
-                that.socket.once('connect', () => {
+                this.socket.once('connect', () => {
                     console.log('connection made');
                     resolve();
                 });
 
-                that.socket.on('playerJoined', (playerData) => {
-                    that.playerId = playerData.playerId;
-                    that.messageIndex = Number(that.playerId) * 10000;
+                this.socket.on('playerJoined', (playerData) => {
+                    this.gameEngine.playerId = playerData.playerId;
+                    this.messageIndex = Number(this.gameEngine.playerId) * 10000; //todo magic number
                 });
 
-                that.socket.on('worldUpdate', (worldData) => {
-                    that.inboundMessages.push(worldData);
+                this.socket.on('worldUpdate', (worldData) => {
+                    this.inboundMessages.push(worldData);
                 });
             });
-        }
+        };
 
         let matchmaker = Promise.resolve({ serverURL: null, status: 'ok' });
         if (this.options.matchmaker)
@@ -166,30 +152,30 @@ class ClientEngine {
      * ready to connect
      */
     start() {
-
-        this.gameEngine.start();
-        if (this.options.scheduler === 'fixed') {
-            // schedule and start the game loop
-            this.scheduler = new Scheduler({
-                period: this.options.stepPeriod,
-                tick: this.step.bind(this),
-                delay: STEP_DELAY_MSEC
-            });
-            this.scheduler.start();
-        }
-
         // initialize the renderer
         // the render loop waits for next animation frame
         if (!this.renderer) alert('ERROR: game has not defined a renderer');
-        let renderLoop = () => {
-            this.renderer.draw();
+        let renderLoop = (timestamp) => {
+            this.renderer.draw(timestamp);
             window.requestAnimationFrame(renderLoop);
         };
 
         return this.renderer.init().then(() => {
+            this.gameEngine.start();
+
+            if (this.options.scheduler === 'fixed') {
+                // schedule and start the game loop
+                this.scheduler = new Scheduler({
+                    period: this.options.stepPeriod,
+                    tick: this.step.bind(this),
+                    delay: STEP_DELAY_MSEC
+                });
+                this.scheduler.start();
+            }
+
             if (typeof window !== 'undefined')
                 window.requestAnimationFrame(renderLoop);
-            if (this.options.autoConnect) {
+            if (this.options.autoConnect && this.options.standaloneMode !== true) {
                 this.connect();
             }
         });
@@ -207,12 +193,12 @@ class ClientEngine {
         let clientStep = this.gameEngine.world.stepCount;
         let serverStep = this.gameEngine.serverStep;
         if (clientStep > serverStep + maxLead) {
-            this.gameEngine.trace.warn(`step drift ${checkType}. [${clientStep} > ${serverStep} + ${maxLead}] Client is ahead of server.  Delaying next step.`);
+            this.gameEngine.trace.warn(() => `step drift ${checkType}. [${clientStep} > ${serverStep} + ${maxLead}] Client is ahead of server.  Delaying next step.`);
             if (this.scheduler) this.scheduler.delayTick();
             this.lastStepTime += STEP_DELAY_MSEC;
             this.correction += STEP_DELAY_MSEC;
         } else if (serverStep > clientStep + maxLag) {
-            this.gameEngine.trace.warn(`step drift ${checkType}. [${serverStep} > ${clientStep} + ${maxLag}] Client is behind server.  Hurrying next step.`);
+            this.gameEngine.trace.warn(() => `step drift ${checkType}. [${serverStep} > ${clientStep} + ${maxLag}] Client is behind server.  Hurrying next step.`);
             if (this.scheduler) this.scheduler.hurryTick();
             this.lastStepTime -= STEP_HURRY_MSEC;
             this.correction -= STEP_HURRY_MSEC;
@@ -246,12 +232,14 @@ class ClientEngine {
         this.checkDrift('onEveryStep');
 
         // perform game engine step
-        this.handleOutboundInput();
+        if (this.options.standaloneMode !== true) {
+            this.handleOutboundInput();
+        }
         this.applyDelayedInputs();
         this.gameEngine.step(false, t, dt);
-        this.gameEngine.emit('client__postStep');
+        this.gameEngine.emit('client__postStep', { dt });
 
-        if (this.gameEngine.trace.length && this.socket) {
+        if (this.options.standaloneMode !== true && this.gameEngine.trace.length && this.socket) {
             // socket might not have been initialized at this point
             this.socket.emit('trace', JSON.stringify(this.gameEngine.trace.rotate()));
         }
@@ -262,10 +250,10 @@ class ClientEngine {
             return;
         }
 
-        const inputEvent = { input: message.data, playerId: this.playerId };
+        const inputEvent = { input: message.data, playerId: this.gameEngine.playerId };
         this.gameEngine.emit('client__processInput', inputEvent);
         this.gameEngine.emit('processInput', inputEvent);
-        this.gameEngine.processInput(message.data, this.playerId, false);
+        this.gameEngine.processInput(message.data, this.gameEngine.playerId, false);
 
     }
 
@@ -304,7 +292,7 @@ class ClientEngine {
             }
         };
 
-        this.gameEngine.trace.info(`USER INPUT[${this.messageIndex}]: ${input} ${inputOptions ? JSON.stringify(inputOptions) : '{}'}`);
+        this.gameEngine.trace.info(() => `USER INPUT[${this.messageIndex}]: ${input} ${inputOptions ? JSON.stringify(inputOptions) : '{}'}`);
 
         // if we delay input application on client, then queue it
         // otherwise apply it now
@@ -313,7 +301,10 @@ class ClientEngine {
         } else {
             this.doInputLocal(message);
         }
-        this.outboundMessages.push(message);
+
+        if (this.options.standaloneMode !== true) {
+            this.outboundMessages.push(message);
+        }
 
         this.messageIndex++;
     }
@@ -331,11 +322,11 @@ class ClientEngine {
             fullUpdate: syncHeader.fullUpdate
         });
 
-        this.gameEngine.trace.info(`========== inbound world update ${syncHeader.stepCount} ==========`);
+        this.gameEngine.trace.info(() => `========== inbound world update ${syncHeader.stepCount} ==========`);
 
         // finally update the stepCount
         if (syncHeader.stepCount > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD__CLIENT_RESET) {
-            this.gameEngine.trace.info(`========== world step count updated from ${this.gameEngine.world.stepCount} to  ${syncHeader.stepCount} ==========`);
+            this.gameEngine.trace.info(() => `========== world step count updated from ${this.gameEngine.world.stepCount} to  ${syncHeader.stepCount} ==========`);
             this.gameEngine.emit('client__stepReset', { oldStep: this.gameEngine.world.stepCount, newStep: syncHeader.stepCount });
             this.gameEngine.world.stepCount = syncHeader.stepCount;
         }
@@ -349,5 +340,3 @@ class ClientEngine {
     }
 
 }
-
-module.exports = ClientEngine;

@@ -1,14 +1,13 @@
-'use strict';
-const PhysicsEngine = require('./PhysicsEngine');
-const CANNON = require('cannon');
+import PhysicsEngine from './PhysicsEngine';
+import CANNON from 'cannon';
 
 /**
  * CannonPhysicsEngine is a three-dimensional lightweight physics engine
  */
-class CannonPhysicsEngine extends PhysicsEngine {
+export default class CannonPhysicsEngine extends PhysicsEngine {
 
-    init(options) {
-        super.init(options);
+    constructor(options) {
+        super(options);
 
         this.options.dt = this.options.dt || (1 / 60);
         let world = this.world = new CANNON.World();
@@ -55,5 +54,3 @@ class CannonPhysicsEngine extends PhysicsEngine {
         this.world.removeBody(obj);
     }
 }
-
-module.exports = CannonPhysicsEngine;

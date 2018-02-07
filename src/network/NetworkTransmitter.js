@@ -1,19 +1,15 @@
-'use strict';
+import Serializer from './../serialize/Serializer';
 
-const Serializer = require('./../serialize/Serializer');
+import NetworkedEventFactory from './NetworkedEventFactory';
+import NetworkedEventCollection from './NetworkedEventCollection';
+import Utils from './../lib/Utils';
 
-const NetworkedEventFactory = require('./NetworkedEventFactory');
-const NetworkedEventCollection = require('./NetworkedEventCollection');
-const Utils = require('./../lib/Utils');
-
-class NetworkTransmitter {
+export default class NetworkTransmitter {
 
     constructor(serializer) {
         this.serializer = serializer;
 
         this.registeredEvents = [];
-
-        this.payload = [];
 
         this.serializer.registerClass(NetworkedEventCollection);
 
@@ -44,6 +40,8 @@ class NetworkTransmitter {
                 fullUpdate: { type: Serializer.TYPES.UINT8 }
             }
         });
+
+        this.networkedEventCollection = new NetworkedEventCollection();
     }
 
     registerNetworkedEventFactory(eventName, options) {
@@ -68,17 +66,16 @@ class NetworkTransmitter {
         }
 
         let stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
-        this.payload.push(stagedNetworkedEvent);
+        this.networkedEventCollection.events.push(stagedNetworkedEvent);
 
         return stagedNetworkedEvent;
     }
 
     serializePayload() {
-        if (this.payload.length === 0)
+        if (this.networkedEventCollection.events.length === 0)
             return null;
 
-        let networkedEventCollection = new NetworkedEventCollection(this.payload);
-        let dataBuffer = networkedEventCollection.serialize(this.serializer);
+        let dataBuffer = this.networkedEventCollection.serialize(this.serializer);
 
         return dataBuffer;
     }
@@ -88,9 +85,7 @@ class NetworkTransmitter {
     }
 
     clearPayload() {
-        this.payload = [];
+        this.networkedEventCollection.events = [];
     }
 
 }
-
-module.exports = NetworkTransmitter;

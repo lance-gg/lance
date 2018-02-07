@@ -1,6 +1,4 @@
-'use strict';
-
-const SyncStrategy = require('./SyncStrategy');
+import SyncStrategy from './SyncStrategy';
 
 const defaults = {
     syncsBufferLength: 5,
@@ -12,7 +10,7 @@ const defaults = {
     bendingIncrements: 10   // the bending should be applied increments (how many steps for entire bend)
 };
 
-class ExtrapolateStrategy extends SyncStrategy {
+export default class ExtrapolateStrategy extends SyncStrategy {
 
     constructor(clientEngine, inputOptions) {
 
@@ -24,7 +22,6 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.recentInputs = {};
         this.gameEngine = this.clientEngine.gameEngine;
         this.gameEngine.on('client__postStep', this.extrapolate.bind(this));
-        this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
         this.gameEngine.on('client__processInput', this.clientInputSave.bind(this));
     }
 
@@ -38,54 +35,12 @@ class ExtrapolateStrategy extends SyncStrategy {
         this.recentInputs[inputData.step].push(inputData);
     }
 
-    // collect a sync and its events
-    collectSync(e) {
-
-        // on first connect we need to wait for a full world update
-        if (this.needFirstSync) {
-            if (!e.fullUpdate)
-                return;
-        } else {
-            // ignore syncs which are older than the latest
-            if (this.lastSync && this.lastSync.stepCount && this.lastSync.stepCount > e.stepCount)
-                return;
-        }
-
-        // build new sync object
-        let lastSync = this.lastSync = {};
-        lastSync.stepCount = e.stepCount;
-
-        // keep a reference of events by object id
-        lastSync.syncObjects = {};
-        e.syncEvents.forEach(sEvent => {
-            let o = sEvent.objectInstance;
-            if (!o) return;
-            if (!lastSync.syncObjects[o.id]) {
-                lastSync.syncObjects[o.id] = [];
-            }
-            lastSync.syncObjects[o.id].push(sEvent);
-        });
-
-        // keep a reference of events by step
-        lastSync.syncSteps = {};
-        e.syncEvents.forEach(sEvent => {
-
-            // add an entry for this step and event-name
-            if (!lastSync.syncSteps[sEvent.stepCount]) lastSync.syncSteps[sEvent.stepCount] = {};
-            if (!lastSync.syncSteps[sEvent.stepCount][sEvent.eventName]) lastSync.syncSteps[sEvent.stepCount][sEvent.eventName] = [];
-            lastSync.syncSteps[sEvent.stepCount][sEvent.eventName].push(sEvent);
-        });
-
-        let objCount = (Object.keys(lastSync.syncObjects)).length;
-        let eventCount = e.syncEvents.length;
-        let stepCount = (Object.keys(lastSync.syncSteps)).length;
-        this.gameEngine.trace.debug(`sync contains ${objCount} objects ${eventCount} events ${stepCount} steps`);
-    }
-
     // add an object to our world
     addNewObject(objId, newObj, options) {
 
-        let curObj = new newObj.constructor();
+        let curObj = new newObj.constructor(this.gameEngine, {
+            id: objId
+        });
         curObj.syncTo(newObj);
         this.gameEngine.addObjectToWorld(curObj);
         console.log(`adding new object ${curObj}`);
@@ -106,7 +61,7 @@ class ExtrapolateStrategy extends SyncStrategy {
     // apply a new sync
     applySync() {
 
-        this.gameEngine.trace.debug('extrapolate applying sync');
+        this.gameEngine.trace.debug(() => 'extrapolate applying sync');
 
         //
         //    scan all the objects in the sync
@@ -132,9 +87,8 @@ class ExtrapolateStrategy extends SyncStrategy {
 
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
             if (localShadowObj) {
-
                 // case 1: this object has a local shadow object on the client
-                this.gameEngine.trace.debug(`object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
+                this.gameEngine.trace.debug(() => `object ${ev.objectInstance.id} replacing local shadow ${localShadowObj.id}`);
 
                 if (!world.objects.hasOwnProperty(ev.objectInstance.id)) {
                     let newObj = this.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
@@ -145,10 +99,10 @@ class ExtrapolateStrategy extends SyncStrategy {
             } else if (curObj) {
 
                 // case 2: this object already exists locally
-                this.gameEngine.trace.trace(`object before syncTo: ${curObj.toString()}`);
+                this.gameEngine.trace.trace(() => `object before syncTo: ${curObj.toString()}`);
                 curObj.saveState();
                 curObj.syncTo(ev.objectInstance);
-                this.gameEngine.trace.trace(`object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
+                this.gameEngine.trace.trace(() => `object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
 
             } else {
 
@@ -161,10 +115,10 @@ class ExtrapolateStrategy extends SyncStrategy {
         // reenact the steps that we want to extrapolate forwards
         //
         this.cleanRecentInputs();
-        this.gameEngine.trace.debug(`extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
+        this.gameEngine.trace.debug(() => `extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
         if (serverStep < world.stepCount - this.options.maxReEnactSteps) {
             serverStep = world.stepCount - this.options.maxReEnactSteps;
-            this.gameEngine.trace.info(`too many steps to re-enact.  Starting from [${serverStep}] to [${world.stepCount}]`);
+            this.gameEngine.trace.info(() => `too many steps to re-enact.  Starting from [${serverStep}] to [${world.stepCount}]`);
         }
 
         let clientStep = world.stepCount;
@@ -175,8 +129,8 @@ class ExtrapolateStrategy extends SyncStrategy {
                     // only movement inputs are re-enacted
                     if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
 
-                    this.gameEngine.trace.trace(`extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
-                    this.gameEngine.processInput(inputData, this.clientEngine.playerId);
+                    this.gameEngine.trace.trace(() => `extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
+                    this.gameEngine.processInput(inputData, this.gameEngine.playerId);
                 });
             }
 
@@ -198,17 +152,17 @@ class ExtrapolateStrategy extends SyncStrategy {
             //       Reminder: the reason we use a string is that these
             //       values are sometimes used as object keys
             let obj = world.objects[objId];
-            let isLocal = (obj.playerId == this.clientEngine.playerId); // eslint-disable-line eqeqeq
+            let isLocal = (obj.playerId == this.gameEngine.playerId); // eslint-disable-line eqeqeq
             let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
             obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
             if (typeof obj.refreshRenderObject === 'function')
                 obj.refreshRenderObject();
-            this.gameEngine.trace.trace(`object[${objId}] ${obj.bendingToString()}`);
+            this.gameEngine.trace.trace(() => `object[${objId}] ${obj.bendingToString()}`);
         }
 
         // trace object state after sync
         for (let objId of Object.keys(world.objects)) {
-            this.gameEngine.trace.trace(`object after extrapolate replay: ${world.objects[objId].toString()}`);
+            this.gameEngine.trace.trace(() => `object after extrapolate replay: ${world.objects[objId].toString()}`);
         }
 
         // destroy objects
@@ -226,13 +180,14 @@ class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // Perform client-side extrapolation.
-    extrapolate() {
+    extrapolate(stepDesc) {
 
         // apply incremental bending
         this.gameEngine.world.forEachObject((id, o) => {
             if (typeof o.applyIncrementalBending === 'function') {
-                o.applyIncrementalBending();
+                o.applyIncrementalBending(stepDesc);
                 o.refreshToPhysics();
+                // this.gameEngine.trace.trace(() => `object[${id}] after bending : ${o.toString()}`);
             }
         });
 
@@ -243,5 +198,3 @@ class ExtrapolateStrategy extends SyncStrategy {
         }
     }
 }
-
-module.exports = ExtrapolateStrategy;

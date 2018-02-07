@@ -1,9 +1,7 @@
-'use strict';
+import Utils from './../lib/Utils';
+import Serializer from './Serializer';
 
-const Utils = require('./../lib/Utils');
-const Serializer = require('./Serializer');
-
-class Serializable {
+export default class Serializable {
     /**
      *  Class can be serialized using either:
          - a class based netScheme
@@ -122,10 +120,10 @@ class Serializable {
         let isString = p => netScheme[p].type === Serializer.TYPES.STRING;
         let hasChanged = p => prevObject[p] !== this[p];
         let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
-        if (!changedStrings) return this;
+        if (changedStrings.length == 0) return this;
 
         // build a clone with pruned strings
-        let prunedCopy = new this.constructor();
+        let prunedCopy = new this.constructor(null, { id: null });
         for (let p of Object.keys(netScheme))
             prunedCopy[p] = changedStrings.indexOf(p) < 0 ? this[p] : null;
 
@@ -152,5 +150,3 @@ class Serializable {
     }
 
 }
-
-module.exports = Serializable;

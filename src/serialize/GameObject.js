@@ -1,7 +1,5 @@
-'use strict';
-
-const Serializable = require('./Serializable');
-const Serializer = require('./Serializer');
+import Serializable from './Serializable';
+import Serializer from './Serializer';
 
 /**
  * GameObject is the base class of all game objects.
@@ -10,7 +8,7 @@ const Serializer = require('./Serializer');
  * Game developers will use one of the subclasses such as DynamicObject,
  * or PhysicalObject.
  */
-class GameObject extends Serializable {
+export default class GameObject extends Serializable {
 
     static get netScheme() {
         return {
@@ -20,37 +18,54 @@ class GameObject extends Serializable {
 
     /**
     * Creates an instance of a game object.
-    * @param {String} id - the object id
+    * @param {GameEngine} gameEngine - the gameEngine this object will be used in
+    * @param {Object} options - options for instantiation of the GameObject
+    * @param {Number} id - if set, the new instantiated object will be set to this id instead of being generated a new one. Use with caution!
     */
-    constructor(id) {
-
+    constructor(gameEngine, options) {
         super();
+        /**
+         * The gameEngine this object will be used in
+         * @member {GameEngine}
+         */
+        this.gameEngine = gameEngine;
 
         /**
-        * ID of this object's instance.  Each instance has an ID which is unique across the entire
-        * game world, including the server and all the clients.  In extrapolation mode,
-        * the client may have an object instance which does not yet exist on the server,
-        * these objects are known as shadow objects.
+        * ID of this object's instance.
+        * There are three cases of instance creation which can occur:
+        * 1. In the normal case, the constructor is asked to assign an ID which is unique
+        * across the entire game world, including the server and all the clients.
+        * 2. In extrapolation mode, the client may have an object instance which does not
+        * yet exist on the server, these objects are known as shadow objects.  Their IDs must
+        * be allocated from a different range.
+        * 3. Also, temporary objects are created on the client side each time a sync is received.
+        * These are used for interpolation purposes and as bending targets of position, velocity,
+        * angular velocity, and orientation.  In this case the id will be set to null.
         * @member {Number}
         */
-        this.id = id;
+        this.id = null;
+        if (options && 'id' in options)
+            this.id = options.id;
+        else if (this.gameEngine)
+            this.id = this.gameEngine.world.getNewId();
+
+        this.components = {};
     }
 
     /**
-     * Initialize the object.
-     * Extend this method if you have object initialization logic.
-     * @param {Object} options Your object's options
-     */
-    init(options) {
-        Object.assign(this, options);
-    }
-
-    /**
-     * Add this object to the game-world by creating physics sub-objects
-     * renderer sub-objects and any other resources
+     * Called after the object is added to to the game world.
+     * This is the right place to add renderer sub-objects, physics sub-objects
+     * and any other resources that should be created
      * @param {GameEngine} gameEngine the game engine
      */
     onAddToWorld(gameEngine) {}
+
+    /**
+     * Called after the object is removed from game-world.
+     * This is where renderer sub-objects and any other resources should be freed
+     * @param {GameEngine} gameEngine the game engine
+     */
+    onRemoveFromWorld(gameEngine) {}
 
     /**
      * Formatted textual description of the game object.
@@ -69,7 +84,7 @@ class GameObject extends Serializable {
     }
 
     saveState(other) {
-        this.savedCopy = (new this.constructor());
+        this.savedCopy = (new this.constructor(this.gameEngine, { id: null }));
         this.savedCopy.syncTo(other ? other : this);
     }
 
@@ -123,11 +138,43 @@ class GameObject extends Serializable {
     // copy physical attributes from physics sub-object
     refreshFromPhysics() {}
 
+    // apply a single bending increment
+    applyIncrementalBending() { }
+
     // clean up resources
     destroy() {}
 
-    // apply a single bending increment
-    applyIncrementalBending() { }
-};
+    addComponent(componentInstance) {
+        componentInstance.parentObject = this;
+        this.components[componentInstance.constructor.name] = componentInstance;
 
-module.exports = GameObject;
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentAdded', this, componentInstance);
+        }
+    }
+
+    removeComponent(componentName) {
+        // todo cleanup of the component ?
+        delete this.components[componentName];
+
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentRemoved', this, componentName);
+        }
+    }
+
+    /**
+     * Check whether this game object has a certain component
+     * @param componentClass the comp
+     * @returns {Boolean} true if the gameObject contains this component
+     */
+    hasComponent(componentClass) {
+        return componentClass.name in this.components;
+    }
+
+    getComponent(componentClass) {
+        return this.components[componentClass.name];
+    }
+
+}

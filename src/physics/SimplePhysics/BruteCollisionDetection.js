@@ -1,11 +1,8 @@
-'use strict';
-
-const TwoVector = require('../../serialize/TwoVector');
-
+import TwoVector from '../../serialize/TwoVector';
 let differenceVector = new TwoVector();
 
 // The collision detection of SimplePhysicsEngine is a brute-force approach
-class CollisionDetection {
+export default class CollisionDetection {
 
     constructor(options) {
         this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);
@@ -41,11 +38,17 @@ class CollisionDetection {
     // detect by checking all pairs
     detect() {
         let objects = this.gameEngine.world.objects;
-        for (let k1 of Object.keys(objects))
-            for (let k2 of Object.keys(objects))
+        let keys = Object.keys(objects);
+
+        //Delete non existed object's pairs
+        for (let pairId in this.collisionPairs)
+            if (this.collisionPairs.hasOwnProperty(pairId))
+                if (keys.indexOf(pairId.split(',')[0]) === -1 || keys.indexOf(pairId.split(',')[1]) === -1)
+                    delete this.collisionPairs[pairId];
+
+        for (let k1 of keys)
+            for (let k2 of keys)
                 if (k2 > k1) this.checkPair(k1, k2);
     }
 
 }
-
-module.exports = CollisionDetection;

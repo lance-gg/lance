@@ -1,7 +1,5 @@
 /* global THREE */
-'use strict';
-
-const Renderer = require('./Renderer');
+import Renderer from './Renderer';
 
 // TODO: I have mixed feelings about this class.  It doesn't actually provide
 // anything useful.  I assume each game will write their own renderer even in THREE.
@@ -9,7 +7,7 @@ const Renderer = require('./Renderer');
 // But it hijacks the creation of the scene and the THREE.renderer.  It doesn't make
 // sense to me that the camera and lights are in the derived class, but the scene and
 // renderer are in the base class.  seems like inheritance-abuse.
-class ThreeRenderer extends Renderer {
+export default class ThreeRenderer extends Renderer {
 
     // constructor
     constructor() {
@@ -55,5 +53,3 @@ class ThreeRenderer extends Renderer {
         this.scene.remove(o);
     }
 }
-
-module.exports = ThreeRenderer;

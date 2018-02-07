@@ -1,9 +1,7 @@
-'use strict';
-
 const FRAME_HISTORY_SIZE = 20;
 const MAX_SLOW_FRAMES = 10;
 
-let AFrameSystem = {
+export default {
     schema: {
         traceLevel: { default: 4 }
     },
@@ -59,5 +57,3 @@ let AFrameSystem = {
         this.renderer = renderer;
     }
 };
-
-module.exports = AFrameSystem;

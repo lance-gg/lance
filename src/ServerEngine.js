@@ -1,11 +1,11 @@
 'use strict';
 
-const fs = require('fs');
-const Utils = require('./lib/Utils');
-const Scheduler = require('./lib/Scheduler');
-const Serializer = require('./serialize/Serializer');
-const NetworkTransmitter = require('./network/NetworkTransmitter');
-const NetworkMonitor = require('./network/NetworkMonitor');
+import fs from 'fs';
+import Utils from './lib/Utils';
+import Scheduler from './lib/Scheduler';
+import Serializer from './serialize/Serializer';
+import NetworkTransmitter from './network/NetworkTransmitter';
+import NetworkMonitor from './network/NetworkMonitor';
 
 /**
  * ServerEngine is the main server-side singleton code.
@@ -24,7 +24,7 @@ const NetworkMonitor = require('./network/NetworkMonitor');
  * connections and dis-connections, emitting periodic game-state
  * updates, and capturing remote user inputs.
  */
-class ServerEngine {
+export default class ServerEngine {
 
     /**
      * create a ServerEngine instance
@@ -139,7 +139,7 @@ class ServerEngine {
             }
 
             let payload = this.serializeUpdate({ diffUpdate });
-            this.gameEngine.trace.info(`========== sending world update ${this.gameEngine.world.stepCount} is delta update: ${diffUpdate} ==========`);
+            this.gameEngine.trace.info(() => `========== sending world update ${this.gameEngine.world.stepCount} is delta update: ${diffUpdate} ==========`);
             // TODO: implement server lag by queuing the emit to a future step
             for (let socketId of Object.keys(this.connectedPlayers))
                 this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
@@ -208,7 +208,6 @@ class ServerEngine {
 
     // handle the object creation
     onObjectAdded(obj) {
-        console.log('object created event');
         this.networkTransmitter.addNetworkedEvent('objectCreate', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
@@ -220,7 +219,6 @@ class ServerEngine {
 
     // handle the object creation
     onObjectDestroyed(obj) {
-        console.log('object destroyed event');
         this.networkTransmitter.addNetworkedEvent('objectDestroy', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
@@ -349,5 +347,3 @@ class ServerEngine {
     }
 
 }
-
-module.exports = ServerEngine;

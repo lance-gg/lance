@@ -1,12 +1,14 @@
-'use strict';
-
 // The base Physics Engine class defines the expected interface
 // for all physics engines
-class PhysicsEngine {
+export default class PhysicsEngine {
 
-    init(options) {
+    constructor(options) {
         this.options = options;
         this.gameEngine = options.gameEngine;
+
+        if (!options.gameEngine) {
+            console.warn('Physics engine initialized without gameEngine!');
+        }
     }
 
     /**
@@ -18,5 +20,3 @@ class PhysicsEngine {
     step(dt, objectFilter) {}
 
 }
-
-module.exports = PhysicsEngine;

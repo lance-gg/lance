@@ -16,9 +16,9 @@ class MyRenderer extends Renderer {
 
     addObject(objData, options) {
         let sprite = {};
-
+        
         // add this object to the renderer:
-        // if (objData.class == PlayerAvatar) {
+        // if (objData instanceof PlayerAvatar) {
         //     ...
         // }
 

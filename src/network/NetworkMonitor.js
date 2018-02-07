@@ -1,12 +1,10 @@
-"use strict";
-
-const EventEmitter = require('eventemitter3');
+import EventEmitter from 'eventemitter3';
 
 /**
  * Measures network performance between the client and the server
  * Represents both the client and server portions of NetworkMonitor
  */
-class NetworkMonitor {
+export default class NetworkMonitor {
 
     constructor() {
         // mixin for EventEmitter
@@ -57,5 +55,3 @@ class NetworkMonitor {
     }
 
 }
-
-module.exports = NetworkMonitor;

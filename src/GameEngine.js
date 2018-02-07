@@ -1,7 +1,7 @@
-'use strict';
-const GameWorld = require('./GameWorld');
-const EventEmitter = require('eventemitter3');
-const Trace = require('./lib/Trace');
+import GameWorld from './GameWorld';
+import EventEmitter from 'eventemitter3';
+import Timer from './game/Timer';
+import Trace from './lib/Trace';
 
 /**
  * The GameEngine contains the game logic.  Extend this class
@@ -22,7 +22,7 @@ const Trace = require('./lib/Trace');
  * and therefore clients must resolve server updates which conflict
  * with client-side predictions.
  */
-class GameEngine {
+export default class GameEngine {
 
     /**
       * Create a game engine instance.  This needs to happen
@@ -34,21 +34,22 @@ class GameEngine {
       */
     constructor(options) {
 
+        // TODO I think we should discuss this whole globals issues
         // place the game engine in the LANCE globals
-        const glob = (typeof window === 'undefined') ? global : window;
+        const isServerSide = (typeof window === 'undefined');
+        const glob = isServerSide ? global : window;
         glob.LANCE = { gameEngine: this };
 
-        // if no GameWorld is specified, use the default one
-        this.options = Object.assign({
-            GameWorld: GameWorld,
-            traceLevel: Trace.TRACE_NONE
-        }, options);
+        // set options
+        const defaultOpts = { GameWorld: GameWorld, traceLevel: Trace.TRACE_NONE };
+        if (!isServerSide) defaultOpts.clientIDSpace = 1000000;
+        this.options = Object.assign(defaultOpts, options);
 
-        // get the physics engine and initialize it
-        if (this.options.physicsEngine) {
-            this.physicsEngine = this.options.physicsEngine;
-            this.physicsEngine.init({ gameEngine: this });
-        }
+        /**
+         * client's player ID, as a string. If running on the client, this is set at runtime by the clientEngine
+         * @member {String}
+         */
+        this.playerId = NaN;
 
         // set up event emitting and interface
         let eventEmitter = new EventEmitter();
@@ -104,7 +105,7 @@ class GameEngine {
         return null;
     }
 
-    initWorld() {
+    initWorld(worldSettings) {
 
         this.world = new GameWorld();
 
@@ -120,7 +121,7 @@ class GameEngine {
         * @member {Object} worldSettings
         * @memberof GameEngine
         */
-        this.worldSettings = {};
+        this.worldSettings = Object.assign({}, worldSettings);
     }
 
     /**
@@ -130,9 +131,17 @@ class GameEngine {
       * and registering methods on the event handler.
       */
     start() {
-        this.trace.info('========== game engine started ==========');
+        this.trace.info(() => '========== game engine started ==========');
         this.initWorld();
-        this.emit('server__start', { timestamp: (new Date()).getTime() });
+
+        // create the default timer
+        this.timer = new Timer();
+        this.timer.play();
+        this.on('postStep', (step, isReenact) => {
+            if (!isReenact) this.timer.tick();
+        });
+
+        this.emit('start', { timestamp: (new Date()).getTime() });
     }
 
     /**
@@ -144,7 +153,6 @@ class GameEngine {
       * @param {Boolean} physicsOnly - do a physics step only, no game logic
       */
     step(isReenact, t, dt, physicsOnly) {
-
         // physics-only step
         if (physicsOnly) {
             if (dt) dt /= 1000; // physics engines work in seconds
@@ -178,7 +186,7 @@ class GameEngine {
         this.world.forEachObject((id, o) => {
             if (typeof o.refreshFromPhysics === 'function')
                 o.refreshFromPhysics();
-            this.trace.trace(`object[${id}] after ${isReenact ? 'reenact' : 'step'} : ${o.toString()}`);
+            this.trace.trace(() => `object[${id}] after ${isReenact ? 'reenact' : 'step'} : ${o.toString()}`);
         });
 
         // emit postStep event
@@ -205,12 +213,12 @@ class GameEngine {
                     serverCopyArrived = true;
             });
             if (serverCopyArrived) {
-                this.trace.info(`========== shadow object NOT added ${object.toString()} ==========`);
+                this.trace.info(() => `========== shadow object NOT added ${object.toString()} ==========`);
                 return null;
             }
         }
 
-        this.world.objects[object.id] = object;
+        this.world.addObject(object);
 
         // tell the object to join the game, by creating
         // its corresponding physical entities and renderer entities.
@@ -218,7 +226,7 @@ class GameEngine {
             object.onAddToWorld(this);
 
         this.emit('objectAdded', object);
-        this.trace.info(`========== object added ${object.toString()} ==========`);
+        this.trace.info(() => `========== object added ${object.toString()} ==========`);
 
         return object;
     }
@@ -244,22 +252,39 @@ class GameEngine {
      * @param {Boolean} isServer - indicate if this function is being called on the server side
      */
     processInput(inputMsg, playerId, isServer) {
-        this.trace.info(`game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
+        this.trace.info(() => `game engine processing input[${inputMsg.messageIndex}] <${inputMsg.input}> from playerId ${playerId}`);
     }
 
     /**
      * Remove an object from the game world.
      *
-     * @param {String} id - the object ID
+     * @param {Object|String} objectId - the object or object ID
      */
-    removeObjectFromWorld(id) {
-        let ob = this.world.objects[id];
-        if (!ob)
-            throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${id}`);
-        this.trace.info(`========== destroying object ${ob.toString()} ==========`);
-        this.emit('objectDestroyed', ob);
-        ob.destroy();
-        delete this.world.objects[id];
+    removeObjectFromWorld(objectId) {
+
+        if (typeof objectId === 'object') objectId = objectId.id;
+        let object = this.world.objects[objectId];
+
+        if (!object) {
+            throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${objectId}`);
+        }
+        this.trace.info(() => `========== destroying object ${object.toString()} ==========`);
+
+        if (typeof object.onRemoveFromWorld === 'function')
+            object.onRemoveFromWorld(this);
+
+        this.emit('objectDestroyed', object);
+        this.world.removeObject(objectId);
+    }
+
+    /**
+     * Check if a given object is owned by the player on this client
+     *
+     * @param {Object} object the game object to check
+     * @return {Boolean} true if the game object is owned by the player on this client
+     */
+    isOwnedByPlayer(object) {
+        return (object.playerId == this.playerId);
     }
 
     /**
@@ -461,8 +486,6 @@ class GameEngine {
   /**
    * server has started
    *
-   * @event GameEngine#server__start
+   * @event GameEngine#start
    * @param {Number} timestamp - UTC epoch of start time
    */
-
-module.exports = GameEngine;

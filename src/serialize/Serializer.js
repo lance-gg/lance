@@ -1,6 +1,8 @@
-'use strict';
+import Utils from './../lib/Utils';
+import TwoVector from './TwoVector';
+import ThreeVector from './ThreeVector';
+import Quaternion from './Quaternion';
 
-const Utils = require('./../lib/Utils');
 const MAX_UINT_16 = 0xFFFF;
 
 /**
@@ -10,15 +12,14 @@ const MAX_UINT_16 = 0xFFFF;
  *
  * The Serializer defines the data types which can be serialized.
  */
-class Serializer {
+export default class Serializer {
 
     constructor() {
         this.registeredClasses = {};
         this.customTypes = {};
-        this.netSchemeSizeCache = {}; // used to cache calculated netSchemes sizes
-        this.registerClass(require('./TwoVector'));
-        this.registerClass(require('./ThreeVector'));
-        this.registerClass(require('./Quaternion'));
+        this.registerClass(TwoVector);
+        this.registerClass(ThreeVector);
+        this.registerClass(Quaternion);
     }
 
     /**
@@ -72,7 +73,8 @@ class Serializer {
 
         localByteOffset += Uint8Array.BYTES_PER_ELEMENT; // advance the byteOffset after the classId
 
-        let obj = new objectClass();
+        // create de-referenced instance of the class. gameEngine and id will be 'tacked on' later at the sync strategies
+        let obj = new objectClass(null, {id: null});
         for (let property of Object.keys(objectClass.netScheme).sort()) {
             let read = this.readDataView(dataView, byteOffset + localByteOffset, objectClass.netScheme[property]);
             obj[property] = read.data;
@@ -248,5 +250,3 @@ Serializer.TYPES = {
     CLASSINSTANCE: 'CLASSINSTANCE',
     LIST: 'LIST'
 };
-
-module.exports = Serializer;
