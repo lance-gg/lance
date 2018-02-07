@@ -54,8 +54,8 @@ export default class GameObject extends Serializable {
 
     /**
      * Called after the object is added to to the game world.
-     * This is where renderer renderer sub-objects, physics sub-objects
-     * and any other resources should be created
+     * This is the right place to add renderer sub-objects, physics sub-objects
+     * and any other resources that should be created
      * @param {GameEngine} gameEngine the game engine
      */
     onAddToWorld(gameEngine) {}

@@ -174,7 +174,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
                 continue;
 
             objEvents.forEach((e) => {
-                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
+                if (e.eventName === 'objectDestroyed') this.gameEngine.removeObjectFromWorld(objId);
             });
         }
     }

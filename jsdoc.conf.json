@@ -11,6 +11,7 @@
             "src/ServerEngine.js",
             "src/ClientEngine.js",
             "src/GameEngine.js",
+            "src/serialize/GameObject.js",
             "src/serialize/DynamicObject.js",
             "src/serialize/Serializer.js",
             "src/serialize/PhysicalObject.js",

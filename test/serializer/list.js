@@ -1,5 +1,3 @@
-import should from 'should';
-
 // Serializer must be loaded first before Serializable because of circular deps
 import Serializer from '../../src/serialize/Serializer';
 import Serializable from '../../src/serialize/Serializable';
@@ -15,29 +13,30 @@ class TestObject extends Serializable {
         };
     }
 
-    constructor(playerAges){
+    constructor(playerAges) {
         super();
         this.playerAges = playerAges;
-    };
+    }
 }
 
 var serializer = new Serializer();
 
-var testObject = new TestObject([1,2,3]);
+var testObject = new TestObject([1, 2, 3]);
 serializer.registerClass(TestObject);
 testObject.class = TestObject;
 
 describe('List serialization/deserialization', function() {
-    let serializedTestObject, deserializedTestObject;
+    let serializedTestObject = null;
+    let deserializedTestObject = null;
 
     describe('primitives', function() {
 
-        it('Serialize list', function () {
+        it('Serialize list', function() {
             serializedTestObject = testObject.serialize(serializer);
 
         });
 
-        it('Deserialize list', function () {
+        it('Deserialize list', function() {
             deserializedTestObject = serializer.deserialize(serializedTestObject.dataBuffer);
             deserializedTestObject.byteOffset.should.equal(6);
             deserializedTestObject.obj.playerAges.should.be.instanceof(Array).and.have.lengthOf(3);

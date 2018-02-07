@@ -1,5 +1,7 @@
 import EventEmitter from 'eventemitter3';
 
+let singleton = null;
+
 const TIME_RESET_THRESHOLD = 100;
 
 /**
@@ -9,6 +11,10 @@ const TIME_RESET_THRESHOLD = 100;
  * render loop.
  */
 export default class Renderer {
+
+    static getInstance() {
+        return singleton;
+    }
 
     /**
     * Constructor of the Renderer singleton.
@@ -24,6 +30,9 @@ export default class Renderer {
 
         // mixin for EventEmitter
         Object.assign(this, EventEmitter.prototype);
+
+        // the singleton renderer has been created
+        singleton = this;
     }
 
     /**

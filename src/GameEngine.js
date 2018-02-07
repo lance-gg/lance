@@ -258,26 +258,23 @@ export default class GameEngine {
     /**
      * Remove an object from the game world.
      *
-     * @param {Object|String} object - the object or object ID
+     * @param {Object|String} objectId - the object or object ID
      */
-    removeObjectFromWorld(object) {
-        let ob;
-        if (typeof object === 'string'){
-            ob = this.world.objects[object];
-        } else {
-            ob = this.world.objects[object.id];
+    removeObjectFromWorld(objectId) {
+
+        if (typeof objectId === 'object') objectId = objectId.id;
+        let object = this.world.objects[objectId];
+
+        if (!object) {
+            throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${objectId}`);
         }
-
-        if (!ob)
-            throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${object}`);
-        this.trace.info(() => `========== destroying object ${ob.toString()} ==========`);
-
-        this.world.removeObject(object);
+        this.trace.info(() => `========== destroying object ${object.toString()} ==========`);
 
         if (typeof object.onRemoveFromWorld === 'function')
             object.onRemoveFromWorld(this);
 
-        this.emit('objectDestroyed', ob);
+        this.emit('objectDestroyed', object);
+        this.world.removeObject(object);
     }
 
     /**
