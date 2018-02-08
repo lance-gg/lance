@@ -1,6 +1,6 @@
 {
   "name": "lance-gg",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A Node.js based real-time multiplayer game server",
   "keywords": [
     "pixijs",
@@ -17,6 +17,7 @@
     "multiplayer"
   ],
   "dependencies": {
+    "babel-cli": "^6.26.0",
     "cannon": "^0.6.2",
     "eventemitter3": "^1.2.0",
     "mkdirp": "^0.5.1",
@@ -26,7 +27,8 @@
     "socket.io-client": "^1.4.6"
   },
   "files": [
-    "src"
+    "src",
+    "es5"
   ],
   "author": "Opher Vishnia",
   "contributors": [
@@ -44,6 +46,7 @@
   "homepage": "https://github.com/lance-gg/lance#readme",
   "scripts": {
     "docs": "jsdoc -c jsdoc.conf.json",
+    "build": "babel src --out-dir es5",
     "test-all": "mocha test/EndToEnd/",
     "test-serializer": "mocha ./test/serializer/",
     "test": "mocha ./test/serializer/ --compilers js:babel-core/register"
