@@ -1,6 +1,6 @@
 {
   "name": "lance-gg",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A Node.js based real-time multiplayer game server",
   "keywords": [
     "pixijs",

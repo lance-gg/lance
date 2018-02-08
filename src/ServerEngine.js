@@ -122,7 +122,7 @@ export default class ServerEngine {
         }
 
         // run the game engine step
-        this.gameEngine.step(false);
+        this.gameEngine.step(false, this.serverTime / 1000);
 
         // update clients only at the specified step interval, as defined in options
         if (this.requestImmediateUpdate ||

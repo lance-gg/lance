@@ -5,6 +5,7 @@ import HSHGCollisionDetection from './SimplePhysics/HSHGCollisionDetection';
 import BruteCollisionDetection from './SimplePhysics/BruteCollisionDetection';
 
 let dv = new TwoVector();
+let dx = new TwoVector();
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
@@ -37,7 +38,17 @@ export default class SimplePhysicsEngine extends PhysicsEngine {
     // a single object advances, based on:
     // isRotatingRight, isRotatingLeft, isAccelerating, current velocity
     // wrap-around the world if necessary
-    objectStep(o) {
+    objectStep(o, dt) {
+
+        // calculate factor
+        if (dt === 0)
+            return;
+
+        if (dt)
+            dt /= (1 / 60);
+        else
+            dt = 1;
+
         let worldSettings = this.gameEngine.worldSettings;
 
         if (o.isRotatingRight) { o.angle += o.rotationSpeed; }
@@ -48,7 +59,7 @@ export default class SimplePhysicsEngine extends PhysicsEngine {
 
         if (o.isAccelerating) {
             let rad = o.angle * (Math.PI / 180);
-            dv.set(Math.cos(rad), Math.sin(rad)).multiplyScalar(o.acceleration);
+            dv.set(Math.cos(rad), Math.sin(rad)).multiplyScalar(o.acceleration).multiplyScalar(dt);
             o.velocity.add(dv);
         }
 
@@ -64,7 +75,8 @@ export default class SimplePhysicsEngine extends PhysicsEngine {
         o.isRotatingLeft = false;
         o.isRotatingRight = false;
 
-        o.position.add(o.velocity);
+        dx.copy(o.velocity).multiplyScalar(dt);
+        o.position.add(dx);
 
         o.velocity.multiply(o.friction);
 
@@ -80,10 +92,6 @@ export default class SimplePhysicsEngine extends PhysicsEngine {
     // entry point for a single step of the Simple Physics
     step(dt, objectFilter) {
 
-        // specifying a specific dt is not allowed in this physics engine
-        if (dt)
-            throw new Error('Simple Physics Engine does not support variable step times');
-
         // each object should advance
         let objects = this.gameEngine.world.objects;
         for (let objId of Object.keys(objects)) {
@@ -94,7 +102,7 @@ export default class SimplePhysicsEngine extends PhysicsEngine {
                 continue;
 
             // run the object step
-            this.objectStep(ob);
+            this.objectStep(ob, dt);
         }
 
         // emit event on collision
