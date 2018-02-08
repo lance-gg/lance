@@ -77,7 +77,7 @@ export default class ClientEngine {
         this.scheduler = null;
         this.lastStepTime = 0;
         this.correction = 0;
-        
+
         if (this.options.standaloneMode !== true) {
             this.configureSynchronization();
         }
@@ -95,7 +95,7 @@ export default class ClientEngine {
         // the reflect syncronizer is just interpolate strategy,
         // configured to show server syncs
         let syncOptions = this.options.syncOptions;
-        if (syncOptions.sync === 'reflect') { //todo would be nicer to use an enum
+        if (syncOptions.sync === 'reflect') {
             syncOptions.sync = 'interpolate';
             syncOptions.reflect = true;
         }
@@ -129,7 +129,7 @@ export default class ClientEngine {
 
                 this.socket.on('playerJoined', (playerData) => {
                     this.gameEngine.playerId = playerData.playerId;
-                    this.messageIndex = Number(this.gameEngine.playerId) * 10000; //todo magic number
+                    this.messageIndex = Number(this.gameEngine.playerId) * 10000;
                 });
 
                 this.socket.on('worldUpdate', (worldData) => {
