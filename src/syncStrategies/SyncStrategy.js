@@ -7,6 +7,7 @@ export default class SyncStrategy {
         this.gameEngine = clientEngine.gameEngine;
         this.options = Object.assign({}, inputOptions);
         this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
+        this.requiredSyncs = [];
     }
 
     // collect a sync and its events
@@ -34,6 +35,12 @@ export default class SyncStrategy {
                 return;
         }
 
+        // before we overwrite the last sync, check if it was a required sync
+        // syncs that create or delete objects are saved because they must be applied.
+        if (this.lastSync && this.lastSync.required) {
+            this.requiredSyncs.push(this.lastSync);
+        }
+
         // build new sync object
         let lastSync = this.lastSync = {
             stepCount: e.stepCount,
@@ -44,15 +51,17 @@ export default class SyncStrategy {
         e.syncEvents.forEach(sEvent => {
 
             // keep a reference of events by object id
-            if (sEvent.objectInstance){
+            if (sEvent.objectInstance) {
                 let objectId = sEvent.objectInstance.id;
                 if (!lastSync.syncObjects[objectId]) lastSync.syncObjects[objectId] = [];
                 lastSync.syncObjects[objectId].push(sEvent);
             }
 
             // keep a reference of events by step
-            let stepCount = sEvent.stepCount,
-                eventName = sEvent.eventName;
+            let stepCount = sEvent.stepCount;
+            let eventName = sEvent.eventName;
+            if (eventName === 'objectDestroy' || eventName === 'objectCreate')
+                lastSync.required = true;
 
             if (!lastSync.syncSteps[stepCount]) lastSync.syncSteps[stepCount] = {};
             if (!lastSync.syncSteps[stepCount][eventName]) lastSync.syncSteps[stepCount][eventName] = [];

@@ -59,7 +59,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // apply a new sync
-    applySync() {
+    applySync(sync) {
 
         this.gameEngine.trace.debug(() => 'extrapolate applying sync');
 
@@ -77,12 +77,12 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         //
         this.needFirstSync = false;
         let world = this.gameEngine.world;
-        let serverStep = this.lastSync.stepCount;
-        for (let ids of Object.keys(this.lastSync.syncObjects)) {
+        let serverStep = sync.stepCount;
+        for (let ids of Object.keys(sync.syncObjects)) {
 
             // TODO: we are currently taking only the first event out of
             // the events that may have arrived for this object
-            let ev = this.lastSync.syncObjects[ids][0];
+            let ev = sync.syncObjects[ids][0];
             let curObj = world.objects[ev.objectInstance.id];
 
             let localShadowObj = this.gameEngine.findLocalShadow(ev.objectInstance);
@@ -169,7 +169,7 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         // TODO: use world.forEachObject((id, ob) => {});
         // TODO: identical code is in InterpolateStrategy
         for (let objId of Object.keys(world.objects)) {
-            let objEvents = this.lastSync.syncObjects[objId];
+            let objEvents = sync.syncObjects[objId];
             if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
                 continue;
 
@@ -187,13 +187,25 @@ export default class ExtrapolateStrategy extends SyncStrategy {
             if (typeof o.applyIncrementalBending === 'function') {
                 o.applyIncrementalBending(stepDesc);
                 o.refreshToPhysics();
-                // this.gameEngine.trace.trace(() => `object[${id}] after bending : ${o.toString()}`);
             }
         });
 
+        // apply all pending required syncs
+        while (this.requiredSyncs.length) {
+
+            let requiredStep = this.requiredSyncs[0].stepCount;
+
+            // if we haven't reached the corresponding step, it's too soon to apply syncs
+            if (requiredStep > this.gameEngine.world.stepCount)
+                return;
+
+            this.gameEngine.trace.trace(() => `applying a required sync ${requiredStep}`);
+            this.applySync(this.requiredSyncs.shift());
+        }
+
         // if there is a sync from the server, from the past or present, apply it now
         if (this.lastSync && this.lastSync.stepCount <= this.gameEngine.world.stepCount) {
-            this.applySync();
+            this.applySync(this.lastSync);
             this.lastSync = null;
         }
     }

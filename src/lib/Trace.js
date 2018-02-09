@@ -61,6 +61,12 @@
      static get TRACE_NONE() { return 1000; }
 
      trace(level, dataCB) {
+
+         // all traces must be functions which return strings
+         if (typeof dataCB !== 'function') {
+             throw new Error(`Lance trace was called but instead of passing a function, it received a [${typeof dataCB}]`);
+         }
+
          if (level < this.options.traceLevel)
              return;
 
