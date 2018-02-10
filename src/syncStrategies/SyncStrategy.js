@@ -44,6 +44,7 @@ export default class SyncStrategy {
         // build new sync object
         let lastSync = this.lastSync = {
             stepCount: e.stepCount,
+            fullUpdate: e.fullUpdate,
             syncObjects: {},
             syncSteps: {}
         };

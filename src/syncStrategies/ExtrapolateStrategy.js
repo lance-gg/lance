@@ -169,10 +169,20 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         // TODO: use world.forEachObject((id, ob) => {});
         // TODO: identical code is in InterpolateStrategy
         for (let objId of Object.keys(world.objects)) {
+
             let objEvents = sync.syncObjects[objId];
+
+            // if this was a full sync, and we did not get a corresponding object,
+            // remove the local object
+            if (sync.fullUpdate && !objEvents && objId < this.gameEngine.options.clientIDSpace) {
+                this.gameEngine.removeObjectFromWorld(objId);
+                continue;
+            }
+
             if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
                 continue;
 
+            // if we got an objectDestroy event, destroy the object
             objEvents.forEach((e) => {
                 if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
             });

@@ -72,6 +72,7 @@ export default class ServerEngine {
         this.pendingAtomicEvents = [];
         this.objMemory = {};
         this.requestImmediateUpdate = false;
+        this.syncCounter = 0;
 
         io.on('connection', this.onPlayerConnected.bind(this));
         this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
@@ -137,6 +138,9 @@ export default class ServerEngine {
                     diffUpdate = false;
                 }
             }
+
+            // also, one in twenty syncs is a full update
+            if (this.syncCounter++ % 20 === 0) diffUpdate = false;
 
             let payload = this.serializeUpdate({ diffUpdate });
             this.gameEngine.trace.info(() => `========== sending world update ${this.gameEngine.world.stepCount} is delta update: ${diffUpdate} ==========`);
