@@ -22,7 +22,7 @@ import Trace from './lib/Trace';
  * and therefore clients must resolve server updates which conflict
  * with client-side predictions.
  */
-export default class GameEngine {
+class GameEngine {
 
     /**
       * Create a game engine instance.  This needs to happen
@@ -489,3 +489,10 @@ export default class GameEngine {
    * @event GameEngine#start
    * @param {Number} timestamp - UTC epoch of start time
    */
+
+// TODO: the declaration "export default" could be done as part of the class
+// declaration up above, but the current version of jsdoc doesn't support this.
+// when jsdoc is fixed, move this descriptor back to the class declaration,
+// in all relevant files (12 files)
+// see: https://github.com/jsdoc3/jsdoc/issues/1132
+export default GameEngine;

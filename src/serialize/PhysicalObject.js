@@ -6,7 +6,7 @@ import Quaternion from './Quaternion';
 /**
  * The PhysicalObject is the base class for physical game objects
  */
-export default class PhysicalObject extends GameObject {
+class PhysicalObject extends GameObject {
 
     // TODO:
     // this code is not performance optimized, generally speaking.
@@ -215,3 +215,5 @@ export default class PhysicalObject extends GameObject {
         this.quaternion.slerp(nextObj.quaternion, percent);
     }
 }
+
+export default PhysicalObject;

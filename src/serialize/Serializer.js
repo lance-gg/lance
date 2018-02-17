@@ -12,7 +12,7 @@ const MAX_UINT_16 = 0xFFFF;
  *
  * The Serializer defines the data types which can be serialized.
  */
-export default class Serializer {
+class Serializer {
 
     constructor() {
         this.registeredClasses = {};
@@ -68,7 +68,7 @@ export default class Serializer {
         // todo if classId is 0 - take care of dynamic serialization.
         let objectClass = this.registeredClasses[objectClassId];
         if (objectClass == null) {
-            console.error(`Serializer: unable to find class with objectClassId ${objectClassId}`);
+            console.error('Serializer: Found a class which was not registered.  Please use serializer.registerClass() to register all serialized classes.');
         }
 
         localByteOffset += Uint8Array.BYTES_PER_ELEMENT; // advance the byteOffset after the classId
@@ -250,3 +250,5 @@ Serializer.TYPES = {
     CLASSINSTANCE: 'CLASSINSTANCE',
     LIST: 'LIST'
 };
+
+export default Serializer;

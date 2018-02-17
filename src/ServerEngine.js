@@ -24,7 +24,7 @@ import NetworkMonitor from './network/NetworkMonitor';
  * connections and dis-connections, emitting periodic game-state
  * updates, and capturing remote user inputs.
  */
-export default class ServerEngine {
+class ServerEngine {
 
     /**
      * create a ServerEngine instance
@@ -351,3 +351,5 @@ export default class ServerEngine {
     }
 
 }
+
+export default ServerEngine;

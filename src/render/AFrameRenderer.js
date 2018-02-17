@@ -6,7 +6,7 @@ import networkedPhysics from './aframe/system';
 /**
  * The A-Frame Renderer
  */
-export default class AFrameRenderer extends Renderer {
+class AFrameRenderer extends Renderer {
 
     /**
     * Constructor of the Renderer singleton.
@@ -57,3 +57,5 @@ export default class AFrameRenderer extends Renderer {
     }
 
 }
+
+export default AFrameRenderer;

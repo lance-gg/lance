@@ -5,7 +5,7 @@ import Serializer from './Serializer';
  * A ThreeVector is a geometric object which is completely described
  * by three values.
  */
-export default class ThreeVector extends Serializable {
+class ThreeVector extends Serializable {
 
     static get netScheme() {
         return {
@@ -140,3 +140,5 @@ export default class ThreeVector extends Serializable {
         return this;
     }
 }
+
+export default ThreeVector;

@@ -14,7 +14,7 @@ import MathUtils from '../lib/MathUtils';
  * allow the client to extrapolate the position
  * of dynamic objects in-between server updates.
  */
-export default class DynamicObject extends GameObject {
+class DynamicObject extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -283,3 +283,5 @@ export default class DynamicObject extends GameObject {
         };
     }
 }
+
+export default DynamicObject;

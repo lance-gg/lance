@@ -10,7 +10,7 @@ const TIME_RESET_THRESHOLD = 100;
  * method.  The draw method will be invoked on every iteration of the browser's
  * render loop.
  */
-export default class Renderer {
+class Renderer {
 
     static getInstance() {
         return singleton;
@@ -117,3 +117,5 @@ export default class Renderer {
      */
     removeObject(obj) {}
 }
+
+export default Renderer;

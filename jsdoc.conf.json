@@ -6,6 +6,7 @@
         "template": "node_modules/lance-docs-template",
         "tutorials": "./docs"
     },
+    "sourceType": "module",
     "source": {
         "include": [
             "src/ServerEngine.js",

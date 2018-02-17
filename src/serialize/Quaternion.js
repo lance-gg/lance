@@ -6,7 +6,7 @@ import ThreeVector from './ThreeVector';
  * A Quaternion is a geometric object which can be used to
  * represent a three-dimensional rotation.
  */
-export default class Quaternion extends Serializable {
+class Quaternion extends Serializable {
 
     static get netScheme() {
         return {
@@ -190,3 +190,5 @@ export default class Quaternion extends Serializable {
     }
     /* eslint-enable */
 }
+
+export default Quaternion;

@@ -8,7 +8,7 @@ import Serializer from './Serializer';
  * Game developers will use one of the subclasses such as DynamicObject,
  * or PhysicalObject.
  */
-export default class GameObject extends Serializable {
+class GameObject extends Serializable {
 
     static get netScheme() {
         return {
@@ -178,3 +178,5 @@ export default class GameObject extends Serializable {
     }
 
 }
+
+export default GameObject;

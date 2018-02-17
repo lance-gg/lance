@@ -23,7 +23,7 @@ const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution b
  * starting client steps, and handling world updates which arrive from
  * the server.
  */
-export default class ClientEngine {
+class ClientEngine {
 
     /**
       * Create a client engine instance.
@@ -342,3 +342,5 @@ export default class ClientEngine {
     }
 
 }
+
+export default ClientEngine;
