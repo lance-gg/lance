@@ -64,7 +64,6 @@
     "lance-docs-template": "github:lance-gg/lance-docs-template",
     "mocha": "^3.0.2",
     "query-string": "^4.3.1",
-    "should": "^11.0.0",
-    "travis-after-all": "^1.4.4"
+    "should": "^11.0.0"
   }
 }
