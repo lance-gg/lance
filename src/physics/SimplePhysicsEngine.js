@@ -24,7 +24,8 @@ class SimplePhysicsEngine extends PhysicsEngine {
 
         /**
          * The actor's name.
-         * @member {TwoVector} constant gravity affecting all objects
+         * @memberof SimplePhysicsEngine
+         * @member {TwoVector} gravity affecting all objects
          */
         this.gravity = new TwoVector(0, 0);
 
