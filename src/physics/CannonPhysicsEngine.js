@@ -4,7 +4,7 @@ import CANNON from 'cannon';
 /**
  * CannonPhysicsEngine is a three-dimensional lightweight physics engine
  */
-export default class CannonPhysicsEngine extends PhysicsEngine {
+class CannonPhysicsEngine extends PhysicsEngine {
 
     constructor(options) {
         super(options);
@@ -54,3 +54,5 @@ export default class CannonPhysicsEngine extends PhysicsEngine {
         this.world.removeBody(obj);
     }
 }
+
+export default CannonPhysicsEngine;
