@@ -5,7 +5,7 @@
 
 # [Lance](http://lance.gg) is a real-time multiplayer game server
 
-It provides an extendible Node.JS based server, on which game logic runs, as well as a client-side library
+Lance provides an extendible Node.JS based server, on which game logic runs, as well as a client-side library
 which synchronizes the client's game state with the server game state.  In order
 to provide a smooth visual experience for each connected client, Lance implements
 efficient networking methods, position interpolation and extrapolation, user input
@@ -31,8 +31,8 @@ Check out the official demo: [Spaaace](http://spaaace.herokuapp.com)
     * TCP via websockets
     * Communication is packed and serialized into binary
     * Automatic handling of network spikes with step correction
-* Intelligent sync strategies for lag handling
-    * Extrapolation (client side prediction) with step re-enactment or:
+* Intelligent synchronization strategies for lag handling
+    * Extrapolation (client side prediction) with step re-enactment, or:
     * Interpolation for optimal object motion
 * Tools for debugging and tracing
 

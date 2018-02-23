@@ -1,29 +1,38 @@
 
 ## Current Release
 
-### r1.0.1 - *Tensor* - March 2017
-* Full 3D support
-* Pluggable Physics Engine support: cannon.js
-* Demonstrate A-Frame support
-* Refactor: game objects contain render and physics sub-objects
+### r2.0.1 - *Spinor* - February 2018
+* ES6 Modules support
+* Renderer-controller game loop.  The game step delta is tuned to the render draw time
+* Full-sync support, providing full data sync to new connections
+* Game Object re-architecture: Renderer objects and Physics objects are sub-objects of the Game Object
+* New KeyboardControls class
+* Smart sync, syncing only changed objects
 
 ## Future Releases
 
 All releases listed here, along with their planned release dates and their listed contents, are a statement of intentions, and are provided with no guarantee whatsoever.  Lance is an open-source project and as such depends on the available time of its developers.  The roadmap is subject to change at any time.
 
-### r1.1.0 - *Spinor* - July 2017
-* Console level logging
+### r2.1.0 - *Majorana* - July 2018
+* 2D engine support - P2
+* level logging
 * Proper testing framework
 * Atomic events
 * Better debug tools:
     * Parses recorded logs
     * shows GUI that allow scrubbing through time to see values over time of client state, server state, interpolated/extrapolated state
 
-### r2.0.0 - *Quaternion* - December 2017
+### r3.0.0 - *Quaternion* - December 2018
 * UDP via WebRTC
 * Automated Cloud Deploy system for Lance game servers
 
 ## Past Releases
+
+### r1.0.1 - *Tensor* - March 2017
+* Full 3D support
+* Pluggable Physics Engine support: cannon.js
+* Demonstrate A-Frame support
+* Refactor: game objects contain render and physics sub-objects
 
 ### r0.9.1 - “Incheon Phase 2” External Beta Release - January 2017
 

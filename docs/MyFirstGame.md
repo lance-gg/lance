@@ -7,14 +7,12 @@ code, and game logic.
 
 ## Setting up the Environment
 
-*Side Note:* we use [yarn](https://yarnpkg.com/) in this tutorial, however you can use the `npm` command in each case - it will work just as well.
-
 The creation of a new game starts by cloning boilerplate code:
 
 ```shell
 git clone https://github.com/lance-gg/lancegame.git
 cd lancegame
-yarn install
+npm install
 ```
 
 You now have the basic directory structure of a game.  Look around.
@@ -23,9 +21,11 @@ to the clients, and a `main.js` file, which is the entry point of the node.js se
 The game code is inside the `src` directory, divided into
 sub-directories `client`, `server`, and `common`.
 
+Take a look at `webpack.config.js` which shows how the game is packaged, and `.babelrc` shows how the game loads the lance library.
+
 ## Step 1: Create the Game Object Classes
 
-We have two kinds of objects in Pong, the paddle and the ball.
+There are two kinds of objects in every Pong game: the paddle and the ball.
 These files extend the `DynamicObject` class, but are quite simple.
 The boilerplate includes a sample game object class, in the file
 `src/common/PlayerAvatar.js`
@@ -39,14 +39,14 @@ the sample `PlayerAvatar.js` object, except that it is called `Paddle` and it as
 ```javascript
 'use strict';
 
-const DynamicObject = require('lance-gg').serialize.DynamicObject;
+import DynamicObject from 'lance/serialize/DynamicObject';
 
-class Paddle extends DynamicObject {
+export default class Paddle extends DynamicObject {
 
-    constructor(id, x, playerId) {
-        super(id);
-        this.position.set(x, 0);
-        this.playerId = playerId;
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options, props);
+        if (props && props.playerId)
+            this.playerId = props.playerId;
         this.class = Paddle;
     }
 
@@ -56,7 +56,6 @@ class Paddle extends DynamicObject {
         }
     }
 }
-module.exports = Paddle;
 ```
 
 ### src/common/Ball.js
@@ -67,19 +66,19 @@ gradually *bend* towards the server object's position at a rate of 80% each time
 velocity should not bend at all, because the ball's velocity can change
 suddenly as it hits a wall or a paddle.
 We also give the Ball an initial velocity when it is created.
+
 ```javascript
 'use strict';
 
-const DynamicObject = require('lance-gg').serialize.DynamicObject;
+import DynamicObject from 'lance/serialize/DynamicObject';
 
-class Ball extends DynamicObject {
+export default class Ball extends DynamicObject {
 
     get bendingMultiple() { return 0.8; }
     get bendingVelocityMultiple() { return 0; }
 
-    constructor(id, x, y) {
-        super(id);
-        this.position.set(x, y);
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options, props);
         this.class = Ball;
         this.velocity.set(2, 2);
     }
@@ -90,7 +89,6 @@ class Ball extends DynamicObject {
         }
     }
 }
-module.exports = Ball;
 ```
 
 ## Step 2: Implement the MyGameEngine class
@@ -107,8 +105,9 @@ hit a paddle.  We will also need to respond to the user's up/down inputs.
 The MyGameEngine class implements the actual logic of the game.  First add the objects we created, and some constants, at the top of the file:
 
 ```javascript
-const Paddle = require('./Paddle');
-const Ball = require('./Ball');
+import TwoVector from 'lance/serialize/TwoVector';
+import Paddle from './Paddle';
+import Ball from './Ball';
 const PADDING = 20;
 const WIDTH = 400;
 const HEIGHT = 400;
@@ -125,12 +124,12 @@ start() {
 
     this.on('postStep', () => { this.postStepHandleBall(); });
     this.on('objectAdded', (object) => {
-        if (object.id == 1) {
-            this.paddle1 = object;
-        } else if (object.id == 2) {
-            this.paddle2 = object;
-        } else if (object.class == Ball) {
+        if (object.class === Ball) {
             this.ball = object;
+        } else if (object.playerId === 1) {
+            this.paddle1 = object;
+        } else if (object.playerId === 2) {
+            this.paddle2 = object;
         }
     });
 }
@@ -140,8 +139,8 @@ start() {
 
 ```javascript
 registerClasses(serializer) {
-    serializer.registerClass(require('../common/Paddle'));
-    serializer.registerClass(require('../common/Ball'));
+    serializer.registerClass(Paddle);
+    serializer.registerClass(Ball);
 }
 ```
 
@@ -154,7 +153,7 @@ processInput(inputData, playerId) {
     super.processInput(inputData, playerId);
 
     // get the player paddle tied to the player socket
-    let playerPaddle = this.world.getPlayerObject(playerId);
+    let playerPaddle = this.world.queryObject({ playerId });
     if (playerPaddle) {
         if (inputData.input === 'up') {
             playerPaddle.position.y -= 5;
@@ -171,9 +170,9 @@ processInput(inputData, playerId) {
 initGame() {
 
     // create the paddle objects
-    this.addObjectToWorld(new Paddle(++this.world.idCount, PADDING, 1));
-    this.addObjectToWorld(new Paddle(++this.world.idCount, WIDTH - PADDING, 2));
-    this.addObjectToWorld(new Ball(++this.world.idCount, WIDTH / 2, HEIGHT / 2));
+    this.addObjectToWorld(new Paddle(this, null, { position: new TwoVector(PADDING, 0), playerId: 1 }));
+    this.addObjectToWorld(new Paddle(this, null, { position: new TwoVector(WIDTH - PADDING, 0), playerId: 2 }));
+    this.addObjectToWorld(new Ball(this, null, { position: new TwoVector(WIDTH /2, HEIGHT / 2) }));
 }
 ```
 
@@ -238,9 +237,10 @@ The server engine will initialize the game engine when the game is started, and 
 ```javascript
 'use strict';
 
-const ServerEngine = require('lance-gg').ServerEngine;
+import ServerEngine from 'lance/ServerEngine';
+import PlayerAvatar from '../common/PlayerAvatar';
 
-class MyServerEngine extends ServerEngine {
+export default class MyServerEngine extends ServerEngine {
 
     constructor(io, gameEngine, inputOptions) {
         super(io, gameEngine, inputOptions);
@@ -282,15 +282,13 @@ class MyServerEngine extends ServerEngine {
         }
     }
 }
-
-module.exports = MyServerEngine;
 ```
 
 ## Step 4: the Client Code
 
 The client-side code must implement a renderer, and a client engine.
 
-The renderer, in our case, will simply update HTML elements created for
+The renderer, in our case, will update HTML elements created for
 each paddle and the ball:
 
 ### src/client/MyRenderer.js
@@ -298,8 +296,8 @@ each paddle and the ball:
 Change the `draw()` method and add the `addSprite()` methods as shown here:
 
 ```javascript
-draw() {
-    super.draw();
+draw(t, dt) {
+    super.draw(t, dt);
 
     for (let objId of Object.keys(this.sprites)) {
         if (this.sprites[objId].el) {
@@ -310,7 +308,7 @@ draw() {
 }
 
 addSprite(obj, objName) {
-    if (objName === 'paddle') objName += obj.id;
+    if (objName === 'paddle') objName += obj.playerId;
     this.sprites[obj.id] = {
         el: document.querySelector('.' + objName)
     };
@@ -339,19 +337,19 @@ NOTE: If you prefer to get a clean working copy, you can run:
 git clone https://github.com/lance-gg/lancegame.git pong
 cd pong
 git checkout pong
-yarn install
+npm install
 ```
 
-To run the game you must first build the JavaScript bundle.  The `yarn install`
+To run the game you must first build the JavaScript bundle.  The `npm install`
 command above already did this for you, but we changed the code, so you must rebuild by
 executing:
 ```shell
-yarn run build
+npm run build
 ```
 
 To run the game, type:
 ```shell
-yarn start
+npm start
 ```
 
 Open two browser windows and point them to the local host.  The URL is

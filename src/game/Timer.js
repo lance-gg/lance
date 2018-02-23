@@ -1,3 +1,8 @@
+// TODO: needs documentation
+// I think the API could be simpler
+//   - Timer.run(waitSteps, cb)
+//   - Timer.repeat(waitSteps, count, cb) // count=null=>forever
+//   - Timer.cancel(cb)
 export default class Timer {
 
     constructor() {

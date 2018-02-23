@@ -11,15 +11,15 @@ These requirements lead to some basic architectural principles:
 
 The main components of a networked game are:
 
-* The **server**. Represented in Lance by a singleton instance of the *ServerEngine* class.
+* The **server**. Represented in Lance by a singleton instance of the **ServerEngine** class.
 
-* The **clients**. Represented in Lance by multiple instances of the *ClientEngine* class.
+* The **clients**. Represented in Lance by multiple instances of the **ClientEngine** class.
 
-* The **game logic**. Represented in Lance by the  *GameEngine* class.
+* The **game logic**. Represented in Lance by the  **GameEngine** class.
 
-* The **game world**, which includes multiple **game objects**. The Lance *DynamicObject* is the base class for all kinds of game objects.
+* The **game world**, which includes multiple **game objects**. The Lance **GameObject** is the base class for all kinds of game objects.
 
-* The **renderer**.  A component which draws the game visuals on every iteration of the render loop.  In Lance this is represented by the *Renderer* class.
+* The **renderer**.  A component which draws the game visuals on every iteration of the render loop.  In Lance this is represented by the **Renderer** class.
 
 * **Synchronization**. Lance provides several ways to synchronize between the server and the clients. The game developer must configure which synchronization method works best for their specific game and use case.
 
@@ -33,10 +33,10 @@ The following diagram shows how these components connect in the overall architec
 
 The basic flow of a game can be seen as a sequence of *game steps*.  This is a basic concept which is true
 for game development generally, and the concept works well for networked games as well.  During a single step, the
-game progresses from time *N* to time *N+1*.  The game engine will have to determine the state of the game
-at time *N+1* by applying physics, taking account of new user inputs, and applying the game mechanics logic.
+game progresses from time *T* to time *T + δt*.  The game engine will have to determine the state of the game
+at time *T + δt* by applying physics, taking account of new user inputs, and applying the game mechanics logic.
 
-In the context of multilayer, networked games, the steps will be executed both on the server and the client. Each step is numbered, and depending on the synchronization strategy, clients may be executing a given step before the corresponding server information has arrived at the client (i.e. extrapolation) or after (i.e. interpolation). Ideally, a given step *N* represents the same point in game play on both the server and the client.
+In the context of multiplayer, networked games, the steps will be executed both on the server and the client. Each step is numbered, and depending on the synchronization strategy, clients may be executing a given step before the corresponding server information has arrived at the client (i.e. extrapolation) or after (i.e. interpolation). Ideally, a given step *N* represents the same point in game play on both the server and the client.
 
 The core game logic is implemented in the game engine, so a game step is simply a call to the game engine’s *step()* method.
 
@@ -72,12 +72,14 @@ The client flow is more complicated than the server, for two reasons.  First it 
 
     * apply user inputs locally
 
-    * GameEngine - *start of a single game step*
 
-        * PhysicsEngine - handle physics step
 
 * ClientEngine - *start of a single render step*
 
-    * Renderer - draw
+    * Renderer - draw event
+
+        * GameEngine - *start of a single game step* - may need to be executed zero or more times, depending on the number of steps which should have taken place since the last render draw event
+
+            * PhysicsEngine - handle physics step
 
 Next: {@tutorial guide_gameengine}
