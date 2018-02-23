@@ -10,7 +10,7 @@ let dx = new TwoVector();
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
  */
-export default class SimplePhysicsEngine extends PhysicsEngine {
+class SimplePhysicsEngine extends PhysicsEngine {
 
     constructor(initOptions) {
         super(initOptions);
@@ -109,3 +109,5 @@ export default class SimplePhysicsEngine extends PhysicsEngine {
         this.collisionDetection.detect(this.gameEngine);
     }
 }
+
+export default SimplePhysicsEngine;

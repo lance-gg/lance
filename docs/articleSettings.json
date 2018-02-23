@@ -1,5 +1,5 @@
 {
-  "category_introduction": {
+  "A_category_introduction": {
     "title": "Introduction",
     "order": 1,
     "children": {
@@ -20,7 +20,7 @@
       }
     }
   },
-  "category_overview": {
+  "B_category_overview": {
     "title": "Overview",
     "order": 2,
     "children": {
@@ -47,7 +47,7 @@
       }
     }
   },
-  "category_sync":{
+  "C_category_sync":{
     "title": "Synchronization Methods",
     "order": 30,
     "children": {
@@ -59,7 +59,7 @@
       }
     }
   },
-  "category_tutorials": {
+  "D_category_tutorials": {
     "title": "Tutorials",
     "order": 50,
     "children": {
@@ -71,7 +71,7 @@
       }
     }
   },
-  "category_extras": {
+  "E_category_extras": {
     "title": "Extras",
     "order": 200,
     "children": {

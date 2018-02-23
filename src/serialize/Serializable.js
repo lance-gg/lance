@@ -1,7 +1,7 @@
 import Utils from './../lib/Utils';
 import Serializer from './Serializer';
 
-export default class Serializable {
+class Serializable {
     /**
      *  Class can be serialized using either:
          - a class based netScheme
@@ -150,3 +150,5 @@ export default class Serializable {
     }
 
 }
+
+export default Serializable;

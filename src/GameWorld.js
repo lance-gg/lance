@@ -3,7 +3,7 @@
  * where all data pertaining to the current state of the
  * world is saved.
  */
-export default class GameWorld {
+class GameWorld {
 
     /**
      * Constructor of the World instance
@@ -120,3 +120,5 @@ export default class GameWorld {
     }
 
 }
+
+export default GameWorld;
