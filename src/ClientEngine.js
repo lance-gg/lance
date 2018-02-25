@@ -36,10 +36,10 @@ class ClientEngine {
       * @param {Number} inputOptions.healthCheckInterval - health check message interval (millisec). Default is 1000.
       * @param {Number} inputOptions.healthCheckRTTSample - health check RTT calculation sample size. Default is 10.
       * @param {Object} inputOptions.syncOptions - an object describing the synchronization method. If not set, will be set to extrapolate, with local object bending set to 0.0 and remote object bending set to 0.6. If the query-string parameter "sync" is defined, then that value is passed to this object's sync attribute.
-      * @param {String} inputOptions.scheduler - When set to "render-schedule" the game step scheduling is controlled by the renderer and step time is variable.  When set to "fixed" the game step is run independently with a fixed step time. Default is "fixed".
+      * @param {String} inputOptions.scheduler - When set to "render-schedule" the game step scheduling is controlled by the renderer and step time is variable.  When set to "fixed" the game step is run independently with a fixed step time. Default is "render-schedule".
       * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
-      * @param {Number} inputOptions.syncOptions.localObjBending - amount of bending towards original client position, after each sync, for local objects
-      * @param {Number} inputOptions.syncOptions.remoteObjBending - amount of bending towards original client position, after each sync, for remote objects
+      * @param {Number} inputOptions.syncOptions.localObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for local objects
+      * @param {Number} inputOptions.syncOptions.remoteObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for remote objects
       * @param {Renderer} Renderer - the Renderer class constructor
       */
     constructor(gameEngine, inputOptions, Renderer) {
@@ -49,7 +49,7 @@ class ClientEngine {
             healthCheckInterval: 1000,
             healthCheckRTTSample: 10,
             stepPeriod: 1000 / GAME_UPS,
-            scheduler: 'fixed',
+            scheduler: 'render-schedule',
         }, inputOptions);
 
         /**
@@ -90,6 +90,7 @@ class ClientEngine {
         }
     }
 
+    // configure the Synchronizer singleton
     configureSynchronization() {
 
         // the reflect syncronizer is just interpolate strategy,
@@ -104,7 +105,9 @@ class ClientEngine {
     }
 
     /**
-     * Makes a connection to the game server
+     * Makes a connection to the game server.  Extend this method if you want to add additional
+     * logic on every connection. Call the super-class connect first, and return a promise which
+     * executes when the super-class promise completes.
      *
      * @param {Object} [options] additional socket.io options
      * @return {Promise} Resolved when the connection is made to the server
@@ -207,6 +210,8 @@ class ClientEngine {
         }
     }
 
+    // execute a single game step.  This is normally called by the Renderer
+    // at each draw event.
     step(t, dt, physicsOnly) {
 
         // physics only case
@@ -247,6 +252,7 @@ class ClientEngine {
         }
     }
 
+    // apply a user input on the client side
     doInputLocal(message) {
         if (this.gameEngine.passive) {
             return;
@@ -259,6 +265,8 @@ class ClientEngine {
 
     }
 
+    // apply user inputs which have been queued in order to create
+    // an artificial delay
     applyDelayedInputs() {
         if (!this.delayedInputs) {
             return;
@@ -280,7 +288,7 @@ class ClientEngine {
      * This function can be called by the extended client engine class,
      * typically at the beginning of client-side step processing (see event client__preStep)
      *
-     * @param {Object} input - string representing the input
+     * @param {String} input - string representing the input
      * @param {Object} inputOptions - options for the input
      */
     sendInput(input, inputOptions) {
@@ -311,6 +319,7 @@ class ClientEngine {
         this.messageIndex++;
     }
 
+    // handle a message that has been received from the server
     handleInboundMessage(syncData) {
 
         let syncEvents = this.networkTransmitter.deserializePayload(syncData).events;
@@ -334,6 +343,7 @@ class ClientEngine {
         }
     }
 
+    // emit an input to the authoritative server
     handleOutboundInput() {
         for (var x = 0; x < this.outboundMessages.length; x++) {
             this.socket.emit(this.outboundMessages[x].command, this.outboundMessages[x].data);

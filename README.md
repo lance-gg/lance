@@ -43,7 +43,7 @@ More features in the pipeline:
 
 The official [Lance documentation](http://docs.lance.gg) contains articles on theory and rational, as well as the structure and architecture of the project.
 
-If you feel like learning by doing you can start with first tutorial, [My first game: Pong](http://docs.lance.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step on implementation of a networked version of this classic game.
+If you feel like learning by doing you can start with first tutorial, [My first game: Pong]{@tutorial MyFirstGame} which contains step-by-step on implementation of a networked version of this classic game.
 
 ## Something went wrong! I need help!
 

@@ -40,7 +40,7 @@ Check out the official demo: [Spaaace](http://spaaace.herokuapp.com)
 
 To get a bird's eye view on what's Lance all about and how to use it to make a multiplayer game, we recommend reading the guide: {@tutorial overview_architecture}
 
-If you're more of the learning-by-doing type, you can start with the first tutorial, [My first game: Pong](http://docs.lance.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step instructions on how to implement a networked version of this classic game.
+If you're more of the learning-by-doing type, you can start with the first tutorial,  {@tutorial MyFirstGame} which contains step-by-step instructions on how to implement a networked version of this classic game.
 
 ## Join the fun!
 

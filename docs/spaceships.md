@@ -2,7 +2,7 @@
 
 This 30-minute tutorial will guide you in the building of a relatively simple
 javascript networked game.  It is meant as a more advanced
-tutorial, a follow-up to [My First Lance Game](http://docs.lance.gg/develop/tutorial-MyFirstGame.html).
+tutorial, a follow-up to {@tutorial MyFirstGame}.
 This tutorial repeats the environment setup, but goes further in-depth,
 introducing the concepts and basic components of a
 networked game,
@@ -15,7 +15,7 @@ first, clone that repository to see the referenced files:
 ```shell
 git clone https://github.com/lance-gg/spaaace
 cd spaaace
-yarn install
+npm install
 ```
 
 ## The Components of a Networked Game
@@ -25,7 +25,7 @@ The networked game is architected around the following components:
 * **The server**.  Represented by the `ServerEngine` class.
 * **The clients**.  Represented by the `ClientEngine` class.
 * **The game logic**.  Represented by the `GameEngine` class.
-* **Multiple game objects**.  The `DynamicObject` is the base class for all kinds of game objects.  Each game object will be associated with one or more render objects, as well as one or more physics objects.
+* **Multiple game objects**.  The `GameObject` is the base class for all kinds of game objects.  Each game object will be associated with one or more render objects, as well as one or more physics objects.
 * **Synchronization**.  Lance provides several ways to synchronize between the server and the clients.  The game developer must configure which synchronization method works best for any given game.
 
 As you write your game, you will need to implement
@@ -199,7 +199,7 @@ synchronization, and that the extended classes can be quite simple.
 For the full game, you will need to create a [`package.json`](https://github.com/lance-gg/spaaace/blob/master/package.json) file, and [`index.html`](https://github.com/lance-gg/spaaace/blob/master/index.html) file,
 examples of which are available in the [spaaace](https://github.com/OpherV/spaaace) repository.
 
-To run the server run `yarn run build` followed by `yarn start`.  
+To run the server run `npm run build` followed by `npm start`.  
 Note that the server has two roles: **(1)** it acts as an HTTP server, serving index.html to clients
 which connect to the game;
 and **(2)** it runs the ServerEngine socket.io entry point, accepting client connections, running the server-authoritative game engine, and broadcasting updates to the clients.
@@ -209,7 +209,7 @@ and **(2)** it runs the ServerEngine socket.io entry point, accepting client con
 It is good programming practice to implement your code using event handlers,
 so that it is clear what each chunk of logic is handling.
 
-The full list of events is available in the [API GameEngine reference](http://docs.lance.gg/develop/GameEngine.html), so we will only list the most
+The full list of events is available in the [API GameEngine reference]{@link GameEngine}, so we will only list the most
 important events here.
 
 * `preStep` and `postStep` - emitted by game engine, just before and just after step execution.  The event handlers receive the step number and whether or not this step is a reenactment.

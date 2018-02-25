@@ -4,7 +4,7 @@ We make great efforts to maintain an active, positive, friendly and inclusive co
 
 To get a bird's eye view on what's Lance all about and how to use it to make a multiplayer game, we recommend reading the guide: {@tutorial architecture}
 
-If you're more of the learning-by-doing type, you can start with the first tutorial, [My first game: Pong](http://docs.lance.gg/develop/tutorial-MyFirstGame.html) which contains step-by-step instructions on how to implement a networked version of this classic game.
+If you're more of the learning-by-doing type, you can start with the first tutorial, {@tutorial MyFirstGame} which contains step-by-step instructions on how to implement a networked version of this classic game.
 
 ### Joining the discussion
 You're welcome to join the [Lance Slack](http://slack.lance.gg) to hang out and engage in active discussion with the project maintainers and fellow game developers.

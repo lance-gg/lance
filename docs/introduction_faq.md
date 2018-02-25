@@ -30,7 +30,7 @@ Since Lance is designed for real-time calculation of position, running typically
 It’s preferred that non-real time communication is handled by a different server than the one which runs the game state, therefore chat services are outside the scope of Lance. The preferred approach is to use an existing chat service together with Lance in your game.  There is a feature request to provide a sample game which demonstrates Lance working together with a third-party chat service. If you’re interested in this feature please upvote the following [feature request](https://github.com/lance-gg/lance/issues/32).
 
 ### 4. What is in the Lance Roadmap?
-See the [Lance Roadmap](http://docs.lance.gg/develop/tutorial-introduction_roadmap.html).  Some of the major planned features include UDP support, and Visual Debugging.
+See the Roadmap: {@tutorial introduction_roadmap}.  Some of the major planned features include UDP support, and Visual Debugging.
 
 ## Lance Packaging / Transpiling
 
@@ -39,4 +39,4 @@ Yes! Lance exports es6 code, so you will need to include it in your babel config
 
 
 ### 4. What is in the Lance Roadmap?
-See the [Lance Roadmap](http://docs.lance.gg/develop/tutorial-introduction_roadmap.html).  Some of the major planned features include UDP support, and Visual Debugging.
+See the Lance Roadmap {@tutorial introduction_roadmap}.  Some of the major planned features include UDP support, and Visual Debugging.
