@@ -1,7 +1,7 @@
 # Lance Game Tutorial
 
-This 30-minute tutorial will guide you in the building of a relatively simple
-javascript networked game.  It is meant as a more advanced
+This 45-minute tutorial will guide you in the building of a
+JavaScript networked game.  It is meant as a more advanced
 tutorial, a follow-up to {@tutorial MyFirstGame}.
 This tutorial repeats the environment setup, but goes further in-depth,
 introducing the concepts and basic components of a
@@ -16,16 +16,19 @@ first, clone that repository to see the referenced files:
 git clone https://github.com/lance-gg/spaaace
 cd spaaace
 npm install
+npm start
 ```
+
+Open one or more browsers at http://localhost:3000 to see the game running.
 
 ## The Components of a Networked Game
 
 The networked game is architected around the following components:
 
-* **The server**.  Represented by the `ServerEngine` class.
-* **The clients**.  Represented by the `ClientEngine` class.
-* **The game logic**.  Represented by the `GameEngine` class.
-* **Multiple game objects**.  The `GameObject` is the base class for all kinds of game objects.  Each game object will be associated with one or more render objects, as well as one or more physics objects.
+* **The server**.  Represented by the `ServerEngine` class.  The code in this class will run on the authoritative server only.
+* **The clients**.  Represented by the `ClientEngine` class.  The code in this class will run on each browser playing the game.
+* **The game logic**.  Represented by the `GameEngine` class.  In extrapolation mode, the code in this class runs on the server, but is also executed on each client, as each client attempts to extrapolate what is happening on the authoritative server.
+* **Multiple game objects**.  The `GameObject` is the base class for all kinds of game objects.  Each game object will be associated with one or more render objects, as well as one or more physics objects.  For example, in a game of spaceships, each spaceship is a game object, but each spaceship game object will have multiple render objects associated with it, such as the spaceship image, the engine thrust images, and an explosion image which is rendered when the spaceship explodes.  In addition, a single spaceship game object is linked to physical objects in a physics engine.  And the physical object will likely be a very simple shape, like a square or a triangle or a point.
 * **Synchronization**.  Lance provides several ways to synchronize between the server and the clients.  The game developer must configure which synchronization method works best for any given game.
 
 As you write your game, you will need to implement
@@ -47,31 +50,34 @@ The server main entry point is a simple javascript file which initializes an ins
 
 The server engine schedules a `step` function to be called at a regular interval.  The
 flow is:
-* ServerEngine - start of a single server step
-  * GameEngine - process any inputs that arrived
+* **ServerEngine** - start of a single server step
+  * GameEngine - **collect inputs from all players:** process any inputs that arrived
   * GameEngine - start of a single game step
     * PhysicsEngine - handle physics step
-  * If a game-state broadcast is needed
+  * **Broadcast game state to clients:** If a game-state broadcast is due
     * For each connected player P_i_
-      * transmit a "world update" to player P_i_
+      * Transmit a "world update" to player P_i_
+      * This world update is called a "sync" and contains only the necessary changes to game objects
+
+Note: the flow described above is already implemented in Lance, and the game developer only needs to implement the `ServerEngine` class and the `GameEngine` class.
 
 ### Client Flow:
 
 The client flow is actually more complicated than the server flow, because of synchronization strategies and the rendering.  The client consists of three independent work schedules: The game step logic, the render step logic, and the server update sync logic.
 
-* ClientEngine - start of a single client game step
-  * check inbound messages / world updates
+* **ClientEngine** - Renderer draw event
+  * At the draw event, the client will typically execute one client game step
+  * Check inbound messages / world updates
     * if a world update has arrived, parse and store the data
-  * capture inputs that have occurred since previous step
-  * transmit inputs to server
-  * handle inputs locally
-  * GameEngine - start of a single game step
+  * Capture local user inputs that have occurred since previous step
+  * Transmit inputs to server
+  * Handle inputs locally
+  * GameEngine - start of a game step
     * PhysicsEngine - handle physics step
-
-
-* ClientEngine - Renderer draw event
   * For each object in the world O_i_:
-    * update the render objects for O_i_
+    * update the associated render objects for O_i_
+
+Note: the flow described above is already implemented in Lance, and the game developer only needs to implement the `ClientEngine` class and the `GameEngine` class.
 
 ## Step 1: main.js and the ServerEngine
 
@@ -82,11 +88,11 @@ you can look at file [`src/server/SpaaaceServerEngine.js`](https://github.com/la
 
 This file does the following:
 
-1. handle player-connected logic by creating a ship for the new player.  See method `onPlayerConnected`.
-1. handle player-disconnected logic by removing the ship of the disconnected player.  See method `onPlayerDisconnected`.
+1. Handle player-connection logic by creating a ship for the new player.  See method `onPlayerConnected`.
+1. handle player-disconnection logic by removing the ship of the disconnected player.  See method `onPlayerDisconnected`.
 1. note the `makeBot()` method, it creates AI-controlled spaceships, which are controlled on the server only.  The AI-control code is implemented in the GameEngine, but since it is only called by the ServerEngine class, it will only run on the server.  This is the preferred technique to implement game code which only executes on the server.
 
-### Build your the main entry point:
+### Build the main entry point:
 
 The next step is to write the server entry code.  For this tutorial the corresponding
 file is [`main.js`](https://github.com/lance-gg/spaaace/blob/master/main.js)
@@ -97,13 +103,10 @@ The file does the following:
 1. create a socketIO handler
 1. create an instance of SpaaaceServerEngine
 1. create an instance of SpaaaceGameEngine
-1. create an instance of the SimplePhysicsEngine
 1. start the serverEngine instance
 
 Sample entry code will look like this:
 ```javascript
-'use strict';
-
 const express = require('express');
 const socketIO = require('socket.io');
 const path = require('path');
@@ -119,14 +122,17 @@ let requestHandler = server.listen(PORT, () => console.log(`Listening on ${ PORT
 const io = socketIO(requestHandler);
 
 // Game Server
-const SpaaaceServerEngine = require(path.join(__dirname, 'src/server/SpaaaceServerEngine.js'));
-const SpaaaceGameEngine = require(path.join(__dirname, 'src/common/SpaaaceGameEngine.js'));
-const SimplePhysicsEngine = require('lance-gg').physics.SimplePhysicsEngine;
+import MyServerEngine from './src/server/SpaaaceServerEngine.js';
+import MyGameEngine from './src/common/SpaaaceGameEngine.js';
+
 
 // Game Instances
-const physicsEngine = new SimplePhysicsEngine({ collisionOptions: { COLLISION_DISTANCE: 50 } } );
-const gameEngine = new SpaaaceGameEngine({ physicsEngine });
-const serverEngine = new SpaaaceServerEngine(io, gameEngine, { timeoutInterval: 60 * 5, debug: {} });
+const gameEngine = new MyGameEngine();
+const serverEngine = new MyServerEngine(io, gameEngine, {
+    debug: {},
+    updateRate: 6,
+    timeoutInterval: 0 // no timeout
+});
 
 // start the game
 serverEngine.start();
@@ -135,12 +141,12 @@ serverEngine.start();
 ## Step 2: the GameEngine
 
 To implement the game logic, you must create a new class which extends
-GameEngine class.  This is where your game mechanics (a.k.a. game rules,
+**GameEngine** class.  This is where your game mechanics (a.k.a. game rules,
 or business logic) are implemented.
 Remember that most of this code is meant to execute on the server
 as well as on each client.
 
-For this tutorial, take a look at [`src/common/SpaaaceGameEngine.js`](https://github.com/lance-gg/spaaace/blob/tutorial/src/common/SpaaaceGameEngine.js)
+For this tutorial, take a look at [`src/common/SpaaaceGameEngine.js`](https://github.com/lance-gg/spaaace/blob/master/src/common/SpaaaceGameEngine.js)
 The game engine logic has three major tasks:
 
 1. to extend the `processInput()` method.  This is the logic which handles new user input such as movement, firing, activate ability, etc.  In the sample code the `processInput()` method handles the keyboard inputs "up", "right", "left", "space".  The inputs will cause the spaceship to accelerate, turn right or left, or to fire a missile.
@@ -148,31 +154,31 @@ The game engine logic has three major tasks:
 1. `makeMissile()`.  Create a new missile, as a result of one ship firing.
 1. `destroyMissile()`.  Remove a missile.
 
-## Step 3: `clientEntryPoint.js`, `ClientEngine`, and `Renderer`
+## Step 3: `clientMain.js`, `SpaaaceClientEngine.js`, and `SpaaaceRenderer.js`
 
-The client entry code is surprisingly similar to the server entry code.  It too creates a physics engine, and game engine, and has options.  The first difference is that the options configure the synchronization, and that instead of a server engine, we instantiate a client engine.
+The client entry code creates a game engine, a client engine, and their options.  The options configure the synchronization.
 
-The full sample code is in [`src/client/clientEntryPoint.js`](https://github.com/lance-gg/spaaace/blob/master/src/client/clientEntryPoint.js) and is roughly implemented as follows:
+The full sample code is in [`src/client/clientMain.js`](https://github.com/lance-gg/spaaace/blob/master/src/client/clientMain.js) and is implemented as follows:
 
 ```javascript
-// default options, overwritten by query-string options
-// are sent to both game engine and client engine
-const defaults = {
+import SpaaaceClientEngine from './SpaaaceClientEngine';
+import SpaaaceGameEngine from '../common/SpaaaceGameEngine';
+import '../../assets/sass/main.scss';
+
+// sent to both game engine and client engine
+const options = {
     traceLevel: 1000,
     delayInputCount: 8,
-    clientIDSpace: 1000000,
+    scheduler: 'render-schedule',
     syncOptions: {
-        sync: qsOptions.sync || 'extrapolate',
+        sync: 'extrapolate',
         localObjBending: 0.2,
         remoteObjBending: 0.5
     }
 };
-let options = Object.assign(defaults, qsOptions);
 
 // create a client engine and a game engine
-const physicsEngine = new SimplePhysicsEngine({ collisionOptions: { COLLISION_DISTANCE: 25 } } );
-const gameOptions = Object.assign({ physicsEngine }, options);
-const gameEngine = new SpaaaceGameEngine(gameOptions);
+const gameEngine = new SpaaaceGameEngine(options);
 const clientEngine = new SpaaaceClientEngine(gameEngine, options);
 
 clientEngine.start();
@@ -181,28 +187,26 @@ clientEngine.start();
 ## Step 4: DynamicObjects
 
 Your game objects, including monsters, spaceships, zombies, and bosses, all extend
-the `DynamicObject` class.  More advanced games which require a true physics engine will prefer to extend the `PhysicsObject` class, but that is outside the scope of this tutorial.  The `DynamicObject` base class is a
+the `DynamicObject` class.  More advanced games which require a true 3D physics engine will prefer to extend the `PhysicsObject` class, but that is outside the scope of this tutorial.  The `DynamicObject` base class is a
 serializable class, meaning that the server can serialize any instance of the class
-(or sub-classes) into a binary object, and transmit it to the clients.  The dynamic
-object instances
+(and sub-class) into a binary object, and transmit it to the clients.  Instances of dynamic objects (and instances of dynamic object sub-classes)
 must be serializable so that the server can send updates to the clients.
 
-Most game objects will have additional attributes that describe the game object, and so each object must specify which attribute values need to be serialized and transmitted from the server to the clients on each update.  To describe the added attributes of an extended class, use the `netscheme` mechanism.
+The serialization mechanism requires sub-classes to explicitly list which attributes will be serialized. Each object must specify exactly which attribute values need to be serialized and transmitted from the server to the clients on each update.  To describe the added attributes of an extended class, use the `netscheme` mechanism.
 
-Take a look at [`src/common/Ship.js`](https://github.com/lance-gg/spaaace/blob/master/src/common/Ship.js) and
-[`src/common/Missile.js`](https://github.com/lance-gg/spaaace/blob/master/src/common/Missile.js).  In both files
-you will find that the base class provides most of the needed logic for movement,
-synchronization, and that the extended classes can be quite simple.
+Take a look at the `netScheme()` getter in [`src/common/Ship.js`](https://github.com/lance-gg/spaaace/blob/master/src/common/Ship.js) and
+[`src/common/Missile.js`](https://github.com/lance-gg/spaaace/blob/master/src/common/Missile.js).  The `netScheme()` getter extends the super-class netScheme.  In both files you will find that the base class provides most of the needed logic for movement,
+and synchronization.
 
 ## Step 5: Putting it all together
 
 For the full game, you will need to create a [`package.json`](https://github.com/lance-gg/spaaace/blob/master/package.json) file, and [`index.html`](https://github.com/lance-gg/spaaace/blob/master/index.html) file,
-examples of which are available in the [spaaace](https://github.com/OpherV/spaaace) repository.
+examples of which are available in the [spaaace](https://github.com/lance-gg/spaaace) repository.
 
 To run the server run `npm run build` followed by `npm start`.  
 Note that the server has two roles: **(1)** it acts as an HTTP server, serving index.html to clients
 which connect to the game;
-and **(2)** it runs the ServerEngine socket.io entry point, accepting client connections, running the server-authoritative game engine, and broadcasting updates to the clients.
+and **(2)** it runs the ServerEngine socket.io entry point, accepting client connections, running the server-authoritative game engine, and broadcasting updates to the clients.  In a published game, you will likely want to store the static files in a CDN, and your game engine will only act in the second role.
 
 ## Game Events
 
@@ -230,6 +234,8 @@ A trace message is usually recorded as follows:
 ```javascript
 gameEngine.trace.info(() => `this just happened: ${foobar()}`);
 ```
+
+The trace methods receive arrow functions as an input, because if they would receive the template string then this template string will be evaluated even in those cases where no tracing is done.  This has been shown to add a heavy load to the garbage collection.
 
 By default, Lance already traces a lot of information, describing
 the progress of the game and each step in detail.
