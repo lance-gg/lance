@@ -27,7 +27,7 @@ As you develop  your game, you will need to implement your own extensions (sub-c
 
 The following diagram shows how these components connect in the overall architecture:
 
-![architecture](https://cloud.githubusercontent.com/assets/3702763/20984514/421f44b4-bcc9-11e6-8346-037d15226216.PNG)
+![architecture](https://user-images.githubusercontent.com/3702763/36915030-e4612af8-1e57-11e8-81d5-fca3855d6fe5.jpg)
 
 ## The Game as a Sequence of Steps
 
