@@ -48,13 +48,13 @@ class GameWorld {
             let conditions = [];
 
             // object id condition
-            conditions.push(!('id' in query) || query.id && object.id === query.id);
+            conditions.push(!('id' in query) || query.id !== null && object.id === query.id);
 
             // player id condition
-            conditions.push(!('playerId' in query) || query.playerId && object.playerId === query.playerId);
+            conditions.push(!('playerId' in query) || query.playerId !== null && object.playerId === query.playerId);
 
             // instance type conditio
-            conditions.push(!('instanceType' in query) || query.instanceType && object instanceof query.instanceType);
+            conditions.push(!('instanceType' in query) || query.instanceType !== null && object instanceof query.instanceType);
 
             // components conditions
             if ('components' in query) {
