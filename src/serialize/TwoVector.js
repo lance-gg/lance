@@ -37,6 +37,13 @@ class TwoVector extends Serializable {
         return `(${round3(this.x)}, ${round3(this.y)})`;
     }
 
+    /**
+     * Set TwoVector values
+     *
+     * @param {Number} x x-value
+     * @param {Number} y y-value
+     * @return {TwoVector} returns self
+     */
     set(x, y) {
         this.x = x;
         this.y = y;
@@ -50,6 +57,12 @@ class TwoVector extends Serializable {
         return this;
     }
 
+    /**
+     * Multiply this TwoVector by a scalar
+     *
+     * @param {Number} s the scale
+     * @return {TwoVector} returns self
+     */
     multiplyScalar(s) {
         this.x *= s;
         this.y *= s;
@@ -57,6 +70,12 @@ class TwoVector extends Serializable {
         return this;
     }
 
+    /**
+     * Add other vector to this vector
+     *
+     * @param {TwoVector} other the other vector
+     * @return {TwoVector} returns self
+     */
     add(other) {
         this.x += other.x;
         this.y += other.y;
@@ -64,6 +83,12 @@ class TwoVector extends Serializable {
         return this;
     }
 
+    /**
+     * Subtract other vector to this vector
+     *
+     * @param {TwoVector} other the other vector
+     * @return {TwoVector} returns self
+     */
     subtract(other) {
         this.x -= other.x;
         this.y -= other.y;
@@ -71,15 +96,31 @@ class TwoVector extends Serializable {
         return this;
     }
 
+    /**
+     * Get vector length
+     *
+     * @return {Number} length of this vector
+     */
     length() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
+    /**
+     * Normalize this vector, in-place
+     *
+     * @return {TwoVector} returns self
+     */
     normalize() {
         this.multiplyScalar(1 / this.length());
         return this;
     }
 
+    /**
+     * Copy values from another TwoVector into this TwoVector
+     *
+     * @param {TwoVector} sourceObj the other vector
+     * @return {TwoVector} returns self
+     */
     copy(sourceObj) {
         this.x = sourceObj.x;
         this.y = sourceObj.y;
@@ -87,13 +128,27 @@ class TwoVector extends Serializable {
         return this;
     }
 
+    /**
+     * Create a clone of this vector
+     *
+     * @return {TwoVector} returns clone
+     */
     clone() {
         return new TwoVector(this.x, this.y);
     }
 
+    /**
+     * Apply in-place lerp (linear interpolation) to this TwoVector
+     * towards another TwoVector
+     * @param {TwoVector} target the target vector
+     * @param {Number} p The percentage to interpolate
+     * @return {TwoVector} returns self
+     */
     lerp(target, p) {
         this.x += (target.x - this.x) * p;
         this.y += (target.y - this.y) * p;
+
+        return this;
     }
 }
 

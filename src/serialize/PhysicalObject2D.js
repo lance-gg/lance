@@ -1,13 +1,12 @@
 import GameObject from './GameObject';
 import Serializer from './Serializer';
-import ThreeVector from './ThreeVector';
-import Quaternion from './Quaternion';
+import TwoVector from './TwoVector';
+import MathUtils from '../lib/MathUtils';
 
 /**
- * The PhysicalObject is the base class for physical game objects
- * TODO: Rename to PhysicalObject3D
+ * The PhysicalObject2D is the base class for physical game objects in 2D Physics
  */
-class PhysicalObject extends GameObject {
+class PhysicalObject2D extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -18,11 +17,11 @@ class PhysicalObject extends GameObject {
     *
     * You may choose not to implement this method, in which
     * case your object only transmits the default attributes
-    * which are already part of {@link PhysicalObject}.
+    * which are already part of {@link PhysicalObject2D}.
     * But if you choose to add more attributes, make sure
     * the return value includes the netScheme of the super class.
     *
-    * @memberof PhysicalObject
+    * @memberof PhysicalObject2D
     * @member {Object} netScheme
     * @example
     *     static get netScheme() {
@@ -35,25 +34,25 @@ class PhysicalObject extends GameObject {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
-            quaternion: { type: Serializer.TYPES.CLASSINSTANCE },
+            angle: { type: Serializer.TYPES.FLOAT32 },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
-            angularVelocity: { type: Serializer.TYPES.CLASSINSTANCE }
+            angularVelocity: { type: Serializer.TYPES.FLOAT32 }
         }, super.netScheme);
     }
 
     /**
     * Creates an instance of a physical object.
-    * Override to provide starting values for position, velocity, quaternion and angular velocity.
+    * Override to provide starting values for position, velocity, angle and angular velocity.
     * NOTE: all subclasses of this class must comply with this constructor signature.
     *       This is required because the engine will create temporary instances when
     *       syncs arrive on the clients.
     * @param {GameEngine} gameEngine - the gameEngine this object will be used in
     * @param {Object} options - options for the new object. See {@link GameObject}
     * @param {Object} props - properties to be set in the new object
-    * @param {ThreeVector} props.position - position vector
-    * @param {ThreeVector} props.velocity - velocity vector
-    * @param {Quaternion} props.quaternion - orientation quaternion
-    * @param {ThreeVector} props.angularVelocity - 3-vector representation of angular velocity
+    * @param {TwoVector} props.position - position vector
+    * @param {TwoVector} props.velocity - velocity vector
+    * @param {Number} props.angle - orientation angle
+    * @param {Number} props.angularVelocity - angular velocity
     */
     constructor(gameEngine, options, props) {
         super(gameEngine, options);
@@ -61,19 +60,19 @@ class PhysicalObject extends GameObject {
         this.bendingIncrements = 0;
 
         // set default position, velocity and quaternion
-        this.position = new ThreeVector(0, 0, 0);
-        this.velocity = new ThreeVector(0, 0, 0);
-        this.quaternion = new Quaternion(1, 0, 0, 0);
-        this.angularVelocity = new ThreeVector(0, 0, 0);
+        this.position = new TwoVector(0, 0);
+        this.velocity = new TwoVector(0, 0, 0);
+        this.quaternion = 0;
+        this.angularVelocity = 0;
 
         // use values if provided
         props = props || {};
         if (props.position) this.position.copy(props.position);
         if (props.velocity) this.velocity.copy(props.velocity);
-        if (props.quaternion) this.quaternion.copy(props.quaternion);
-        if (props.angularVelocity) this.angularVelocity.copy(props.angularVelocity);
+        if (props.angle) this.angle = props.angle;
+        if (props.angularVelocity) this.angularVelocity = props.angularVelocity;
 
-        this.class = PhysicalObject;
+        this.class = PhysicalObject2D;
     }
 
     /**
@@ -81,14 +80,14 @@ class PhysicalObject extends GameObject {
      * The output of this method is used to describe each instance in the traces,
      * which significantly helps in debugging.
      *
-     * @return {String} description - a string describing the PhysicalObject
+     * @return {String} description - a string describing the PhysicalObject2D
      */
     toString() {
         let p = this.position.toString();
         let v = this.velocity.toString();
-        let q = this.quaternion.toString();
-        let a = this.angularVelocity.toString();
-        return `phyObj[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Dir=${q} AVel=${a}`;
+        let a = this.angle;
+        let av = this.angularVelocity;
+        return `phyObj2D[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Dir=${a} AVel=${av}`;
     }
 
     // display object's physical attributes as a string
@@ -102,29 +101,41 @@ class PhysicalObject extends GameObject {
     // derive and save the bending increment parameters:
     // - bendingPositionDelta
     // - bendingAVDelta
-    // - bendingQuaternionDelta
+    // - bendingAngleDelta
     // these can later be used to "bend" incrementally from the state described
     // by "original" to the state described by "self"
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
 
+        // if the object has defined a bending multiples for this object, use them
+        if (typeof this.bendingMultiple === 'number')
+            bending = this.bendingMultiple;
+
+        // velocity bending factor
+        let velocityBending = bending;
+        if (typeof this.bendingVelocityMultiple === 'number')
+            velocityBending = this.bendingVelocityMultiple;
+
+        // angle bending factor
+        let angleBending = bending;
+        if (typeof this.bendingAngleMultiple === 'number')
+            angleBending = this.bendingAngleMultiple;
+        if (isLocal && (typeof this.bendingAngleLocalMultiple === 'number'))
+            angleBending = this.bendingAngleLocalMultiple;
+
         // get the incremental delta position
         this.incrementScale = bending / bendingIncrements;
-        this.bendingPositionDelta = (new ThreeVector()).copy(this.position);
+        this.bendingPositionDelta = this.position.clone();
         this.bendingPositionDelta.subtract(original.position);
         this.bendingPositionDelta.multiplyScalar(this.incrementScale);
+        this.bendingVelocityDelta = this.velocity.clone();
+        this.bendingVelocityDelta.subtract(original.velocity);
+        this.bendingVelocityDelta.multiplyScalar(this.incrementScale);
 
         // get the incremental angular-velocity
-        this.bendingAVDelta = (new ThreeVector()).copy(this.angularVelocity);
-        this.bendingAVDelta.subtract(original.angularVelocity);
-        this.bendingAVDelta.multiplyScalar(this.incrementScale);
+        this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale;
 
-        // get the incremental quaternion rotation
-        let currentConjugate = (new Quaternion()).copy(original.quaternion).conjugate();
-        this.bendingQuaternionDelta = (new Quaternion()).copy(this.quaternion);
-        this.bendingQuaternionDelta.multiply(currentConjugate);
-        let axisAngle = this.bendingQuaternionDelta.toAxisAngle();
-        axisAngle.angle *= this.incrementScale;
-        this.bendingQuaternionDelta.setFromAxisAngle(axisAngle.axis, axisAngle.angle);
+        // get the incremental angle correction
+        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 2 * Math.PI) / bendingIncrements;
 
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
@@ -132,7 +143,6 @@ class PhysicalObject extends GameObject {
         this.bendingIncrements = bendingIncrements;
         this.bending = bending;
 
-        // TODO: use configurable physics bending
         // TODO: does refreshToPhysics() really belong here?
         //       should refreshToPhysics be decoupled from syncTo
         //       and called explicitly in all cases?
@@ -144,8 +154,8 @@ class PhysicalObject extends GameObject {
         super.syncTo(other);
 
         this.position.copy(other.position);
-        this.quaternion.copy(other.quaternion);
-        this.angularVelocity.copy(other.angularVelocity);
+        this.angle = other.angle;
+        this.angularVelocity = other.angularVelocity;
 
         if (!options || !options.keepVelocity) {
             this.velocity.copy(other.velocity);
@@ -155,20 +165,20 @@ class PhysicalObject extends GameObject {
             this.refreshToPhysics();
     }
 
-    // update position, quaternion, and velocity from new physical state.
+    // update position, angle, angular velocity, and velocity from new physical state.
     refreshFromPhysics() {
         this.position.copy(this.physicsObj.position);
-        this.quaternion.copy(this.physicsObj.quaternion);
         this.velocity.copy(this.physicsObj.velocity);
-        this.angularVelocity.copy(this.physicsObj.angularVelocity);
+        this.angle = this.physicsObj.angle;
+        this.angularVelocity = this.physicsObj.angularVelocity;
     }
 
-    // update position, quaternion, and velocity from new game state.
+    // update position, angle, angular velocity, and velocity from new game state.
     refreshToPhysics() {
         this.physicsObj.position.copy(this.position);
-        this.physicsObj.quaternion.copy(this.quaternion);
         this.physicsObj.velocity.copy(this.velocity);
-        this.physicsObj.angularVelocity.copy(this.angularVelocity);
+        this.physicsObj.angle = this.angle;
+        this.physicsObj.angularVelocity = this.angularVelocity;
     }
 
     // apply one increment of bending
@@ -176,28 +186,19 @@ class PhysicalObject extends GameObject {
         if (this.bendingIncrements === 0)
             return;
 
-        if (stepDesc && stepDesc.dt) {
-            const timeFactor = stepDesc.dt / (1000 / 60);
-            // TODO: use clone() below.  it's cleaner
-            const posDelta = (new ThreeVector()).copy(this.bendingPositionDelta).multiplyScalar(timeFactor);
-            const avDelta = (new ThreeVector()).copy(this.bendingAVDelta).multiplyScalar(timeFactor);
-            this.position.add(posDelta);
-            this.angularVelocity.add(avDelta);
+        let timeFactor = 1;
+        if (stepDesc && stepDesc.dt)
+            timeFactor = stepDesc.dt / (1000 / 60);
 
-            // TODO: this is an unacceptable workaround that must be removed.  It solves the
-            // jitter problem by applying only three steps of slerp (thus avoiding slerp to back in time
-            // instead of solving the problem with a true differential quaternion
-            if (this.bendingIncrements > 3) {
-                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
-            }
-        } else {
-            this.position.add(this.bendingPositionDelta);
-            this.angularVelocity.add(this.bendingAVDelta);
-            this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
-        }
+        const posDelta = this.bendingPositionDelta.clone().multiplyScalar(timeFactor);
+        const velDelta = this.bendingVelocDelta.clone().multiplyScalar(timeFactor);
+        this.position.add(posDelta);
+        this.velocity.add(velDelta);
+        this.angularVelocity += (this.bendingAVDelta * timeFactor);
+        this.angle += (this.bendingAngleDelta * timeFactor);
+        if (this.angle > Math.PI) this.angle -= Math.PI;
+        if (this.angle < 0) this.angle += Math.PI;
 
-        // TODO: the following approach is encountering gimbal lock
-        // this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;
     }
 
@@ -206,8 +207,8 @@ class PhysicalObject extends GameObject {
 
         // slerp to target position
         this.position.lerp(nextObj.position, percent);
-        this.quaternion.slerp(nextObj.quaternion, percent);
+        this.angle = MathUtils.interpolateDeltaWithWrapping(this.angle, nextObj.angle, percent, 0, 2 * Math.PI);
     }
 }
 
-export default PhysicalObject;
+export default PhysicalObject2D;
