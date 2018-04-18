@@ -20,5 +20,3 @@ A series on Game Networking and a series on Networked Physics.
      Authors
 ](http://link.springer.com/article/10.1007/s00530-012-0271-3#Sec17)** by Cheryl Savery, T. C. Nicholas Graham  
  In depth discussion of a timeline model for multiplayer games
-
-http://link.springer.com/article/10.1007/s00530-012-0271-3#Sec17
