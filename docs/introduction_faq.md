@@ -36,7 +36,3 @@ See the Roadmap: {@tutorial introduction_roadmap}.  Some of the major planned fe
 
 ### 1. Can I use Lance with babel?
 Yes! Lance exports es6 code, so you will need to include it in your babel configuration so that it gets transpiled with the rest of your code. This can be done using the include option in your .babelrc or webpack.config file.  See the sample games provided in the Github Lance-gg organization.  
-
-
-### 4. What is in the Lance Roadmap?
-See the Lance Roadmap {@tutorial introduction_roadmap}.  Some of the major planned features include UDP support, and Visual Debugging.
