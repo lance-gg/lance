@@ -61,8 +61,8 @@ class PhysicalObject2D extends GameObject {
 
         // set default position, velocity and quaternion
         this.position = new TwoVector(0, 0);
-        this.velocity = new TwoVector(0, 0, 0);
-        this.quaternion = 0;
+        this.velocity = new TwoVector(0, 0);
+        this.angle = 0;
         this.angularVelocity = 0;
 
         // use values if provided
@@ -87,14 +87,14 @@ class PhysicalObject2D extends GameObject {
         let v = this.velocity.toString();
         let a = this.angle;
         let av = this.angularVelocity;
-        return `phyObj2D[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Dir=${a} AVel=${av}`;
+        return `phyObj2D[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Ang=${a} AVel=${av}`;
     }
 
     // display object's physical attributes as a string
     // for debugging purposes mostly
     bendingToString() {
         if (this.bendingIncrements)
-            return `bend=${this.bending} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaQuat=${this.bendingQuaternionDelta}`;
+            return `bend=${this.bending} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaAngle=${this.bendingAngleDelta}`;
         return 'no bending';
     }
 
@@ -109,11 +109,6 @@ class PhysicalObject2D extends GameObject {
         // if the object has defined a bending multiples for this object, use them
         if (typeof this.bendingMultiple === 'number')
             bending = this.bendingMultiple;
-
-        // velocity bending factor
-        let velocityBending = bending;
-        if (typeof this.bendingVelocityMultiple === 'number')
-            velocityBending = this.bendingVelocityMultiple;
 
         // angle bending factor
         let angleBending = bending;
@@ -167,16 +162,35 @@ class PhysicalObject2D extends GameObject {
 
     // update position, angle, angular velocity, and velocity from new physical state.
     refreshFromPhysics() {
-        this.position.copy(this.physicsObj.position);
-        this.velocity.copy(this.physicsObj.velocity);
+        this.copyVector(this.physicsObj.position, this.position);
+        this.copyVector(this.physicsObj.velocity, this.velocity);
         this.angle = this.physicsObj.angle;
         this.angularVelocity = this.physicsObj.angularVelocity;
     }
 
+    // generic vector copy.  We need this because different
+    // physics engines have different implementations.
+    // TODO: Better implementation: the physics engine implementor
+    // should define copyFromLanceVector and copyToLanceVector
+    copyVector(source, target) {
+        let sourceVec = source;
+        if (typeof source[0] === 'number' && typeof source[1] === 'number')
+            sourceVec = { x: source[0], y: source[1] };
+
+        if (typeof target.copy === 'function') {
+            target.copy(sourceVec);
+        } else if (Array.isArray(target)) {
+            target = [sourceVec.x, sourceVec.y];
+        } else {
+            target.x = sourceVec.x;
+            target.y = sourceVec.y;
+        }
+    }
+
     // update position, angle, angular velocity, and velocity from new game state.
     refreshToPhysics() {
-        this.physicsObj.position.copy(this.position);
-        this.physicsObj.velocity.copy(this.velocity);
+        this.copyVector(this.position, this.physicsObj.position);
+        this.copyVector(this.velocity, this.physicsObj.velocity);
         this.physicsObj.angle = this.angle;
         this.physicsObj.angularVelocity = this.angularVelocity;
     }
@@ -191,7 +205,7 @@ class PhysicalObject2D extends GameObject {
             timeFactor = stepDesc.dt / (1000 / 60);
 
         const posDelta = this.bendingPositionDelta.clone().multiplyScalar(timeFactor);
-        const velDelta = this.bendingVelocDelta.clone().multiplyScalar(timeFactor);
+        const velDelta = this.bendingVelocityDelta.clone().multiplyScalar(timeFactor);
         this.position.add(posDelta);
         this.velocity.add(velDelta);
         this.angularVelocity += (this.bendingAVDelta * timeFactor);
