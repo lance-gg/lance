@@ -33,6 +33,7 @@ class PhysicalObject2D extends GameObject {
     static get netScheme() {
         return Object.assign({
             playerId: { type: Serializer.TYPES.INT16 },
+            mass: { type: Serializer.TYPES.FLOAT32 },
             position: { type: Serializer.TYPES.CLASSINSTANCE },
             angle: { type: Serializer.TYPES.FLOAT32 },
             velocity: { type: Serializer.TYPES.CLASSINSTANCE },
@@ -52,6 +53,7 @@ class PhysicalObject2D extends GameObject {
     * @param {TwoVector} props.position - position vector
     * @param {TwoVector} props.velocity - velocity vector
     * @param {Number} props.angle - orientation angle
+    * @param {Number} props.mass - the mass
     * @param {Number} props.angularVelocity - angular velocity
     */
     constructor(gameEngine, options, props) {
@@ -64,6 +66,7 @@ class PhysicalObject2D extends GameObject {
         this.velocity = new TwoVector(0, 0);
         this.angle = 0;
         this.angularVelocity = 0;
+        this.mass = 0;
 
         // use values if provided
         props = props || {};
@@ -71,9 +74,18 @@ class PhysicalObject2D extends GameObject {
         if (props.velocity) this.velocity.copy(props.velocity);
         if (props.angle) this.angle = props.angle;
         if (props.angularVelocity) this.angularVelocity = props.angularVelocity;
+        if (props.mass) this.mass = props.mass;
 
         this.class = PhysicalObject2D;
     }
+
+    /**
+     * Called after the object is added to to the game world.
+     * This is the right place to add renderer sub-objects, physics sub-objects
+     * and any other resources that should be created
+     * @param {GameEngine} gameEngine the game engine
+     */
+    onAddToWorld(gameEngine) {}
 
     /**
      * Formatted textual description of the dynamic object.
