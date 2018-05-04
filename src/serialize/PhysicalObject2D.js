@@ -223,8 +223,6 @@ class PhysicalObject2D extends GameObject {
         this.velocity.add(velDelta);
         this.angularVelocity += (this.bendingAVDelta * timeFactor);
         this.angle += (this.bendingAngleDelta * timeFactor);
-        if (this.angle > (2 * Math.PI)) this.angle -= (2 * Math.PI);
-        if (this.angle < 0) this.angle += (2 * Math.PI);
 
         this.bendingIncrements--;
     }
