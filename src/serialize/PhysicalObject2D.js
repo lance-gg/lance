@@ -84,9 +84,8 @@ class PhysicalObject2D extends GameObject {
      * Called after the object is added to to the game world.
      * This is the right place to add renderer sub-objects, physics sub-objects
      * and any other resources that should be created
-     * @param {GameEngine} gameEngine the game engine
      */
-    onAddToWorld(gameEngine) {}
+    onAddToWorld() {}
 
     /**
      * Formatted textual description of the dynamic object.
@@ -224,8 +223,8 @@ class PhysicalObject2D extends GameObject {
         this.velocity.add(velDelta);
         this.angularVelocity += (this.bendingAVDelta * timeFactor);
         this.angle += (this.bendingAngleDelta * timeFactor);
-        if (this.angle > Math.PI) this.angle -= Math.PI;
-        if (this.angle < 0) this.angle += Math.PI;
+        if (this.angle > Math.PI) this.angle -= (2 * Math.PI);
+        if (this.angle < 0) this.angle += (2 * Math.PI);
 
         this.bendingIncrements--;
     }
