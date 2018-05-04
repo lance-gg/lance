@@ -92,7 +92,7 @@ class GameWorld {
 
     /**
      * Remove an object from the game world
-     * @param object
+     * @param {Object} object object to remove
      */
     addObject(object) {
         this.objects[object.id] = object;
@@ -100,7 +100,7 @@ class GameWorld {
 
     /**
      * Add an object to the game world
-     * @param id
+     * @param {number} id id of the object to remove
      */
     removeObject(id) {
         delete this.objects[id];

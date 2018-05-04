@@ -70,6 +70,7 @@ class PhysicalObject2D extends GameObject {
 
         // use values if provided
         props = props || {};
+        if (props.playerId) this.playerId = props.playerId;
         if (props.position) this.position.copy(props.position);
         if (props.velocity) this.velocity.copy(props.velocity);
         if (props.angle) this.angle = props.angle;
