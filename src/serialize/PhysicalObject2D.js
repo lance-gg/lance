@@ -191,8 +191,9 @@ class PhysicalObject2D extends GameObject {
 
         if (typeof target.copy === 'function') {
             target.copy(sourceVec);
-        } else if (Array.isArray(target)) {
-            target = [sourceVec.x, sourceVec.y];
+        } else if (target instanceof Float32Array) {
+            target[0] = sourceVec.x;
+            target[1] = sourceVec.y;
         } else {
             target.x = sourceVec.x;
             target.y = sourceVec.y;
