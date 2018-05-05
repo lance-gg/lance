@@ -1,5 +1,5 @@
 import Serializable from './Serializable';
-import Serializer from './Serializer';
+import BaseTypes from './BaseTypes';
 
 /**
  * A TwoVector is a geometric object which is completely described
@@ -9,8 +9,8 @@ class TwoVector extends Serializable {
 
     static get netScheme() {
         return {
-            x: { type: Serializer.TYPES.FLOAT32 },
-            y: { type: Serializer.TYPES.FLOAT32 }
+            x: { type: BaseTypes.TYPES.FLOAT32 },
+            y: { type: BaseTypes.TYPES.FLOAT32 }
         };
     }
 
