@@ -146,7 +146,12 @@ class PhysicalObject2D extends GameObject {
 
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
-        this.syncTo(original, { keepVelocity: true });
+
+        this.position.copy(original.position);
+        this.angle = original.angle;
+        this.angularVelocity = original.angularVelocity;
+        this.velocity.copy(original.velocity);
+
         this.bendingIncrements = bendingIncrements;
         this.bending = bending;
 
@@ -168,8 +173,7 @@ class PhysicalObject2D extends GameObject {
             this.velocity.copy(other.velocity);
         }
 
-        if (this.physicsObj)
-            this.refreshToPhysics();
+        if (this.physicsObj) this.refreshToPhysics();
     }
 
     // update position, angle, angular velocity, and velocity from new physical state.
