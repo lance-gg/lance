@@ -254,6 +254,19 @@ var GameObject = function (_Serializable) {
         get: function get() {
             return null;
         }
+
+        /**
+        * The angle bending multiple is a getter, which returns the
+        * amount of angle bending.
+        * @memberof GameObject
+        * @member {Number} bendingAngleMultiple
+        */
+
+    }, {
+        key: 'bendingAngleMultiple',
+        get: function get() {
+            return null;
+        }
     }]);
 
     return GameObject;
