@@ -2,6 +2,7 @@ import Utils from './../lib/Utils';
 import TwoVector from './TwoVector';
 import ThreeVector from './ThreeVector';
 import Quaternion from './Quaternion';
+import BaseTypes from './BaseTypes';
 
 const MAX_UINT_16 = 0xFFFF;
 
@@ -238,17 +239,9 @@ class Serializer {
 
 /**
 * The TYPES object defines the supported serialization types
+* @deprecated use the constants found in {@link BaseTypes} to avoid circular reference
 * @constant
 */
-Serializer.TYPES = {
-    FLOAT32: 'FLOAT32',
-    INT32: 'INT32',
-    INT16: 'INT16',
-    INT8: 'INT8',
-    UINT8: 'UINT8',
-    STRING: 'STRING',
-    CLASSINSTANCE: 'CLASSINSTANCE',
-    LIST: 'LIST'
-};
+Serializer.TYPES = BaseTypes.TYPES;
 
 export default Serializer;

@@ -16,6 +16,7 @@
             "src/controls/KeyboardControls.js",
             "src/physics/SimplePhysicsEngine.js",
             "src/physics/CannonPhysicsEngine.js",
+            "src/serialize/BaseTypes.js",
             "src/serialize/GameObject.js",
             "src/serialize/DynamicObject.js",
             "src/serialize/Serializer.js",
