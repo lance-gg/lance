@@ -133,7 +133,7 @@ class PhysicalObject2D extends GameObject {
         if (typeof this.bendingVelocityMultiple === 'number')
             velocityBending = this.bendingVelocityMultiple;
         if (typeof this.bendingAngularVelocityMultiple === 'number')
-            angulerVelocityBending = this.bendingAngularVelocityMultiple;
+            angularVelocityBending = this.bendingAngularVelocityMultiple;
 
         // get the incremental delta position
         this.incrementScale = bending / bendingIncrements;
