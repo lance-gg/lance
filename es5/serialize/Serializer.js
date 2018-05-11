@@ -22,6 +22,10 @@ var _Quaternion = require('./Quaternion');
 
 var _Quaternion2 = _interopRequireDefault(_Quaternion);
 
+var _BaseTypes = require('./BaseTypes');
+
+var _BaseTypes2 = _interopRequireDefault(_BaseTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -328,19 +332,11 @@ var Serializer = function () {
 
 /**
 * The TYPES object defines the supported serialization types
+* @deprecated use the constants found in {@link BaseTypes} to avoid circular reference
 * @constant
 */
 
 
-Serializer.TYPES = {
-    FLOAT32: 'FLOAT32',
-    INT32: 'INT32',
-    INT16: 'INT16',
-    INT8: 'INT8',
-    UINT8: 'UINT8',
-    STRING: 'STRING',
-    CLASSINSTANCE: 'CLASSINSTANCE',
-    LIST: 'LIST'
-};
+Serializer.TYPES = _BaseTypes2.default.TYPES;
 
 exports.default = Serializer;

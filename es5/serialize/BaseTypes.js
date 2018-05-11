@@ -10,6 +10,16 @@ var BaseTypes = function BaseTypes() {
     _classCallCheck(this, BaseTypes);
 };
 
+/**
+ * Defines Lance's base types which are available for serialization
+ */
+
+/**
+* The TYPES object defines the supported serialization types
+* @constant
+*/
+
+
 BaseTypes.TYPES = {
     FLOAT32: 'FLOAT32',
     INT32: 'INT32',
