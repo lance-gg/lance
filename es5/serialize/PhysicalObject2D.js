@@ -181,7 +181,7 @@ var PhysicalObject2D = function (_GameObject) {
             if (typeof this.bendingAngleMultiple === 'number') angleBending = this.bendingAngleMultiple;
             if (isLocal && typeof this.bendingAngleLocalMultiple === 'number') angleBending = this.bendingAngleLocalMultiple;
             if (typeof this.bendingVelocityMultiple === 'number') velocityBending = this.bendingVelocityMultiple;
-            if (typeof this.bendingAngularVelocityMultiple === 'number') angulerVelocityBending = this.bendingAngularVelocityMultiple;
+            if (typeof this.bendingAngularVelocityMultiple === 'number') angularVelocityBending = this.bendingAngularVelocityMultiple;
 
             // get the incremental delta position
             this.incrementScale = bending / bendingIncrements;
