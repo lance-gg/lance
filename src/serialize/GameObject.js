@@ -125,6 +125,14 @@ class GameObject extends Serializable {
     get bendingVelocityMultiple() { return null; }
 
     /**
+    * The angle bending multiple is a getter, which returns the
+    * amount of angle bending.
+    * @memberof GameObject
+    * @member {Number} bendingAngleMultiple
+    */
+    get bendingAngleMultiple() { return null; }
+
+    /**
      * synchronize this object to the state of an other object
      * @param {GameObject} other the other object to synchronize to
      */

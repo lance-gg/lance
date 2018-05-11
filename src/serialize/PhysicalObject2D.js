@@ -124,10 +124,16 @@ class PhysicalObject2D extends GameObject {
 
         // angle bending factor
         let angleBending = bending;
+        let velocityBending = bending;
+        let angularVelocityBending = bending;
         if (typeof this.bendingAngleMultiple === 'number')
             angleBending = this.bendingAngleMultiple;
         if (isLocal && (typeof this.bendingAngleLocalMultiple === 'number'))
             angleBending = this.bendingAngleLocalMultiple;
+        if (typeof this.bendingVelocityMultiple === 'number')
+            velocityBending = this.bendingVelocityMultiple;
+        if (typeof this.bendingAngularVelocityMultiple === 'number')
+            angulerVelocityBending = this.bendingAngularVelocityMultiple;
 
         // get the incremental delta position
         this.incrementScale = bending / bendingIncrements;
@@ -136,10 +142,10 @@ class PhysicalObject2D extends GameObject {
         this.bendingPositionDelta.multiplyScalar(this.incrementScale);
         this.bendingVelocityDelta = this.velocity.clone();
         this.bendingVelocityDelta.subtract(original.velocity);
-        this.bendingVelocityDelta.multiplyScalar(this.incrementScale);
+        this.bendingVelocityDelta.multiplyScalar(this.incrementScale * velocityBending);
 
         // get the incremental angular-velocity
-        this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale;
+        this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * angularVelocityBending;
 
         // get the incremental angle correction
         this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 2 * Math.PI) / bendingIncrements;
