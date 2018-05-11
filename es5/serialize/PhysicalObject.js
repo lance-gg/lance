@@ -178,7 +178,11 @@ var PhysicalObject = function (_GameObject) {
 
             this.bendingTarget = new this.constructor();
             this.bendingTarget.syncTo(this);
-            this.syncTo(original, { keepVelocity: true });
+
+            this.position.copy(original.position);
+            this.quaternion.copy(original.quaternion);
+            this.angularVelocity.copy(original.angularVelocity);
+
             this.bendingIncrements = bendingIncrements;
             this.bending = bending;
 
