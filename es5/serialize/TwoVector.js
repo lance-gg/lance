@@ -216,6 +216,29 @@ var TwoVector = function (_Serializable) {
 
             return this;
         }
+
+        /**
+         * Get bending Delta Vector
+         * towards another TwoVector
+         * @param {TwoVector} target the target vector
+         * @param {Object} options bending options
+         * @param {Number} options.increments number of increments
+         * @param {Number} options.percent The percentage to bend
+         * @param {Number} options.minDelta No less than this value
+         * @param {Number} options.maxDelta No more than this value
+         * @return {TwoVector} returns new Incremental Vector
+         */
+
+    }, {
+        key: 'getBendingDelta',
+        value: function getBendingDelta(target, options) {
+            var increment = target.clone();
+            increment.subtract(this);
+            increment.multiplyScalar(options.percent / options.increments);
+            console.log('BENDING DELTA = ' + increment.toString());
+            if (Number.isNaN(increment.x)) debugger;
+            return increment;
+        }
     }]);
 
     return TwoVector;

@@ -102,11 +102,16 @@ class PhysicalObject2D extends GameObject {
         return `phyObj2D[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Ang=${a} AVel=${av}`;
     }
 
+    // default bending has no overrides
+    get bending() {
+        return {};
+    }
+
     // display object's physical attributes as a string
     // for debugging purposes mostly
     bendingToString() {
         if (this.bendingIncrements)
-            return `bend=${this.bending} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaAngle=${this.bendingAngleDelta}`;
+            return `bend=${this.bendingOptions} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaVel=${this.bendingVelocityDelta} deltaAngle=${this.bendingAngleDelta}`;
         return 'no bending';
     }
 
@@ -116,39 +121,33 @@ class PhysicalObject2D extends GameObject {
     // - bendingAngleDelta
     // these can later be used to "bend" incrementally from the state described
     // by "original" to the state described by "self"
-    bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
+    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
 
+        let bending = { increments, percent };
         // if the object has defined a bending multiples for this object, use them
-        if (typeof this.bendingMultiple === 'number')
-            bending = this.bendingMultiple;
+        let positionBending = Object.assign({}, bending, this.bending.position);
+        let velocityBending = Object.assign({}, bending, this.bending.velocity);
 
         // angle bending factor
-        let angleBending = bending;
-        let velocityBending = bending;
-        let angularVelocityBending = bending;
+        let angleBending = percent;
+        let angularVelocityBending = percent;
         if (typeof this.bendingAngleMultiple === 'number')
             angleBending = this.bendingAngleMultiple;
         if (isLocal && (typeof this.bendingAngleLocalMultiple === 'number'))
             angleBending = this.bendingAngleLocalMultiple;
-        if (typeof this.bendingVelocityMultiple === 'number')
-            velocityBending = this.bendingVelocityMultiple;
         if (typeof this.bendingAngularVelocityMultiple === 'number')
             angularVelocityBending = this.bendingAngularVelocityMultiple;
 
         // get the incremental delta position
-        this.incrementScale = bending / bendingIncrements;
-        this.bendingPositionDelta = this.position.clone();
-        this.bendingPositionDelta.subtract(original.position);
-        this.bendingPositionDelta.multiplyScalar(this.incrementScale);
-        this.bendingVelocityDelta = this.velocity.clone();
-        this.bendingVelocityDelta.subtract(original.velocity);
-        this.bendingVelocityDelta.multiplyScalar(this.incrementScale * velocityBending);
+        this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
+        this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
+        this.incrementScale = percent / increments;
 
         // get the incremental angular-velocity
         this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * angularVelocityBending;
 
         // get the incremental angle correction
-        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 2 * Math.PI) / bendingIncrements;
+        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 2 * Math.PI) / increments;
 
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
@@ -158,8 +157,8 @@ class PhysicalObject2D extends GameObject {
         this.angularVelocity = original.angularVelocity;
         this.velocity.copy(original.velocity);
 
-        this.bendingIncrements = bendingIncrements;
-        this.bending = bending;
+        this.bendingIncrements = increments;
+        this.bendingOptions = bending;
 
         // TODO: does refreshToPhysics() really belong here?
         //       should refreshToPhysics be decoupled from syncTo

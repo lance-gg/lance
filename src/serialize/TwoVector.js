@@ -150,6 +150,33 @@ class TwoVector extends Serializable {
 
         return this;
     }
+
+    /**
+     * Get bending Delta Vector
+     * towards another TwoVector
+     * @param {TwoVector} target the target vector
+     * @param {Object} options bending options
+     * @param {Number} options.increments number of increments
+     * @param {Number} options.percent The percentage to bend
+     * @param {Number} options.minDelta No less than this value
+     * @param {Number} options.maxDelta No more than this value
+     * @return {TwoVector} returns new Incremental Vector
+     */
+    getBendingDelta(target, options) {
+        let increment = target.clone();
+        increment.subtract(this);
+        increment.multiplyScalar(options.percent);
+
+        // check for max case
+        if (options.maxDelta && increment.length() > options.maxDelta) {
+            return new TwoVector(0, 0);
+        }
+
+        // divide into increments
+        increment.multiplyScalar(1 / options.increments);
+
+        return increment;
+    }
 }
 
 export default TwoVector;
