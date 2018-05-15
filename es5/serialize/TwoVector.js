@@ -234,9 +234,16 @@ var TwoVector = function (_Serializable) {
         value: function getBendingDelta(target, options) {
             var increment = target.clone();
             increment.subtract(this);
-            increment.multiplyScalar(options.percent / options.increments);
-            console.log('BENDING DELTA = ' + increment.toString());
-            if (Number.isNaN(increment.x)) debugger;
+            increment.multiplyScalar(options.percent);
+
+            // check for max case
+            if (options.maxDelta && increment.length() > options.maxDelta) {
+                return new TwoVector(0, 0);
+            }
+
+            // divide into increments
+            increment.multiplyScalar(1 / options.increments);
+
             return increment;
         }
     }]);
