@@ -11,7 +11,6 @@ const MAX_UINT_16 = 0xFFFF;
  * objects on the server, before they are sent to each client.  On the client side the
  * Serializer deserializes these objects.
  *
- * The Serializer defines the data types which can be serialized.
  */
 class Serializer {
 
