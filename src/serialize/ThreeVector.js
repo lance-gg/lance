@@ -127,6 +127,15 @@ class ThreeVector extends Serializable {
     }
 
     /**
+     * Create a clone of this vector
+     *
+     * @return {ThreeVector} returns clone
+     */
+    clone() {
+        return new ThreeVector(this.x, this.y, this.z);
+    }
+
+    /**
      * Apply in-place lerp (linear interpolation) to this ThreeVector
      * towards another ThreeVector
      * @param {ThreeVector} target the target vector
@@ -138,6 +147,33 @@ class ThreeVector extends Serializable {
         this.y += (target.y - this.y) * p;
         this.z += (target.z - this.z) * p;
         return this;
+    }
+
+    /**
+     * Get bending Delta Vector
+     * towards another ThreeVector
+     * @param {ThreeVector} target the target vector
+     * @param {Object} options bending options
+     * @param {Number} options.increments number of increments
+     * @param {Number} options.percent The percentage to bend
+     * @param {Number} options.minDifference No less than this value (not implemented yet)
+     * @param {Number} options.maxDifference No more than this value
+     * @return {ThreeVector} returns new Incremental Vector
+     */
+    getBendingDelta(target, options) {
+        let increment = target.clone();
+        increment.subtract(this);
+        increment.multiplyScalar(options.percent);
+
+        // check for max case
+        if (options.maxDelta && increment.length() > options.maxDifference) {
+            return new ThreeVector(0, 0, 0);
+        }
+
+        // divide into increments
+        increment.multiplyScalar(1 / options.increments);
+
+        return increment;
     }
 }
 
