@@ -168,7 +168,7 @@ class TwoVector extends Serializable {
         increment.multiplyScalar(options.percent);
 
         // check for max case
-        if (options.maxDelta && increment.length() > options.maxDifference) {
+        if (options.maxDifference && increment.length() > options.maxDifference) {
             return new TwoVector(0, 0);
         }
 
