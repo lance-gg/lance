@@ -131,13 +131,35 @@ var GameObject = function (_Serializable) {
             this.savedCopy = new this.constructor(this.gameEngine, { id: null });
             this.savedCopy.syncTo(other ? other : this);
         }
+        /**
+         * Bending is defined as the amount of correction that will be applied
+         * on the client side to a given object's physical attributes, incrementally,
+         * by the time the next server broadcast is expected to arrive.
+         *
+         * When this percentage is 0.0, the client ignores the server object's value.
+         * When this percentage is 1.0, the bending is taken from the synchronization.
+         *
+         * The GameObject bending attribute is implemented as a getter, and can provide
+         * distinct values for:
+         * position: { percent, min, max }
+         * velocity: { percent, min, max }
+         * angle: { percent, min, max }
+         * angularVelocity: { percent, min, max }
+         *
+         * in each case, you can also provide overrides for local objects,
+         * these attributes will be called, respectively, positionLocal, velocityLocal,
+         * angleLocal, angularVelocityLocal.
+         * @memberof GameObject
+         * @member {Object} bending
+         */
+
+    }, {
+        key: 'bendToCurrentState',
+
 
         // TODO:
         // rather than pass worldSettings on each bend, they could
         // be passed in on the constructor just once.
-
-    }, {
-        key: 'bendToCurrentState',
         value: function bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
             if (this.savedCopy) {
                 this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
@@ -235,6 +257,16 @@ var GameObject = function (_Serializable) {
         key: 'getComponent',
         value: function getComponent(componentClass) {
             return this.components[componentClass.name];
+        }
+    }, {
+        key: 'bending',
+        get: function get() {
+            return {
+                position: { percent: 1.0, min: 0.0 },
+                velocity: { percent: 0.0, min: 0.0 },
+                angularVelocity: { percent: 0.0 },
+                angleLocal: { percent: 1.0 }
+            };
         }
     }, {
         key: 'bendingMultiple',

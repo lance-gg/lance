@@ -158,8 +158,8 @@ class TwoVector extends Serializable {
      * @param {Object} options bending options
      * @param {Number} options.increments number of increments
      * @param {Number} options.percent The percentage to bend
-     * @param {Number} options.minDifference No less than this value (not implemented yet)
-     * @param {Number} options.maxDifference No more than this value
+     * @param {Number} options.min No less than this value (not implemented yet)
+     * @param {Number} options.max No more than this value
      * @return {TwoVector} returns new Incremental Vector
      */
     getBendingDelta(target, options) {
@@ -168,7 +168,8 @@ class TwoVector extends Serializable {
         increment.multiplyScalar(options.percent);
 
         // check for max case
-        if (options.maxDifference && increment.length() > options.maxDifference) {
+        if (((typeof options.max === 'number') && increment.length() > options.max) ||
+            ((typeof options.min === 'number') && increment.length() < options.min)) {
             return new TwoVector(0, 0);
         }
 

@@ -129,14 +129,16 @@ class PhysicalObject2D extends GameObject {
         let velocityBending = Object.assign({}, bending, this.bending.velocity);
 
         // angle bending factor
-        let angleBending = percent;
-        let angularVelocityBending = percent;
-        if (typeof this.bendingAngleMultiple === 'number')
-            angleBending = this.bendingAngleMultiple;
-        if (isLocal && (typeof this.bendingAngleLocalMultiple === 'number'))
-            angleBending = this.bendingAngleLocalMultiple;
-        if (typeof this.bendingAngularVelocityMultiple === 'number')
-            angularVelocityBending = this.bendingAngularVelocityMultiple;
+        let angleBending = Object.assign({}, bending, this.bending.angle);
+        let avBending = Object.assign({}, bending, this.bending.angularVelocity);
+
+        // check for local object overrides to bendingTarget
+        if (isLocal) {
+            Object.assign(positionBending, this.bending.positionLocal);
+            Object.assign(velocityBending, this.bending.velocityLocal);
+            Object.assign(angleBending, this.bending.angleLocal);
+            Object.assign(avBending, this.bending.angularVelocityLocal);
+        }
 
         // get the incremental delta position
         this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
@@ -144,10 +146,10 @@ class PhysicalObject2D extends GameObject {
         this.incrementScale = percent / increments;
 
         // get the incremental angular-velocity
-        this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * angularVelocityBending;
+        this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * avBending.percent;
 
         // get the incremental angle correction
-        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 2 * Math.PI) / increments;
+        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 2 * Math.PI) / increments;
 
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
