@@ -1,13 +1,12 @@
 import GameObject from './GameObject';
-import Serializer from './Serializer';
+import BaseTypes from './BaseTypes';
 import ThreeVector from './ThreeVector';
 import Quaternion from './Quaternion';
 
 /**
- * The PhysicalObject is the base class for physical game objects
- * TODO: Rename to PhysicalObject3D
+ * The PhysicalObject3D is the base class for physical game objects
  */
-class PhysicalObject extends GameObject {
+class PhysicalObject3D extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -18,26 +17,26 @@ class PhysicalObject extends GameObject {
     *
     * You may choose not to implement this method, in which
     * case your object only transmits the default attributes
-    * which are already part of {@link PhysicalObject}.
+    * which are already part of {@link PhysicalObject3D}.
     * But if you choose to add more attributes, make sure
     * the return value includes the netScheme of the super class.
     *
-    * @memberof PhysicalObject
+    * @memberof PhysicalObject3D
     * @member {Object} netScheme
     * @example
     *     static get netScheme() {
     *       return Object.assign({
-    *           mojo: { type: Serializer.TYPES.UINT8 },
+    *           mojo: { type: BaseTypes.TYPES.UINT8 },
     *         }, super.netScheme);
     *     }
     */
     static get netScheme() {
         return Object.assign({
-            playerId: { type: Serializer.TYPES.INT16 },
-            position: { type: Serializer.TYPES.CLASSINSTANCE },
-            quaternion: { type: Serializer.TYPES.CLASSINSTANCE },
-            velocity: { type: Serializer.TYPES.CLASSINSTANCE },
-            angularVelocity: { type: Serializer.TYPES.CLASSINSTANCE }
+            playerId: { type: BaseTypes.TYPES.INT16 },
+            position: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            quaternion: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angularVelocity: { type: BaseTypes.TYPES.CLASSINSTANCE }
         }, super.netScheme);
     }
 
@@ -73,7 +72,7 @@ class PhysicalObject extends GameObject {
         if (props.quaternion) this.quaternion.copy(props.quaternion);
         if (props.angularVelocity) this.angularVelocity.copy(props.angularVelocity);
 
-        this.class = PhysicalObject;
+        this.class = PhysicalObject3D;
     }
 
     /**
@@ -81,7 +80,7 @@ class PhysicalObject extends GameObject {
      * The output of this method is used to describe each instance in the traces,
      * which significantly helps in debugging.
      *
-     * @return {String} description - a string describing the PhysicalObject
+     * @return {String} description - a string describing the PhysicalObject3D
      */
     toString() {
         let p = this.position.toString();
@@ -95,7 +94,7 @@ class PhysicalObject extends GameObject {
     // for debugging purposes mostly
     bendingToString() {
         if (this.bendingIncrements)
-            return `bend=${this.bending} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaQuat=${this.bendingQuaternionDelta}`;
+            return `bend=${this.bendingOptions} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaVel=${this.bendingVelocityDelta} deltaQuat=${this.bendingQuaternionDelta}`;
         return 'no bending';
     }
 
@@ -105,18 +104,23 @@ class PhysicalObject extends GameObject {
     // - bendingQuaternionDelta
     // these can later be used to "bend" incrementally from the state described
     // by "original" to the state described by "self"
-    bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
+    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
 
-        // get the incremental delta position
-        this.incrementScale = bending / bendingIncrements;
-        this.bendingPositionDelta = (new ThreeVector()).copy(this.position);
-        this.bendingPositionDelta.subtract(original.position);
-        this.bendingPositionDelta.multiplyScalar(this.incrementScale);
+        let bending = { increments, percent };
+        // if the object has defined a bending multiples for this object, use them
+        let positionBending = Object.assign({}, bending, this.bending.position);
+        let velocityBending = Object.assign({}, bending, this.bending.velocity);
 
-        // get the incremental angular-velocity
-        this.bendingAVDelta = (new ThreeVector()).copy(this.angularVelocity);
-        this.bendingAVDelta.subtract(original.angularVelocity);
-        this.bendingAVDelta.multiplyScalar(this.incrementScale);
+        // check for local object overrides to bendingTarget
+        if (isLocal) {
+            Object.assign(positionBending, this.bending.positionLocal);
+            Object.assign(velocityBending, this.bending.velocityLocal);
+        }
+
+        // get the incremental delta position & velocity
+        this.incrementScale = bending / increments;
+        this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
+        this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
 
         // get the incremental quaternion rotation
         let currentConjugate = (new Quaternion()).copy(original.quaternion).conjugate();
@@ -133,13 +137,9 @@ class PhysicalObject extends GameObject {
         this.quaternion.copy(original.quaternion);
         this.angularVelocity.copy(original.angularVelocity);
 
-        this.bendingIncrements = bendingIncrements;
-        this.bending = bending;
+        this.bendingIncrements = increments;
+        this.bendingOptions = bending;
 
-        // TODO: use configurable physics bending
-        // TODO: does refreshToPhysics() really belong here?
-        //       should refreshToPhysics be decoupled from syncTo
-        //       and called explicitly in all cases?
         this.refreshToPhysics();
     }
 
@@ -214,4 +214,4 @@ class PhysicalObject extends GameObject {
     }
 }
 
-export default PhysicalObject;
+export default PhysicalObject3D;

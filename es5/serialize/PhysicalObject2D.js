@@ -12,9 +12,9 @@ var _GameObject2 = require('./GameObject');
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _Serializer = require('./Serializer');
+var _BaseTypes = require('./BaseTypes');
 
-var _Serializer2 = _interopRequireDefault(_Serializer);
+var _BaseTypes2 = _interopRequireDefault(_BaseTypes);
 
 var _TwoVector = require('./TwoVector');
 
@@ -60,18 +60,18 @@ var PhysicalObject2D = function (_GameObject) {
         * @example
         *     static get netScheme() {
         *       return Object.assign({
-        *           mojo: { type: Serializer.TYPES.UINT8 },
+        *           mojo: { type: BaseTypes.TYPES.UINT8 },
         *         }, super.netScheme);
         *     }
         */
         get: function get() {
             return Object.assign({
-                playerId: { type: _Serializer2.default.TYPES.INT16 },
-                mass: { type: _Serializer2.default.TYPES.FLOAT32 },
-                position: { type: _Serializer2.default.TYPES.CLASSINSTANCE },
-                angle: { type: _Serializer2.default.TYPES.FLOAT32 },
-                velocity: { type: _Serializer2.default.TYPES.CLASSINSTANCE },
-                angularVelocity: { type: _Serializer2.default.TYPES.FLOAT32 }
+                playerId: { type: _BaseTypes2.default.TYPES.INT16 },
+                mass: { type: _BaseTypes2.default.TYPES.FLOAT32 },
+                position: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE },
+                angle: { type: _BaseTypes2.default.TYPES.FLOAT32 },
+                velocity: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE },
+                angularVelocity: { type: _BaseTypes2.default.TYPES.FLOAT32 }
             }, _get(PhysicalObject2D.__proto__ || Object.getPrototypeOf(PhysicalObject2D), 'netScheme', this));
         }
 
@@ -150,7 +150,14 @@ var PhysicalObject2D = function (_GameObject) {
             return 'phyObj2D[' + this.id + '] player' + this.playerId + ' Pos=' + p + ' Vel=' + v + ' Ang=' + a + ' AVel=' + av;
         }
 
-        // default bending has no overrides
+        /**
+         * Each object class can define its own bending overrides.
+         * return an object which can include attributes: position, velocity,
+         * angle, and angularVelocity.  In each case, you can specify a min value, max
+         * value, and a percent value.
+         *
+         * @return {Object} bending - an object with bending paramters
+         */
 
     }, {
         key: 'bendingToString',
@@ -165,6 +172,7 @@ var PhysicalObject2D = function (_GameObject) {
 
         // derive and save the bending increment parameters:
         // - bendingPositionDelta
+        // - bendingVelocityDelta
         // - bendingAVDelta
         // - bendingAngleDelta
         // these can later be used to "bend" incrementally from the state described
@@ -178,8 +186,6 @@ var PhysicalObject2D = function (_GameObject) {
             // if the object has defined a bending multiples for this object, use them
             var positionBending = Object.assign({}, bending, this.bending.position);
             var velocityBending = Object.assign({}, bending, this.bending.velocity);
-
-            // angle bending factor
             var angleBending = Object.assign({}, bending, this.bending.angle);
             var avBending = Object.assign({}, bending, this.bending.angularVelocity);
 
@@ -191,10 +197,10 @@ var PhysicalObject2D = function (_GameObject) {
                 Object.assign(avBending, this.bending.angularVelocityLocal);
             }
 
-            // get the incremental delta position
+            // get the incremental delta position & velocity
+            this.incrementScale = percent / increments;
             this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
             this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
-            this.incrementScale = percent / increments;
 
             // get the incremental angular-velocity
             this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * avBending.percent;
@@ -205,6 +211,7 @@ var PhysicalObject2D = function (_GameObject) {
             this.bendingTarget = new this.constructor();
             this.bendingTarget.syncTo(this);
 
+            // revert to original
             this.position.copy(original.position);
             this.angle = original.angle;
             this.angularVelocity = original.angularVelocity;
@@ -213,9 +220,6 @@ var PhysicalObject2D = function (_GameObject) {
             this.bendingIncrements = increments;
             this.bendingOptions = bending;
 
-            // TODO: does refreshToPhysics() really belong here?
-            //       should refreshToPhysics be decoupled from syncTo
-            //       and called explicitly in all cases?
             this.refreshToPhysics();
         }
     }, {
@@ -312,7 +316,13 @@ var PhysicalObject2D = function (_GameObject) {
     }, {
         key: 'bending',
         get: function get() {
-            return {};
+            return {
+                // example:
+                // position: { percent: 0.8, min: 0.0, max: 4.0 },
+                // velocity: { percent: 0.4, min: 0.0 },
+                // angularVelocity: { percent: 0.0 },
+                // angleLocal: { percent: 0.0 }
+            };
         }
     }]);
 

@@ -1,14 +1,15 @@
 import should from 'should';
 
-import Serializer from '../../src/serialize//Serializer';
+import BaseTypes from '../../src/serialize/BaseTypes';
+import Serializer from '../../src/serialize/Serializer';
 import Serializable from '../../src/serialize/Serializable';
 
 class TestObject extends Serializable {
 
     static get netScheme() {
         return {
-            helloString: { type: Serializer.TYPES.STRING },
-            color: { type: Serializer.TYPES.STRING }
+            helloString: { type: BaseTypes.TYPES.STRING },
+            color: { type: BaseTypes.TYPES.STRING }
         };
     }
 

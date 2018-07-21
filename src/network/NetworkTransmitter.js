@@ -1,4 +1,4 @@
-import Serializer from './../serialize/Serializer';
+import BaseTypes from '../serialize/BaseTypes';
 
 import NetworkedEventFactory from './NetworkedEventFactory';
 import NetworkedEventCollection from './NetworkedEventCollection';
@@ -15,29 +15,29 @@ export default class NetworkTransmitter {
 
         this.registerNetworkedEventFactory('objectUpdate', {
             netScheme: {
-                stepCount: { type: Serializer.TYPES.INT32 },
-                objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                objectInstance: { type: BaseTypes.TYPES.CLASSINSTANCE }
             }
         });
 
         this.registerNetworkedEventFactory('objectCreate', {
             netScheme: {
-                stepCount: { type: Serializer.TYPES.INT32 },
-                objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                objectInstance: { type: BaseTypes.TYPES.CLASSINSTANCE }
             }
         });
 
         this.registerNetworkedEventFactory('objectDestroy', {
             netScheme: {
-                stepCount: { type: Serializer.TYPES.INT32 },
-                objectInstance: { type: Serializer.TYPES.CLASSINSTANCE }
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                objectInstance: { type: BaseTypes.TYPES.CLASSINSTANCE }
             }
         });
 
         this.registerNetworkedEventFactory('syncHeader', {
             netScheme: {
-                stepCount: { type: Serializer.TYPES.INT32 },
-                fullUpdate: { type: Serializer.TYPES.UINT8 }
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                fullUpdate: { type: BaseTypes.TYPES.UINT8 }
             }
         });
 

@@ -1,20 +1,19 @@
 import Utils from './../lib/Utils';
 import BaseTypes from './BaseTypes';
 
-
 class Serializable {
     /**
      *  Class can be serialized using either:
-         - a class based netScheme
-         - an instance based netScheme
-         - completely dynamically (not implemented yet)
-
-     * @param {Object} serializer
+     * - a class based netScheme
+     * - an instance based netScheme
+     * - completely dynamically (not implemented yet)
+     *
+     * @param {Object} serializer - Serializer instance
      * @param {Object} [options] - Options object
      * @param {Object} options.dataBuffer [optional] - Data buffer to write to. If null a new data buffer will be created
      * @param {Number} options.bufferOffset [optional] - The buffer data offset to start writing at. Default: 0
      * @param {String} options.dry [optional] - Does not actually write to the buffer (useful to gather serializeable size)
-     * @returns {Object} the serialized object.  Contains attributes: dataBuffer - buffer which contains the serialized data;  bufferOffset - offset where the serialized data starts.
+     * @return {Object} the serialized object.  Contains attributes: dataBuffer - buffer which contains the serialized data;  bufferOffset - offset where the serialized data starts.
      */
     serialize(serializer, options) {
         options = Object.assign({

@@ -1,5 +1,5 @@
 import Serializable from './Serializable';
-import Serializer from './Serializer';
+import BaseTypes from './BaseTypes';
 import ThreeVector from './ThreeVector';
 
 /**
@@ -10,10 +10,10 @@ class Quaternion extends Serializable {
 
     static get netScheme() {
         return {
-            w: { type: Serializer.TYPES.FLOAT32 },
-            x: { type: Serializer.TYPES.FLOAT32 },
-            y: { type: Serializer.TYPES.FLOAT32 },
-            z: { type: Serializer.TYPES.FLOAT32 }
+            w: { type: BaseTypes.TYPES.FLOAT32 },
+            x: { type: BaseTypes.TYPES.FLOAT32 },
+            y: { type: BaseTypes.TYPES.FLOAT32 },
+            z: { type: BaseTypes.TYPES.FLOAT32 }
         };
     }
 

@@ -1,5 +1,5 @@
 import Serializable from './Serializable';
-import Serializer from './Serializer';
+import BaseTypes from './BaseTypes';
 
 /**
  * GameObject is the base class of all game objects.
@@ -12,7 +12,7 @@ class GameObject extends Serializable {
 
     static get netScheme() {
         return {
-            id: { type: Serializer.TYPES.INT32 }
+            id: { type: BaseTypes.TYPES.INT32 }
         };
     }
 
@@ -129,37 +129,6 @@ class GameObject extends Serializable {
 
     bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
     }
-
-    /**
-    * The bending multiple is a getter, which returns the
-    * amount of bending.
-    * Bending is defined as the amount of correction that will be applied
-    * on the client side to a given object's position, incrementally, until the next
-    * server broadcast is expected to arrive.
-    * When this value is 0.0, the client ignores the server object's position.
-    * When this value is null, the bending is taken from the synchronization
-    * defaults.  Set this to zero for objects whose position
-    * jumps suddenly - because the game intended a jump, not a gradual bend.
-    * @memberof GameObject
-    * @member {Number} bendingMultiple
-    */
-    get bendingMultiple() { return null; }
-
-    /**
-    * The velocity bending multiple is a getter, which returns the
-    * amount of velocity bending.
-    * @memberof GameObject
-    * @member {Number} bendingVelocityMultiple
-    */
-    get bendingVelocityMultiple() { return null; }
-
-    /**
-    * The angle bending multiple is a getter, which returns the
-    * amount of angle bending.
-    * @memberof GameObject
-    * @member {Number} bendingAngleMultiple
-    */
-    get bendingAngleMultiple() { return null; }
 
     /**
      * synchronize this object to the state of an other object

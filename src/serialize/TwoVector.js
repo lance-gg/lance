@@ -158,7 +158,7 @@ class TwoVector extends Serializable {
      * @param {Object} options bending options
      * @param {Number} options.increments number of increments
      * @param {Number} options.percent The percentage to bend
-     * @param {Number} options.min No less than this value (not implemented yet)
+     * @param {Number} options.min No less than this value
      * @param {Number} options.max No more than this value
      * @return {TwoVector} returns new Incremental Vector
      */

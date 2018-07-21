@@ -1,6 +1,7 @@
 import TwoVector from './TwoVector';
 import GameObject from './GameObject';
 import Serializer from './Serializer';
+import BaseTypes from './BaseTypes';
 import MathUtils from '../lib/MathUtils';
 
 /**
@@ -34,18 +35,18 @@ class DynamicObject extends GameObject {
     * @example
     *     static get netScheme() {
     *       return Object.assign({
-    *           mojo: { type: Serializer.TYPES.UINT8 },
+    *           mojo: { type: BaseTypes.TYPES.UINT8 },
     *         }, super.netScheme);
     *     }
     */
     static get netScheme() {
         return Object.assign({
-            playerId: { type: Serializer.TYPES.INT16 },
-            position: { type: Serializer.TYPES.CLASSINSTANCE },
-            width: { type: Serializer.TYPES.INT16 },
-            height: { type: Serializer.TYPES.INT16 },
-            velocity: { type: Serializer.TYPES.CLASSINSTANCE },
-            angle: { type: Serializer.TYPES.FLOAT32 }
+            playerId: { type: BaseTypes.TYPES.INT16 },
+            position: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            width: { type: BaseTypes.TYPES.INT16 },
+            height: { type: BaseTypes.TYPES.INT16 },
+            velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angle: { type: BaseTypes.TYPES.FLOAT32 }
         }, super.netScheme);
     }
 
@@ -68,6 +69,7 @@ class DynamicObject extends GameObject {
         * @member {Number}
         */
         this.playerId = 0;
+        this.bendingIncrements = 0;
 
         this.position = new TwoVector(0, 0);
         this.velocity = new TwoVector(0, 0);
@@ -144,8 +146,6 @@ class DynamicObject extends GameObject {
         */
         this.acceleration = 0.1;
 
-        this.bending = new TwoVector(0, 0);
-        this.bendingAngle = 0;
         this.deceleration = 0.99;
     }
 
@@ -163,6 +163,23 @@ class DynamicObject extends GameObject {
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
         return `${this.constructor.name}[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
+    }
+
+    /**
+     * Each object class can define its own bending overrides.
+     * return an object which can include attributes: position, velocity,
+     * and angle.  In each case, you can specify a min value, max
+     * value, and a percent value.
+     *
+     * @return {Object} bending - an object with bending paramters
+     */
+    get bending() {
+        return {
+            // example:
+            // position: { percent: 0.8, min: 0.0, max: 4.0 },
+            // velocity: { percent: 0.4, min: 0.0 },
+            // angleLocal: { percent: 0.0 }
+        };
     }
 
     /**
@@ -186,61 +203,59 @@ class DynamicObject extends GameObject {
         super.syncTo(other);
         this.position.copy(other.position);
         this.velocity.copy(other.velocity);
-        this.bending.copy(other.bending);
         this.bendingAngle = other.bendingAngle;
         this.rotationSpeed = other.rotationSpeed;
         this.acceleration = other.acceleration;
         this.deceleration = other.deceleration;
     }
 
-    bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
+    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
 
-        // TODO: the bending parameters should now be an object,
-        //     with a single getter bendingMultiples which has local
-        //     and remote values for position, velocity, and angle
-        this.bendingIncrements = bendingIncrements;
-
+        let bending = { increments, percent };
         // if the object has defined a bending multiples for this object, use them
-        if (typeof this.bendingMultiple === 'number')
-            bending = this.bendingMultiple;
+        let positionBending = Object.assign({}, bending, this.bending.position);
+        let velocityBending = Object.assign({}, bending, this.bending.velocity);
+        let angleBending = Object.assign({}, bending, this.bending.angle);
 
-        // velocity bending factor
-        let velocityBending = bending;
-        if (typeof this.bendingVelocityMultiple === 'number')
-            velocityBending = this.bendingVelocityMultiple;
-
-        // angle bending factor
-        let angleBending = bending;
-        if (typeof this.bendingAngleMultiple === 'number')
-            angleBending = this.bendingAngleMultiple;
-        if (isLocal && (typeof this.bendingAngleLocalMultiple === 'number'))
-            angleBending = this.bendingAngleLocalMultiple;
-
-        // bend to position, velocity, and angle gradually
-        // TODO: consider using lerp() method of TwoVector instead.
-        //     you will need implement lerpWrapped() first.
-        if (worldSettings.worldWrap) {
-            this.bending.x = MathUtils.interpolateDeltaWithWrapping(original.position.x, this.position.x, bending, 0, worldSettings.width) / bendingIncrements;
-            this.bending.y = MathUtils.interpolateDeltaWithWrapping(original.position.y, this.position.y, bending, 0, worldSettings.height) / bendingIncrements;
-        } else {
-            this.bending.x = MathUtils.interpolateDelta(original.position.x, this.position.x, bending) / bendingIncrements;
-            this.bending.y = MathUtils.interpolateDelta(original.position.y, this.position.y, bending) / bendingIncrements;
+        if (isLocal) {
+            Object.assign(positionBending, this.bending.positionLocal);
+            Object.assign(velocityBending, this.bending.velocityLocal);
+            Object.assign(angleBending, this.bending.angleLocal);
         }
-        this.bendingAngle = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending, 0, 360) / bendingIncrements;
-        this.velocity.x = MathUtils.interpolate(original.velocity.x, this.velocity.x, velocityBending);
-        this.velocity.y = MathUtils.interpolate(original.velocity.y, this.velocity.y, velocityBending);
+
+        // get the incremental delta position & velocity
+        this.incrementScale = percent / increments;
+        this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
+        this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
+        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 2 * Math.PI) / increments;
+
+        this.bendingTarget = (new this.constructor());
+        this.bendingTarget.syncTo(this);
 
         // revert to original
         this.position.copy(original.position);
+        this.velocity.copy(original.velocity);
         this.angle = original.angle;
+
+        // keep parameters
+        this.bendingIncrements = increments;
+        this.bendingOptions = bending;
     }
 
-    applyIncrementalBending() {
+    applyIncrementalBending(stepDesc) {
         if (this.bendingIncrements === 0)
             return;
 
-        this.position.add(this.bending);
-        this.angle += this.bendingAngle;
+        let timeFactor = 1;
+        if (stepDesc && stepDesc.dt)
+            timeFactor = stepDesc.dt / (1000 / 60);
+
+        const posDelta = this.bendingPositionDelta.clone().multiplyScalar(timeFactor);
+        const velDelta = this.bendingVelocityDelta.clone().multiplyScalar(timeFactor);
+        this.position.add(posDelta);
+        this.velocity.add(velDelta);
+        this.angle += (this.bendingAngleDelta * timeFactor);
+
         this.bendingIncrements--;
     }
 

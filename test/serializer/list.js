@@ -1,14 +1,15 @@
 // Serializer must be loaded first before Serializable because of circular deps
 import Serializer from '../../src/serialize/Serializer';
 import Serializable from '../../src/serialize/Serializable';
+import BaseTypes from '../../src/serialize/BaseTypes';
 
 class TestObject extends Serializable {
 
     static get netScheme() {
         return {
             playerAges: {
-                type: Serializer.TYPES.LIST,
-                itemType: Serializer.TYPES.UINT8
+                type: BaseTypes.TYPES.LIST,
+                itemType: BaseTypes.TYPES.UINT8
             },
         };
     }

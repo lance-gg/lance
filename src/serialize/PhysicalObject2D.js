@@ -1,5 +1,5 @@
 import GameObject from './GameObject';
-import Serializer from './Serializer';
+import BaseTypes from './BaseTypes';
 import TwoVector from './TwoVector';
 import MathUtils from '../lib/MathUtils';
 
@@ -26,18 +26,18 @@ class PhysicalObject2D extends GameObject {
     * @example
     *     static get netScheme() {
     *       return Object.assign({
-    *           mojo: { type: Serializer.TYPES.UINT8 },
+    *           mojo: { type: BaseTypes.TYPES.UINT8 },
     *         }, super.netScheme);
     *     }
     */
     static get netScheme() {
         return Object.assign({
-            playerId: { type: Serializer.TYPES.INT16 },
-            mass: { type: Serializer.TYPES.FLOAT32 },
-            position: { type: Serializer.TYPES.CLASSINSTANCE },
-            angle: { type: Serializer.TYPES.FLOAT32 },
-            velocity: { type: Serializer.TYPES.CLASSINSTANCE },
-            angularVelocity: { type: Serializer.TYPES.FLOAT32 }
+            playerId: { type: BaseTypes.TYPES.INT16 },
+            mass: { type: BaseTypes.TYPES.FLOAT32 },
+            position: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angle: { type: BaseTypes.TYPES.FLOAT32 },
+            velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angularVelocity: { type: BaseTypes.TYPES.FLOAT32 }
         }, super.netScheme);
     }
 
@@ -102,9 +102,22 @@ class PhysicalObject2D extends GameObject {
         return `phyObj2D[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Ang=${a} AVel=${av}`;
     }
 
-    // default bending has no overrides
+    /**
+     * Each object class can define its own bending overrides.
+     * return an object which can include attributes: position, velocity,
+     * angle, and angularVelocity.  In each case, you can specify a min value, max
+     * value, and a percent value.
+     *
+     * @return {Object} bending - an object with bending paramters
+     */
     get bending() {
-        return {};
+        return {
+            // example:
+            // position: { percent: 0.8, min: 0.0, max: 4.0 },
+            // velocity: { percent: 0.4, min: 0.0 },
+            // angularVelocity: { percent: 0.0 },
+            // angleLocal: { percent: 0.0 }
+        };
     }
 
     // display object's physical attributes as a string
@@ -117,6 +130,7 @@ class PhysicalObject2D extends GameObject {
 
     // derive and save the bending increment parameters:
     // - bendingPositionDelta
+    // - bendingVelocityDelta
     // - bendingAVDelta
     // - bendingAngleDelta
     // these can later be used to "bend" incrementally from the state described
@@ -127,8 +141,6 @@ class PhysicalObject2D extends GameObject {
         // if the object has defined a bending multiples for this object, use them
         let positionBending = Object.assign({}, bending, this.bending.position);
         let velocityBending = Object.assign({}, bending, this.bending.velocity);
-
-        // angle bending factor
         let angleBending = Object.assign({}, bending, this.bending.angle);
         let avBending = Object.assign({}, bending, this.bending.angularVelocity);
 
@@ -140,10 +152,10 @@ class PhysicalObject2D extends GameObject {
             Object.assign(avBending, this.bending.angularVelocityLocal);
         }
 
-        // get the incremental delta position
+        // get the incremental delta position & velocity
+        this.incrementScale = percent / increments;
         this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
         this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
-        this.incrementScale = percent / increments;
 
         // get the incremental angular-velocity
         this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * avBending.percent;
@@ -154,6 +166,7 @@ class PhysicalObject2D extends GameObject {
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
 
+        // revert to original
         this.position.copy(original.position);
         this.angle = original.angle;
         this.angularVelocity = original.angularVelocity;
@@ -162,9 +175,6 @@ class PhysicalObject2D extends GameObject {
         this.bendingIncrements = increments;
         this.bendingOptions = bending;
 
-        // TODO: does refreshToPhysics() really belong here?
-        //       should refreshToPhysics be decoupled from syncTo
-        //       and called explicitly in all cases?
         this.refreshToPhysics();
     }
 

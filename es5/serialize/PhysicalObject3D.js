@@ -12,9 +12,9 @@ var _GameObject2 = require('./GameObject');
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _Serializer = require('./Serializer');
+var _BaseTypes = require('./BaseTypes');
 
-var _Serializer2 = _interopRequireDefault(_Serializer);
+var _BaseTypes2 = _interopRequireDefault(_BaseTypes);
 
 var _ThreeVector = require('./ThreeVector');
 
@@ -33,13 +33,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /**
- * The PhysicalObject is the base class for physical game objects
- * TODO: Rename to PhysicalObject3D
+ * The PhysicalObject3D is the base class for physical game objects
  */
-var PhysicalObject = function (_GameObject) {
-    _inherits(PhysicalObject, _GameObject);
+var PhysicalObject3D = function (_GameObject) {
+    _inherits(PhysicalObject3D, _GameObject);
 
-    _createClass(PhysicalObject, null, [{
+    _createClass(PhysicalObject3D, null, [{
         key: 'netScheme',
 
 
@@ -52,27 +51,27 @@ var PhysicalObject = function (_GameObject) {
         *
         * You may choose not to implement this method, in which
         * case your object only transmits the default attributes
-        * which are already part of {@link PhysicalObject}.
+        * which are already part of {@link PhysicalObject3D}.
         * But if you choose to add more attributes, make sure
         * the return value includes the netScheme of the super class.
         *
-        * @memberof PhysicalObject
+        * @memberof PhysicalObject3D
         * @member {Object} netScheme
         * @example
         *     static get netScheme() {
         *       return Object.assign({
-        *           mojo: { type: Serializer.TYPES.UINT8 },
+        *           mojo: { type: BaseTypes.TYPES.UINT8 },
         *         }, super.netScheme);
         *     }
         */
         get: function get() {
             return Object.assign({
-                playerId: { type: _Serializer2.default.TYPES.INT16 },
-                position: { type: _Serializer2.default.TYPES.CLASSINSTANCE },
-                quaternion: { type: _Serializer2.default.TYPES.CLASSINSTANCE },
-                velocity: { type: _Serializer2.default.TYPES.CLASSINSTANCE },
-                angularVelocity: { type: _Serializer2.default.TYPES.CLASSINSTANCE }
-            }, _get(PhysicalObject.__proto__ || Object.getPrototypeOf(PhysicalObject), 'netScheme', this));
+                playerId: { type: _BaseTypes2.default.TYPES.INT16 },
+                position: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE },
+                quaternion: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE },
+                velocity: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE },
+                angularVelocity: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE }
+            }, _get(PhysicalObject3D.__proto__ || Object.getPrototypeOf(PhysicalObject3D), 'netScheme', this));
         }
 
         /**
@@ -92,10 +91,10 @@ var PhysicalObject = function (_GameObject) {
 
     }]);
 
-    function PhysicalObject(gameEngine, options, props) {
-        _classCallCheck(this, PhysicalObject);
+    function PhysicalObject3D(gameEngine, options, props) {
+        _classCallCheck(this, PhysicalObject3D);
 
-        var _this = _possibleConstructorReturn(this, (PhysicalObject.__proto__ || Object.getPrototypeOf(PhysicalObject)).call(this, gameEngine, options));
+        var _this = _possibleConstructorReturn(this, (PhysicalObject3D.__proto__ || Object.getPrototypeOf(PhysicalObject3D)).call(this, gameEngine, options));
 
         _this.playerId = 0;
         _this.bendingIncrements = 0;
@@ -113,7 +112,7 @@ var PhysicalObject = function (_GameObject) {
         if (props.quaternion) _this.quaternion.copy(props.quaternion);
         if (props.angularVelocity) _this.angularVelocity.copy(props.angularVelocity);
 
-        _this.class = PhysicalObject;
+        _this.class = PhysicalObject3D;
         return _this;
     }
 
@@ -122,11 +121,11 @@ var PhysicalObject = function (_GameObject) {
      * The output of this method is used to describe each instance in the traces,
      * which significantly helps in debugging.
      *
-     * @return {String} description - a string describing the PhysicalObject
+     * @return {String} description - a string describing the PhysicalObject3D
      */
 
 
-    _createClass(PhysicalObject, [{
+    _createClass(PhysicalObject3D, [{
         key: 'toString',
         value: function toString() {
             var p = this.position.toString();
@@ -142,7 +141,7 @@ var PhysicalObject = function (_GameObject) {
     }, {
         key: 'bendingToString',
         value: function bendingToString() {
-            if (this.bendingIncrements) return 'bend=' + this.bending + ' increments=' + this.bendingIncrements + ' deltaPos=' + this.bendingPositionDelta + ' deltaQuat=' + this.bendingQuaternionDelta;
+            if (this.bendingIncrements) return 'bend=' + this.bendingOptions + ' increments=' + this.bendingIncrements + ' deltaPos=' + this.bendingPositionDelta + ' deltaVel=' + this.bendingVelocityDelta + ' deltaQuat=' + this.bendingQuaternionDelta;
             return 'no bending';
         }
 
@@ -155,18 +154,23 @@ var PhysicalObject = function (_GameObject) {
 
     }, {
         key: 'bendToCurrent',
-        value: function bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
+        value: function bendToCurrent(original, percent, worldSettings, isLocal, increments) {
 
-            // get the incremental delta position
-            this.incrementScale = bending / bendingIncrements;
-            this.bendingPositionDelta = new _ThreeVector2.default().copy(this.position);
-            this.bendingPositionDelta.subtract(original.position);
-            this.bendingPositionDelta.multiplyScalar(this.incrementScale);
+            var bending = { increments: increments, percent: percent };
+            // if the object has defined a bending multiples for this object, use them
+            var positionBending = Object.assign({}, bending, this.bending.position);
+            var velocityBending = Object.assign({}, bending, this.bending.velocity);
 
-            // get the incremental angular-velocity
-            this.bendingAVDelta = new _ThreeVector2.default().copy(this.angularVelocity);
-            this.bendingAVDelta.subtract(original.angularVelocity);
-            this.bendingAVDelta.multiplyScalar(this.incrementScale);
+            // check for local object overrides to bendingTarget
+            if (isLocal) {
+                Object.assign(positionBending, this.bending.positionLocal);
+                Object.assign(velocityBending, this.bending.velocityLocal);
+            }
+
+            // get the incremental delta position & velocity
+            this.incrementScale = bending / increments;
+            this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
+            this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
 
             // get the incremental quaternion rotation
             var currentConjugate = new _Quaternion2.default().copy(original.quaternion).conjugate();
@@ -183,20 +187,16 @@ var PhysicalObject = function (_GameObject) {
             this.quaternion.copy(original.quaternion);
             this.angularVelocity.copy(original.angularVelocity);
 
-            this.bendingIncrements = bendingIncrements;
-            this.bending = bending;
+            this.bendingIncrements = increments;
+            this.bendingOptions = bending;
 
-            // TODO: use configurable physics bending
-            // TODO: does refreshToPhysics() really belong here?
-            //       should refreshToPhysics be decoupled from syncTo
-            //       and called explicitly in all cases?
             this.refreshToPhysics();
         }
     }, {
         key: 'syncTo',
         value: function syncTo(other, options) {
 
-            _get(PhysicalObject.prototype.__proto__ || Object.getPrototypeOf(PhysicalObject.prototype), 'syncTo', this).call(this, other);
+            _get(PhysicalObject3D.prototype.__proto__ || Object.getPrototypeOf(PhysicalObject3D.prototype), 'syncTo', this).call(this, other);
 
             this.position.copy(other.position);
             this.quaternion.copy(other.quaternion);
@@ -275,7 +275,7 @@ var PhysicalObject = function (_GameObject) {
         }
     }]);
 
-    return PhysicalObject;
+    return PhysicalObject3D;
 }(_GameObject3.default);
 
-exports.default = PhysicalObject;
+exports.default = PhysicalObject3D;

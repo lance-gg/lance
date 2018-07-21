@@ -114,8 +114,8 @@ var GameWorld = function () {
         }
 
         /**
-         * Remove an object from the game world
-         * @param {Object} object object to remove
+         * Add an object to the game world
+         * @param {Object} object object to add
          */
 
     }, {
@@ -125,7 +125,7 @@ var GameWorld = function () {
         }
 
         /**
-         * Add an object to the game world
+         * Remove an object from the game world
          * @param {number} id id of the object to remove
          */
 

@@ -156,8 +156,8 @@ class ThreeVector extends Serializable {
      * @param {Object} options bending options
      * @param {Number} options.increments number of increments
      * @param {Number} options.percent The percentage to bend
-     * @param {Number} options.minDifference No less than this value (not implemented yet)
-     * @param {Number} options.maxDifference No more than this value
+     * @param {Number} options.min No less than this value
+     * @param {Number} options.max No more than this value
      * @return {ThreeVector} returns new Incremental Vector
      */
     getBendingDelta(target, options) {
@@ -166,7 +166,8 @@ class ThreeVector extends Serializable {
         increment.multiplyScalar(options.percent);
 
         // check for max case
-        if (options.maxDelta && increment.length() > options.maxDifference) {
+        if ((options.max && increment.length() > options.max) ||
+            (options.max && increment.length() < options.min)) {
             return new ThreeVector(0, 0, 0);
         }
 

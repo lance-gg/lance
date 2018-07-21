@@ -10,9 +10,9 @@ var _Serializable2 = require('./Serializable');
 
 var _Serializable3 = _interopRequireDefault(_Serializable2);
 
-var _Serializer = require('./Serializer');
+var _BaseTypes = require('./BaseTypes');
 
-var _Serializer2 = _interopRequireDefault(_Serializer);
+var _BaseTypes2 = _interopRequireDefault(_BaseTypes);
 
 var _ThreeVector = require('./ThreeVector');
 
@@ -37,10 +37,10 @@ var Quaternion = function (_Serializable) {
         key: 'netScheme',
         get: function get() {
             return {
-                w: { type: _Serializer2.default.TYPES.FLOAT32 },
-                x: { type: _Serializer2.default.TYPES.FLOAT32 },
-                y: { type: _Serializer2.default.TYPES.FLOAT32 },
-                z: { type: _Serializer2.default.TYPES.FLOAT32 }
+                w: { type: _BaseTypes2.default.TYPES.FLOAT32 },
+                x: { type: _BaseTypes2.default.TYPES.FLOAT32 },
+                y: { type: _BaseTypes2.default.TYPES.FLOAT32 },
+                z: { type: _BaseTypes2.default.TYPES.FLOAT32 }
             };
         }
 

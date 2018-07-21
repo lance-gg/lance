@@ -1,7 +1,7 @@
 'use strict'
 
 const should = require('should');
-const Serializer = require('../../src/serialize/Serializer');
+const BaseTypes = require('../../src/serialize/BaseTypes');
 const DynamicObject = require('../../src/serialize/DynamicObject');
 const GameEngine = require('../../src/GameEngine');
 const SimplePhysicsEngine = require('../../src/physics/SimplePhysicsEngine');
@@ -10,8 +10,8 @@ class TestObject extends DynamicObject {
 
     static get netScheme(){
         return Object.assign({
-            height: Serializer.TYPES.UINT16,
-            width: Serializer.TYPES.UINT16
+            height: BaseTypes.TYPES.UINT16,
+            width: BaseTypes.TYPES.UINT16
         }, super.netScheme);
     }
 

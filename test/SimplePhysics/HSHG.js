@@ -1,7 +1,7 @@
 'use strict'
 
 const should = require('should');
-const Serializer = require('../../src/serialize/Serializer');
+const BaseTypes = require('../../src/serialize/BaseTypes');
 const DynamicObject = require('../../src/serialize/DynamicObject');
 const HSHG = require('../../src/physics/SimplePhysics/HSHG');
 
@@ -9,8 +9,8 @@ class TestObject extends DynamicObject {
 
     static get netScheme(){
         return {
-            height: Serializer.TYPES.UINT16,
-            width: Serializer.TYPES.UINT16
+            height: BaseTypes.TYPES.UINT16,
+            width: BaseTypes.TYPES.UINT16
         };
     }
 
@@ -21,7 +21,7 @@ class TestObject extends DynamicObject {
     };
 }
 
-let grid = new HSHG(); 
+let grid = new HSHG();
 
 let obj1 = new TestObject(1);
 let obj2 = new TestObject(2);

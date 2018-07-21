@@ -1,17 +1,18 @@
 import should from 'should';
 
-import Serializer from '../../src/serialize//Serializer';
+import Serializer from '../../src/serialize/Serializer';
 import Serializable from '../../src/serialize/Serializable';
+import BaseTypes from '../../src/serialize/BaseTypes';
 
 class TestObject extends Serializable {
 
     static get netScheme(){
         return {
-            float32: { type: Serializer.TYPES.FLOAT32 },
-            int32: { type: Serializer.TYPES.INT32 },
-            int16: { type: Serializer.TYPES.INT16 },
-            int8: { type: Serializer.TYPES.INT8 },
-            uint8: { type: Serializer.TYPES.UINT8 }
+            float32: { type: BaseTypes.TYPES.FLOAT32 },
+            int32: { type: BaseTypes.TYPES.INT32 },
+            int16: { type: BaseTypes.TYPES.INT16 },
+            int8: { type: BaseTypes.TYPES.INT8 },
+            uint8: { type: BaseTypes.TYPES.UINT8 }
         }
     }
 

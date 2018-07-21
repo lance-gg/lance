@@ -12,9 +12,9 @@ var _Serializable2 = require('./Serializable');
 
 var _Serializable3 = _interopRequireDefault(_Serializable2);
 
-var _Serializer = require('./Serializer');
+var _BaseTypes = require('./BaseTypes');
 
-var _Serializer2 = _interopRequireDefault(_Serializer);
+var _BaseTypes2 = _interopRequireDefault(_BaseTypes);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38,7 +38,7 @@ var GameObject = function (_Serializable) {
         key: 'netScheme',
         get: function get() {
             return {
-                id: { type: _Serializer2.default.TYPES.INT32 }
+                id: { type: _BaseTypes2.default.TYPES.INT32 }
             };
         }
 
@@ -171,27 +171,12 @@ var GameObject = function (_Serializable) {
         value: function bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {}
 
         /**
-        * The bending multiple is a getter, which returns the
-        * amount of bending.
-        * Bending is defined as the amount of correction that will be applied
-        * on the client side to a given object's position, incrementally, until the next
-        * server broadcast is expected to arrive.
-        * When this value is 0.0, the client ignores the server object's position.
-        * When this value is null, the bending is taken from the synchronization
-        * defaults.  Set this to zero for objects whose position
-        * jumps suddenly - because the game intended a jump, not a gradual bend.
-        * @memberof GameObject
-        * @member {Number} bendingMultiple
-        */
-
-    }, {
-        key: 'syncTo',
-
-
-        /**
          * synchronize this object to the state of an other object
          * @param {GameObject} other the other object to synchronize to
          */
+
+    }, {
+        key: 'syncTo',
         value: function syncTo(other) {
             _get(GameObject.prototype.__proto__ || Object.getPrototypeOf(GameObject.prototype), 'syncTo', this).call(this, other);
         }
@@ -267,37 +252,6 @@ var GameObject = function (_Serializable) {
                 angularVelocity: { percent: 0.0 },
                 angleLocal: { percent: 1.0 }
             };
-        }
-    }, {
-        key: 'bendingMultiple',
-        get: function get() {
-            return null;
-        }
-
-        /**
-        * The velocity bending multiple is a getter, which returns the
-        * amount of velocity bending.
-        * @memberof GameObject
-        * @member {Number} bendingVelocityMultiple
-        */
-
-    }, {
-        key: 'bendingVelocityMultiple',
-        get: function get() {
-            return null;
-        }
-
-        /**
-        * The angle bending multiple is a getter, which returns the
-        * amount of angle bending.
-        * @memberof GameObject
-        * @member {Number} bendingAngleMultiple
-        */
-
-    }, {
-        key: 'bendingAngleMultiple',
-        get: function get() {
-            return null;
         }
     }]);
 
