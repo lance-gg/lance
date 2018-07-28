@@ -168,7 +168,7 @@ var PhysicalObject3D = function (_GameObject) {
             }
 
             // get the incremental delta position & velocity
-            this.incrementScale = bending / increments;
+            this.incrementScale = percent / increments;
             this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
             this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
             this.bendingAVDelta = new _ThreeVector2.default(0, 0, 0);
