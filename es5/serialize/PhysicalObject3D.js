@@ -171,6 +171,7 @@ var PhysicalObject3D = function (_GameObject) {
             this.incrementScale = bending / increments;
             this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
             this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
+            this.bendingAVDelta = new _ThreeVector2.default(0, 0, 0);
 
             // get the incremental quaternion rotation
             var currentConjugate = new _Quaternion2.default().copy(original.quaternion).conjugate();
