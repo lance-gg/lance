@@ -254,7 +254,9 @@ class ClientEngine {
 
     // apply a user input on the client side
     doInputLocal(message) {
-        if (this.gameEngine.passive) {
+
+        // some synchronization strategies (interpolate) ignore inputs on client side
+        if (this.gameEngine.ignoreInputsOnClient) {
             return;
         }
 
@@ -262,7 +264,6 @@ class ClientEngine {
         this.gameEngine.emit('client__processInput', inputEvent);
         this.gameEngine.emit('processInput', inputEvent);
         this.gameEngine.processInput(message.data, this.gameEngine.playerId, false);
-
     }
 
     // apply user inputs which have been queued in order to create

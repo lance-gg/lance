@@ -20,8 +20,6 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         this.lastSync = null;
         this.needFirstSync = true;
         this.recentInputs = {};
-        this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.on('client__postStep', this.extrapolate.bind(this));
         this.gameEngine.on('client__processInput', this.clientInputSave.bind(this));
     }
 
@@ -33,19 +31,6 @@ export default class ExtrapolateStrategy extends SyncStrategy {
             this.recentInputs[inputData.step] = [];
         }
         this.recentInputs[inputData.step].push(inputData);
-    }
-
-    // add an object to our world
-    addNewObject(objId, newObj, options) {
-
-        let curObj = new newObj.constructor(this.gameEngine, {
-            id: objId
-        });
-        curObj.syncTo(newObj);
-        this.gameEngine.addObjectToWorld(curObj);
-        console.log(`adding new object ${curObj}`);
-
-        return curObj;
     }
 
     // clean up the input buffer
@@ -189,34 +174,4 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         }
     }
 
-    // Perform client-side extrapolation.
-    extrapolate(stepDesc) {
-
-        // apply incremental bending
-        this.gameEngine.world.forEachObject((id, o) => {
-            if (typeof o.applyIncrementalBending === 'function') {
-                o.applyIncrementalBending(stepDesc);
-                o.refreshToPhysics();
-            }
-        });
-
-        // apply all pending required syncs
-        while (this.requiredSyncs.length) {
-
-            let requiredStep = this.requiredSyncs[0].stepCount;
-
-            // if we haven't reached the corresponding step, it's too soon to apply syncs
-            if (requiredStep > this.gameEngine.world.stepCount)
-                return;
-
-            this.gameEngine.trace.trace(() => `applying a required sync ${requiredStep}`);
-            this.applySync(this.requiredSyncs.shift());
-        }
-
-        // if there is a sync from the server, from the past or present, apply it now
-        if (this.lastSync && this.lastSync.stepCount <= this.gameEngine.world.stepCount) {
-            this.applySync(this.lastSync);
-            this.lastSync = null;
-        }
-    }
 }

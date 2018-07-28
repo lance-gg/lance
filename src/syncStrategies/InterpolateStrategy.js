@@ -1,8 +1,10 @@
 import SyncStrategy from './SyncStrategy';
 
 const defaults = {
-    syncsBufferLength: 6,
     clientStepHold: 6,
+    localObjBending: 1.0,  // amount of bending towards position of sync object
+    remoteObjBending: 1.0, // amount of bending towards position of sync object
+    bendingIncrements: 6, // the bending should be applied increments (how many steps for entire bend)
     reflect: false
 };
 
@@ -13,23 +15,7 @@ export default class InterpolateStrategy extends SyncStrategy {
         const options = Object.assign({}, defaults, inputOptions);
         super(clientEngine, options);
 
-        this.syncsBuffer = []; // buffer for server world updates
-        this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.passive = true; // client side engine ignores inputs
-        this.gameEngine.on('client__postStep', this.interpolate.bind(this));
-    }
-
-    collectSync(e) {
-
-        super.collectSync(e);
-
-        if (!this.lastSync)
-            return;
-
-        this.syncsBuffer.push(this.lastSync);
-        if (this.syncsBuffer.length >= this.options.syncsBufferLength) {
-            this.syncsBuffer.shift();
-        }
+        this.gameEngine.ignoreInputsOnClient = true; // client side engine ignores inputs
     }
 
     // add an object to our world
@@ -39,121 +25,81 @@ export default class InterpolateStrategy extends SyncStrategy {
             id: objId
         });
         curObj.syncTo(newObj);
-        curObj.passive = true;
         this.gameEngine.addObjectToWorld(curObj);
         console.log(`adding new object ${curObj}`);
-
-        if (stepCount) {
-            curObj.lastUpdateStep = stepCount;
-        }
 
         return curObj;
     }
 
-    /**
-     * Perform client-side interpolation.
-     */
-    interpolate() {
-
-        // get the step we will perform
+    // apply a new sync
+    applySync(sync) {
+        this.gameEngine.trace.debug(() => 'interpolate applying sync');
+        //
+        //    scan all the objects in the sync
+        //
+        // 1. if the object exists locally, sync to the server object
+        // 2. if the object is new, just create it
+        //
+        this.needFirstSync = false;
         let world = this.gameEngine.world;
-        let stepToPlay = world.stepCount - this.options.clientStepHold;
-        let nextSync = null;
+        let serverStep = sync.stepCount;
+        for (let ids of Object.keys(sync.syncObjects)) {
 
-        // get the closest sync to our next step
-        for (let x = 0; x < this.syncsBuffer.length; x++) {
-            if (this.syncsBuffer[x].stepCount >= stepToPlay) {
-                nextSync = this.syncsBuffer[x];
-                break;
+            // TODO: we are currently taking only the first event out of
+            // the events that may have arrived for this object
+            let ev = sync.syncObjects[ids][0];
+            let curObj = world.objects[ev.objectInstance.id];
+
+            if (curObj) {
+
+                // case 1: this object already exists locally
+                this.gameEngine.trace.trace(() => `object before syncTo: ${curObj.toString()}`);
+                curObj.saveState();
+                curObj.syncTo(ev.objectInstance);
+                this.gameEngine.trace.trace(() => `object after syncTo: ${curObj.toString()} synced to step[${ev.stepCount}]`);
+
+            } else {
+
+                // case 2: object does not exist.  create it now
+                this.addNewObject(ev.objectInstance.id, ev.objectInstance);
             }
         }
 
-        // we requires a sync before we proceed
-        if (!nextSync) {
-            this.gameEngine.trace.debug(() => 'interpolate lacks future sync - requesting step skip');
-            this.clientEngine.skipOneStep = true;
-            return;
+        //
+        // bend back to original state
+        //
+        for (let objId of Object.keys(world.objects)) {
+
+            let obj = world.objects[objId];
+            let isLocal = (obj.playerId == this.gameEngine.playerId); // eslint-disable-line eqeqeq
+            let bending = isLocal ? this.options.localObjBending : this.options.remoteObjBending;
+            obj.bendToCurrentState(bending, this.gameEngine.worldSettings, isLocal, this.options.bendingIncrements);
+            if (typeof obj.refreshRenderObject === 'function')
+                obj.refreshRenderObject();
+            this.gameEngine.trace.trace(() => `object[${objId}] ${obj.bendingToString()}`);
         }
-
-        this.gameEngine.trace.debug(() => `interpolate past step [${stepToPlay}] using sync from step ${nextSync.stepCount}`);
-
-        // create objects which are created at this step
-        let stepEvents = nextSync.syncSteps[stepToPlay];
-        if (stepEvents && stepEvents.objectCreate) {
-            stepEvents.objectCreate.forEach(ev => {
-                this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
-            });
-        }
-
-        // create objects for events that imply a create-object
-        if (stepEvents && stepEvents.objectUpdate) {
-            stepEvents.objectUpdate.forEach(ev => {
-                if (!world.objects[ev.objectInstance.id])
-                    this.addNewObject(ev.objectInstance.id, ev.objectInstance, stepToPlay);
-            });
-        }
-
-        // remove objects which are removed at this step
-        if (stepEvents && stepEvents.objectDestroy) {
-            stepEvents.objectDestroy.forEach(ev => {
-                if (world.objects[ev.objectInstance.id])
-                    this.gameEngine.removeObjectFromWorld(ev.objectInstance.id);
-            });
-        }
-
-        // interpolate values for all objects in this world
-        world.forEachObject((id, ob) => {
-
-            let nextObj = null;
-            let nextStep = null;
-
-            // if we already handled this object, continue
-            // TODO maybe call it lastUpdatedStep
-            if (ob.lastUpdateStep === stepToPlay)
-                return;
-
-            // get the nearest object we can interpolate to
-            if (!nextSync.syncObjects.hasOwnProperty(id))
-                return;
-
-            nextSync.syncObjects[id].forEach(ev => {
-                if (!nextObj && ev.stepCount >= stepToPlay) {
-                    nextObj = ev.objectInstance;
-                    nextStep = ev.stepCount;
-                }
-            });
-
-            if (nextObj) {
-                let playPercentage = 1 / (nextStep + 1 - stepToPlay);
-                if (this.options.reflect)
-                    playPercentage = 1.0;
-                this.interpolateOneObject(ob, nextObj, id, playPercentage);
-            }
-        });
 
         // destroy objects
-        world.forEachObject((id, ob) => {
-            let objEvents = nextSync.syncObjects[id];
-            if (!objEvents || Number(id) >= this.gameEngine.options.clientIDSpace) return;
+        // TODO: use world.forEachObject((id, ob) => {});
+        // TODO: identical code is in InterpolateStrategy
+        for (let objId of Object.keys(world.objects)) {
 
+            let objEvents = sync.syncObjects[objId];
+
+            // if this was a full sync, and we did not get a corresponding object,
+            // remove the local object
+            if (sync.fullUpdate && !objEvents && objId < this.gameEngine.options.clientIDSpace) {
+                this.gameEngine.removeObjectFromWorld(objId);
+                continue;
+            }
+
+            if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
+                continue;
+
+            // if we got an objectDestroy event, destroy the object
             objEvents.forEach((e) => {
-                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(id);
+                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
             });
-        });
-
-    }
-
-    // TODO: prevObj is now just curObj
-    //       and playPercentage is 1/(nextObj.step - now)
-    //       so the code below should be easy to simplify now
-    interpolateOneObject(prevObj, nextObj, objId, playPercentage) {
-
-        // update position and orientation with interpolation
-        let curObj = this.gameEngine.world.objects[objId];
-        if (typeof curObj.interpolate === 'function') {
-            this.gameEngine.trace.trace(() => `object ${objId} before ${playPercentage} interpolate: ${curObj.toString()}`);
-            curObj.interpolate(nextObj, playPercentage, this.gameEngine.worldSettings);
-            this.gameEngine.trace.trace(() => `object ${objId} after interpolate: ${curObj.toString()}`);
         }
     }
 }

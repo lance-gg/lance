@@ -16,10 +16,6 @@ var _GameObject2 = require('./GameObject');
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _Serializer = require('./Serializer');
-
-var _Serializer2 = _interopRequireDefault(_Serializer);
-
 var _BaseTypes = require('./BaseTypes');
 
 var _BaseTypes2 = _interopRequireDefault(_BaseTypes);
@@ -272,7 +268,7 @@ var DynamicObject = function (_GameObject) {
             this.incrementScale = percent / increments;
             this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
             this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
-            this.bendingAngleDelta = _MathUtils2.default.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 2 * Math.PI) / increments;
+            this.bendingAngleDelta = _MathUtils2.default.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 360) / increments;
 
             this.bendingTarget = new this.constructor();
             this.bendingTarget.syncTo(this);
@@ -301,55 +297,6 @@ var DynamicObject = function (_GameObject) {
             this.angle += this.bendingAngleDelta * timeFactor;
 
             this.bendingIncrements--;
-        }
-    }, {
-        key: 'interpolate',
-        value: function interpolate(nextObj, playPercentage, worldSettings) {
-
-            var px = this.position.x;
-            var py = this.position.y;
-            var angle = this.angle;
-
-            // TODO allow netscheme to designate interpolatable attribute (power, shield, etc)
-            // first copy all the assignable attributes
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = Object.keys(this.constructor.netScheme)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var k = _step.value;
-
-                    var val = nextObj[k];
-                    if (_Serializer2.default.typeCanAssign(this.constructor.netScheme[k].type)) this[k] = val;else if (typeof val.clone === 'function') this[k] = val.clone();
-                }
-
-                // update other objects with interpolation
-                // TODO interpolate using TwoVector methods, including wrap-around
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
-            function calcInterpolate(start, end, wrap, p) {
-                if (Math.abs(end - start) > wrap / 2) return end;
-                return (end - start) * p + start;
-            }
-            this.position.x = calcInterpolate(px, nextObj.position.x, worldSettings.width, playPercentage);
-            this.position.y = calcInterpolate(py, nextObj.position.y, worldSettings.height, playPercentage);
-
-            var shortestAngle = ((nextObj.angle - angle) % 360 + 540) % 360 - 180;
-            this.angle = angle + shortestAngle * playPercentage;
         }
     }, {
         key: 'getAABB',

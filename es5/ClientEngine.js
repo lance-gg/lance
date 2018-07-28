@@ -314,7 +314,9 @@ var ClientEngine = function () {
     }, {
         key: 'doInputLocal',
         value: function doInputLocal(message) {
-            if (this.gameEngine.passive) {
+
+            // some synchronization strategies (interpolate) ignore inputs on client side
+            if (this.gameEngine.ignoreInputsOnClient) {
                 return;
             }
 

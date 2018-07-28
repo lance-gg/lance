@@ -1,6 +1,5 @@
 import TwoVector from './TwoVector';
 import GameObject from './GameObject';
-import Serializer from './Serializer';
 import BaseTypes from './BaseTypes';
 import MathUtils from '../lib/MathUtils';
 
@@ -227,7 +226,7 @@ class DynamicObject extends GameObject {
         this.incrementScale = percent / increments;
         this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
         this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
-        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 2 * Math.PI) / increments;
+        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 360) / increments;
 
         this.bendingTarget = (new this.constructor());
         this.bendingTarget.syncTo(this);
@@ -257,36 +256,6 @@ class DynamicObject extends GameObject {
         this.angle += (this.bendingAngleDelta * timeFactor);
 
         this.bendingIncrements--;
-    }
-
-    interpolate(nextObj, playPercentage, worldSettings) {
-
-        let px = this.position.x;
-        let py = this.position.y;
-        let angle = this.angle;
-
-        // TODO allow netscheme to designate interpolatable attribute (power, shield, etc)
-        // first copy all the assignable attributes
-        for (let k of Object.keys(this.constructor.netScheme)) {
-            let val = nextObj[k];
-            if (Serializer.typeCanAssign(this.constructor.netScheme[k].type))
-                this[k] = val;
-            else if (typeof val.clone === 'function')
-                this[k] = val.clone();
-        }
-
-        // update other objects with interpolation
-        // TODO interpolate using TwoVector methods, including wrap-around
-        function calcInterpolate(start, end, wrap, p) {
-            if (Math.abs(end - start) > wrap / 2) return end;
-            return (end - start) * p + start;
-        }
-        this.position.x = calcInterpolate(px, nextObj.position.x, worldSettings.width, playPercentage);
-        this.position.y = calcInterpolate(py, nextObj.position.y, worldSettings.height, playPercentage);
-
-        var shortestAngle = ((((nextObj.angle - angle) % 360) + 540) % 360) - 180;
-        this.angle = angle + shortestAngle * playPercentage;
-
     }
 
     getAABB() {
