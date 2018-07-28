@@ -166,7 +166,7 @@ var PhysicalObject2D = function (_GameObject) {
         // display object's physical attributes as a string
         // for debugging purposes mostly
         value: function bendingToString() {
-            if (this.bendingIncrements) return 'bend=' + this.bendingOptions + ' increments=' + this.bendingIncrements + ' deltaPos=' + this.bendingPositionDelta + ' deltaVel=' + this.bendingVelocityDelta + ' deltaAngle=' + this.bendingAngleDelta;
+            if (this.bendingIncrements) return '\u0394Pos=' + this.bendingPositionDelta + ' \u0394Vel=' + this.bendingVelocityDelta + ' \u0394Angle=' + this.bendingAngleDelta + ' increments=' + this.bendingIncrements;
             return 'no bending';
         }
 

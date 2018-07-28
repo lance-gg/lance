@@ -187,7 +187,7 @@ class DynamicObject extends GameObject {
      */
     bendingToString() {
         if (this.bendingIncrements)
-            return `bend=${this.bending} angle=${this.bendingAngle} num_increments=${this.bendingIncrements}`;
+            return `ΔPos=${this.bendingPositionDelta} ΔVel=${this.bendingVelocityDelta} ΔAngle=${this.bendingAngleDelta} increments=${this.bendingIncrements}`;
         return 'no bending';
     }
 
