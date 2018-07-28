@@ -124,7 +124,7 @@ class PhysicalObject2D extends GameObject {
     // for debugging purposes mostly
     bendingToString() {
         if (this.bendingIncrements)
-            return `bend=${this.bendingOptions} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaVel=${this.bendingVelocityDelta} deltaAngle=${this.bendingAngleDelta}`;
+            return `ΔPos=${this.bendingPositionDelta} ΔVel=${this.bendingVelocityDelta} ΔAngle=${this.bendingAngleDelta} increments=${this.bendingIncrements}`;
         return 'no bending';
     }
 

@@ -227,7 +227,7 @@ var DynamicObject = function (_GameObject) {
          * @return {String} description - a string description
          */
         value: function bendingToString() {
-            if (this.bendingIncrements) return 'bend=' + this.bending + ' angle=' + this.bendingAngle + ' num_increments=' + this.bendingIncrements;
+            if (this.bendingIncrements) return '\u0394Pos=' + this.bendingPositionDelta + ' \u0394Vel=' + this.bendingVelocityDelta + ' \u0394Angle=' + this.bendingAngleDelta + ' increments=' + this.bendingIncrements;
             return 'no bending';
         }
 
