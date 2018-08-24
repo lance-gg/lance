@@ -43,7 +43,7 @@ class ClientEngine {
       * @param {String} inputOptions.serverURL - Socket server url
       * @param {Renderer} Renderer - the Renderer class constructor
       */
-    constructor(gameEngine, inputOptions, Renderer, connectOptions) {
+    constructor(gameEngine, inputOptions, Renderer) {
 
         this.options = Object.assign({
             autoConnect: true,
