@@ -76,7 +76,7 @@ var ClientEngine = function () {
       * @param {String} inputOptions.serverURL - Socket server url
       * @param {Renderer} Renderer - the Renderer class constructor
       */
-    function ClientEngine(gameEngine, inputOptions, Renderer, connectOptions) {
+    function ClientEngine(gameEngine, inputOptions, Renderer) {
         _classCallCheck(this, ClientEngine);
 
         this.options = Object.assign({
