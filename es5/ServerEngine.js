@@ -389,6 +389,9 @@ var ServerEngine = function () {
                 objectInstance: obj
             });
         }
+    }, {
+        key: 'getPlayerId',
+        value: function getPlayerId(socket) {}
 
         // handle new player connection
 
@@ -404,7 +407,13 @@ var ServerEngine = function () {
                 socket: socket,
                 state: 'new'
             };
-            var playerId = socket.playerId = ++this.gameEngine.world.playerCount;
+
+            var playerId = this.getPlayerId(socket);
+            if (!playerId) {
+                playerId = ++this.gameEngine.world.playerCount;
+            }
+            socket.playerId = playerId;
+
             socket.lastHandledInput = null;
             socket.joinTime = new Date().getTime();
             this.resetIdleTimeout(socket);
