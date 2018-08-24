@@ -157,6 +157,14 @@ var Renderer = function () {
     }, {
         key: 'removeObject',
         value: function removeObject(obj) {}
+
+        /**
+         * Called when clientEngine has stopped, time to clean up
+         */
+
+    }, {
+        key: 'stop',
+        value: function stop() {}
     }]);
 
     return Renderer;
