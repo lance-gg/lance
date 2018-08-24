@@ -229,6 +229,9 @@ class ServerEngine {
         });
     }
 
+    getPlayerId(socket) {
+    }
+
     // handle new player connection
     onPlayerConnected(socket) {
         let that = this;
@@ -240,7 +243,13 @@ class ServerEngine {
             socket: socket,
             state: 'new'
         };
-        let playerId = socket.playerId = ++this.gameEngine.world.playerCount;
+
+        let playerId = this.getPlayerId(socket);
+        if (!playerId) {
+            playerId = ++this.gameEngine.world.playerCount;
+        }
+        socket.playerId = playerId;
+
         socket.lastHandledInput = null;
         socket.joinTime = (new Date()).getTime();
         this.resetIdleTimeout(socket);
