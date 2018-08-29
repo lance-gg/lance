@@ -73,6 +73,7 @@ var ClientEngine = function () {
       * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
       * @param {Number} inputOptions.syncOptions.localObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for local objects
       * @param {Number} inputOptions.syncOptions.remoteObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for remote objects
+      * @param {String} inputOptions.serverURL - Socket server url
       * @param {Renderer} Renderer - the Renderer class constructor
       */
     function ClientEngine(gameEngine, inputOptions, Renderer) {
@@ -83,7 +84,8 @@ var ClientEngine = function () {
             healthCheckInterval: 1000,
             healthCheckRTTSample: 10,
             stepPeriod: 1000 / GAME_UPS,
-            scheduler: 'render-schedule'
+            scheduler: 'render-schedule',
+            serverURL: null
         }, inputOptions);
 
         /**
@@ -163,7 +165,7 @@ var ClientEngine = function () {
             var connectSocket = function connectSocket(matchMakerAnswer) {
                 return new Promise(function (resolve, reject) {
 
-                    if (matchMakerAnswer.status !== 'ok') reject();
+                    if (matchMakerAnswer.status !== 'ok') reject('matchMaker failed status: ' + matchMakerAnswer.status);
 
                     console.log('connecting to game server ' + matchMakerAnswer.serverURL);
                     _this.socket = (0, _socket2.default)(matchMakerAnswer.serverURL, options);
@@ -173,6 +175,10 @@ var ClientEngine = function () {
                     _this.socket.once('connect', function () {
                         console.log('connection made');
                         resolve();
+                    });
+
+                    _this.socket.once('error', function (error) {
+                        reject(error);
                     });
 
                     _this.socket.on('playerJoined', function (playerData) {
@@ -186,7 +192,7 @@ var ClientEngine = function () {
                 });
             };
 
-            var matchmaker = Promise.resolve({ serverURL: null, status: 'ok' });
+            var matchmaker = Promise.resolve({ serverURL: this.options.serverURL, status: 'ok' });
             if (this.options.matchmaker) matchmaker = _Utils2.default.httpGetPromise(this.options.matchmaker);
 
             return matchmaker.then(connectSocket);
@@ -204,10 +210,16 @@ var ClientEngine = function () {
         value: function start() {
             var _this2 = this;
 
+            this.stopped = false;
+            this.resolved = false;
             // initialize the renderer
             // the render loop waits for next animation frame
             if (!this.renderer) alert('ERROR: game has not defined a renderer');
             var renderLoop = function renderLoop(timestamp) {
+                if (_this2.stopped) {
+                    _this2.renderer.stop();
+                    return;
+                }
                 _this2.lastTimestamp = _this2.lastTimestamp || timestamp;
                 _this2.renderer.draw(timestamp, timestamp - _this2.lastTimestamp);
                 _this2.lastTimestamp = timestamp;
@@ -229,9 +241,36 @@ var ClientEngine = function () {
 
                 if (typeof window !== 'undefined') window.requestAnimationFrame(renderLoop);
                 if (_this2.options.autoConnect && _this2.options.standaloneMode !== true) {
-                    _this2.connect();
+                    return _this2.connect().catch(function (error) {
+                        _this2.stopped = true;
+                        throw error;
+                    });
                 }
+            }).then(function () {
+                return new Promise(function (resolve, reject) {
+                    _this2.resolveGame = resolve;
+                    _this2.socket.on('disconnect', function () {
+                        if (!_this2.resolved && !_this2.stopped) {
+                            console.log('disconneted by server...');
+                            _this2.stopped = true;
+                            reject();
+                        }
+                    });
+                });
             });
+        }
+
+        /**
+         * Disconnect from game server
+         */
+
+    }, {
+        key: 'disconnect',
+        value: function disconnect() {
+            if (!this.stopped) {
+                this.socket.disconnect();
+                this.stopped = true;
+            }
         }
 
         // check if client step is too far ahead (leading) or too far
@@ -270,6 +309,16 @@ var ClientEngine = function () {
     }, {
         key: 'step',
         value: function step(t, dt, physicsOnly) {
+
+            if (!this.resolved) {
+                var result = this.gameEngine.getPlayerGameOverResult();
+                if (result) {
+                    this.resolved = true;
+                    this.resolveGame(result);
+                    // simulation can continue...
+                    // call disconnect to quit
+                }
+            }
 
             // physics only case
             if (physicsOnly) {

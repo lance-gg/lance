@@ -116,6 +116,11 @@ class Renderer {
      * @param {Object} obj - The object to be removed.
      */
     removeObject(obj) {}
+
+    /**
+     * Called when clientEngine has stopped, time to clean up
+     */
+    stop() {}
 }
 
 export default Renderer;

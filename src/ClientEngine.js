@@ -40,6 +40,7 @@ class ClientEngine {
       * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
       * @param {Number} inputOptions.syncOptions.localObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for local objects
       * @param {Number} inputOptions.syncOptions.remoteObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for remote objects
+      * @param {String} inputOptions.serverURL - Socket server url
       * @param {Renderer} Renderer - the Renderer class constructor
       */
     constructor(gameEngine, inputOptions, Renderer) {
@@ -50,6 +51,7 @@ class ClientEngine {
             healthCheckRTTSample: 10,
             stepPeriod: 1000 / GAME_UPS,
             scheduler: 'render-schedule',
+            serverURL: null,
         }, inputOptions);
 
         /**
@@ -118,7 +120,7 @@ class ClientEngine {
             return new Promise((resolve, reject) => {
 
                 if (matchMakerAnswer.status !== 'ok')
-                    reject();
+                    reject('matchMaker failed status: ' + matchMakerAnswer.status);
 
                 console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
                 this.socket = io(matchMakerAnswer.serverURL, options);
@@ -128,6 +130,10 @@ class ClientEngine {
                 this.socket.once('connect', () => {
                     console.log('connection made');
                     resolve();
+                });
+
+                this.socket.once('error', (error) => {
+                    reject(error);
                 });
 
                 this.socket.on('playerJoined', (playerData) => {
@@ -141,7 +147,7 @@ class ClientEngine {
             });
         };
 
-        let matchmaker = Promise.resolve({ serverURL: null, status: 'ok' });
+        let matchmaker = Promise.resolve({ serverURL: this.options.serverURL, status: 'ok' });
         if (this.options.matchmaker)
             matchmaker = Utils.httpGetPromise(this.options.matchmaker);
 
@@ -155,10 +161,16 @@ class ClientEngine {
      * ready to connect
      */
     start() {
+        this.stopped = false;
+        this.resolved = false;
         // initialize the renderer
         // the render loop waits for next animation frame
         if (!this.renderer) alert('ERROR: game has not defined a renderer');
         let renderLoop = (timestamp) => {
+            if (this.stopped) {
+                this.renderer.stop();
+                return;
+            }
             this.lastTimestamp = this.lastTimestamp || timestamp;
             this.renderer.draw(timestamp, timestamp - this.lastTimestamp);
             this.lastTimestamp = timestamp;
@@ -181,9 +193,34 @@ class ClientEngine {
             if (typeof window !== 'undefined')
                 window.requestAnimationFrame(renderLoop);
             if (this.options.autoConnect && this.options.standaloneMode !== true) {
-                this.connect();
+                return this.connect()
+                    .catch((error) => {
+                        this.stopped = true;
+                        throw error;
+                    });
             }
+        }).then(() => {
+            return new Promise((resolve, reject) => {
+                this.resolveGame = resolve;
+                this.socket.on('disconnect', () => {
+                    if (!this.resolved && !this.stopped) {
+                        console.log('disconneted by server...');
+                        this.stopped = true;
+                        reject();
+                    }
+                });
+            });
         });
+    }
+
+    /**
+     * Disconnect from game server
+     */
+    disconnect() {
+        if (!this.stopped) {
+            this.socket.disconnect();
+            this.stopped = true;
+        }
     }
 
     // check if client step is too far ahead (leading) or too far
@@ -213,6 +250,16 @@ class ClientEngine {
     // execute a single game step.  This is normally called by the Renderer
     // at each draw event.
     step(t, dt, physicsOnly) {
+
+        if (!this.resolved) {
+            const result = this.gameEngine.getPlayerGameOverResult();
+            if (result) {
+                this.resolved = true;
+                this.resolveGame(result);
+                // simulation can continue...
+                // call disconnect to quit
+            }
+        }
 
         // physics only case
         if (physicsOnly) {
