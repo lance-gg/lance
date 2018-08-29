@@ -193,7 +193,11 @@ class ClientEngine {
             if (typeof window !== 'undefined')
                 window.requestAnimationFrame(renderLoop);
             if (this.options.autoConnect && this.options.standaloneMode !== true) {
-                return this.connect();
+                return this.connect()
+                    .catch((error) => {
+                        this.stopped = true;
+                        throw error;
+                    });
             }
         }).then(() => {
             return new Promise((resolve, reject) => {
