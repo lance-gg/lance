@@ -241,7 +241,10 @@ var ClientEngine = function () {
 
                 if (typeof window !== 'undefined') window.requestAnimationFrame(renderLoop);
                 if (_this2.options.autoConnect && _this2.options.standaloneMode !== true) {
-                    return _this2.connect();
+                    return _this2.connect().catch(function (error) {
+                        _this2.stopped = true;
+                        throw error;
+                    });
                 }
             }).then(function () {
                 return new Promise(function (resolve, reject) {
