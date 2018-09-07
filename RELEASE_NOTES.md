@@ -2,6 +2,13 @@
 
 # Release Notes for Lance
 
+## Release 3.0.0 - July 2018
+
+* 2D Physics Support via P2
+* New sample game Asteroids
+* Interpolation mode
+* Common bending code
+
 ## Release 2.0.0 - February 2018
 
 ### New Features
