@@ -90,6 +90,8 @@ class ClientEngine {
             for (let i = 0; i < inputOptions.delayInputCount; i++)
                 this.delayedInputs[i] = [];
         }
+
+        this.gameEngine.emit('client__init');
     }
 
     // configure the Synchronizer singleton

@@ -125,6 +125,8 @@ var ClientEngine = function () {
                 this.delayedInputs[i] = [];
             }
         }
+
+        this.gameEngine.emit('client__init');
     }
 
     // configure the Synchronizer singleton

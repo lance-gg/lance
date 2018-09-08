@@ -43,6 +43,7 @@ class Renderer {
         if ((typeof window === 'undefined') || !document) {
             console.log('renderer invoked on server side.');
         }
+        this.gameEngine.emit('client__rendererReady');
         return Promise.resolve(); // eslint-disable-line new-cap
     }
 
@@ -60,6 +61,8 @@ class Renderer {
      * @param {Number} dt - time elapsed since last draw (only required in render-schedule mode)
      */
     draw(t, dt) {
+        this.gameEngine.emit('client__draw');
+
         if (this.clientEngine.options.scheduler === 'render-schedule')
             this.runClientStep(t, dt);
     }
