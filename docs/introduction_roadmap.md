@@ -1,6 +1,33 @@
 
 ## Current Release
 
+### r3.0.0 - *Majorana* - July 2018
+* 2D engine support - P2
+* New sample game Asteroids
+* Interpolation mode
+* Generic bending code
+
+
+## Future Releases
+
+All releases listed here, along with their planned release dates and their listed contents, are a statement of intentions, and are provided with no guarantee whatsoever.  Lance is an open-source project and as such depends on the available time of its developers.  The roadmap is subject to change at any time.
+
+### r4.0.0 - *Noether* - December 2018
+
+## Roadmap Candidates
+
+* entity-component-system redesign
+* UDP via WebRTC
+* one-page games
+* support for rooms (game object name-spacing)
+* Automated Cloud Deploy system for Lance game servers
+* Proper testing framework
+* Better debug tools:
+    * Parses recorded logs
+    * shows GUI that allow scrubbing through time to see values over time of client state, server state, interpolated/extrapolated state
+
+## Past Releases
+
 ### r2.0.1 - *Spinor* - February 2018
 * ES6 Modules support
 * Renderer-controller game loop.  The game step delta is tuned to the render draw time
@@ -8,25 +35,6 @@
 * Game Object re-architecture: Renderer objects and Physics objects are sub-objects of the Game Object
 * New KeyboardControls class
 * Smart sync, syncing only changed objects
-
-## Future Releases
-
-All releases listed here, along with their planned release dates and their listed contents, are a statement of intentions, and are provided with no guarantee whatsoever.  Lance is an open-source project and as such depends on the available time of its developers.  The roadmap is subject to change at any time.
-
-### r2.1.0 - *Majorana* - July 2018
-* 2D engine support - P2
-* level logging
-* Proper testing framework
-* Atomic events
-* Better debug tools:
-    * Parses recorded logs
-    * shows GUI that allow scrubbing through time to see values over time of client state, server state, interpolated/extrapolated state
-
-### r3.0.0 - *Quaternion* - December 2018
-* UDP via WebRTC
-* Automated Cloud Deploy system for Lance game servers
-
-## Past Releases
 
 ### r1.0.1 - *Tensor* - March 2017
 * Full 3D support

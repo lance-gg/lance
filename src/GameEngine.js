@@ -301,6 +301,14 @@ class GameEngine {
     registerClasses(serializer) {
     }
 
+    /**
+     * Decide whether the player game is over by returning an Object, need to be implemented
+     *
+     * @return {Object} truthful if the game is over for the player and the object is returned as GameOver data
+     */
+    getPlayerGameOverResult() {
+        return null;
+    }
 }
 
 /**

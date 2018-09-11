@@ -72,6 +72,7 @@ var Renderer = function () {
             if (typeof window === 'undefined' || !document) {
                 console.log('renderer invoked on server side.');
             }
+            this.gameEngine.emit('client__rendererReady');
             return Promise.resolve(); // eslint-disable-line new-cap
         }
     }, {
@@ -93,6 +94,8 @@ var Renderer = function () {
     }, {
         key: 'draw',
         value: function draw(t, dt) {
+            this.gameEngine.emit('client__draw');
+
             if (this.clientEngine.options.scheduler === 'render-schedule') this.runClientStep(t, dt);
         }
 
@@ -157,6 +160,14 @@ var Renderer = function () {
     }, {
         key: 'removeObject',
         value: function removeObject(obj) {}
+
+        /**
+         * Called when clientEngine has stopped, time to clean up
+         */
+
+    }, {
+        key: 'stop',
+        value: function stop() {}
     }]);
 
     return Renderer;
