@@ -9,6 +9,12 @@ export default class SyncStrategy {
         this.gameEngine.on('client__postStep', this.syncStep.bind(this));
         this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
         this.requiredSyncs = [];
+        this.SYNC_APPLIED = 'SYNC_APPLIED';
+        this.STEP_DRIFT_THRESHOLDS = {
+            onServerSync: { MAX_LEAD: 1, MAX_LAG: 3 }, // max step lead/lag allowed after every server sync
+            onEveryStep: { MAX_LEAD: 7, MAX_LAG: 8 }, // max step lead/lag allowed at every step
+            clientReset: 20 // if we are behind this many steps, just reset the step counter
+        };
     }
 
     // collect a sync and its events
@@ -110,13 +116,14 @@ export default class SyncStrategy {
                 return;
 
             this.gameEngine.trace.trace(() => `applying a required sync ${requiredStep}`);
-            this.applySync(this.requiredSyncs.shift());
+            this.applySync(this.requiredSyncs.shift(), true);
         }
 
-        // if there is a sync from the server, from the past or present, apply it now
-        if (this.lastSync && this.lastSync.stepCount <= this.gameEngine.world.stepCount) {
-            this.applySync(this.lastSync);
-            this.lastSync = null;
+        // apply the sync and delete it on success
+        if (this.lastSync) {
+            let rc = this.applySync(this.lastSync, false);
+            if (rc === this.SYNC_APPLIED)
+                this.lastSync = null;
         }
     }
 }

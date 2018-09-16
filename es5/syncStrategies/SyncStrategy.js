@@ -20,6 +20,12 @@ var SyncStrategy = function () {
         this.gameEngine.on('client__postStep', this.syncStep.bind(this));
         this.gameEngine.on('client__syncReceived', this.collectSync.bind(this));
         this.requiredSyncs = [];
+        this.SYNC_APPLIED = 'SYNC_APPLIED';
+        this.STEP_DRIFT_THRESHOLDS = {
+            onServerSync: { MAX_LEAD: 1, MAX_LAG: 3 }, // max step lead/lag allowed after every server sync
+            onEveryStep: { MAX_LEAD: 7, MAX_LAG: 8 }, // max step lead/lag allowed at every step
+            clientReset: 20 // if we are behind this many steps, just reset the step counter
+        };
     }
 
     // collect a sync and its events
@@ -135,7 +141,7 @@ var SyncStrategy = function () {
                 _this.gameEngine.trace.trace(function () {
                     return 'applying a required sync ' + requiredStep;
                 });
-                _this.applySync(_this.requiredSyncs.shift());
+                _this.applySync(_this.requiredSyncs.shift(), true);
             };
 
             while (this.requiredSyncs.length) {
@@ -144,10 +150,10 @@ var SyncStrategy = function () {
                 if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
 
-            // if there is a sync from the server, from the past or present, apply it now
-            if (this.lastSync && this.lastSync.stepCount <= this.gameEngine.world.stepCount) {
-                this.applySync(this.lastSync);
-                this.lastSync = null;
+            // apply the sync and delete it on success
+            if (this.lastSync) {
+                var rc = this.applySync(this.lastSync, false);
+                if (rc === this.SYNC_APPLIED) this.lastSync = null;
             }
         }
     }]);

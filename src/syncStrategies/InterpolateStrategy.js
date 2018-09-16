@@ -15,24 +15,23 @@ export default class InterpolateStrategy extends SyncStrategy {
         const options = Object.assign({}, defaults, inputOptions);
         super(clientEngine, options);
 
-        this.gameEngine.ignoreInputsOnClient = true; // client side engine ignores inputs
-    }
-
-    // add an object to our world
-    addNewObject(objId, newObj, stepCount) {
-
-        let curObj = new newObj.constructor(this.gameEngine, {
-            id: objId
-        });
-        curObj.syncTo(newObj);
-        this.gameEngine.addObjectToWorld(curObj);
-        console.log(`adding new object ${curObj}`);
-
-        return curObj;
+        this.gameEngine.ignoreInputs = true; // client side engine ignores inputs
+        this.gameEngine.ignorePhysics = true; // client side engine ignores physics
+        this.STEP_DRIFT_THRESHOLDS = {
+            onServerSync: { MAX_LEAD: -8, MAX_LAG: 16 }, // max step lead/lag allowed after every server sync
+            onEveryStep: { MAX_LEAD: -4, MAX_LAG: 24 }, // max step lead/lag allowed at every step
+            clientReset: 40 // if we are behind this many steps, just reset the step counter
+        };
     }
 
     // apply a new sync
-    applySync(sync) {
+    applySync(sync, required) {
+
+        // if sync is in the past we cannot interpolate to it
+        if (!required && sync.stepCount <= this.gameEngine.world.stepCount) {
+            return this.SYNC_APPLIED;
+        }
+
         this.gameEngine.trace.debug(() => 'interpolate applying sync');
         //
         //    scan all the objects in the sync
@@ -42,7 +41,6 @@ export default class InterpolateStrategy extends SyncStrategy {
         //
         this.needFirstSync = false;
         let world = this.gameEngine.world;
-        let serverStep = sync.stepCount;
         for (let ids of Object.keys(sync.syncObjects)) {
 
             // TODO: we are currently taking only the first event out of
@@ -101,5 +99,7 @@ export default class InterpolateStrategy extends SyncStrategy {
                 if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
             });
         }
+
+        return this.SYNC_APPLIED;
     }
 }

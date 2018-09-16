@@ -97,8 +97,13 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
 
     }, {
         key: 'applySync',
-        value: function applySync(sync) {
+        value: function applySync(sync, required) {
             var _this2 = this;
+
+            // if sync is in the future, we are not ready to apply yet.
+            if (!required && sync.stepCount > this.gameEngine.world.stepCount) {
+                return null;
+            }
 
             this.gameEngine.trace.debug(function () {
                 return 'extrapolate applying sync';
@@ -346,6 +351,8 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
                     }
                 }
             }
+
+            return this.SYNC_APPLIED;
         }
     }]);
 

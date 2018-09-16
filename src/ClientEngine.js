@@ -6,13 +6,6 @@ import Serializer from './serialize/Serializer';
 import NetworkMonitor from './network/NetworkMonitor';
 import NetworkTransmitter from './network/NetworkTransmitter';
 
-// externalizing these parameters as options would add confusion to game
-// developers, and provide no real benefit.
-const STEP_DRIFT_THRESHOLDS = {
-    onServerSync: { MAX_LEAD: 1, MAX_LAG: 3 }, // max step lead/lag allowed after every server sync
-    onEveryStep: { MAX_LEAD: 7, MAX_LAG: 8 } // max step lead/lag allowed at every step
-};
-const STEP_DRIFT_THRESHOLD__CLIENT_RESET = 20; // if we are behind this many steps, just reset the step counter
 const GAME_UPS = 60; // default number of game steps per second
 const STEP_DELAY_MSEC = 12; // if forward drift detected, delay next execution by this amount
 const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution by this amount
@@ -105,7 +98,7 @@ class ClientEngine {
             syncOptions.reflect = true;
         }
 
-        const synchronizer = new Synchronizer(this, syncOptions);
+        this.synchronizer = new Synchronizer(this, syncOptions);
     }
 
     /**
@@ -204,13 +197,15 @@ class ClientEngine {
         }).then(() => {
             return new Promise((resolve, reject) => {
                 this.resolveGame = resolve;
-                this.socket.on('disconnect', () => {
-                    if (!this.resolved && !this.stopped) {
-                        console.log('disconneted by server...');
-                        this.stopped = true;
-                        reject();
-                    }
-                });
+                if (this.socket) {
+                    this.socket.on('disconnect', () => {
+                        if (!this.resolved && !this.stopped) {
+                            console.log('disconnected by server...');
+                            this.stopped = true;
+                            reject();
+                        }
+                    });
+                }
             });
         });
     }
@@ -232,8 +227,9 @@ class ClientEngine {
         if (!this.gameEngine.serverStep)
             return;
 
-        let maxLead = STEP_DRIFT_THRESHOLDS[checkType].MAX_LEAD;
-        let maxLag = STEP_DRIFT_THRESHOLDS[checkType].MAX_LAG;
+        let thresholds = this.synchronizer.syncStrategy.STEP_DRIFT_THRESHOLDS;
+        let maxLead = thresholds[checkType].MAX_LEAD;
+        let maxLag = thresholds[checkType].MAX_LAG;
         let clientStep = this.gameEngine.world.stepCount;
         let serverStep = this.gameEngine.serverStep;
         if (clientStep > serverStep + maxLead) {
@@ -305,7 +301,7 @@ class ClientEngine {
     doInputLocal(message) {
 
         // some synchronization strategies (interpolate) ignore inputs on client side
-        if (this.gameEngine.ignoreInputsOnClient) {
+        if (this.gameEngine.ignoreInputs) {
             return;
         }
 
@@ -386,7 +382,7 @@ class ClientEngine {
         this.gameEngine.trace.info(() => `========== inbound world update ${syncHeader.stepCount} ==========`);
 
         // finally update the stepCount
-        if (syncHeader.stepCount > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD__CLIENT_RESET) {
+        if (syncHeader.stepCount > this.gameEngine.world.stepCount + this.synchronizer.syncStrategy.STEP_DRIFT_THRESHOLDS.clientReset) {
             this.gameEngine.trace.info(() => `========== world step count updated from ${this.gameEngine.world.stepCount} to  ${syncHeader.stepCount} ==========`);
             this.gameEngine.emit('client__stepReset', { oldStep: this.gameEngine.world.stepCount, newStep: syncHeader.stepCount });
             this.gameEngine.world.stepCount = syncHeader.stepCount;

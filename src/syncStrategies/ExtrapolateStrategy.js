@@ -44,7 +44,12 @@ export default class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // apply a new sync
-    applySync(sync) {
+    applySync(sync, required) {
+
+        // if sync is in the future, we are not ready to apply yet.
+        if (!required && sync.stepCount > this.gameEngine.world.stepCount) {
+            return null;
+        }
 
         this.gameEngine.trace.debug(() => 'extrapolate applying sync');
 
@@ -172,6 +177,8 @@ export default class ExtrapolateStrategy extends SyncStrategy {
                 if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
             });
         }
+
+        return this.SYNC_APPLIED;
     }
 
 }

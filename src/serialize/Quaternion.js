@@ -2,6 +2,8 @@ import Serializable from './Serializable';
 import BaseTypes from './BaseTypes';
 import ThreeVector from './ThreeVector';
 
+const SHOW_AS_AXIS_ANGLE = true;
+
 /**
  * A Quaternion is a geometric object which can be used to
  * represent a three-dimensional rotation.
@@ -41,7 +43,11 @@ class Quaternion extends Serializable {
      */
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
-        return `quaternion(${round3(this.w)}, ${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)})`;
+        if (SHOW_AS_AXIS_ANGLE) {
+            let axisAngle = this.toAxisAngle();
+            return `[${round3(axisAngle.angle)},${axisAngle.axis.toString()}]`;
+        }
+        return `[${round3(this.w)}, ${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)}]`;
     }
 
     /**
@@ -82,6 +88,7 @@ class Quaternion extends Serializable {
 
         // assuming quaternion normalised then w is less than 1, so term always positive.
         let axis = new ThreeVector(1, 0, 0);
+        this.normalize();
         let angle = 2 * Math.acos(this.w);
         let s = Math.sqrt(1 - this.w * this.w);
         if (s > 0.001) {
@@ -90,7 +97,28 @@ class Quaternion extends Serializable {
             axis.y = this.y * divS;
             axis.z = this.z * divS;
         }
+        if (s > Math.PI) {
+            s -= 2 * Math.PI;
+        }
         return { axis, angle };
+    }
+
+    normalize() {
+        let l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        if (l === 0) {
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            this.w = 0;
+        } else {
+            l = 1 / l;
+            this.x *= l;
+            this.y *= l;
+            this.z *= l;
+            this.w *= l;
+        }
+
+        return this;
     }
 
     /**
@@ -102,6 +130,8 @@ class Quaternion extends Serializable {
      */
     setFromAxisAngle(axis, angle) {
 
+        if (angle < 0)
+            angle += Math.PI * 2;
         let halfAngle = angle * 0.5;
         let s = Math.sin(halfAngle);
         this.x = axis.x * s;

@@ -87,14 +87,14 @@ class PhysicalObject3D extends GameObject {
         let v = this.velocity.toString();
         let q = this.quaternion.toString();
         let a = this.angularVelocity.toString();
-        return `phyObj[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Dir=${q} AVel=${a}`;
+        return `phyObj[${this.id}] player${this.playerId} Pos${p} Vel${v} Dir${q} AVel${a}`;
     }
 
     // display object's physical attributes as a string
     // for debugging purposes mostly
     bendingToString() {
-        if (this.bendingIncrements)
-            return `bend=${this.bendingOptions} increments=${this.bendingIncrements} deltaPos=${this.bendingPositionDelta} deltaVel=${this.bendingVelocityDelta} deltaQuat=${this.bendingQuaternionDelta}`;
+        if (this.bendingOptions)
+            return `bend=${this.bendingOptions.percent} deltaPos=${this.bendingPositionDelta} deltaVel=${this.bendingVelocityDelta} deltaQuat=${this.bendingQuaternionDelta}`;
         return 'no bending';
     }
 
@@ -124,9 +124,9 @@ class PhysicalObject3D extends GameObject {
         this.bendingAVDelta = new ThreeVector(0, 0, 0);
 
         // get the incremental quaternion rotation
-        let currentConjugate = (new Quaternion()).copy(original.quaternion).conjugate();
-        this.bendingQuaternionDelta = (new Quaternion()).copy(this.quaternion);
-        this.bendingQuaternionDelta.multiply(currentConjugate);
+        this.bendingQuaternionDelta = (new Quaternion()).copy(original.quaternion).conjugate();
+        this.bendingQuaternionDelta.multiply(this.quaternion);
+
         let axisAngle = this.bendingQuaternionDelta.toAxisAngle();
         axisAngle.angle *= this.incrementScale;
         this.bendingQuaternionDelta.setFromAxisAngle(axisAngle.axis, axisAngle.angle);
@@ -189,20 +189,19 @@ class PhysicalObject3D extends GameObject {
             this.position.add(posDelta);
             this.angularVelocity.add(avDelta);
 
-            // TODO: this is an unacceptable workaround that must be removed.  It solves the
-            // jitter problem by applying only three steps of slerp (thus avoiding slerp to back in time
-            // instead of solving the problem with a true differential quaternion
-            if (this.bendingIncrements > 3) {
-                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
-            }
+            // an alternative approach to orientation bending is slerp:
+            // three steps of slerp (thus avoiding slerp to back in time)
+            // if (this.bendingIncrements > 3) {
+            //     this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
+            // }
         } else {
             this.position.add(this.bendingPositionDelta);
             this.angularVelocity.add(this.bendingAVDelta);
             this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
         }
 
-        // TODO: the following approach is encountering gimbal lock
-        // this.quaternion.multiply(this.bendingQuaternionDelta);
+        // TODO: adjust quaternion bending to dt timefactor precision
+        this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;
     }
 
