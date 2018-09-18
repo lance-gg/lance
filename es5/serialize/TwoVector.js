@@ -72,7 +72,7 @@ var TwoVector = function (_Serializable) {
             function round3(x) {
                 return Math.round(x * 1000) / 1000;
             }
-            return '(' + round3(this.x) + ', ' + round3(this.y) + ')';
+            return '[' + round3(this.x) + ', ' + round3(this.y) + ']';
         }
 
         /**

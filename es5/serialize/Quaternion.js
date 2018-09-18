@@ -26,10 +26,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var SHOW_AS_AXIS_ANGLE = true;
+
 /**
  * A Quaternion is a geometric object which can be used to
  * represent a three-dimensional rotation.
  */
+
 var Quaternion = function (_Serializable) {
     _inherits(Quaternion, _Serializable);
 
@@ -82,7 +85,11 @@ var Quaternion = function (_Serializable) {
             function round3(x) {
                 return Math.round(x * 1000) / 1000;
             }
-            return 'quaternion(' + round3(this.w) + ', ' + round3(this.x) + ', ' + round3(this.y) + ', ' + round3(this.z) + ')';
+            if (SHOW_AS_AXIS_ANGLE) {
+                var axisAngle = this.toAxisAngle();
+                return '[' + round3(axisAngle.angle) + ',' + axisAngle.axis.toString() + ']';
+            }
+            return '[' + round3(this.w) + ', ' + round3(this.x) + ', ' + round3(this.y) + ', ' + round3(this.z) + ']';
         }
 
         /**
@@ -132,6 +139,7 @@ var Quaternion = function (_Serializable) {
 
             // assuming quaternion normalised then w is less than 1, so term always positive.
             var axis = new _ThreeVector2.default(1, 0, 0);
+            this.normalize();
             var angle = 2 * Math.acos(this.w);
             var s = Math.sqrt(1 - this.w * this.w);
             if (s > 0.001) {
@@ -140,7 +148,29 @@ var Quaternion = function (_Serializable) {
                 axis.y = this.y * divS;
                 axis.z = this.z * divS;
             }
+            if (s > Math.PI) {
+                s -= 2 * Math.PI;
+            }
             return { axis: axis, angle: angle };
+        }
+    }, {
+        key: 'normalize',
+        value: function normalize() {
+            var l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+            if (l === 0) {
+                this.x = 0;
+                this.y = 0;
+                this.z = 0;
+                this.w = 0;
+            } else {
+                l = 1 / l;
+                this.x *= l;
+                this.y *= l;
+                this.z *= l;
+                this.w *= l;
+            }
+
+            return this;
         }
 
         /**
@@ -155,6 +185,7 @@ var Quaternion = function (_Serializable) {
         key: 'setFromAxisAngle',
         value: function setFromAxisAngle(axis, angle) {
 
+            if (angle < 0) angle += Math.PI * 2;
             var halfAngle = angle * 0.5;
             var s = Math.sin(halfAngle);
             this.x = axis.x * s;

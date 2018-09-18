@@ -38,13 +38,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-// externalizing these parameters as options would add confusion to game
-// developers, and provide no real benefit.
-var STEP_DRIFT_THRESHOLDS = {
-    onServerSync: { MAX_LEAD: 1, MAX_LAG: 3 }, // max step lead/lag allowed after every server sync
-    onEveryStep: { MAX_LEAD: 7, MAX_LAG: 8 // max step lead/lag allowed at every step
-    } };
-var STEP_DRIFT_THRESHOLD__CLIENT_RESET = 20; // if we are behind this many steps, just reset the step counter
 var GAME_UPS = 60; // default number of game steps per second
 var STEP_DELAY_MSEC = 12; // if forward drift detected, delay next execution by this amount
 var STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution by this amount
@@ -144,7 +137,7 @@ var ClientEngine = function () {
                 syncOptions.reflect = true;
             }
 
-            var synchronizer = new _Synchronizer2.default(this, syncOptions);
+            this.synchronizer = new _Synchronizer2.default(this, syncOptions);
         }
 
         /**
@@ -251,13 +244,15 @@ var ClientEngine = function () {
             }).then(function () {
                 return new Promise(function (resolve, reject) {
                     _this2.resolveGame = resolve;
-                    _this2.socket.on('disconnect', function () {
-                        if (!_this2.resolved && !_this2.stopped) {
-                            console.log('disconneted by server...');
-                            _this2.stopped = true;
-                            reject();
-                        }
-                    });
+                    if (_this2.socket) {
+                        _this2.socket.on('disconnect', function () {
+                            if (!_this2.resolved && !_this2.stopped) {
+                                console.log('disconnected by server...');
+                                _this2.stopped = true;
+                                reject();
+                            }
+                        });
+                    }
                 });
             });
         }
@@ -284,8 +279,9 @@ var ClientEngine = function () {
 
             if (!this.gameEngine.serverStep) return;
 
-            var maxLead = STEP_DRIFT_THRESHOLDS[checkType].MAX_LEAD;
-            var maxLag = STEP_DRIFT_THRESHOLDS[checkType].MAX_LAG;
+            var thresholds = this.synchronizer.syncStrategy.STEP_DRIFT_THRESHOLDS;
+            var maxLead = thresholds[checkType].MAX_LEAD;
+            var maxLag = thresholds[checkType].MAX_LAG;
             var clientStep = this.gameEngine.world.stepCount;
             var serverStep = this.gameEngine.serverStep;
             if (clientStep > serverStep + maxLead) {
@@ -367,7 +363,7 @@ var ClientEngine = function () {
         value: function doInputLocal(message) {
 
             // some synchronization strategies (interpolate) ignore inputs on client side
-            if (this.gameEngine.ignoreInputsOnClient) {
+            if (this.gameEngine.ignoreInputs) {
                 return;
             }
 
@@ -466,7 +462,7 @@ var ClientEngine = function () {
             });
 
             // finally update the stepCount
-            if (syncHeader.stepCount > this.gameEngine.world.stepCount + STEP_DRIFT_THRESHOLD__CLIENT_RESET) {
+            if (syncHeader.stepCount > this.gameEngine.world.stepCount + this.synchronizer.syncStrategy.STEP_DRIFT_THRESHOLDS.clientReset) {
                 this.gameEngine.trace.info(function () {
                     return '========== world step count updated from ' + _this4.gameEngine.world.stepCount + ' to  ' + syncHeader.stepCount + ' ==========';
                 });

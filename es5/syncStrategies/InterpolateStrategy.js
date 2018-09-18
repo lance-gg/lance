@@ -36,33 +36,28 @@ var InterpolateStrategy = function (_SyncStrategy) {
 
         var _this = _possibleConstructorReturn(this, (InterpolateStrategy.__proto__ || Object.getPrototypeOf(InterpolateStrategy)).call(this, clientEngine, options));
 
-        _this.gameEngine.ignoreInputsOnClient = true; // client side engine ignores inputs
+        _this.gameEngine.ignoreInputs = true; // client side engine ignores inputs
+        _this.gameEngine.ignorePhysics = true; // client side engine ignores physics
+        _this.STEP_DRIFT_THRESHOLDS = {
+            onServerSync: { MAX_LEAD: -8, MAX_LAG: 16 }, // max step lead/lag allowed after every server sync
+            onEveryStep: { MAX_LEAD: -4, MAX_LAG: 24 }, // max step lead/lag allowed at every step
+            clientReset: 40 // if we are behind this many steps, just reset the step counter
+        };
         return _this;
     }
 
-    // add an object to our world
+    // apply a new sync
 
 
     _createClass(InterpolateStrategy, [{
-        key: 'addNewObject',
-        value: function addNewObject(objId, newObj, stepCount) {
-
-            var curObj = new newObj.constructor(this.gameEngine, {
-                id: objId
-            });
-            curObj.syncTo(newObj);
-            this.gameEngine.addObjectToWorld(curObj);
-            console.log('adding new object ' + curObj);
-
-            return curObj;
-        }
-
-        // apply a new sync
-
-    }, {
         key: 'applySync',
-        value: function applySync(sync) {
+        value: function applySync(sync, required) {
             var _this2 = this;
+
+            // if sync is in the past we cannot interpolate to it
+            if (!required && sync.stepCount <= this.gameEngine.world.stepCount) {
+                return this.SYNC_APPLIED;
+            }
 
             this.gameEngine.trace.debug(function () {
                 return 'interpolate applying sync';
@@ -75,7 +70,6 @@ var InterpolateStrategy = function (_SyncStrategy) {
             //
             this.needFirstSync = false;
             var world = this.gameEngine.world;
-            var serverStep = sync.stepCount;
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -216,6 +210,8 @@ var InterpolateStrategy = function (_SyncStrategy) {
                     }
                 }
             }
+
+            return this.SYNC_APPLIED;
         }
     }]);
 

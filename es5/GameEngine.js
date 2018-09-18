@@ -235,7 +235,7 @@ var GameEngine = function () {
       }
 
       // physics step
-      if (this.physicsEngine) {
+      if (this.physicsEngine && !this.ignorePhysics) {
         if (dt) dt /= 1000; // physics engines work in seconds
         this.physicsEngine.step(dt, objectFilter);
       }

@@ -37,7 +37,7 @@ class ThreeVector extends Serializable {
      */
     toString() {
         function round3(x) { return Math.round(x * 1000) / 1000; }
-        return `(${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)})`;
+        return `[${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)}]`;
     }
 
     /**
