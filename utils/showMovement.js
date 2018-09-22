@@ -13,11 +13,11 @@ let lines = fin.toString().split('\n');
 for (let l of lines) {
     if (l.indexOf('after step') < 0) continue;
 
-    // match:  Pos=(0, -15.4, 0)
-    let p = l.match(/Pos=\(([0-9.-]*), ([0-9.-]*), ([0-9.-]*)\)/);
+    // position match:  Pos[0, -15.4, 0]
+    let p = l.match(/Pos\[([0-9.-]*), ([0-9.-]*), ([0-9.-]*)\]/);
 
-    // match:  quaternion=(1, 0, 0, -0.01)
-    let q = l.match(/quaternion\(([0-9.-]*), ([0-9.-]*), ([0-9.-]*), ([0-9.-]*)\)/);
+    // quaternion match:  Dir[0.34, [0, 1, 0]]
+    let q = l.match(/Dir\[([0-9.-]*),[([0-9.-]*), ([0-9.-]*), ([0-9.-]*)\]\]/);
 
     // match:  2017-06-01T14:25:24.197Z
     let ts = l.match(/^\[([0-9\-T:.Z]*)\]/);
