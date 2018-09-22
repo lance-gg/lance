@@ -1,5 +1,7 @@
+/* global THREE */
 const FRAME_HISTORY_SIZE = 20;
 const MAX_SLOW_FRAMES = 10;
+const CAMERA_OFFSET_VEC = new THREE.Vector3(0, 5, -10);
 
 export default {
     schema: {
@@ -9,24 +11,25 @@ export default {
     init: function() {
 
         // TODO: Sometimes an object is "simple".  For example it uses
-        //       existing AFrame asstes (an OBJ file and a material)
+        //       existing AFrame assets (an OBJ file and a material)
         //       in this case, we can auto-generate the DOM element,
         //       setting the quaternion, position, material, game-object-id
         //       and obj-model.  Same goes for objects which use primitive
-        //       geometric objects.  Then developers don't need to create
-        //       a class for each simple object type.
-        //
-        //       Remember to also remove them.
+        //       geometric objects.  Remember to also remove them.
         this.frameRateHistory = [];
-        for (let i=0; i<FRAME_HISTORY_SIZE; i++)
+        for (let i = 0; i < FRAME_HISTORY_SIZE; i++)
             this.frameRateHistory.push(false);
         this.frameRateTest = (1000 / 60) * 1.2;
+
+        // capture the chase camera if available
+        let chaseCameras = document.getElementsByClassName('chaseCamera');
+        if (chaseCameras)
+            this.cameraEl = chaseCameras[0];
     },
 
     tick: function(t, dt) {
         if (!this.gameEngine)
             return;
-
         this.renderer.tick(t, dt);
 
         let frh = this.frameRateHistory;
@@ -46,6 +49,16 @@ export default {
                 let p = o.position;
                 el.setAttribute('position', `${p.x} ${p.y} ${p.z}`);
                 el.object3D.quaternion.set(q.x, q.y, q.z, q.w);
+
+                // if a chase camera is configured, update it
+                if (this.cameraEl && this.gameEngine.playerId === o.playerId) {
+                    let camera = this.cameraEl.object3D.children[0];
+                    let relativeCameraOffset = CAMERA_OFFSET_VEC.clone();
+                    let cameraOffset = relativeCameraOffset.applyMatrix4(o.renderEl.object3D.matrixWorld);
+                    camera.position.copy(cameraOffset);
+                    camera.lookAt(o.renderEl.object3D.position);
+                }
+
             }
         });
     },

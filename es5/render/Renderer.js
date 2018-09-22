@@ -88,7 +88,7 @@ var Renderer = function () {
          * method must call the clientEngine's step method.
          *
          * @param {Number} t - current time (only required in render-schedule mode)
-         * @param {Number} dt - time elapsed since last draw (only required in render-schedule mode)
+         * @param {Number} dt - time elapsed since last draw
          */
 
     }, {
@@ -96,7 +96,7 @@ var Renderer = function () {
         value: function draw(t, dt) {
             this.gameEngine.emit('client__draw');
 
-            if (this.clientEngine.options.scheduler === 'render-schedule') this.runClientStep(t, dt);
+            if (this.clientEngine.options.scheduler === 'render-schedule') this.runClientStep(t);
         }
 
         /**
@@ -109,8 +109,9 @@ var Renderer = function () {
 
     }, {
         key: 'runClientStep',
-        value: function runClientStep(t, dt) {
+        value: function runClientStep(t) {
             var p = this.clientEngine.options.stepPeriod;
+            var dt = 0;
 
             // reset step time if we passed a threshold
             if (this.doReset || t > this.clientEngine.lastStepTime + TIME_RESET_THRESHOLD) {
@@ -126,7 +127,7 @@ var Renderer = function () {
                 this.clientEngine.correction = 0;
             }
 
-            // if not ready for a real step yet, retun
+            // if not ready for a real step yet, return
             // this might happen after catch up above
             if (t < this.clientEngine.lastStepTime) {
                 dt = t - this.clientEngine.lastStepTime + this.clientEngine.correction;
