@@ -191,9 +191,9 @@ class PhysicalObject3D extends GameObject {
 
             // an alternative approach to orientation bending is slerp:
             // three steps of slerp (thus avoiding slerp to back in time)
-            // if (this.bendingIncrements > 3) {
-            //     this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
-            // }
+            if (this.bendingIncrements > 3) {
+                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
+            }
         } else {
             this.position.add(this.bendingPositionDelta);
             this.angularVelocity.add(this.bendingAVDelta);
@@ -201,7 +201,7 @@ class PhysicalObject3D extends GameObject {
         }
 
         // TODO: adjust quaternion bending to dt timefactor precision
-        this.quaternion.multiply(this.bendingQuaternionDelta);
+        // this.quaternion.multiply(this.bendingQuaternionDelta);
         this.bendingIncrements--;
     }
 
