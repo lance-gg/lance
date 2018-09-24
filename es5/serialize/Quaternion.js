@@ -27,6 +27,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SHOW_AS_AXIS_ANGLE = true;
+var MAX_DEL_THETA = 0.01;
 
 /**
  * A Quaternion is a geometric object which can be used to
@@ -276,14 +277,13 @@ var Quaternion = function (_Serializable) {
             }
 
             var sinHalfTheta = Math.sqrt(1.0 - cosHalfTheta * cosHalfTheta);
-            if (Math.abs(sinHalfTheta) < 0.001) {
-                this.set(0.5 * (aw + this.w), 0.5 * (ax + this.x), 0.5 * (ay + this.y), 0.5 * (az + this.z));
-                return this;
-            }
+            if (Math.abs(sinHalfTheta) < 0.001) return this;
 
             var halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
-            var ratioA = Math.sin((1 - bending) * halfTheta) / sinHalfTheta;
-            var ratioB = Math.sin(bending * halfTheta) / sinHalfTheta;
+            var delTheta = bending * halfTheta;
+            if (Math.abs(delTheta) > MAX_DEL_THETA) delTheta = MAX_DEL_THETA * Math.sign(delTheta);
+            var ratioA = Math.sin(halfTheta - delTheta) / sinHalfTheta;
+            var ratioB = Math.sin(delTheta) / sinHalfTheta;
             this.set(aw * ratioA + this.w * ratioB, ax * ratioA + this.x * ratioB, ay * ratioA + this.y * ratioB, az * ratioA + this.z * ratioB);
             return this;
         }
