@@ -247,17 +247,15 @@ var PhysicalObject3D = function (_GameObject) {
                 this.position.add(posDelta);
                 this.angularVelocity.add(avDelta);
 
-                // an alternative approach to orientation bending is slerp:
-                // three steps of slerp (thus avoiding slerp to back in time)
-                if (this.bendingIncrements > 3) {
-                    this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
-                }
+                // one approach to orientation bending is slerp:
+                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
             } else {
                 this.position.add(this.bendingPositionDelta);
                 this.angularVelocity.add(this.bendingAVDelta);
                 this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
             }
 
+            // alternative: fixed delta-quaternion correction
             // TODO: adjust quaternion bending to dt timefactor precision
             // this.quaternion.multiply(this.bendingQuaternionDelta);
             this.bendingIncrements--;
