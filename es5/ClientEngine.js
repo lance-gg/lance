@@ -277,13 +277,13 @@ var ClientEngine = function () {
         key: 'checkDrift',
         value: function checkDrift(checkType) {
 
-            if (!this.gameEngine.serverStep) return;
+            if (!this.gameEngine.highestServerStep) return;
 
             var thresholds = this.synchronizer.syncStrategy.STEP_DRIFT_THRESHOLDS;
             var maxLead = thresholds[checkType].MAX_LEAD;
             var maxLag = thresholds[checkType].MAX_LAG;
             var clientStep = this.gameEngine.world.stepCount;
-            var serverStep = this.gameEngine.serverStep;
+            var serverStep = this.gameEngine.highestServerStep;
             if (clientStep > serverStep + maxLead) {
                 this.gameEngine.trace.warn(function () {
                     return 'step drift ' + checkType + '. [' + clientStep + ' > ' + serverStep + ' + ' + maxLead + '] Client is ahead of server.  Delaying next step.';
@@ -450,7 +450,7 @@ var ClientEngine = function () {
             });
 
             // emit that a snapshot has been received
-            this.gameEngine.serverStep = syncHeader.stepCount;
+            if (!this.gameEngine.highestServerStep || syncHeader.stepCount > this.gameEngine.highestServerStep) this.gameEngine.highestServerStep = syncHeader.stepCount;
             this.gameEngine.emit('client__syncReceived', {
                 syncEvents: syncEvents,
                 stepCount: syncHeader.stepCount,

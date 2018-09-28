@@ -21,6 +21,11 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         this.needFirstSync = true;
         this.recentInputs = {};
         this.gameEngine.on('client__processInput', this.clientInputSave.bind(this));
+        this.STEP_DRIFT_THRESHOLDS = {
+            onServerSync: { MAX_LEAD: 2, MAX_LAG: 3 }, // max step lead/lag allowed after every server sync
+            onEveryStep: { MAX_LEAD: 7, MAX_LAG: 4 }, // max step lead/lag allowed at every step
+            clientReset: 40 // if we are behind this many steps, just reset the step counter
+        };
     }
 
     // keep a buffer of inputs so that we can replay them on extrapolation
