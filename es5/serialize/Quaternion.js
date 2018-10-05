@@ -27,7 +27,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SHOW_AS_AXIS_ANGLE = true;
-var MAX_DEL_THETA = 0.01;
+var MAX_DEL_THETA = 0.2;
 
 /**
  * A Quaternion is a geometric object which can be used to
@@ -254,6 +254,10 @@ var Quaternion = function (_Serializable) {
     }, {
         key: 'slerp',
         value: function slerp(target, bending) {
+
+            if (bending <= 0) return this;
+            if (bending >= 1) return this.copy(target);
+
             var aw = this.w,
                 ax = this.x,
                 ay = this.y,
@@ -276,9 +280,14 @@ var Quaternion = function (_Serializable) {
                 return this;
             }
 
-            var sinHalfTheta = Math.sqrt(1.0 - cosHalfTheta * cosHalfTheta);
-            if (Math.abs(sinHalfTheta) < 0.001) return this;
+            var sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
+            if (sqrSinHalfTheta < Number.EPSILON) {
+                var s = 1 - t;
+                this.set(s * w + bending * this.w, s * x + bending * this.x, s * y + bending * this.y, s * z + bending * this.z);
+                return this.normalize();
+            }
 
+            var sinHalfTheta = Math.sqrt(sqrSinHalfTheta);
             var halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
             var delTheta = bending * halfTheta;
             if (Math.abs(delTheta) > MAX_DEL_THETA) delTheta = MAX_DEL_THETA * Math.sign(delTheta);
