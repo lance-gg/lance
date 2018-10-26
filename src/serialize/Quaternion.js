@@ -3,7 +3,7 @@ import BaseTypes from './BaseTypes';
 import ThreeVector from './ThreeVector';
 
 const SHOW_AS_AXIS_ANGLE = true;
-const MAX_DEL_THETA = 0.01;
+const MAX_DEL_THETA = 0.2;
 
 /**
  * A Quaternion is a geometric object which can be used to
@@ -185,6 +185,10 @@ class Quaternion extends Serializable {
      * @return {Quaternion} returns self
      */
     slerp(target, bending) {
+
+        if (bending <= 0) return this;
+        if (bending >= 1) return this.copy(target);
+
         let aw = this.w, ax = this.x, ay = this.y, az = this.z;
         let bw = target.w, bx = target.x, by = target.y, bz = target.z;
 
@@ -201,10 +205,14 @@ class Quaternion extends Serializable {
             return this;
         }
 
-        let sinHalfTheta = Math.sqrt(1.0 - cosHalfTheta*cosHalfTheta);
-        if (Math.abs(sinHalfTheta) < 0.001)
-            return this;
+        let sqrSinHalfTheta = 1.0 - cosHalfTheta*cosHalfTheta;
+        if (sqrSinHalfTheta < Number.EPSILON) {
+            let s = 1 - t;
+            this.set(s*w + bending*this.w, s*x + bending*this.x, s*y + bending*this.y, s*z + bending*this.z);
+            return this.normalize();
+        }
 
+        let sinHalfTheta = Math.sqrt(sqrSinHalfTheta);
         let halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
         let delTheta = bending * halfTheta;
         if (Math.abs(delTheta) > MAX_DEL_THETA)

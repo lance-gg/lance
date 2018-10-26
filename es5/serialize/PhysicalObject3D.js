@@ -248,7 +248,7 @@ var PhysicalObject3D = function (_GameObject) {
                 this.angularVelocity.add(avDelta);
 
                 // one approach to orientation bending is slerp:
-                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.6);
+                this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.8);
             } else {
                 this.position.add(this.bendingPositionDelta);
                 this.angularVelocity.add(this.bendingAVDelta);
