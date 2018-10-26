@@ -76,7 +76,6 @@ var FrameSyncStrategy = function (_SyncStrategy) {
 
                     // if the object is new, add it
                     if (!world.objects.hasOwnProperty(objId)) {
-                        console.log('adding new object ' + objId + ' at (' + nextObj.x + ',' + nextObj.y + ',' + nextObj.z + ') velocity (' + nextObj.velX + ',' + nextObj.velY + ',' + nextObj.velZ + ')');
 
                         curObj = new nextObj.constructor();
                         curObj.copyFrom(nextObj);

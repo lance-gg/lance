@@ -56,6 +56,7 @@ var ClientEngine = function () {
       *
       * @param {GameEngine} gameEngine - a game engine
       * @param {Object} inputOptions - options object
+      * @param {Boolean} inputOptions.verbose - print logs to console
       * @param {Boolean} inputOptions.autoConnect - if true, the client will automatically attempt connect to server.
       * @param {Boolean} inputOptions.standaloneMode - if true, the client will never try to connect to a server
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
@@ -162,13 +163,13 @@ var ClientEngine = function () {
 
                     if (matchMakerAnswer.status !== 'ok') reject('matchMaker failed status: ' + matchMakerAnswer.status);
 
-                    console.log('connecting to game server ' + matchMakerAnswer.serverURL);
+                    if (_this.options.verbose) console.log('connecting to game server ' + matchMakerAnswer.serverURL);
                     _this.socket = (0, _socket2.default)(matchMakerAnswer.serverURL, options);
 
                     _this.networkMonitor.registerClient(_this);
 
                     _this.socket.once('connect', function () {
-                        console.log('connection made');
+                        if (_this.options.verbose) console.log('connection made');
                         resolve();
                     });
 
@@ -247,7 +248,7 @@ var ClientEngine = function () {
                     if (_this2.socket) {
                         _this2.socket.on('disconnect', function () {
                             if (!_this2.resolved && !_this2.stopped) {
-                                console.log('disconnected by server...');
+                                if (_this2.options.verbose) console.log('disconnected by server...');
                                 _this2.stopped = true;
                                 reject();
                             }

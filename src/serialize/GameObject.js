@@ -88,23 +88,29 @@ class GameObject extends Serializable {
         this.savedCopy.syncTo(other ? other : this);
     }
    /**
-    * Bending is defined as the amount of correction that will be applied
+    * Bending is defined as the amount of error correction that will be applied
     * on the client side to a given object's physical attributes, incrementally,
     * by the time the next server broadcast is expected to arrive.
     *
-    * When this percentage is 0.0, the client ignores the server object's value.
-    * When this percentage is 1.0, the bending is taken from the synchronization.
+    * When this percentage is 0.0, the client always ignores the server object's value.
+    * When this percentage is 1.0, the server object's attributes will be applied in full.
     *
     * The GameObject bending attribute is implemented as a getter, and can provide
-    * distinct values for:
-    * position: { percent, min, max }
-    * velocity: { percent, min, max }
-    * angle: { percent, min, max }
-    * angularVelocity: { percent, min, max }
-    *
-    * in each case, you can also provide overrides for local objects,
+    * distinct values for position, velocity, angle, and angularVelocity.
+    * And in each case, you can also provide overrides for local objects,
     * these attributes will be called, respectively, positionLocal, velocityLocal,
     * angleLocal, angularVelocityLocal.
+    *
+    * @example
+    * get bending() {
+    *   return {
+    *     position: { percent: 1.0, min: 0.0 },
+    *     velocity: { percent: 0.0, min: 0.0 },
+    *     angularVelocity: { percent: 0.0 },
+    *     angleLocal: { percent: 1.0 }
+    *   }
+    * };
+    *
     * @memberof GameObject
     * @member {Object} bending
     */

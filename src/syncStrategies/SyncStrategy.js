@@ -90,7 +90,8 @@ export default class SyncStrategy {
         });
         curObj.syncTo(newObj);
         this.gameEngine.addObjectToWorld(curObj);
-        console.log(`adding new object ${curObj}`);
+        if (this.clientEngine.options.verbose)
+            console.log(`adding new object ${curObj}`);
 
         return curObj;
     }

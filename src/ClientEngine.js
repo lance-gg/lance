@@ -23,6 +23,7 @@ class ClientEngine {
       *
       * @param {GameEngine} gameEngine - a game engine
       * @param {Object} inputOptions - options object
+      * @param {Boolean} inputOptions.verbose - print logs to console
       * @param {Boolean} inputOptions.autoConnect - if true, the client will automatically attempt connect to server.
       * @param {Boolean} inputOptions.standaloneMode - if true, the client will never try to connect to a server
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
@@ -117,13 +118,15 @@ class ClientEngine {
                 if (matchMakerAnswer.status !== 'ok')
                     reject('matchMaker failed status: ' + matchMakerAnswer.status);
 
-                console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
+                if (this.options.verbose)
+                    console.log(`connecting to game server ${matchMakerAnswer.serverURL}`);
                 this.socket = io(matchMakerAnswer.serverURL, options);
 
                 this.networkMonitor.registerClient(this);
 
                 this.socket.once('connect', () => {
-                    console.log('connection made');
+                    if (this.options.verbose)
+                        console.log('connection made');
                     resolve();
                 });
 
@@ -200,7 +203,8 @@ class ClientEngine {
                 if (this.socket) {
                     this.socket.on('disconnect', () => {
                         if (!this.resolved && !this.stopped) {
-                            console.log('disconnected by server...');
+                            if (this.options.verbose)
+                                console.log('disconnected by server...');
                             this.stopped = true;
                             reject();
                         }
