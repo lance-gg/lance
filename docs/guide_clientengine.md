@@ -2,9 +2,11 @@ The Client Engine must run the game loop, just like the server engine.  However 
 
 A deeper exploration of the game world synchronization algorithms is addressed in separate chapters.  The client will let the synchronization method take care of updating the client's game world in a way which appears visually smooth to the player.
 
+The client collects the player's inputs, such as mouse clicks, keyboard presses, and submits them to the server by calling `ClientEngine::sendInput()` method.
+
 Additionally, the client engine handles the following functions:
 
-1. Apply user inputs locally, with a delay if so configured
+1. In the case of extrapolation mode, the client will not wait for the server to apply the inputs.  Instead, it will apply the inputs locall as well, with a delay if so configured
 
 2. Transmit user inputs to server
 

@@ -11,9 +11,9 @@ These requirements lead to some basic architectural principles:
 
 The main components of a networked game are:
 
-* The **server**. Represented in Lance by a singleton instance of the **ServerEngine** class.
+* The **clients**. Represented in Lance by multiple instances of the **ClientEngine** class.  Clients collect inputs from the player and send them to the server.
 
-* The **clients**. Represented in Lance by multiple instances of the **ClientEngine** class.
+* The **server**. Represented in Lance by a singleton instance of the **ServerEngine** class.  The server handles the user inputs, and sends updates to all clients.
 
 * The **game logic**. Represented in Lance by the  **GameEngine** class.
 
@@ -38,17 +38,17 @@ at time *T + δt* by applying physics, taking account of new user inputs, and ap
 
 In the context of multiplayer, networked games, the steps will be executed both on the server and the client. Each step is numbered, and depending on the synchronization strategy, clients may be executing a given step before the corresponding server information has arrived at the client (i.e. extrapolation) or after (i.e. interpolation). Ideally, a given step *N* represents the same point in game play on both the server and the client.
 
-The core game logic is implemented in the game engine, so a game step is simply a call to the game engine’s *step()* method.
+The core game logic is implemented in the game engine, so a game step is simply a call to the game engine’s `GameEngine::step()` method.
 
 ## Server Flow
 
-The server logic is implemented by the server engine, which must do the following: (1) it must initialize the game, (2) it must accept connections from players over a socket, (3) it must execute the game loop, by calling the game engine’s *step()* method at a fixed interval, and (4) it must broadcast regular updates to all the clients at a fixed interval.
+The server logic is implemented by the server engine, which must do the following: (1) it must initialize the game, (2) it must accept connections from players over a socket, (3) it must execute the game loop, by calling the game engine’s `GameEngine::step()` method at a fixed interval, and (4) it must broadcast regular updates to all the clients at a fixed interval.
 
 The server engine schedules a step function to be called at a regular interval. The flow is:
 
 * ServerEngine - *start of a single server step*
 
-    * GameEngine - read and process any inputs that arrived from clients since the previous step
+    * GameEngine - read and process any inputs that arrived from clients since the previous step.  The inputs are handled by the `GameEngine::processInput()` method.
 
     * GameEngine - *start of a single game step*
 
@@ -66,7 +66,7 @@ The client flow is more complicated than the server, for two reasons.  First it 
 
     * check inbound messages / syncs
 
-    * capture user inputs that have occurred since previous step
+    * capture user inputs that have occurred since previous step.  Inputs are sent to the server by calling the method `ClientEngine::sendInput()`.
 
     * transmit user inputs to server
 

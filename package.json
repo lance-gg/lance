@@ -1,6 +1,6 @@
 {
   "name": "lance-gg",
-  "version": "3.0.9",
+  "version": "3.0.10",
   "description": "A Node.js based real-time multiplayer game server",
   "keywords": [
     "pixijs",
@@ -16,6 +16,10 @@
     "realtime",
     "multiplayer"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lance-gg/lance.git"
+  },
   "dependencies": {
     "babel-cli": "^6.26.0",
     "cannon": "^0.6.2",

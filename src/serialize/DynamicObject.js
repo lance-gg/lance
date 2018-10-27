@@ -116,30 +116,35 @@ class DynamicObject extends GameObject {
         this.angle = 90;
 
         /**
+        * @deprecated since version 3.0.8
         * should rotate left by {@link DynamicObject#rotationSpeed} on next step
         * @member {Boolean}
         */
         this.isRotatingLeft = false;
 
         /**
+        * @deprecated since version 3.0.8
         * should rotate right by {@link DynamicObject#rotationSpeed} on next step
         * @member {Boolean}
         */
         this.isRotatingRight = false;
 
         /**
+        * @deprecated since version 3.0.8
         * should accelerate by {@link DynamicObject#acceleration} on next step
         * @member {Boolean}
         */
         this.isAccelerating = false;
 
         /**
+        * @deprecated since version 3.0.8
         * angle rotation per step
         * @member {Number}
         */
         this.rotationSpeed = 2.5;
 
         /**
+        * @deprecated since version 3.0.8
         * acceleration per step
         * @member {Number}
         */
@@ -179,6 +184,41 @@ class DynamicObject extends GameObject {
             // velocity: { percent: 0.4, min: 0.0 },
             // angleLocal: { percent: 0.0 }
         };
+    }
+
+    /**
+    * turn object clock-wise
+    * @param {Number} deltaAngle - the angle to turn, in degrees
+    * @return {DynamicObject} return this object
+    */
+    turnRight(deltaAngle) {
+        this.angle += deltaAngle;
+        if (this.angle >= 360) { this.angle -= 360; }
+        if (this.angle < 0) { this.angle += 360; }
+        return this;
+    }
+
+    /**
+    * turn object counter-clock-wise
+    * @param {Number} deltaAngle - the angle to turn, in degrees
+    * @return {DynamicObject} return this object
+    */
+    turnLeft(deltaAngle) {
+        return this.turnRight(-deltaAngle);
+    }
+
+    /**
+    * accelerate along the direction that the object is facing
+    * @param {Number} acceleration - the acceleration
+    * @return {DynamicObject} return this object
+    */
+    accelerate(acceleration) {
+        let rad = this.angle * (Math.PI / 180);
+        let dv = new TwoVector(Math.cos(rad), Math.sin(rad));
+        dv.multiplyScalar(acceleration);
+        this.velocity.add(dv);
+
+        return this;
     }
 
     /**

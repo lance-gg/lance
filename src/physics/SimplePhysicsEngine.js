@@ -52,12 +52,15 @@ class SimplePhysicsEngine extends PhysicsEngine {
 
         let worldSettings = this.gameEngine.worldSettings;
 
+        // TODO: remove this code in version 4: these attributes are deprecated
         if (o.isRotatingRight) { o.angle += o.rotationSpeed; }
         if (o.isRotatingLeft) { o.angle -= o.rotationSpeed; }
 
+        // TODO: remove this code in version 4: these attributes are deprecated
         if (o.angle >= 360) { o.angle -= 360; }
         if (o.angle < 0) { o.angle += 360; }
 
+        // TODO: remove this code in version 4: these attributes are deprecated
         if (o.isAccelerating) {
             let rad = o.angle * (Math.PI / 180);
             dv.set(Math.cos(rad), Math.sin(rad)).multiplyScalar(o.acceleration).multiplyScalar(dt);

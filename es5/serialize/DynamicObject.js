@@ -155,30 +155,35 @@ var DynamicObject = function (_GameObject) {
         _this.angle = 90;
 
         /**
+        * @deprecated since version 3.0.8
         * should rotate left by {@link DynamicObject#rotationSpeed} on next step
         * @member {Boolean}
         */
         _this.isRotatingLeft = false;
 
         /**
+        * @deprecated since version 3.0.8
         * should rotate right by {@link DynamicObject#rotationSpeed} on next step
         * @member {Boolean}
         */
         _this.isRotatingRight = false;
 
         /**
+        * @deprecated since version 3.0.8
         * should accelerate by {@link DynamicObject#acceleration} on next step
         * @member {Boolean}
         */
         _this.isAccelerating = false;
 
         /**
+        * @deprecated since version 3.0.8
         * angle rotation per step
         * @member {Number}
         */
         _this.rotationSpeed = 2.5;
 
         /**
+        * @deprecated since version 3.0.8
         * acceleration per step
         * @member {Number}
         */
@@ -219,13 +224,61 @@ var DynamicObject = function (_GameObject) {
          */
 
     }, {
-        key: 'bendingToString',
+        key: 'turnRight',
 
+
+        /**
+        * turn object clock-wise
+        * @param {Number} deltaAngle - the angle to turn, in degrees
+        * @return {DynamicObject} return this object
+        */
+        value: function turnRight(deltaAngle) {
+            this.angle += deltaAngle;
+            if (this.angle >= 360) {
+                this.angle -= 360;
+            }
+            if (this.angle < 0) {
+                this.angle += 360;
+            }
+            return this;
+        }
+
+        /**
+        * turn object counter-clock-wise
+        * @param {Number} deltaAngle - the angle to turn, in degrees
+        * @return {DynamicObject} return this object
+        */
+
+    }, {
+        key: 'turnLeft',
+        value: function turnLeft(deltaAngle) {
+            return this.turnRight(-deltaAngle);
+        }
+
+        /**
+        * accelerate along the direction that the object is facing
+        * @param {Number} acceleration - the acceleration
+        * @return {DynamicObject} return this object
+        */
+
+    }, {
+        key: 'accelerate',
+        value: function accelerate(acceleration) {
+            var rad = this.angle * (Math.PI / 180);
+            var dv = new _TwoVector2.default(Math.cos(rad), Math.sin(rad));
+            dv.multiplyScalar(acceleration);
+            this.velocity.add(dv);
+
+            return this;
+        }
 
         /**
          * Formatted textual description of the game object's current bending properties.
          * @return {String} description - a string description
          */
+
+    }, {
+        key: 'bendingToString',
         value: function bendingToString() {
             if (this.bendingIncrements) return '\u0394Pos=' + this.bendingPositionDelta + ' \u0394Vel=' + this.bendingVelocityDelta + ' \u0394Angle=' + this.bendingAngleDelta + ' increments=' + this.bendingIncrements;
             return 'no bending';
