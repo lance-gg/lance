@@ -2,6 +2,7 @@
   "name": "lance-gg",
   "version": "3.0.10",
   "description": "A Node.js based real-time multiplayer game server",
+  "main": "es5/index",
   "keywords": [
     "pixijs",
     "pixi",
