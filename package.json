@@ -21,7 +21,8 @@
     "webpack-dev-server": "^3.1.10"
   },
   "scripts": {
-    "dev": "webpack-dev-server --hot --inline"
+    "dev": "webpack-dev-server --hot --inline",
+    "build": "webpack"
   },
   "author": "OpherV",
   "license": "ISC",
