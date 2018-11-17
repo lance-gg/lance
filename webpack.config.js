@@ -9,19 +9,19 @@ module.exports = {
         filename: "bundle.js"
     },
     module: {
-        loaders: [
-            // { test: /\.css$/, loader: "style!css" },
-            {
-                test: /\.scss$/,
-                loaders: ["style", "css", "sass"]
-            }
-        ]
-    },
-    sassLoader: {
-        includePaths: [
-            path.resolve(__dirname, "./node_modules/compass-mixins/lib"),
-            path.resolve(__dirname, "./node_modules/breakpoint-sass/stylesheets")
-        ]
+        rules: [{
+            test: /\.scss$/,
+            use: ["style", "css",
+                {
+                    loader: "sass",
+                    options: {
+                        includePaths: [
+                            path.resolve(__dirname, "./node_modules/compass-mixins/lib"),
+                            path.resolve(__dirname, "./node_modules/breakpoint-sass/stylesheets")
+                        ]
+                    }
+                }],
+        }]
     },
     plugins: [
         // new webpack.optimize.UglifyJsPlugin({minimize: true})

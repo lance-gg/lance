@@ -9,17 +9,19 @@
   "devDependencies": {
     "breakpoint-sass": "^2.7.0",
     "compass-mixins": "^0.12.10",
-    "css-loader": "^0.26.0",
+    "css-loader": "^1.0.1",
     "image-webpack-loader": "^3.0.0",
-    "node-sass": "^3.13.0",
+    "node-sass": "^4",
     "raw-loader": "^0.5.1",
-    "sass-loader": "^4.0.2",
-    "style-loader": "^0.13.1",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
     "susy": "^2.2.12",
-    "webpack": "^1.13.3"
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
   },
   "scripts": {
-    "debug": "webpack-dev-server --hot --inline"
+    "dev": "webpack-dev-server --hot --inline"
   },
   "author": "OpherV",
   "license": "ISC",
