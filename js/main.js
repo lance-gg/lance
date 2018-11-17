@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
     if (innerWidth>500) {
         var waypoint = new Waypoint({
-            element: document.getElementById('demo'),
+            element: document.getElementById('gallery'),
             context: qs('.siteContainer'),
             offset: 73,
             handler: function (direction) {
