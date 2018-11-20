@@ -238,6 +238,11 @@ class DynamicObject extends GameObject {
     */
     get maxSpeed() { return null; }
 
+    /**
+    * Copy the netscheme variables from another DynamicObject
+    * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
+    * @param {DynamicObject} other DynamicObject
+    */
     syncTo(other) {
         super.syncTo(other);
         this.position.copy(other.position);

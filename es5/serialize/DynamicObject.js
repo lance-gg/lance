@@ -292,6 +292,13 @@ var DynamicObject = function (_GameObject) {
 
     }, {
         key: 'syncTo',
+
+
+        /**
+        * Copy the netscheme variables from another DynamicObject
+        * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
+        * @param {DynamicObject} other DynamicObject
+        */
         value: function syncTo(other) {
             _get(DynamicObject.prototype.__proto__ || Object.getPrototypeOf(DynamicObject.prototype), 'syncTo', this).call(this, other);
             this.position.copy(other.position);

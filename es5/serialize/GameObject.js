@@ -177,7 +177,8 @@ var GameObject = function (_Serializable) {
         value: function bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {}
 
         /**
-         * synchronize this object to the state of an other object
+         * synchronize this object to the state of an other object, by copying all the netscheme variables.
+         * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
          * @param {GameObject} other the other object to synchronize to
          */
 

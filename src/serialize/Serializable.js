@@ -78,20 +78,23 @@ class Serializable {
                     localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
                     if (this[property] !== null)
                         localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
-                } else if (netScheme[property].type == BaseTypes.TYPES.CLASSINSTANCE) {
+                } else if (netScheme[property].type === BaseTypes.TYPES.CLASSINSTANCE) {
                     // derive the size of the included class
                     let objectInstanceBufferOffset = this[property].serialize(serializer, { dry: true }).bufferOffset;
                     localBufferOffset += objectInstanceBufferOffset;
-                } else if (netScheme[property].type == BaseTypes.TYPES.LIST) {
+                } else if (netScheme[property].type === BaseTypes.TYPES.LIST) {
                     // derive the size of the list
                     // list starts with number of elements
                     localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
                     for (let item of this[property]) {
                         // todo inelegant, currently doesn't support list of lists
-                        if (netScheme[property].itemType == BaseTypes.TYPES.CLASSINSTANCE) {
+                        if (netScheme[property].itemType === BaseTypes.TYPES.CLASSINSTANCE) {
                             let listBufferOffset = item.serialize(serializer, { dry: true }).bufferOffset;
                             localBufferOffset += listBufferOffset;
+                        } else if (netScheme[property].itemType === BaseTypes.TYPES.STRING) {
+                            // size includes string length plus double-byte characters
+                            localBufferOffset += Uint16Array.BYTES_PER_ELEMENT * (1 + item.length);
                         } else {
                             localBufferOffset += serializer.getTypeByteSize(netScheme[property].itemType);
                         }
