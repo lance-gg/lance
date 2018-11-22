@@ -91,11 +91,11 @@ var HSHGCollisionDetection = function () {
                 for (var _iterator2 = Object.keys(this.stepCollidingPairs)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var _pairId = _step2.value;
 
-                    var _pairObj = this.stepCollidingPairs[_pairId];
+                    var pairObj = this.stepCollidingPairs[_pairId];
 
                     // didn't exist in previous pairs, but exists now: this is a new colliding pair
                     if (_pairId in this.previousCollisionPairs === false) {
-                        this.gameEngine.emit('collisionStart', _pairObj);
+                        this.gameEngine.emit('collisionStart', pairObj);
                     }
                 }
             } catch (err) {

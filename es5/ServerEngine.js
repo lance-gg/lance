@@ -141,33 +141,34 @@ var ServerEngine = function () {
             this.serverTime = new Date().getTime();
 
             // for each player, replay all the inputs in the oldest step
+
+            var _loop = function _loop(playerIdStr) {
+                var playerId = Number(playerIdStr);
+                var inputQueue = _this.playerInputQueues[playerId];
+                var queueSteps = Object.keys(inputQueue);
+                var minStep = Math.min.apply(null, queueSteps);
+
+                // check that there are inputs for this step,
+                // and that we have reached/passed this step
+                if (queueSteps.length > 0 && minStep <= _this.gameEngine.world.stepCount) {
+                    inputQueue[minStep].forEach(function (input) {
+                        _this.gameEngine.emit('server__processInput', { input: input, playerId: playerId });
+                        _this.gameEngine.emit('processInput', { input: input, playerId: playerId });
+                        _this.gameEngine.processInput(input, playerId, true);
+                    });
+                    delete inputQueue[minStep];
+                }
+            };
+
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
 
             try {
-                var _loop = function _loop() {
+                for (var _iterator = Object.keys(this.playerInputQueues)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var playerIdStr = _step.value;
 
-                    var playerId = Number(playerIdStr);
-                    var inputQueue = _this.playerInputQueues[playerId];
-                    var queueSteps = Object.keys(inputQueue);
-                    var minStep = Math.min.apply(null, queueSteps);
-
-                    // check that there are inputs for this step,
-                    // and that we have reached/passed this step
-                    if (queueSteps.length > 0 && minStep <= _this.gameEngine.world.stepCount) {
-                        inputQueue[minStep].forEach(function (input) {
-                            _this.gameEngine.emit('server__processInput', { input: input, playerId: playerId });
-                            _this.gameEngine.emit('processInput', { input: input, playerId: playerId });
-                            _this.gameEngine.processInput(input, playerId, true);
-                        });
-                        delete inputQueue[minStep];
-                    }
-                };
-
-                for (var _iterator = Object.keys(this.playerInputQueues)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    _loop();
+                    _loop(playerIdStr);
                 }
 
                 // run the game engine step
@@ -298,15 +299,15 @@ var ServerEngine = function () {
 
             try {
                 for (var _iterator4 = Object.keys(world.objects)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var _objId = _step4.value;
+                    var objId = _step4.value;
 
-                    var obj = world.objects[_objId];
-                    var prevObject = this.objMemory[_objId];
+                    var obj = world.objects[objId];
+                    var prevObject = this.objMemory[objId];
 
                     // if the object (in serialized form) hasn't changed, move on
                     if (diffUpdate) {
                         var s = obj.serialize(this.serializer);
-                        if (prevObject && _Utils2.default.arrayBuffersEqual(s.dataBuffer, prevObject)) continue;else this.objMemory[_objId] = s.dataBuffer;
+                        if (prevObject && _Utils2.default.arrayBuffersEqual(s.dataBuffer, prevObject)) continue;else this.objMemory[objId] = s.dataBuffer;
 
                         // prune strings which haven't changed
                         obj = obj.prunedStringsClone(this.serializer, prevObject);
@@ -341,10 +342,10 @@ var ServerEngine = function () {
 
                 try {
                     for (var _iterator5 = Object.keys(this.objMemory)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                        var objId = _step5.value;
+                        var _objId = _step5.value;
 
-                        if (!(objId in world.objects)) {
-                            delete this.objMemory[objId];
+                        if (!(_objId in world.objects)) {
+                            delete this.objMemory[_objId];
                         }
                     }
                 } catch (err) {

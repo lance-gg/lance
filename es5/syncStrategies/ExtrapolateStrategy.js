@@ -55,21 +55,31 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
 
     _createClass(ExtrapolateStrategy, [{
         key: 'clientInputSave',
-        value: function clientInputSave(inputData) {
+        value: function clientInputSave(inputEvent) {
 
             // if no inputs have been stored for this step, create an array
-            if (!this.recentInputs[inputData.step]) {
-                this.recentInputs[inputData.step] = [];
+            if (!this.recentInputs[inputEvent.input.step]) {
+                this.recentInputs[inputEvent.input.step] = [];
             }
-            this.recentInputs[inputData.step].push(inputData);
+            this.recentInputs[inputEvent.input.step].push(inputEvent.input);
         }
 
         // clean up the input buffer
 
     }, {
         key: 'cleanRecentInputs',
-        value: function cleanRecentInputs() {
-            var firstReplayStep = this.gameEngine.world.stepCount - this.options.extrapolate;
+        value: function cleanRecentInputs(lastServerStep) {
+            var _this2 = this;
+
+            var _loop = function _loop(input) {
+                if (_this2.recentInputs[input][0].step <= lastServerStep) {
+                    _this2.gameEngine.trace.debug(function () {
+                        return 'removing recentInput for step ' + input;
+                    });
+                    delete _this2.recentInputs[input];
+                }
+            };
+
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -78,9 +88,7 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
                 for (var _iterator = Object.keys(this.recentInputs)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var input = _step.value;
 
-                    if (this.recentInputs[input].step < firstReplayStep) {
-                        delete this.recentInputs[input];
-                    }
+                    _loop(input);
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -103,7 +111,7 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
     }, {
         key: 'applySync',
         value: function applySync(sync, required) {
-            var _this2 = this;
+            var _this3 = this;
 
             // if sync is in the future, we are not ready to apply yet.
             if (!required && sync.stepCount > this.gameEngine.world.stepCount) {
@@ -129,52 +137,53 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
             this.needFirstSync = false;
             var world = this.gameEngine.world;
             var serverStep = sync.stepCount;
+
+            var _loop2 = function _loop2(ids) {
+
+                // TODO: we are currently taking only the first event out of
+                // the events that may have arrived for this object
+                var ev = sync.syncObjects[ids][0];
+                var curObj = world.objects[ev.objectInstance.id];
+
+                var localShadowObj = _this3.gameEngine.findLocalShadow(ev.objectInstance);
+                if (localShadowObj) {
+                    // case 1: this object has a local shadow object on the client
+                    _this3.gameEngine.trace.debug(function () {
+                        return 'object ' + ev.objectInstance.id + ' replacing local shadow ' + localShadowObj.id;
+                    });
+
+                    if (!world.objects.hasOwnProperty(ev.objectInstance.id)) {
+                        var newObj = _this3.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
+                        newObj.saveState(localShadowObj);
+                    }
+                    _this3.gameEngine.removeObjectFromWorld(localShadowObj.id);
+                } else if (curObj) {
+
+                    // case 2: this object already exists locally
+                    _this3.gameEngine.trace.trace(function () {
+                        return 'object before syncTo: ' + curObj.toString();
+                    });
+                    curObj.saveState();
+                    curObj.syncTo(ev.objectInstance);
+                    _this3.gameEngine.trace.trace(function () {
+                        return 'object after syncTo: ' + curObj.toString() + ' synced to step[' + ev.stepCount + ']';
+                    });
+                } else {
+
+                    // case 3: object does not exist.  create it now
+                    _this3.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                }
+            };
+
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
 
             try {
-                var _loop = function _loop() {
+                for (var _iterator2 = Object.keys(sync.syncObjects)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var ids = _step2.value;
 
-
-                    // TODO: we are currently taking only the first event out of
-                    // the events that may have arrived for this object
-                    var ev = sync.syncObjects[ids][0];
-                    var curObj = world.objects[ev.objectInstance.id];
-
-                    var localShadowObj = _this2.gameEngine.findLocalShadow(ev.objectInstance);
-                    if (localShadowObj) {
-                        // case 1: this object has a local shadow object on the client
-                        _this2.gameEngine.trace.debug(function () {
-                            return 'object ' + ev.objectInstance.id + ' replacing local shadow ' + localShadowObj.id;
-                        });
-
-                        if (!world.objects.hasOwnProperty(ev.objectInstance.id)) {
-                            var newObj = _this2.addNewObject(ev.objectInstance.id, ev.objectInstance, { visible: false });
-                            newObj.saveState(localShadowObj);
-                        }
-                        _this2.gameEngine.removeObjectFromWorld(localShadowObj.id);
-                    } else if (curObj) {
-
-                        // case 2: this object already exists locally
-                        _this2.gameEngine.trace.trace(function () {
-                            return 'object before syncTo: ' + curObj.toString();
-                        });
-                        curObj.saveState();
-                        curObj.syncTo(ev.objectInstance);
-                        _this2.gameEngine.trace.trace(function () {
-                            return 'object after syncTo: ' + curObj.toString() + ' synced to step[' + ev.stepCount + ']';
-                        });
-                    } else {
-
-                        // case 3: object does not exist.  create it now
-                        _this2.addNewObject(ev.objectInstance.id, ev.objectInstance);
-                    }
-                };
-
-                for (var _iterator2 = Object.keys(sync.syncObjects)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    _loop();
+                    _loop2(ids);
                 }
 
                 //
@@ -195,7 +204,6 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
                 }
             }
 
-            this.cleanRecentInputs();
             this.gameEngine.trace.debug(function () {
                 return 'extrapolate re-enacting steps from [' + serverStep + '] to [' + world.stepCount + ']';
             });
@@ -208,56 +216,62 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
 
             var clientStep = world.stepCount;
             for (world.stepCount = serverStep; world.stepCount < clientStep;) {
+                this.gameEngine.trace.debug(function () {
+                    return 'reenacting inputs for step ' + world.stepCount + ' inputs contain ' + JSON.stringify(_this3.recentInputs);
+                });
+
                 if (this.recentInputs[world.stepCount]) {
-                    this.recentInputs[world.stepCount].forEach(function (inputData) {
+                    this.recentInputs[world.stepCount].forEach(function (inputDesc) {
 
                         // only movement inputs are re-enacted
-                        if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
+                        if (!inputDesc.options || !inputDesc.options.movement) return;
 
-                        _this2.gameEngine.trace.trace(function () {
-                            return 'extrapolate re-enacting movement input[' + inputData.messageIndex + ']: ' + inputData.input;
+                        _this3.gameEngine.trace.trace(function () {
+                            return 'extrapolate re-enacting movement input[' + inputDesc.messageIndex + ']: ' + inputDesc.input;
                         });
-                        _this2.gameEngine.processInput(inputData, _this2.gameEngine.playerId);
+                        _this3.gameEngine.processInput(inputDesc, _this3.gameEngine.playerId);
                     });
                 }
 
                 // run the game engine step in "reenact" mode
                 this.gameEngine.step(true);
             }
+            this.cleanRecentInputs(serverStep);
 
             //
             // bend back to original state
             //
+
+            var _loop3 = function _loop3(objId) {
+
+                // shadow objects are not bent
+                if (objId >= _this3.gameEngine.options.clientIDSpace) return 'continue';
+
+                // TODO: using == instead of === because of string/number mismatch
+                //       These values should always be strings (which contain a number)
+                //       Reminder: the reason we use a string is that these
+                //       values are sometimes used as object keys
+                var obj = world.objects[objId];
+                var isLocal = obj.playerId == _this3.gameEngine.playerId; // eslint-disable-line eqeqeq
+                var bending = isLocal ? _this3.options.localObjBending : _this3.options.remoteObjBending;
+                obj.bendToCurrentState(bending, _this3.gameEngine.worldSettings, isLocal, _this3.options.bendingIncrements);
+                if (typeof obj.refreshRenderObject === 'function') obj.refreshRenderObject();
+                _this3.gameEngine.trace.trace(function () {
+                    return 'object[' + objId + '] ' + obj.bendingToString();
+                });
+            };
+
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
 
             try {
-                var _loop2 = function _loop2() {
+                for (var _iterator3 = Object.keys(world.objects)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                     var objId = _step3.value;
 
+                    var _ret3 = _loop3(objId);
 
-                    // shadow objects are not bent
-                    if (objId >= _this2.gameEngine.options.clientIDSpace) return 'continue';
-
-                    // TODO: using == instead of === because of string/number mismatch
-                    //       These values should always be strings (which contain a number)
-                    //       Reminder: the reason we use a string is that these
-                    //       values are sometimes used as object keys
-                    var obj = world.objects[objId];
-                    var isLocal = obj.playerId == _this2.gameEngine.playerId; // eslint-disable-line eqeqeq
-                    var bending = isLocal ? _this2.options.localObjBending : _this2.options.remoteObjBending;
-                    obj.bendToCurrentState(bending, _this2.gameEngine.worldSettings, isLocal, _this2.options.bendingIncrements);
-                    if (typeof obj.refreshRenderObject === 'function') obj.refreshRenderObject();
-                    _this2.gameEngine.trace.trace(function () {
-                        return 'object[' + objId + '] ' + obj.bendingToString();
-                    });
-                };
-
-                for (var _iterator3 = Object.keys(world.objects)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var _ret2 = _loop2();
-
-                    if (_ret2 === 'continue') continue;
+                    if (_ret3 === 'continue') continue;
                 }
 
                 // trace object state after sync
@@ -276,21 +290,21 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
                 }
             }
 
+            var _loop4 = function _loop4(objId) {
+                _this3.gameEngine.trace.trace(function () {
+                    return 'object after extrapolate replay: ' + world.objects[objId].toString();
+                });
+            };
+
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
 
             try {
-                var _loop3 = function _loop3() {
+                for (var _iterator4 = Object.keys(world.objects)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                     var objId = _step4.value;
 
-                    _this2.gameEngine.trace.trace(function () {
-                        return 'object after extrapolate replay: ' + world.objects[objId].toString();
-                    });
-                };
-
-                for (var _iterator4 = Object.keys(world.objects)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    _loop3();
+                    _loop4(objId);
                 }
 
                 // destroy objects
@@ -311,36 +325,36 @@ var ExtrapolateStrategy = function (_SyncStrategy) {
                 }
             }
 
+            var _loop5 = function _loop5(objId) {
+
+                var objEvents = sync.syncObjects[objId];
+
+                // if this was a full sync, and we did not get a corresponding object,
+                // remove the local object
+                if (sync.fullUpdate && !objEvents && objId < _this3.gameEngine.options.clientIDSpace) {
+                    _this3.gameEngine.removeObjectFromWorld(objId);
+                    return 'continue';
+                }
+
+                if (!objEvents || objId >= _this3.gameEngine.options.clientIDSpace) return 'continue';
+
+                // if we got an objectDestroy event, destroy the object
+                objEvents.forEach(function (e) {
+                    if (e.eventName === 'objectDestroy') _this3.gameEngine.removeObjectFromWorld(objId);
+                });
+            };
+
             var _iteratorNormalCompletion5 = true;
             var _didIteratorError5 = false;
             var _iteratorError5 = undefined;
 
             try {
-                var _loop4 = function _loop4() {
+                for (var _iterator5 = Object.keys(world.objects)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                     var objId = _step5.value;
 
+                    var _ret5 = _loop5(objId);
 
-                    var objEvents = sync.syncObjects[objId];
-
-                    // if this was a full sync, and we did not get a corresponding object,
-                    // remove the local object
-                    if (sync.fullUpdate && !objEvents && objId < _this2.gameEngine.options.clientIDSpace) {
-                        _this2.gameEngine.removeObjectFromWorld(objId);
-                        return 'continue';
-                    }
-
-                    if (!objEvents || objId >= _this2.gameEngine.options.clientIDSpace) return 'continue';
-
-                    // if we got an objectDestroy event, destroy the object
-                    objEvents.forEach(function (e) {
-                        if (e.eventName === 'objectDestroy') _this2.gameEngine.removeObjectFromWorld(objId);
-                    });
-                };
-
-                for (var _iterator5 = Object.keys(world.objects)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var _ret4 = _loop4();
-
-                    if (_ret4 === 'continue') continue;
+                    if (_ret5 === 'continue') continue;
                 }
             } catch (err) {
                 _didIteratorError5 = true;

@@ -342,7 +342,7 @@ class ClientEngine {
      * @param {Object} inputOptions - options for the input
      */
     sendInput(input, inputOptions) {
-        var message = {
+        let inputEvent = {
             command: 'move',
             data: {
                 messageIndex: this.messageIndex,
@@ -357,13 +357,13 @@ class ClientEngine {
         // if we delay input application on client, then queue it
         // otherwise apply it now
         if (this.delayedInputs) {
-            this.delayedInputs[this.delayedInputs.length - 1].push(message);
+            this.delayedInputs[this.delayedInputs.length - 1].push(inputEvent);
         } else {
-            this.doInputLocal(message);
+            this.doInputLocal(inputEvent);
         }
 
         if (this.options.standaloneMode !== true) {
-            this.outboundMessages.push(message);
+            this.outboundMessages.push(inputEvent);
         }
 
         this.messageIndex++;

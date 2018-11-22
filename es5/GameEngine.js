@@ -311,18 +311,19 @@ var GameEngine = function () {
      * on the client during synchronization.  The input is also associated with
      * the ID of a player.
      *
-     * @param {Object} inputMsg - input descriptor object
-     * @param {String} inputMsg.input - describe the input (e.g. "up", "down", "fire")
-     * @param {Number} inputMsg.messageIndex - input identifier
+     * @param {Object} inputDesc - input descriptor object
+     * @param {String} inputDesc.input - describe the input (e.g. "up", "down", "fire")
+     * @param {Number} inputDesc.messageIndex - input identifier
+     * @param {Number} inputDesc.step - the step on which this input occurred
      * @param {Number} playerId - the player ID
      * @param {Boolean} isServer - indicate if this function is being called on the server side
      */
 
   }, {
     key: 'processInput',
-    value: function processInput(inputMsg, playerId, isServer) {
+    value: function processInput(inputDesc, playerId, isServer) {
       this.trace.info(function () {
-        return 'game engine processing input[' + inputMsg.messageIndex + '] <' + inputMsg.input + '> from playerId ' + playerId;
+        return 'game engine processing input[' + inputDesc.messageIndex + '] <' + inputDesc.input + '> from playerId ' + playerId;
       });
     }
 

@@ -70,40 +70,41 @@ var InterpolateStrategy = function (_SyncStrategy) {
             //
             this.needFirstSync = false;
             var world = this.gameEngine.world;
+
+            var _loop = function _loop(ids) {
+
+                // TODO: we are currently taking only the first event out of
+                // the events that may have arrived for this object
+                var ev = sync.syncObjects[ids][0];
+                var curObj = world.objects[ev.objectInstance.id];
+
+                if (curObj) {
+
+                    // case 1: this object already exists locally
+                    _this2.gameEngine.trace.trace(function () {
+                        return 'object before syncTo: ' + curObj.toString();
+                    });
+                    curObj.saveState();
+                    curObj.syncTo(ev.objectInstance);
+                    _this2.gameEngine.trace.trace(function () {
+                        return 'object after syncTo: ' + curObj.toString() + ' synced to step[' + ev.stepCount + ']';
+                    });
+                } else {
+
+                    // case 2: object does not exist.  create it now
+                    _this2.addNewObject(ev.objectInstance.id, ev.objectInstance);
+                }
+            };
+
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
 
             try {
-                var _loop = function _loop() {
+                for (var _iterator = Object.keys(sync.syncObjects)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var ids = _step.value;
 
-
-                    // TODO: we are currently taking only the first event out of
-                    // the events that may have arrived for this object
-                    var ev = sync.syncObjects[ids][0];
-                    var curObj = world.objects[ev.objectInstance.id];
-
-                    if (curObj) {
-
-                        // case 1: this object already exists locally
-                        _this2.gameEngine.trace.trace(function () {
-                            return 'object before syncTo: ' + curObj.toString();
-                        });
-                        curObj.saveState();
-                        curObj.syncTo(ev.objectInstance);
-                        _this2.gameEngine.trace.trace(function () {
-                            return 'object after syncTo: ' + curObj.toString() + ' synced to step[' + ev.stepCount + ']';
-                        });
-                    } else {
-
-                        // case 2: object does not exist.  create it now
-                        _this2.addNewObject(ev.objectInstance.id, ev.objectInstance);
-                    }
-                };
-
-                for (var _iterator = Object.keys(sync.syncObjects)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    _loop();
+                    _loop(ids);
                 }
 
                 //
@@ -124,27 +125,27 @@ var InterpolateStrategy = function (_SyncStrategy) {
                 }
             }
 
+            var _loop2 = function _loop2(objId) {
+
+                var obj = world.objects[objId];
+                var isLocal = obj.playerId == _this2.gameEngine.playerId; // eslint-disable-line eqeqeq
+                var bending = isLocal ? _this2.options.localObjBending : _this2.options.remoteObjBending;
+                obj.bendToCurrentState(bending, _this2.gameEngine.worldSettings, isLocal, _this2.options.bendingIncrements);
+                if (typeof obj.refreshRenderObject === 'function') obj.refreshRenderObject();
+                _this2.gameEngine.trace.trace(function () {
+                    return 'object[' + objId + '] ' + obj.bendingToString();
+                });
+            };
+
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
 
             try {
-                var _loop2 = function _loop2() {
+                for (var _iterator2 = Object.keys(world.objects)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var objId = _step2.value;
 
-
-                    var obj = world.objects[objId];
-                    var isLocal = obj.playerId == _this2.gameEngine.playerId; // eslint-disable-line eqeqeq
-                    var bending = isLocal ? _this2.options.localObjBending : _this2.options.remoteObjBending;
-                    obj.bendToCurrentState(bending, _this2.gameEngine.worldSettings, isLocal, _this2.options.bendingIncrements);
-                    if (typeof obj.refreshRenderObject === 'function') obj.refreshRenderObject();
-                    _this2.gameEngine.trace.trace(function () {
-                        return 'object[' + objId + '] ' + obj.bendingToString();
-                    });
-                };
-
-                for (var _iterator2 = Object.keys(world.objects)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    _loop2();
+                    _loop2(objId);
                 }
 
                 // destroy objects
@@ -165,34 +166,34 @@ var InterpolateStrategy = function (_SyncStrategy) {
                 }
             }
 
+            var _loop3 = function _loop3(objId) {
+
+                var objEvents = sync.syncObjects[objId];
+
+                // if this was a full sync, and we did not get a corresponding object,
+                // remove the local object
+                if (sync.fullUpdate && !objEvents && objId < _this2.gameEngine.options.clientIDSpace) {
+                    _this2.gameEngine.removeObjectFromWorld(objId);
+                    return 'continue';
+                }
+
+                if (!objEvents || objId >= _this2.gameEngine.options.clientIDSpace) return 'continue';
+
+                // if we got an objectDestroy event, destroy the object
+                objEvents.forEach(function (e) {
+                    if (e.eventName === 'objectDestroy') _this2.gameEngine.removeObjectFromWorld(objId);
+                });
+            };
+
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
 
             try {
-                var _loop3 = function _loop3() {
+                for (var _iterator3 = Object.keys(world.objects)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                     var objId = _step3.value;
 
-
-                    var objEvents = sync.syncObjects[objId];
-
-                    // if this was a full sync, and we did not get a corresponding object,
-                    // remove the local object
-                    if (sync.fullUpdate && !objEvents && objId < _this2.gameEngine.options.clientIDSpace) {
-                        _this2.gameEngine.removeObjectFromWorld(objId);
-                        return 'continue';
-                    }
-
-                    if (!objEvents || objId >= _this2.gameEngine.options.clientIDSpace) return 'continue';
-
-                    // if we got an objectDestroy event, destroy the object
-                    objEvents.forEach(function (e) {
-                        if (e.eventName === 'objectDestroy') _this2.gameEngine.removeObjectFromWorld(objId);
-                    });
-                };
-
-                for (var _iterator3 = Object.keys(world.objects)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var _ret3 = _loop3();
+                    var _ret3 = _loop3(objId);
 
                     if (_ret3 === 'continue') continue;
                 }

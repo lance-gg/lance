@@ -29,20 +29,19 @@ export default class ExtrapolateStrategy extends SyncStrategy {
     }
 
     // keep a buffer of inputs so that we can replay them on extrapolation
-    clientInputSave(inputData) {
+    clientInputSave(inputEvent) {
 
         // if no inputs have been stored for this step, create an array
-        if (!this.recentInputs[inputData.step]) {
-            this.recentInputs[inputData.step] = [];
+        if (!this.recentInputs[inputEvent.input.step]) {
+            this.recentInputs[inputEvent.input.step] = [];
         }
-        this.recentInputs[inputData.step].push(inputData);
+        this.recentInputs[inputEvent.input.step].push(inputEvent.input);
     }
 
     // clean up the input buffer
-    cleanRecentInputs() {
-        let firstReplayStep = this.gameEngine.world.stepCount - this.options.extrapolate;
+    cleanRecentInputs(lastServerStep) {
         for (let input of Object.keys(this.recentInputs)) {
-            if (this.recentInputs[input].step < firstReplayStep) {
+            if (this.recentInputs[input][0].step <= lastServerStep) {
                 delete this.recentInputs[input];
             }
         }
@@ -109,7 +108,6 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         //
         // reenact the steps that we want to extrapolate forwards
         //
-        this.cleanRecentInputs();
         this.gameEngine.trace.debug(() => `extrapolate re-enacting steps from [${serverStep}] to [${world.stepCount}]`);
         if (serverStep < world.stepCount - this.options.maxReEnactSteps) {
             serverStep = world.stepCount - this.options.maxReEnactSteps;
@@ -118,20 +116,22 @@ export default class ExtrapolateStrategy extends SyncStrategy {
 
         let clientStep = world.stepCount;
         for (world.stepCount = serverStep; world.stepCount < clientStep;) {
+
             if (this.recentInputs[world.stepCount]) {
-                this.recentInputs[world.stepCount].forEach(inputData => {
+                this.recentInputs[world.stepCount].forEach(inputDesc => {
 
                     // only movement inputs are re-enacted
-                    if (!inputData.inputOptions || !inputData.inputOptions.movement) return;
+                    if (!inputDesc.options || !inputDesc.options.movement) return;
 
-                    this.gameEngine.trace.trace(() => `extrapolate re-enacting movement input[${inputData.messageIndex}]: ${inputData.input}`);
-                    this.gameEngine.processInput(inputData, this.gameEngine.playerId);
+                    this.gameEngine.trace.trace(() => `extrapolate re-enacting movement input[${inputDesc.messageIndex}]: ${inputDesc.input}`);
+                    this.gameEngine.processInput(inputDesc, this.gameEngine.playerId);
                 });
             }
 
             // run the game engine step in "reenact" mode
             this.gameEngine.step(true);
         }
+        this.cleanRecentInputs(serverStep);
 
         //
         // bend back to original state
