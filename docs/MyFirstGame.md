@@ -1,7 +1,4 @@
-This tutorial takes about 45 minutes.  It will guide you in building the simplest
-JavaScript networked game, [Pong](https://en.wikipedia.org/wiki/Pong).  It starts with a walk-through of environment setup,
-then proceeds with the writing of client code, server
-code, and game logic.
+This tutorial takes about 45 minutes. It will guide you in building the simplest JavaScript multiplayer networked game, [Pong](https://en.wikipedia.org/wiki/Pong). It starts with a walk-through of environment setup, and then proceeds with the writing of client code, server code, and game logic.
 
 ![Pong](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Pong.png/220px-Pong.png)
 
@@ -15,11 +12,8 @@ cd tinygames/boilerplate
 npm install
 ```
 
-You now have the basic directory structure of a game.  Look around.
-The boilerplate includes an `dist/index.html` file, which will be served
-to the clients, and a `main.js` file, which is the entry point of the node.js server.
-The game code is inside the `src` directory, divided into
-sub-directories `client`, `server`, and `common`.
+You now have the basic directory structure of a game.  Look around. The boilerplate includes a `dist/index.html` file, which will be served to the clients, and a `main.js` file, which is the entry point of the node.js server.
+The game code is inside the `src` directory, divided into sub-directories `client`, `server`, and `common`.
 
 Take a look at `webpack.config.js` which shows how the game is packaged, and `.babelrc` shows how the game loads the lance library.
 
@@ -27,7 +21,7 @@ The tutorial will be limited to a single file: `src/common/Game.js` for the sake
 
 ## Step 1: Create the Game Object Classes
 
-There are two kinds of objects in every Pong game: the paddle and the ball.
+There are only two kinds of objects in Pong, the paddle and the ball.
 These classes extend the `DynamicObject` class, and are quite simple.  Open the file `src/common/Game.js` with your favorite editor, and find the *GAME OBJECTS* section.  Remove the class `YourGameObject` and add the following two classes instead.
 
 
@@ -84,7 +78,8 @@ For Pong, we will need to bounce the ball around the board, and check if it hit 
 
 Find the GAME ENGINE section, which defines the *GameEngine* sub-class.  The *Game* class implements the actual logic of the game.  
 
-### **constructor() and registerClasses()**. The constructor creates a physics engine, and registers listener functions for the game:
+### The Constructor and Registering your Game Objects
+The methods are **constructor()** and **registerClasses()**. The constructor creates a physics engine, and registers listener functions for the game. The method **registerClasses()** registers the list of GameObject classes with the Lance serializer.
 
 ```javascript
 constructor(options) {
@@ -110,7 +105,8 @@ registerClasses(serializer) {
 }
 ```
 
-### **gameLogic()**: this method is executed after the ball has moved.  It contains **all the core pong game logic**: it checks if the ball has hit any wall, or any paddle, and decides if a player has scored.  
+### The Game logic
+Update the method **gameLogic()**, which was registered to run on the **postStep** event, with the code below.  This method is executed after the ball has moved.  It contains **all the core pong game logic**: it runs after every game step, and checks if the ball has hit any wall, or any paddle, and decides if a player has scored.
 
 ```javascript
 gameLogic() {
@@ -163,8 +159,8 @@ gameLogic() {
 }
 ```
 
-### **processInput**: handle user inputs by moving the paddle up or down.
-Modify the processInput method to match the following:
+### Handling user inputs
+The method **processInput()** handles user inputs by moving the paddle up or down. Modify the **processInput()** method to match the following:
 
 ```javascript
 processInput(inputData, playerId) {
@@ -182,12 +178,12 @@ processInput(inputData, playerId) {
 }
 ```
 
-## Step 3: Server-only code
+## Step 3: Server-Only code
 
 The server engine will initialize the game engine when the game is started, and handle player connections and "disconnections".
 
-### **serverSideInit()**
-Create two paddles, a ball, and add these objects to the game world. Define these object's positions and velocities. This method will be called only on the server. Add the following `serverSideInit()` method:
+### Server-side Game Initialization
+Create two paddles, a ball, and add these objects to the game world. Define these object's positions and velocities. This method will be called only on the server. Add the following **serverSideInit()** method:
 
 ```javascript
 initGame() {
@@ -203,7 +199,8 @@ initGame() {
 }
 ```
 
-### **serverSidePlayerJoined() and serverSidePlayerDisconnected()**: attach players to the paddles when they join or disconnect.  Fill out the following two methods:
+### New Client Connections
+The methods **serverSidePlayerJoined()** and **serverSidePlayerDisconnected()** were previously registered to handle connection events.  They attach players to the paddles when they join or disconnect.  Fill out the following two methods:
 
 ```javascript
 // attach newly connected player to next available paddle
@@ -226,13 +223,16 @@ serverSidePlayerDisconnected(ev) {
 }
 ```
 
-## Step 4: Client-only code
+## Step 4: Client-Only Code
 
 The client-side code must implement a renderer, and a client engine.
 
 First, let's add some objects in the HTML file, found in `dist/index.html`.
 
-### dist/index.html
+### HTML Elements
+
+Update the file `dist/index.html` to include DIV elements for the ball and the paddles:
+
 ```html
 <html>
     <head>
@@ -252,9 +252,8 @@ First, let's add some objects in the HTML file, found in `dist/index.html`.
 The renderer, in our case, will update HTML elements created for
 each paddle and the ball:
 
-### **clientSideInit() and clientSideDraw()**: initialize the client, and draw
-
-Fill out the following two methods.  In `clientSideInit()` we bind the keyboard buttons "up" and "down".  In `clientSideDraw()` we update the HTML elements.
+### Initialization and Draw on the Client
+Fill out the following two methods.  In `clientSideInit()` we bind the keyboard buttons "up" and "down" to emit events called "up" and "down", respectively. In `clientSideDraw()` we update the positions of HTML elements for the paddles and the ball.
 
 ```javascript
 clientSideInit() {
@@ -292,9 +291,8 @@ cd ../pong
 npm install
 ```
 
-To run the game you must first build the JavaScript bundle.  The `npm install`
-command above already did this for you, but we changed the code, so you must rebuild by
-executing:
+To run the game you must first build the JavaScript bundle.  The `npm install` command above already did this for you, but we changed the code, so you must rebuild by executing:
+
 ```shell
 npm run build
 ```
@@ -312,4 +310,4 @@ on a Mac.
 
 Your next steps might be to get a deeper understanding by going through
 the Spaceships Tutorial, which introduces the concepts and components
-of an Lance networked game.
+of a Lance multiplayer networked game.
