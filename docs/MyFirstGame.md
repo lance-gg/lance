@@ -7,28 +7,31 @@ This tutorial takes about 45 minutes. It will guide you in building the simplest
 The creation of a new game starts by cloning boilerplate code:
 
 ```shell
-git clone https://github.com/lance-gg/tinygames.git
-cd tinygames/boilerplate
-npm install
+$ git clone https://github.com/lance-gg/tinygames.git
+$ cd tinygames/boilerplate
+$ npm install
 ```
 
-You now have the basic directory structure of a game.  Look around. The boilerplate includes a `dist/index.html` file, which will be served to the clients, and a `main.js` file, which is the entry point of the node.js server.
-The game code is inside the `src` directory, divided into sub-directories `client`, `server`, and `common`.
+The entire tutorial will be limited to editing a single file, `src/common/Game.js` for the sake of simplicity.  All the Pong game logic is implemented in this one file.  However, you may want to look around. The boilerplate directory includes a `dist/index.html` file, which will be served to the clients, and a `main.js` file, which is the entry point of the node.js server.  `src/client/clientEntryPoint.js` is the entry point of the client.  The game code is inside the `src` directory, and more advanced games will take advantage of the sub-directories `client`, `server`, and `common` to structure the code.
 
 Take a look at `webpack.config.js` which shows how the game is packaged, and `.babelrc` shows how the game loads the lance library.
 
-The tutorial will be limited to a single file: `src/common/Game.js` for the sake of simplicity.
 
 ## Step 1: Create the Game Object Classes
 
 There are only two kinds of objects in Pong, the paddle and the ball.
-These classes extend the `DynamicObject` class, and are quite simple.  Open the file `src/common/Game.js` with your favorite editor, and find the *GAME OBJECTS* section.  Remove the class `YourGameObject` and add the following two classes instead.
+These classes Paddle and Ball are sub-classes of the `DynamicObject` class, and are quite simple.  Open the file `src/common/Game.js` with your favorite editor, and find the *GAME OBJECTS* section.  Remove the class `YourGameObject` and add the following two classes instead.
 
 
 ### The Paddle Game Object
-The Paddle class has a constructor, and a netScheme.  The netScheme lists which attributes need to be synchronized between the server and the clients.  In this game we will synchronize the health of the paddle to all clients.  The `syncTo` method copies netScheme attributes from another object and is required by Lance.
+The Paddle class has a constructor, and a netScheme.  The netScheme lists which attributes need to be synchronized between the server and the clients.  In this game we will synchronize the health of the paddle to all clients.  The `syncTo` method copies netScheme attributes from another object and is required by Lance. Note that we also declared the constants PADDING, WIDTH, HEIGHT, PADDLE_WIDTH and PADDLE_HEIGHT which will be used later in the game logic.
 
 ```javascript
+const PADDING = 20;
+const WIDTH = 400;
+const HEIGHT = 400;
+const PADDLE_WIDTH = 10;
+const PADDLE_HEIGHT = 50;
 class Paddle extends DynamicObject {
 
     constructor(gameEngine, options, props) {
@@ -50,7 +53,7 @@ class Paddle extends DynamicObject {
 
 ### The Ball Game Object
 The Ball class is only slightly more complicated than the Paddle
-class.  It has no netScheme attributes, but it does have a *bending* property.  The default bending properties indicate that the client object's position should gradually *bend* towards the server object's position at a rate of 80% each time the server sends position updates.  In the game of Pong, the Ball's velocity should not bend at all, because the ball's velocity can change suddenly as it hits a wall or a paddle.  We also give the Ball an initial velocity when it is created.
+class.  It has no netScheme attributes, but it does have a *bending* property.  The default bending properties indicate that the client object's position should gradually *bend* towards the server object's position at a rate of 80% each time the server sends position updates.  In the game of Pong, the Ball's velocity *should not* bend at all, because the ball's velocity can change suddenly as it hits a wall or a paddle.
 
 ```javascript
 class Ball extends DynamicObject {
@@ -70,16 +73,14 @@ class Ball extends DynamicObject {
 }
 ```
 
-## Step 2: Implement the MyGameEngine class
+## Step 2: Implement a GameEngine Sub-Class
 
-The game engine class runs on both the server and the client, and executes the game's logic.  The client runs the game engine to predict what will happen, but the server execution is the true game progress, overriding what the clients might have predicted.
+The **GameEngine** sub-class is called **Game**. It runs on both the server and the client, and executes the game's logic.  The client runs the game engine to predict what will happen, but the server execution is the true game progress, overriding what the clients might have predicted.
 
-For Pong, we will need to bounce the ball around the board, and check if it hit a paddle.  We will also need to respond to the user's up/down inputs.
-
-Find the GAME ENGINE section, which defines the *GameEngine* sub-class.  The *Game* class implements the actual logic of the game.  
+For Pong, we will need to bounce the ball around the board, and check if it hit a paddle.  We will also need to respond to the user's up/down inputs. Find the GAME ENGINE section, which defines the *GameEngine* sub-class.  The *Game* class implements the actual logic of the game.  
 
 ### The Constructor and Registering your Game Objects
-The methods are **constructor()** and **registerClasses()**. The constructor creates a physics engine, and registers listener functions for the game. The method **registerClasses()** registers the list of GameObject classes with the Lance serializer.
+The methods are **constructor()** and **registerClasses()**. The constructor creates a physics engine, and registers event handler functions for the game. The method **registerClasses()** registers the list of DynamicObject sub-classes with the Lance serializer.
 
 ```javascript
 constructor(options) {
@@ -105,7 +106,7 @@ registerClasses(serializer) {
 }
 ```
 
-### The Game logic
+### The Game Logic
 Update the method **gameLogic()**, which was registered to run on the **postStep** event, with the code below.  This method is executed after the ball has moved.  It contains **all the core pong game logic**: it runs after every game step, and checks if the ball has hit any wall, or any paddle, and decides if a player has scored.
 
 ```javascript
@@ -159,8 +160,8 @@ gameLogic() {
 }
 ```
 
-### Handling user inputs
-The method **processInput()** handles user inputs by moving the paddle up or down. Modify the **processInput()** method to match the following:
+### Handling User Inputs
+The method **processInput()** is executed on the server, as it collects inputs from the various clients over the network and applies them to the game.  For example, if it receives the input string "up" from player 1, then it will change the corresponding paddle to move up by 5 pixels. Modify the **processInput()** method to match the following:
 
 ```javascript
 processInput(inputData, playerId) {
@@ -178,15 +179,15 @@ processInput(inputData, playerId) {
 }
 ```
 
-## Step 3: Server-Only code
+## Step 3: Server-Only Code
 
 The server engine will initialize the game engine when the game is started, and handle player connections and "disconnections".
 
-### Server-side Game Initialization
-Create two paddles, a ball, and add these objects to the game world. Define these object's positions and velocities. This method will be called only on the server. Add the following **serverSideInit()** method:
+### Server-Side Game Initialization
+Create two paddles, a ball, and add these objects to the game world. Provide these objects' positions and velocities. This method will be called only on the server. Add the following **serverSideInit()** method:
 
 ```javascript
-initGame() {
+serverSideInit() {
 
     // create the paddle objects
     this.addObjectToWorld(new Paddle(this, null, { position: new TwoVector(PADDING, 0) }));
@@ -225,9 +226,7 @@ serverSidePlayerDisconnected(ev) {
 
 ## Step 4: Client-Only Code
 
-The client-side code must implement a renderer, and a client engine.
-
-First, let's add some objects in the HTML file, found in `dist/index.html`.
+The client-side code must initialize the client, and draw the game on the screen on each render-frame. First, let's add some objects in the HTML file, found in `dist/index.html`.
 
 ### HTML Elements
 
@@ -249,8 +248,7 @@ Update the file `dist/index.html` to include DIV elements for the ball and the p
 </html>
 ```
 
-The renderer, in our case, will update HTML elements created for
-each paddle and the ball:
+The rendering, in our case, will update HTML elements representing the paddles and the ball:
 
 ### Initialization and Draw on the Client
 Fill out the following two methods.  In `clientSideInit()` we bind the keyboard buttons "up" and "down" to emit events called "up" and "down", respectively. In `clientSideDraw()` we update the positions of HTML elements for the paddles and the ball.
