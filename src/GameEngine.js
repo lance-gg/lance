@@ -209,8 +209,10 @@ class GameEngine {
         if (Number(object.id) >= this.options.clientIDSpace) {
             let serverCopyArrived = false;
             this.world.forEachObject((id, o) => {
-                if (o.hasOwnProperty('inputId') && o.inputId === object.inputId)
+                if (o.hasOwnProperty('inputId') && o.inputId === object.inputId) {
                     serverCopyArrived = true;
+                    return false; // quit the loop
+                }
             });
             if (serverCopyArrived) {
                 this.trace.info(() => `========== shadow object NOT added ${object.toString()} ==========`);
