@@ -183,11 +183,11 @@ class GameObject extends Serializable {
      * @returns {Boolean} true if the gameObject contains this component
      */
     hasComponent(componentClass) {
-        return componentClass.name in this.components;
+        return ((typeof componentClass === 'string') ? componentClass : componentClass.name) in this.components;
     }
 
     getComponent(componentClass) {
-        return this.components[componentClass.name];
+        return this.components[(typeof componentClass === 'string') ? componentClass : componentClass.name];
     }
 
 }
