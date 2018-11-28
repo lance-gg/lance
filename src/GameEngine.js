@@ -107,7 +107,7 @@ class GameEngine {
 
     initWorld(worldSettings) {
 
-        this.world = new GameWorld();
+        this.world = new this.options.GameWorld();
 
         // on the client we have a different ID space
         if (this.options.clientIDSpace) {
