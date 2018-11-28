@@ -13,20 +13,23 @@ class GameWorld {
         this.objects = {};
         this.playerCount = 0;
         this.idCount = 0;
+        this.freeIds = []
     }
+
 
     /**
      * Gets a new, fresh and unused id that can be used for a new object
      * @return {Number} the new id
      */
     getNewId() {
-        let possibleId = this.idCount;
         // find a free id
-        while (possibleId in this.objects)
-            possibleId++;
+        if (this.freeIds.length > 0) {
+          return this.freeIds.pop()
+        }
 
-        this.idCount = possibleId + 1;
-        return possibleId;
+        let id = this.idCount
+        this.idCount = this.idCount + 1;
+        return id;
     }
 
     /**
@@ -104,6 +107,7 @@ class GameWorld {
      */
     removeObject(id) {
         delete this.objects[id];
+        this.freeIds.push(id)
     }
 
     /**
