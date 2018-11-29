@@ -56,6 +56,27 @@ class Serializer {
         this.registeredClasses[classId] = classObj;
     }
 
+    // build a clone of this object with pruned strings (if necessary)
+    prunedStringsClone(object, prevObject) {
+        if (!prevObject) return object;
+        prevObject = this.deserialize(prevObject).obj;
+
+        // get list of string properties which changed
+        let netScheme = object.constructor.netScheme;
+        let isString = p => netScheme[p].type === BaseTypes.TYPES.STRING;
+        let hasChanged = p => prevObject[p] !== object[p];
+        let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
+        if (changedStrings.length == 0) return object;
+
+        // build a clone with pruned strings
+        let prunedCopy = new object.constructor(null, { id: null });
+        for (let p of Object.keys(netScheme))
+            prunedCopy[p] = changedStrings.indexOf(p) < 0 ? object[p] : null;
+
+        return prunedCopy;
+    }
+
+
     /**
      *  Class can be serialized using either:
      * - a class based netScheme
