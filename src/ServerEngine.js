@@ -189,7 +189,7 @@ class ServerEngine {
                     this.objMemory[objId] = s.dataBuffer;
 
                 // prune strings which haven't changed
-                obj = obj.prunedStringsClone(this.serializer, prevObject);
+                obj = this.serializer.prunedStringsClone(obj, prevObject);
             }
 
             this.networkTransmitter.addNetworkedEvent('objectUpdate', {
