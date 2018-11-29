@@ -1,4 +1,3 @@
-import Utils from './../lib/Utils';
 import BaseTypes from './BaseTypes';
 
 class Serializable {

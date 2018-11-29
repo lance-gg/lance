@@ -103,14 +103,14 @@ class Serializer {
         //       a single pass by starting with a large (and static) ArrayBuffer and
         //       recursively building it up.
         // buffer has one Uint8Array for class id, then payload
-        if (options.dataBuffer == null && options.dry != true) {
+        if (options.dataBuffer == null && options.dry !== true) {
             let bufferSize = object.serialize(this, { dry: true }).bufferOffset;
             dataBuffer = new ArrayBuffer(bufferSize);
         } else {
             dataBuffer = options.dataBuffer;
         }
 
-        if (options.dry != true) {
+        if (options.dry !== true) {
             dataView = new DataView(dataBuffer);
             // first set the id of the class, so that the deserializer can fetch information about it
             dataView.setUint8(bufferOffset + localBufferOffset, classId);
@@ -123,7 +123,7 @@ class Serializer {
             for (let property of Object.keys(netScheme).sort()) {
 
                 // write the property to buffer
-                if (options.dry != true) {
+                if (options.dry !== true) {
                     this.writeDataView(dataView, object[property], bufferOffset + localBufferOffset, netScheme[property]);
                 }
 
