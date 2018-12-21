@@ -98,6 +98,12 @@ class DynamicObject extends GameObject {
         this.affectedByGravity = true;
 
         /**
+        * playerId
+        * @member {Number}
+        */
+        if (props && props.playerId) this.playerId = props.playerId;
+
+        /**
         * position
         * @member {TwoVector}
         */
@@ -247,6 +253,8 @@ class DynamicObject extends GameObject {
         super.syncTo(other);
         this.position.copy(other.position);
         this.velocity.copy(other.velocity);
+        this.width = other.width;
+        this.height = other.height;
         this.bendingAngle = other.bendingAngle;
         this.rotationSpeed = other.rotationSpeed;
         this.acceleration = other.acceleration;

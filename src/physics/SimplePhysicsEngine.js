@@ -1,4 +1,3 @@
-'use strict';
 import PhysicsEngine from './PhysicsEngine';
 import TwoVector from '../serialize/TwoVector';
 import HSHGCollisionDetection from './SimplePhysics/HSHGCollisionDetection';
@@ -6,6 +5,7 @@ import BruteCollisionDetection from './SimplePhysics/BruteCollisionDetection';
 
 let dv = new TwoVector();
 let dx = new TwoVector();
+
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
