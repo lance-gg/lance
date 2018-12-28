@@ -50,30 +50,52 @@ var BruteForceCollisionDetection = function () {
             // need to auto-resolve
             if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
                 var shift = o2Box.xMax - o1Box.xMin;
-                if (o2.isStatic) o1.position.x += shift;else if (o1.isStatic) o2.position.x -= shift;else {
+                if (o2.isStatic) {
+                    o1.position.x += shift;
+                } else if (o1.isStatic) {
+                    o2.position.x -= shift;
+                } else {
                     o1.position.x += shift / 2;
                     o2.position.x -= shift / 2;
                 }
             } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
                 var _shift = o1Box.xMax - o2Box.xMin;
-                if (o2.isStatic) o1.position.x -= _shift;else if (o1.isStatic) o2.position.x += _shift;else {
+                if (o2.isStatic) {
+                    o1.position.x -= _shift;
+                } else if (o1.isStatic) {
+                    o2.position.x += _shift;
+                } else {
                     o1.position.x -= _shift / 2;
                     o2.position.x -= _shift / 2;
                 }
             }
             if (o1Box.yMin > o2Box.yMin && o1Box.yMin < o2Box.yMax) {
                 var _shift2 = o2Box.yMax - o1Box.yMin;
-                if (o2.isStatic) o1.y += _shift2;else if (o1.isStatic) o2.y -= _shift2;else {
+                if (o2.isStatic) {
+                    o1.position.y += _shift2;
+                    // as a very special case, landing on static object stop velocity
+                    o1.velocity.y = 0;
+                } else if (o1.isStatic) {
+                    o2.position.y -= _shift2;
+                } else {
                     o1.position.y += _shift2 / 2;
                     o2.position.y -= _shift2 / 2;
                 }
             } else if (o1Box.yMax > o2Box.yMin && o1Box.yMax < o2Box.yMax) {
                 var _shift3 = o1Box.yMax - o2Box.yMin;
-                if (o2.isStatic) o1.position.y -= _shift3;else if (o1.isStatic) o2.position.y += _shift3;else {
+                if (o2.isStatic) {
+                    o1.position.y -= _shift3;
+                } else if (o1.isStatic) {
+                    o2.position.y += _shift3;
+                    // as a very special case, landing on static object stop velocity
+                    o2.velocity.y = 0;
+                } else {
                     o1.position.y -= _shift3 / 2;
                     o2.position.y -= _shift3 / 2;
                 }
             }
+
+            return true;
         }
 
         // check if pair (id1, id2) have collided
