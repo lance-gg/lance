@@ -273,7 +273,10 @@ var GameEngine = function () {
       if (Number(object.id) >= this.options.clientIDSpace) {
         var serverCopyArrived = false;
         this.world.forEachObject(function (id, o) {
-          if (o.hasOwnProperty('inputId') && o.inputId === object.inputId) serverCopyArrived = true;
+          if (o.hasOwnProperty('inputId') && o.inputId === object.inputId) {
+            serverCopyArrived = true;
+            return false;
+          }
         });
         if (serverCopyArrived) {
           this.trace.info(function () {

@@ -44,6 +44,7 @@ class DynamicObject extends GameObject {
             position: { type: BaseTypes.TYPES.CLASSINSTANCE },
             width: { type: BaseTypes.TYPES.INT16 },
             height: { type: BaseTypes.TYPES.INT16 },
+            isStatic: { type: BaseTypes.TYPES.UINT8 },
             velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
             angle: { type: BaseTypes.TYPES.FLOAT32 }
         }, super.netScheme);
@@ -86,16 +87,16 @@ class DynamicObject extends GameObject {
         this.height = 1;
 
         /**
+         * Determine if the object is static (i.e. it never moves, like a wall). The value 0 implies the object is dynamic.  Default is 0 (dynamic).
+         * @member {Number}
+         */
+        this.isStatic = 0;
+
+        /**
          * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
          * @member {TwoVector}
          */
         this.friction = new TwoVector(1, 1);
-
-        /**
-         * Whether this object is affected by gravity.
-         * @member {Boolean}
-         */
-        this.affectedByGravity = true;
 
         /**
         * playerId

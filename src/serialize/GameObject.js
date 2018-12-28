@@ -179,8 +179,8 @@ class GameObject extends Serializable {
 
     /**
      * Check whether this game object has a certain component
-     * @param componentClass the comp
-     * @returns {Boolean} true if the gameObject contains this component
+     * @param {Object} componentClass the comp
+     * @return {Boolean} true if the gameObject contains this component
      */
     hasComponent(componentClass) {
         return componentClass.name in this.components;

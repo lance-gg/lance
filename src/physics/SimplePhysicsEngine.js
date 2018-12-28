@@ -1,7 +1,7 @@
 import PhysicsEngine from './PhysicsEngine';
 import TwoVector from '../serialize/TwoVector';
 import HSHGCollisionDetection from './SimplePhysics/HSHGCollisionDetection';
-import BruteCollisionDetection from './SimplePhysics/BruteCollisionDetection';
+import BruteForceCollisionDetection from './SimplePhysics/BruteForceCollisionDetection';
 
 let dv = new TwoVector();
 let dx = new TwoVector();
@@ -9,17 +9,31 @@ let dx = new TwoVector();
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
+ * The Simple Physics Engine is a "fake" physics engine, which is more
+ * appropriate for arcade games, and it is sometimes referred to as "arcade"
+ * physics. For example if a character is standing at the edge of a platform,
+ * with only one foot on the platform, it won't fall over. This is a desired
+ * game behaviour in platformer games.
  */
 class SimplePhysicsEngine extends PhysicsEngine {
 
-    constructor(initOptions) {
-        super(initOptions);
+    /**
+    * Creates an instance of the Simple Physics Engine.
+    * @param {Object} options - physics options
+    * @param {Object} options.collisions - collision options
+    * @param {String} options.collisions.type - can be set to "HSHG" or "bruteForce".  Default is Brute-Force collision detection.
+    * @param {Number} options.collisions.collisionDistance - for brute force, this can be set for a simple distance-based (radius) collision detection.
+    * @param {Boolean} options.collisions.autoResolve - for brute force collision, colliding objects should be moved apart
+    * @param {TwoVector} options.gravity - TwoVector instance which describes gravity, which will be added to the velocity of all objects at every step.  For example TwoVector(0, -0.01)
+    */
+    constructor(options) {
+        super(options);
 
         // todo does this mean both modules always get loaded?
-        if (initOptions.collisions && initOptions.collisions.type === 'HSHG') {
-            this.collisionDetection = new HSHGCollisionDetection();
+        if (options.collisions && options.collisions.type === 'HSHG') {
+            this.collisionDetection = new HSHGCollisionDetection(options.collisions);
         } else {
-            this.collisionDetection = new BruteCollisionDetection();
+            this.collisionDetection = new BruteForceCollisionDetection(options.collisions);
         }
 
         /**
@@ -29,10 +43,10 @@ class SimplePhysicsEngine extends PhysicsEngine {
          */
         this.gravity = new TwoVector(0, 0);
 
-        if (initOptions.gravity)
-            this.gravity.copy(initOptions.gravity);
+        if (options.gravity)
+            this.gravity.copy(options.gravity);
 
-        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, initOptions.collisionOptions);
+        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, options.collisionOptions);
         this.collisionDetection.init(collisionOptions);
     }
 
@@ -49,6 +63,11 @@ class SimplePhysicsEngine extends PhysicsEngine {
             dt /= (1 / 60);
         else
             dt = 1;
+
+        // TODO: worldsettings is a hack.  Find all places which use it in all games
+        // and come up with a better solution.  for example an option sent to the physics Engine
+        // with a "worldWrap:true" options
+        // replace with a "worldBounds" parameter to the PhysicsEngine constructor
 
         let worldSettings = this.gameEngine.worldSettings;
 
@@ -68,7 +87,7 @@ class SimplePhysicsEngine extends PhysicsEngine {
         }
 
         // apply gravity
-        if (o.affectedByGravity) o.velocity.add(this.gravity);
+        if (!o.isStatic) o.velocity.add(this.gravity);
 
         let velMagnitude = o.velocity.length();
         if ((o.maxSpeed !== null) && (velMagnitude > o.maxSpeed)) {

@@ -236,8 +236,8 @@ var GameObject = function (_Serializable) {
 
         /**
          * Check whether this game object has a certain component
-         * @param componentClass the comp
-         * @returns {Boolean} true if the gameObject contains this component
+         * @param {Object} componentClass the comp
+         * @return {Boolean} true if the gameObject contains this component
          */
 
     }, {

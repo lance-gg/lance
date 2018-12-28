@@ -33,7 +33,7 @@ export default class HSHGCollisionDetection {
             return accumulator;
         }, {});
 
-        for (let pairId of Object.keys(this.previousCollisionPairs)){
+        for (let pairId of Object.keys(this.previousCollisionPairs)) {
             let pairObj = this.previousCollisionPairs[pairId];
 
             // existed in previous pairs, but not during this step: this pair stopped colliding
@@ -56,20 +56,20 @@ export default class HSHGCollisionDetection {
 
     /**
      * checks wheter two objects are currently colliding
-     * @param o1 {Object} first object
-     * @param o2 {Object} second object
-     * @returns {boolean} are the two objects colliding?
+     * @param {Object} o1 first object
+     * @param {Object} o2 second object
+     * @return {boolean} are the two objects colliding?
      */
-    areObjectsColliding(o1, o2){
-        return getArrayPairId([o1,o2]) in this.stepCollidingPairs;
+    areObjectsColliding(o1, o2) {
+        return getArrayPairId([o1, o2]) in this.stepCollidingPairs;
     }
 
 }
 
-function getArrayPairId(arrayPair){
+function getArrayPairId(arrayPair) {
     // make sure to get the same id regardless of object order
     let sortedArrayPair = arrayPair.slice(0).sort();
     return sortedArrayPair[0].id + '-' + sortedArrayPair[1].id;
 }
 
-module.exports = HSHGCollisionDetection ;
+module.exports = HSHGCollisionDetection;
