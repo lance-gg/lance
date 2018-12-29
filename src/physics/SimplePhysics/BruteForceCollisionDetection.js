@@ -15,6 +15,10 @@ export default class BruteForceCollisionDetection {
 
     findCollision(o1, o2) {
 
+        // static objects don't collide
+        if (o1.isStatic && o2.isStatic)
+            return false;
+
         // radius-based collision
         if (this.options.collisionDistance) {
             differenceVector.copy(o1.position).subtract(o2.position);
@@ -33,27 +37,10 @@ export default class BruteForceCollisionDetection {
             return true;
 
         // need to auto-resolve
-        if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
-            let shift = o2Box.xMax - o1Box.xMin;
-            if (o2.isStatic) {
-                o1.position.x += shift;
-            } else if (o1.isStatic) {
-                o2.position.x -= shift;
-            } else {
-                o1.position.x += shift / 2;
-                o2.position.x -= shift / 2;
-            }
-        } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
-            let shift = o1Box.xMax - o2Box.xMin;
-            if (o2.isStatic) {
-                o1.position.x -= shift;
-            } else if (o1.isStatic) {
-                o2.position.x += shift;
-            } else {
-                o1.position.x -= shift / 2;
-                o2.position.x -= shift / 2;
-            }
-        }
+        // Note 1: check y-axis before x-axis. Because standing on platform should be first check,
+        //         to avoid sliding on platform
+        // Note 2: overlap of object on top of platform sets y-velocity to zero, to help with
+        //         gravity
         if (o1Box.yMin > o2Box.yMin && o1Box.yMin < o2Box.yMax) {
             let shift = o2Box.yMax - o1Box.yMin;
             if (o2.isStatic) {
@@ -77,6 +64,26 @@ export default class BruteForceCollisionDetection {
             } else {
                 o1.position.y -= shift / 2;
                 o2.position.y -= shift / 2;
+            }
+        } else if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
+            let shift = o2Box.xMax - o1Box.xMin;
+            if (o2.isStatic) {
+                o1.position.x += shift;
+            } else if (o1.isStatic) {
+                o2.position.x -= shift;
+            } else {
+                o1.position.x += shift / 2;
+                o2.position.x -= shift / 2;
+            }
+        } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
+            let shift = o1Box.xMax - o2Box.xMin;
+            if (o2.isStatic) {
+                o1.position.x -= shift;
+            } else if (o1.isStatic) {
+                o2.position.x += shift;
+            } else {
+                o1.position.x -= shift / 2;
+                o2.position.x -= shift / 2;
             }
         }
 
@@ -120,7 +127,6 @@ export default class BruteForceCollisionDetection {
             for (let k2 of keys)
                 if (k2 > k1) this.checkPair(k1, k2);
     }
-
 }
 
 // get bounding box of object o
