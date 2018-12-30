@@ -51,54 +51,58 @@ var BruteForceCollisionDetection = function () {
             if (!this.options.autoResolve) return true;
 
             // need to auto-resolve
-            // Note 1: check y-axis before x-axis. Because standing on platform should be first check,
-            //         to avoid sliding on platform
-            // Note 2: overlap of object on top of platform sets y-velocity to zero, to help with
-            //         gravity
-            if (o1Box.yMin > o2Box.yMin && o1Box.yMin < o2Box.yMax) {
-                var shift = o2Box.yMax - o1Box.yMin;
-                if (o2.isStatic) {
-                    o1.position.y += shift;
-                    // as a very special case, landing on static object stop velocity
-                    o1.velocity.y = 0;
-                } else if (o1.isStatic) {
-                    o2.position.y -= shift;
-                } else {
-                    o1.position.y += shift / 2;
-                    o2.position.y -= shift / 2;
+            var shiftY1 = o2Box.yMax - o1Box.yMin;
+            var shiftY2 = o1Box.yMax - o2Box.yMin;
+            var shiftX1 = o2Box.xMax - o1Box.xMin;
+            var shiftX2 = o1Box.xMax - o2Box.xMin;
+            var smallestYShift = Math.min(Math.abs(shiftY1), Math.abs(shiftY2));
+            var smallestXShift = Math.min(Math.abs(shiftX1), Math.abs(shiftX2));
+
+            // choose to apply the smallest shift which solves the collision
+            if (smallestYShift < smallestXShift) {
+                if (o1Box.yMin > o2Box.yMin && o1Box.yMin < o2Box.yMax) {
+                    if (o2.isStatic) {
+                        o1.position.y += shiftY1;
+                    } else if (o1.isStatic) {
+                        o2.position.y -= shiftY1;
+                    } else {
+                        o1.position.y += shiftY1 / 2;
+                        o2.position.y -= shiftY1 / 2;
+                    }
+                } else if (o1Box.yMax > o2Box.yMin && o1Box.yMax < o2Box.yMax) {
+                    if (o2.isStatic) {
+                        o1.position.y -= shiftY2;
+                    } else if (o1.isStatic) {
+                        o2.position.y += shiftY2;
+                    } else {
+                        o1.position.y -= shiftY2 / 2;
+                        o2.position.y -= shiftY2 / 2;
+                    }
                 }
-            } else if (o1Box.yMax > o2Box.yMin && o1Box.yMax < o2Box.yMax) {
-                var _shift = o1Box.yMax - o2Box.yMin;
-                if (o2.isStatic) {
-                    o1.position.y -= _shift;
-                } else if (o1.isStatic) {
-                    o2.position.y += _shift;
-                    // as a very special case, landing on static object stop velocity
-                    o2.velocity.y = 0;
-                } else {
-                    o1.position.y -= _shift / 2;
-                    o2.position.y -= _shift / 2;
+                o1.velocity.y = 0;
+                o2.velocity.y = 0;
+            } else {
+                if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
+                    if (o2.isStatic) {
+                        o1.position.x += shiftX1;
+                    } else if (o1.isStatic) {
+                        o2.position.x -= shiftX1;
+                    } else {
+                        o1.position.x += shiftX1 / 2;
+                        o2.position.x -= shiftX1 / 2;
+                    }
+                } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
+                    if (o2.isStatic) {
+                        o1.position.x -= shiftX2;
+                    } else if (o1.isStatic) {
+                        o2.position.x += shiftX2;
+                    } else {
+                        o1.position.x -= shiftX2 / 2;
+                        o2.position.x -= shiftX2 / 2;
+                    }
                 }
-            } else if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
-                var _shift2 = o2Box.xMax - o1Box.xMin;
-                if (o2.isStatic) {
-                    o1.position.x += _shift2;
-                } else if (o1.isStatic) {
-                    o2.position.x -= _shift2;
-                } else {
-                    o1.position.x += _shift2 / 2;
-                    o2.position.x -= _shift2 / 2;
-                }
-            } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
-                var _shift3 = o1Box.xMax - o2Box.xMin;
-                if (o2.isStatic) {
-                    o1.position.x -= _shift3;
-                } else if (o1.isStatic) {
-                    o2.position.x += _shift3;
-                } else {
-                    o1.position.x -= _shift3 / 2;
-                    o2.position.x -= _shift3 / 2;
-                }
+                o1.velocity.x = 0;
+                o2.velocity.x = 0;
             }
 
             return true;
