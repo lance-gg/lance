@@ -38,6 +38,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+// TODO: the GAME_UPS below should be common to the value implemented in the server engine,
+// or better yet, it should be configurable in the GameEngine instead of ServerEngine+ClientEngine
 var GAME_UPS = 60; // default number of game steps per second
 var STEP_DELAY_MSEC = 12; // if forward drift detected, delay next execution by this amount
 var STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution by this amount

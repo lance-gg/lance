@@ -18,9 +18,9 @@ var _HSHGCollisionDetection = require('./SimplePhysics/HSHGCollisionDetection');
 
 var _HSHGCollisionDetection2 = _interopRequireDefault(_HSHGCollisionDetection);
 
-var _BruteCollisionDetection = require('./SimplePhysics/BruteCollisionDetection');
+var _BruteForceCollisionDetection = require('./SimplePhysics/BruteForceCollisionDetection');
 
-var _BruteCollisionDetection2 = _interopRequireDefault(_BruteCollisionDetection);
+var _BruteForceCollisionDetection2 = _interopRequireDefault(_BruteForceCollisionDetection);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32,24 +32,39 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var dv = new _TwoVector2.default();
 var dx = new _TwoVector2.default();
+
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
+ * The Simple Physics Engine is a "fake" physics engine, which is more
+ * appropriate for arcade games, and it is sometimes referred to as "arcade"
+ * physics. For example if a character is standing at the edge of a platform,
+ * with only one foot on the platform, it won't fall over. This is a desired
+ * game behaviour in platformer games.
  */
 
 var SimplePhysicsEngine = function (_PhysicsEngine) {
     _inherits(SimplePhysicsEngine, _PhysicsEngine);
 
-    function SimplePhysicsEngine(initOptions) {
+    /**
+    * Creates an instance of the Simple Physics Engine.
+    * @param {Object} options - physics options
+    * @param {Object} options.collisions - collision options
+    * @param {String} options.collisions.type - can be set to "HSHG" or "bruteForce".  Default is Brute-Force collision detection.
+    * @param {Number} options.collisions.collisionDistance - for brute force, this can be set for a simple distance-based (radius) collision detection.
+    * @param {Boolean} options.collisions.autoResolve - for brute force collision, colliding objects should be moved apart
+    * @param {TwoVector} options.gravity - TwoVector instance which describes gravity, which will be added to the velocity of all objects at every step.  For example TwoVector(0, -0.01)
+    */
+    function SimplePhysicsEngine(options) {
         _classCallCheck(this, SimplePhysicsEngine);
 
         // todo does this mean both modules always get loaded?
-        var _this = _possibleConstructorReturn(this, (SimplePhysicsEngine.__proto__ || Object.getPrototypeOf(SimplePhysicsEngine)).call(this, initOptions));
+        var _this = _possibleConstructorReturn(this, (SimplePhysicsEngine.__proto__ || Object.getPrototypeOf(SimplePhysicsEngine)).call(this, options));
 
-        if (initOptions.collisions && initOptions.collisions.type === 'HSHG') {
-            _this.collisionDetection = new _HSHGCollisionDetection2.default();
+        if (options.collisions && options.collisions.type === 'HSHG') {
+            _this.collisionDetection = new _HSHGCollisionDetection2.default(options.collisions);
         } else {
-            _this.collisionDetection = new _BruteCollisionDetection2.default();
+            _this.collisionDetection = new _BruteForceCollisionDetection2.default(options.collisions);
         }
 
         /**
@@ -59,9 +74,9 @@ var SimplePhysicsEngine = function (_PhysicsEngine) {
          */
         _this.gravity = new _TwoVector2.default(0, 0);
 
-        if (initOptions.gravity) _this.gravity.copy(initOptions.gravity);
+        if (options.gravity) _this.gravity.copy(options.gravity);
 
-        var collisionOptions = Object.assign({ gameEngine: _this.gameEngine }, initOptions.collisionOptions);
+        var collisionOptions = Object.assign({ gameEngine: _this.gameEngine }, options.collisionOptions);
         _this.collisionDetection.init(collisionOptions);
         return _this;
     }
@@ -79,6 +94,11 @@ var SimplePhysicsEngine = function (_PhysicsEngine) {
             if (dt === 0) return;
 
             if (dt) dt /= 1 / 60;else dt = 1;
+
+            // TODO: worldsettings is a hack.  Find all places which use it in all games
+            // and come up with a better solution.  for example an option sent to the physics Engine
+            // with a "worldWrap:true" options
+            // replace with a "worldBounds" parameter to the PhysicsEngine constructor
 
             var worldSettings = this.gameEngine.worldSettings;
 
@@ -106,7 +126,7 @@ var SimplePhysicsEngine = function (_PhysicsEngine) {
             }
 
             // apply gravity
-            if (o.affectedByGravity) o.velocity.add(this.gravity);
+            if (!o.isStatic) o.velocity.add(this.gravity);
 
             var velMagnitude = o.velocity.length();
             if (o.maxSpeed !== null && velMagnitude > o.maxSpeed) {

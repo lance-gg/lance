@@ -78,6 +78,7 @@ var DynamicObject = function (_GameObject) {
                 position: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE },
                 width: { type: _BaseTypes2.default.TYPES.INT16 },
                 height: { type: _BaseTypes2.default.TYPES.INT16 },
+                isStatic: { type: _BaseTypes2.default.TYPES.UINT8 },
                 velocity: { type: _BaseTypes2.default.TYPES.CLASSINSTANCE },
                 angle: { type: _BaseTypes2.default.TYPES.FLOAT32 }
             }, _get(DynamicObject.__proto__ || Object.getPrototypeOf(DynamicObject), 'netScheme', this));
@@ -125,16 +126,22 @@ var DynamicObject = function (_GameObject) {
         _this.height = 1;
 
         /**
+         * Determine if the object is static (i.e. it never moves, like a wall). The value 0 implies the object is dynamic.  Default is 0 (dynamic).
+         * @member {Number}
+         */
+        _this.isStatic = 0;
+
+        /**
          * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
          * @member {TwoVector}
          */
         _this.friction = new _TwoVector2.default(1, 1);
 
         /**
-         * Whether this object is affected by gravity.
-         * @member {Boolean}
-         */
-        _this.affectedByGravity = true;
+        * playerId
+        * @member {Number}
+        */
+        if (props && props.playerId) _this.playerId = props.playerId;
 
         /**
         * position
@@ -303,6 +310,8 @@ var DynamicObject = function (_GameObject) {
             _get(DynamicObject.prototype.__proto__ || Object.getPrototypeOf(DynamicObject.prototype), 'syncTo', this).call(this, other);
             this.position.copy(other.position);
             this.velocity.copy(other.velocity);
+            this.width = other.width;
+            this.height = other.height;
             this.bendingAngle = other.bendingAngle;
             this.rotationSpeed = other.rotationSpeed;
             this.acceleration = other.acceleration;

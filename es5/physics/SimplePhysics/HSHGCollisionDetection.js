@@ -118,9 +118,9 @@ var HSHGCollisionDetection = function () {
 
         /**
          * checks wheter two objects are currently colliding
-         * @param o1 {Object} first object
-         * @param o2 {Object} second object
-         * @returns {boolean} are the two objects colliding?
+         * @param {Object} o1 first object
+         * @param {Object} o2 second object
+         * @return {boolean} are the two objects colliding?
          */
 
     }, {
