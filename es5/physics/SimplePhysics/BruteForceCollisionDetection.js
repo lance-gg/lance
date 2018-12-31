@@ -22,7 +22,9 @@ var BruteForceCollisionDetection = function () {
     function BruteForceCollisionDetection(options) {
         _classCallCheck(this, BruteForceCollisionDetection);
 
-        this.options = Object.assign({}, options);
+        this.options = Object.assign({
+            autoResolve: true
+        }, options);
         this.collisionPairs = {};
     }
 
@@ -44,6 +46,7 @@ var BruteForceCollisionDetection = function () {
                 return differenceVector.length() < this.options.collisionDistance;
             }
 
+            // check for no-collision first
             var o1Box = getBox(o1);
             var o2Box = getBox(o2);
             if (o1Box.xMin > o2Box.xMax || o1Box.yMin > o2Box.yMax || o2Box.xMin > o1Box.xMax || o2Box.yMin > o1Box.yMax) return false;
@@ -61,44 +64,28 @@ var BruteForceCollisionDetection = function () {
             // choose to apply the smallest shift which solves the collision
             if (smallestYShift < smallestXShift) {
                 if (o1Box.yMin > o2Box.yMin && o1Box.yMin < o2Box.yMax) {
-                    if (o2.isStatic) {
-                        o1.position.y += shiftY1;
-                    } else if (o1.isStatic) {
-                        o2.position.y -= shiftY1;
-                    } else {
+                    if (o2.isStatic) o1.position.y += shiftY1;else if (o1.isStatic) o2.position.y -= shiftY1;else {
                         o1.position.y += shiftY1 / 2;
                         o2.position.y -= shiftY1 / 2;
                     }
                 } else if (o1Box.yMax > o2Box.yMin && o1Box.yMax < o2Box.yMax) {
-                    if (o2.isStatic) {
-                        o1.position.y -= shiftY2;
-                    } else if (o1.isStatic) {
-                        o2.position.y += shiftY2;
-                    } else {
+                    if (o2.isStatic) o1.position.y -= shiftY2;else if (o1.isStatic) o2.position.y += shiftY2;else {
                         o1.position.y -= shiftY2 / 2;
-                        o2.position.y -= shiftY2 / 2;
+                        o2.position.y += shiftY2 / 2;
                     }
                 }
                 o1.velocity.y = 0;
                 o2.velocity.y = 0;
             } else {
                 if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
-                    if (o2.isStatic) {
-                        o1.position.x += shiftX1;
-                    } else if (o1.isStatic) {
-                        o2.position.x -= shiftX1;
-                    } else {
+                    if (o2.isStatic) o1.position.x += shiftX1;else if (o1.isStatic) o2.position.x -= shiftX1;else {
                         o1.position.x += shiftX1 / 2;
                         o2.position.x -= shiftX1 / 2;
                     }
                 } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
-                    if (o2.isStatic) {
-                        o1.position.x -= shiftX2;
-                    } else if (o1.isStatic) {
-                        o2.position.x += shiftX2;
-                    } else {
+                    if (o2.isStatic) o1.position.x -= shiftX2;else if (o1.isStatic) o2.position.x += shiftX2;else {
                         o1.position.x -= shiftX2 / 2;
-                        o2.position.x -= shiftX2 / 2;
+                        o2.position.x += shiftX2 / 2;
                     }
                 }
                 o1.velocity.x = 0;

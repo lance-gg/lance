@@ -6,6 +6,8 @@ import Serializer from './serialize/Serializer';
 import NetworkMonitor from './network/NetworkMonitor';
 import NetworkTransmitter from './network/NetworkTransmitter';
 
+// TODO: the GAME_UPS below should be common to the value implemented in the server engine,
+// or better yet, it should be configurable in the GameEngine instead of ServerEngine+ClientEngine
 const GAME_UPS = 60; // default number of game steps per second
 const STEP_DELAY_MSEC = 12; // if forward drift detected, delay next execution by this amount
 const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution by this amount
