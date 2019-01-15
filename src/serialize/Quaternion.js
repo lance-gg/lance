@@ -207,8 +207,8 @@ class Quaternion extends Serializable {
 
         let sqrSinHalfTheta = 1.0 - cosHalfTheta*cosHalfTheta;
         if (sqrSinHalfTheta < Number.EPSILON) {
-            let s = 1 - t;
-            this.set(s*w + bending*this.w, s*x + bending*this.x, s*y + bending*this.y, s*z + bending*this.z);
+            let s = 1 - bending;
+            this.set(s*aw + bending*this.w, s*ax + bending*this.x, s*ay + bending*this.y, s*az + bending*this.z);
             return this.normalize();
         }
 

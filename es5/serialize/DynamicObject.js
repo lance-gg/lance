@@ -94,6 +94,8 @@ var DynamicObject = function (_GameObject) {
         * @param {Object} props - properties to be set in the new object
         * @param {TwoVector} props.position - position vector
         * @param {TwoVector} props.velocity - velocity vector
+        * @param {Number} props.height - object height
+        * @param {Number} props.width - object width
         */
 
     }]);
@@ -107,7 +109,8 @@ var DynamicObject = function (_GameObject) {
         */
         var _this = _possibleConstructorReturn(this, (DynamicObject.__proto__ || Object.getPrototypeOf(DynamicObject)).call(this, gameEngine, options));
 
-        _this.playerId = 0;
+        _this.playerId = props && props.playerId ? props.playerId : 0;
+
         _this.bendingIncrements = 0;
 
         _this.position = new _TwoVector2.default(0, 0);
@@ -117,19 +120,19 @@ var DynamicObject = function (_GameObject) {
          * Object width for collision detection purposes. Default is 1
          * @member {Number}
          */
-        _this.width = 1;
+        _this.width = props && props.width ? props.width : 1;
 
         /**
-         * Object Height for collision detection purposes. Default is 1
+         * Object height for collision detection purposes. Default is 1
          * @member {Number}
          */
-        _this.height = 1;
+        _this.height = props && props.height ? props.height : 1;
 
         /**
          * Determine if the object is static (i.e. it never moves, like a wall). The value 0 implies the object is dynamic.  Default is 0 (dynamic).
          * @member {Number}
          */
-        _this.isStatic = 0;
+        _this.isStatic = props && props.isStatic ? props.isStatic : 0;
 
         /**
          * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)

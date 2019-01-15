@@ -60,6 +60,8 @@ class DynamicObject extends GameObject {
     * @param {Object} props - properties to be set in the new object
     * @param {TwoVector} props.position - position vector
     * @param {TwoVector} props.velocity - velocity vector
+    * @param {Number} props.height - object height
+    * @param {Number} props.width - object width
     */
     constructor(gameEngine, options, props) {
         super(gameEngine, options);
@@ -68,7 +70,8 @@ class DynamicObject extends GameObject {
         * ID of player who created this object
         * @member {Number}
         */
-        this.playerId = 0;
+        this.playerId = (props && props.playerId) ? props.playerId : 0;
+
         this.bendingIncrements = 0;
 
         this.position = new TwoVector(0, 0);
@@ -78,19 +81,19 @@ class DynamicObject extends GameObject {
          * Object width for collision detection purposes. Default is 1
          * @member {Number}
          */
-        this.width = 1;
+        this.width = (props && props.width) ? props.width : 1;
 
         /**
-         * Object Height for collision detection purposes. Default is 1
+         * Object height for collision detection purposes. Default is 1
          * @member {Number}
          */
-        this.height = 1;
+        this.height = (props && props.height) ? props.height : 1;
 
         /**
          * Determine if the object is static (i.e. it never moves, like a wall). The value 0 implies the object is dynamic.  Default is 0 (dynamic).
          * @member {Number}
          */
-        this.isStatic = 0;
+        this.isStatic = (props && props.isStatic) ? props.isStatic : 0;
 
         /**
          * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
