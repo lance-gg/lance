@@ -21,6 +21,12 @@ export default class BruteForceCollisionDetection {
         if (o1.isStatic && o2.isStatic)
             return false;
 
+        // allow a collision checker function
+        if (typeof o1.collidesWith === 'function') {
+            if (!o1.collidesWith(o2))
+                return false;
+        }
+
         // radius-based collision
         if (this.options.collisionDistance) {
             differenceVector.copy(o1.position).subtract(o2.position);

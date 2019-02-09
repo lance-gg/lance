@@ -380,6 +380,19 @@ var DynamicObject = function (_GameObject) {
                 max: [this.x + this.width / 2, this.y + this.height / 2]
             };
         }
+
+        /**
+        * Determine if this object will collide with another object.
+        * Only applicable on "bruteForce" physics engine.
+        * @param {DynamicObject} other DynamicObject
+        * @return {Boolean} true if the two objects collide
+        */
+
+    }, {
+        key: 'collidesWith',
+        value: function collidesWith(other) {
+            return true;
+        }
     }, {
         key: 'x',
         get: function get() {
