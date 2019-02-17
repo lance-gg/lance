@@ -17,9 +17,11 @@ a simple development model which is highly configurable and easy to analyze
 and debug.
 
 ## See it in action
-Check out the official demo.
-[Spaaace (Europe Game Server)](http://spaaace.lance.gg/index.html?serverURL=spaaace.games-eu.lance.gg)
-[Spaaace (US Game Server)](http://spaaace.lance.gg/index.html?serverURL=spaaace.games-us.lance.gg)
+Check out the official demo, Spaaace:
+(
+[Europe Game Server](http://spaaace.lance.gg/index.html?serverURL=spaaace.games-eu.lance.gg),
+[US Game Server](http://spaaace.lance.gg/index.html?serverURL=spaaace.games-us.lance.gg)
+)
 
 ## Features:
 
