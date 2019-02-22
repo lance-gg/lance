@@ -220,7 +220,12 @@ class ServerEngine {
     }
 
     /**
-     * create a room
+     * Create a room
+     *
+     * There is a default room called "/lobby".  All newly created players
+     * and objects are assigned to the default room.  When the server sends
+     * periodic syncs to the players, each player is only sent those objects
+     * which are present in his room.
      *
      * @param {String} roomName - the new room name
      */
@@ -229,7 +234,7 @@ class ServerEngine {
     }
 
     /**
-     * assign an object to a room
+     * Assign an object to a room
      *
      * @param {Object} obj - the object to move
      * @param {String} roomName - the target room
@@ -239,7 +244,7 @@ class ServerEngine {
     }
 
     /**
-     * assign a player to a room
+     * Assign a player to a room
      *
      * @param {Number} playerId - the playerId
      * @param {String} roomName - the target room
@@ -257,6 +262,9 @@ class ServerEngine {
         if (!player) {
             this.trace.error(() => `cannot assign non-existant playerId ${playerId} to room ${roomName}`);
         }
+        const roomUpdate = { playerId: playerId, from: player.roomName, to: roomName };
+        player.socket.emit('roomUpdate', roomUpdate);
+        this.gameEngine.emit('server__roomUpdate', roomUpdate);
         player.room = this.rooms[room];
     }
 

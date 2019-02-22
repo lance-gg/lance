@@ -144,6 +144,10 @@ class ClientEngine {
                 this.socket.on('worldUpdate', (worldData) => {
                     this.inboundMessages.push(worldData);
                 });
+
+                this.socket.on('roomUpdate', (roomData) => {
+                    this.gameEngine.emit('client__roomUpdate', roomData);
+                });
             });
         };
 
