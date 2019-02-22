@@ -1,5 +1,3 @@
-'use strict';
-
 import fs from 'fs';
 import Utils from './lib/Utils';
 import Scheduler from './lib/Scheduler';
@@ -7,6 +5,7 @@ import Serializer from './serialize/Serializer';
 import NetworkTransmitter from './network/NetworkTransmitter';
 import NetworkMonitor from './network/NetworkMonitor';
 
+const DEFAULT_ROOM = 'lobby';
 /**
  * ServerEngine is the main server-side singleton code.
  * Extend this class with your own server-side logic, and
@@ -67,12 +66,12 @@ class ServerEngine {
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
         this.networkMonitor = new NetworkMonitor();
 
+        this.rooms = {};
+        this.createRoom(DEFAULT_ROOM);
         this.connectedPlayers = {};
         this.playerInputQueues = {};
         this.pendingAtomicEvents = [];
         this.objMemory = {};
-        this.requestImmediateUpdate = false;
-        this.syncCounter = 0;
 
         io.on('connection', this.onPlayerConnected.bind(this));
         this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
@@ -125,30 +124,14 @@ class ServerEngine {
         // run the game engine step
         this.gameEngine.step(false, this.serverTime / 1000);
 
-        // update clients only at the specified step interval, as defined in options
-        if (this.requestImmediateUpdate ||
-            this.gameEngine.world.stepCount % this.options.updateRate === 0) {
+        // synchronize the state to all clients
+        Object.keys(this.rooms).map(this.syncStateToClients.bind(this));
 
-            // if at least one player is new, we should send a full payload
-            let diffUpdate = true;
-            for (let socketId of Object.keys(this.connectedPlayers)) {
-                let player = this.connectedPlayers[socketId];
-                if (player.state === 'new') {
-                    player.state = 'synced';
-                    diffUpdate = false;
-                }
+        // remove memory-objects which no longer exist
+        for (let objId of Object.keys(this.objMemory)) {
+            if (!(objId in this.gameEngine.world.objects)) {
+                delete this.objMemory[objId];
             }
-
-            // also, one in twenty syncs is a full update
-            if (this.syncCounter++ % 20 === 0) diffUpdate = false;
-
-            let payload = this.serializeUpdate({ diffUpdate });
-            this.gameEngine.trace.info(() => `========== sending world update ${this.gameEngine.world.stepCount} is delta update: ${diffUpdate} ==========`);
-            // TODO: implement server lag by queuing the emit to a future step
-            for (let socketId of Object.keys(this.connectedPlayers))
-                this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
-            this.networkTransmitter.clearPayload();
-            this.requestImmediateUpdate = false;
         }
 
         // step is done on the server side
@@ -162,10 +145,43 @@ class ServerEngine {
         }
     }
 
+    syncStateToClients(roomName) {
+
+        // update clients only at the specified step interval, as defined in options
+        // or if this room needs to sync
+        const room = this.rooms[roomName];
+        if (room.requestImmediateSync ||
+            this.gameEngine.world.stepCount % this.options.updateRate === 0) {
+
+            const roomPlayers = Object.keys(this.connectedPlayers)
+                .filter(p => this.connectedPlayers[p].room === room);
+
+            // if at least one player is new, we should send a full payload
+            let diffUpdate = true;
+            for (const socketId of roomPlayers) {
+                const player = this.connectedPlayers[socketId];
+                if (player.state === 'new') {
+                    player.state = 'synced';
+                    diffUpdate = false;
+                }
+            }
+
+            // also, one in twenty syncs is a full update
+            if (room.syncCounter++ % 20 === 0) diffUpdate = false;
+
+            const payload = this.serializeUpdate(roomName, { diffUpdate });
+            this.gameEngine.trace.info(() => `========== sending world update ${this.gameEngine.world.stepCount} to room ${roomName} is delta update: ${diffUpdate} ==========`);
+            for (const socketId of roomPlayers)
+                this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
+            this.networkTransmitter.clearPayload();
+            room.requestImmediateSync = false;
+        }
+    }
+
     // create a serialized package of the game world
     // TODO: this process could be made much much faster if the buffer creation and
     //       size calculation are done in a single phase, along with string pruning.
-    serializeUpdate(options) {
+    serializeUpdate(roomName, options) {
         let world = this.gameEngine.world;
         let diffUpdate = Boolean(options && options.diffUpdate);
 
@@ -176,7 +192,9 @@ class ServerEngine {
             fullUpdate: Number(!diffUpdate)
         });
 
-        for (let objId of Object.keys(world.objects)) {
+        const roomObjects = Object.keys(world.objects)
+            .filter(o => world.objects[o]._roomName === roomName);
+        for (let objId of roomObjects) {
             let obj = world.objects[objId];
             let prevObject = this.objMemory[objId];
 
@@ -198,27 +216,61 @@ class ServerEngine {
             });
         }
 
-        // remove memory objects which no longer exist
-        if (diffUpdate) {
-            for (let objId of Object.keys(this.objMemory)) {
-                if (!(objId in world.objects)) {
-                    delete this.objMemory[objId];
-                }
-            }
-        }
-
         return this.networkTransmitter.serializePayload();
+    }
+
+    /**
+     * create a room
+     *
+     * @param {String} roomName - the new room name
+     */
+    createRoom(roomName) {
+        this.rooms[roomName] = { syncCounter: 0, requestImmediateSync: false };
+    }
+
+    /**
+     * assign an object to a room
+     *
+     * @param {Object} obj - the object to move
+     * @param {String} roomName - the target room
+     */
+    assignObjectToRoom(obj, roomName) {
+        obj._roomName = roomName;
+    }
+
+    /**
+     * assign a player to a room
+     *
+     * @param {Number} playerId - the playerId
+     * @param {String} roomName - the target room
+     */
+    assignPlayerToRoom(playerId, roomName) {
+        const room = this.rooms[roomName];
+        let player = null;
+        if (!room) {
+            this.trace.error(() => `cannot assign player to non-existant room ${roomName}`);
+        }
+        for (const p in Object.keys(this.connectedPlayers)) {
+            if (p.socket.playerId === playerId)
+                player = this.connectedPlayers[p];
+        }
+        if (!player) {
+            this.trace.error(() => `cannot assign non-existant playerId ${playerId} to room ${roomName}`);
+        }
+        player.room = this.rooms[room];
     }
 
     // handle the object creation
     onObjectAdded(obj) {
+        obj._roomName = obj._roomName || DEFAULT_ROOM;
         this.networkTransmitter.addNetworkedEvent('objectCreate', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
         });
 
-        if (this.options.updateOnObjectCreation)
-            this.requestImmediateUpdate = true;
+        if (this.options.updateOnObjectCreation) {
+            this.rooms[obj._roomName].requestImmediateSync = true;
+        }
     }
 
     // handle the object creation
@@ -241,7 +293,8 @@ class ServerEngine {
         // save player
         this.connectedPlayers[socket.id] = {
             socket: socket,
-            state: 'new'
+            state: 'new',
+            room: this.rooms[DEFAULT_ROOM]
         };
 
         let playerId = this.getPlayerId(socket);

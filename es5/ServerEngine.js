@@ -34,6 +34,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var DEFAULT_ROOM = 'lobby';
 /**
  * ServerEngine is the main server-side singleton code.
  * Extend this class with your own server-side logic, and
@@ -51,6 +52,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * connections and dis-connections, emitting periodic game-state
  * updates, and capturing remote user inputs.
  */
+
 var ServerEngine = function () {
 
     /**
@@ -96,12 +98,12 @@ var ServerEngine = function () {
         this.networkTransmitter = new _NetworkTransmitter2.default(this.serializer);
         this.networkMonitor = new _NetworkMonitor2.default();
 
+        this.rooms = {};
+        this.createRoom(DEFAULT_ROOM);
         this.connectedPlayers = {};
         this.playerInputQueues = {};
         this.pendingAtomicEvents = [];
         this.objMemory = {};
-        this.requestImmediateUpdate = false;
-        this.syncCounter = 0;
 
         io.on('connection', this.onPlayerConnected.bind(this));
         this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
@@ -189,18 +191,75 @@ var ServerEngine = function () {
 
             this.gameEngine.step(false, this.serverTime / 1000);
 
+            // synchronize the state to all clients
+            Object.keys(this.rooms).map(this.syncStateToClients.bind(this));
+
+            // remove memory-objects which no longer exist
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = Object.keys(this.objMemory)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var objId = _step2.value;
+
+                    if (!(objId in this.gameEngine.world.objects)) {
+                        delete this.objMemory[objId];
+                    }
+                }
+
+                // step is done on the server side
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
+            this.gameEngine.emit('server__postStep', this.gameEngine.world.stepCount);
+
+            if (this.gameEngine.trace.length) {
+                var traceData = this.gameEngine.trace.rotate();
+                var traceString = '';
+                traceData.forEach(function (t) {
+                    traceString += '[' + t.time.toISOString() + ']' + t.step + '>' + t.data + '\n';
+                });
+                _fs2.default.appendFile(this.options.tracesPath + 'server.trace', traceString, function (err) {
+                    if (err) throw err;
+                });
+            }
+        }
+    }, {
+        key: 'syncStateToClients',
+        value: function syncStateToClients(roomName) {
+            var _this2 = this;
+
             // update clients only at the specified step interval, as defined in options
-            if (this.requestImmediateUpdate || this.gameEngine.world.stepCount % this.options.updateRate === 0) {
+            // or if this room needs to sync
+            var room = this.rooms[roomName];
+            if (room.requestImmediateSync || this.gameEngine.world.stepCount % this.options.updateRate === 0) {
+
+                var roomPlayers = Object.keys(this.connectedPlayers).filter(function (p) {
+                    return _this2.connectedPlayers[p].room === room;
+                });
 
                 // if at least one player is new, we should send a full payload
                 var diffUpdate = true;
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
                 try {
-                    for (var _iterator2 = Object.keys(this.connectedPlayers)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var socketId = _step2.value;
+                    for (var _iterator3 = roomPlayers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var socketId = _step3.value;
 
                         var player = this.connectedPlayers[socketId];
                         if (player.state === 'new') {
@@ -210,38 +269,6 @@ var ServerEngine = function () {
                     }
 
                     // also, one in twenty syncs is a full update
-                } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
-                        }
-                    } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
-                        }
-                    }
-                }
-
-                if (this.syncCounter++ % 20 === 0) diffUpdate = false;
-
-                var payload = this.serializeUpdate({ diffUpdate: diffUpdate });
-                this.gameEngine.trace.info(function () {
-                    return '========== sending world update ' + _this.gameEngine.world.stepCount + ' is delta update: ' + diffUpdate + ' ==========';
-                });
-                // TODO: implement server lag by queuing the emit to a future step
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
-
-                try {
-                    for (var _iterator3 = Object.keys(this.connectedPlayers)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var _socketId = _step3.value;
-
-                        this.connectedPlayers[_socketId].socket.emit('worldUpdate', payload);
-                    }
                 } catch (err) {
                     _didIteratorError3 = true;
                     _iteratorError3 = err;
@@ -257,22 +284,39 @@ var ServerEngine = function () {
                     }
                 }
 
+                if (room.syncCounter++ % 20 === 0) diffUpdate = false;
+
+                var payload = this.serializeUpdate(roomName, { diffUpdate: diffUpdate });
+                this.gameEngine.trace.info(function () {
+                    return '========== sending world update ' + _this2.gameEngine.world.stepCount + ' to room ' + roomName + ' is delta update: ' + diffUpdate + ' ==========';
+                });
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
+
+                try {
+                    for (var _iterator4 = roomPlayers[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                        var _socketId = _step4.value;
+
+                        this.connectedPlayers[_socketId].socket.emit('worldUpdate', payload);
+                    }
+                } catch (err) {
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                            _iterator4.return();
+                        }
+                    } finally {
+                        if (_didIteratorError4) {
+                            throw _iteratorError4;
+                        }
+                    }
+                }
+
                 this.networkTransmitter.clearPayload();
-                this.requestImmediateUpdate = false;
-            }
-
-            // step is done on the server side
-            this.gameEngine.emit('server__postStep', this.gameEngine.world.stepCount);
-
-            if (this.gameEngine.trace.length) {
-                var traceData = this.gameEngine.trace.rotate();
-                var traceString = '';
-                traceData.forEach(function (t) {
-                    traceString += '[' + t.time.toISOString() + ']' + t.step + '>' + t.data + '\n';
-                });
-                _fs2.default.appendFile(this.options.tracesPath + 'server.trace', traceString, function (err) {
-                    if (err) throw err;
-                });
+                room.requestImmediateSync = false;
             }
         }
 
@@ -282,7 +326,7 @@ var ServerEngine = function () {
 
     }, {
         key: 'serializeUpdate',
-        value: function serializeUpdate(options) {
+        value: function serializeUpdate(roomName, options) {
             var world = this.gameEngine.world;
             var diffUpdate = Boolean(options && options.diffUpdate);
 
@@ -293,13 +337,16 @@ var ServerEngine = function () {
                 fullUpdate: Number(!diffUpdate)
             });
 
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
+            var roomObjects = Object.keys(world.objects).filter(function (o) {
+                return world.objects[o]._roomName === roomName;
+            });
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
 
             try {
-                for (var _iterator4 = Object.keys(world.objects)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var objId = _step4.value;
+                for (var _iterator5 = roomObjects[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var objId = _step5.value;
 
                     var obj = world.objects[objId];
                     var prevObject = this.objMemory[objId];
@@ -318,48 +365,17 @@ var ServerEngine = function () {
                         objectInstance: obj
                     });
                 }
-
-                // remove memory objects which no longer exist
             } catch (err) {
-                _didIteratorError4 = true;
-                _iteratorError4 = err;
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                        _iterator4.return();
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
                     }
                 } finally {
-                    if (_didIteratorError4) {
-                        throw _iteratorError4;
-                    }
-                }
-            }
-
-            if (diffUpdate) {
-                var _iteratorNormalCompletion5 = true;
-                var _didIteratorError5 = false;
-                var _iteratorError5 = undefined;
-
-                try {
-                    for (var _iterator5 = Object.keys(this.objMemory)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                        var _objId = _step5.value;
-
-                        if (!(_objId in world.objects)) {
-                            delete this.objMemory[_objId];
-                        }
-                    }
-                } catch (err) {
-                    _didIteratorError5 = true;
-                    _iteratorError5 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                            _iterator5.return();
-                        }
-                    } finally {
-                        if (_didIteratorError5) {
-                            throw _iteratorError5;
-                        }
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
                     }
                 }
             }
@@ -367,17 +383,73 @@ var ServerEngine = function () {
             return this.networkTransmitter.serializePayload();
         }
 
+        /**
+         * create a room
+         *
+         * @param {String} roomName - the new room name
+         */
+
+    }, {
+        key: 'createRoom',
+        value: function createRoom(roomName) {
+            this.rooms[roomName] = { syncCounter: 0, requestImmediateSync: false };
+        }
+
+        /**
+         * assign an object to a room
+         *
+         * @param {Object} obj - the object to move
+         * @param {String} roomName - the target room
+         */
+
+    }, {
+        key: 'assignObjectToRoom',
+        value: function assignObjectToRoom(obj, roomName) {
+            obj._roomName = roomName;
+        }
+
+        /**
+         * assign a player to a room
+         *
+         * @param {Number} playerId - the playerId
+         * @param {String} roomName - the target room
+         */
+
+    }, {
+        key: 'assignPlayerToRoom',
+        value: function assignPlayerToRoom(playerId, roomName) {
+            var room = this.rooms[roomName];
+            var player = null;
+            if (!room) {
+                this.trace.error(function () {
+                    return 'cannot assign player to non-existant room ' + roomName;
+                });
+            }
+            for (var p in Object.keys(this.connectedPlayers)) {
+                if (p.socket.playerId === playerId) player = this.connectedPlayers[p];
+            }
+            if (!player) {
+                this.trace.error(function () {
+                    return 'cannot assign non-existant playerId ' + playerId + ' to room ' + roomName;
+                });
+            }
+            player.room = this.rooms[room];
+        }
+
         // handle the object creation
 
     }, {
         key: 'onObjectAdded',
         value: function onObjectAdded(obj) {
+            obj._roomName = obj._roomName || DEFAULT_ROOM;
             this.networkTransmitter.addNetworkedEvent('objectCreate', {
                 stepCount: this.gameEngine.world.stepCount,
                 objectInstance: obj
             });
 
-            if (this.options.updateOnObjectCreation) this.requestImmediateUpdate = true;
+            if (this.options.updateOnObjectCreation) {
+                this.rooms[obj._roomName].requestImmediateSync = true;
+            }
         }
 
         // handle the object creation
@@ -406,7 +478,8 @@ var ServerEngine = function () {
             // save player
             this.connectedPlayers[socket.id] = {
                 socket: socket,
-                state: 'new'
+                state: 'new',
+                room: this.rooms[DEFAULT_ROOM]
             };
 
             var playerId = this.getPlayerId(socket);
@@ -476,12 +549,12 @@ var ServerEngine = function () {
     }, {
         key: 'resetIdleTimeout',
         value: function resetIdleTimeout(socket) {
-            var _this2 = this;
+            var _this3 = this;
 
             if (socket.idleTimeout) clearTimeout(socket.idleTimeout);
             if (this.options.timeoutInterval > 0) {
                 socket.idleTimeout = setTimeout(function () {
-                    _this2.onPlayerTimeout(socket);
+                    _this3.onPlayerTimeout(socket);
                 }, this.options.timeoutInterval * 1000);
             }
         }
