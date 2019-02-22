@@ -520,6 +520,15 @@ var GameEngine = function () {
  */
 
 /**
+ * Client moved from one room to another
+ *
+ * @event GameEngine#server__roomUpdate
+ * @param {Number} playerId - the player ID
+ * @param {String} from - the room from which the client came
+ * @param {String} to - the room to which the client went
+ */
+
+/**
  * An input needs to be handled.
  * This event is emitted on the client only, just before the
  * general processInput event.
@@ -540,6 +549,15 @@ var GameEngine = function () {
  * @param {Object} sync - sync from the server
  * @param {Array} syncEvents - array of events in the sync
  * @param {Number} maxStepCount - highest step in the sync
+ */
+
+/**
+ * Client moved from one room to another
+ *
+ * @event GameEngine#client__roomUpdate
+ * @param {Number} playerId - the player ID
+ * @param {String} from - the room from which the client came
+ * @param {String} to - the room to which the client went
  */
 
 /**

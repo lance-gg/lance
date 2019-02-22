@@ -34,7 +34,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var DEFAULT_ROOM = 'lobby';
 /**
  * ServerEngine is the main server-side singleton code.
  * Extend this class with your own server-side logic, and
@@ -52,7 +51,6 @@ var DEFAULT_ROOM = 'lobby';
  * connections and dis-connections, emitting periodic game-state
  * updates, and capturing remote user inputs.
  */
-
 var ServerEngine = function () {
 
     /**
@@ -98,8 +96,13 @@ var ServerEngine = function () {
         this.networkTransmitter = new _NetworkTransmitter2.default(this.serializer);
         this.networkMonitor = new _NetworkMonitor2.default();
 
+        /**
+         * Default room name
+         * @member {String} DEFAULT_ROOM_NAME
+         */
+        this.DEFAULT_ROOM_NAME = '/lobby';
         this.rooms = {};
-        this.createRoom(DEFAULT_ROOM);
+        this.createRoom(this.DEFAULT_ROOM_NAME);
         this.connectedPlayers = {};
         this.playerInputQueues = {};
         this.pendingAtomicEvents = [];
@@ -248,7 +251,7 @@ var ServerEngine = function () {
             if (room.requestImmediateSync || this.gameEngine.world.stepCount % this.options.updateRate === 0) {
 
                 var roomPlayers = Object.keys(this.connectedPlayers).filter(function (p) {
-                    return _this2.connectedPlayers[p].room === room;
+                    return _this2.connectedPlayers[p].roomName === roomName;
                 });
 
                 // if at least one player is new, we should send a full payload
@@ -384,7 +387,12 @@ var ServerEngine = function () {
         }
 
         /**
-         * create a room
+         * Create a room
+         *
+         * There is a default room called "/lobby".  All newly created players
+         * and objects are assigned to the default room.  When the server sends
+         * periodic syncs to the players, each player is only sent those objects
+         * which are present in his room.
          *
          * @param {String} roomName - the new room name
          */
@@ -396,7 +404,7 @@ var ServerEngine = function () {
         }
 
         /**
-         * assign an object to a room
+         * Assign an object to a room
          *
          * @param {Object} obj - the object to move
          * @param {String} roomName - the target room
@@ -409,7 +417,7 @@ var ServerEngine = function () {
         }
 
         /**
-         * assign a player to a room
+         * Assign a player to a room
          *
          * @param {Number} playerId - the playerId
          * @param {String} roomName - the target room
@@ -421,19 +429,47 @@ var ServerEngine = function () {
             var room = this.rooms[roomName];
             var player = null;
             if (!room) {
-                this.trace.error(function () {
+                this.gameEngine.trace.error(function () {
                     return 'cannot assign player to non-existant room ' + roomName;
                 });
             }
-            for (var p in Object.keys(this.connectedPlayers)) {
-                if (p.socket.playerId === playerId) player = this.connectedPlayers[p];
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+                for (var _iterator6 = Object.keys(this.connectedPlayers)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var p = _step6.value;
+
+                    if (this.connectedPlayers[p].socket.playerId === playerId) player = this.connectedPlayers[p];
+                }
+            } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
+                    }
+                } finally {
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
+                    }
+                }
             }
+
             if (!player) {
-                this.trace.error(function () {
+                this.gameEngine.trace.error(function () {
                     return 'cannot assign non-existant playerId ' + playerId + ' to room ' + roomName;
                 });
             }
-            player.room = this.rooms[room];
+            var roomUpdate = { playerId: playerId, from: player.roomName, to: roomName };
+            player.socket.emit('roomUpdate', roomUpdate);
+            this.gameEngine.emit('server__roomUpdate', roomUpdate);
+            this.gameEngine.trace.info(function () {
+                return 'ROOM UPDATE: playerId ' + playerId + ' from room ' + player.roomName + ' to room ' + roomName;
+            });
+            player.roomName = roomName;
         }
 
         // handle the object creation
@@ -441,7 +477,7 @@ var ServerEngine = function () {
     }, {
         key: 'onObjectAdded',
         value: function onObjectAdded(obj) {
-            obj._roomName = obj._roomName || DEFAULT_ROOM;
+            obj._roomName = obj._roomName || this.DEFAULT_ROOM_NAME;
             this.networkTransmitter.addNetworkedEvent('objectCreate', {
                 stepCount: this.gameEngine.world.stepCount,
                 objectInstance: obj
@@ -479,7 +515,7 @@ var ServerEngine = function () {
             this.connectedPlayers[socket.id] = {
                 socket: socket,
                 state: 'new',
-                room: this.rooms[DEFAULT_ROOM]
+                roomName: this.DEFAULT_ROOM_NAME
             };
 
             var playerId = this.getPlayerId(socket);
@@ -611,29 +647,29 @@ var ServerEngine = function () {
                 players: {}
             };
 
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
 
             try {
-                for (var _iterator6 = Object.keys(this.connectedPlayers)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                    var p = _step6.value;
+                for (var _iterator7 = Object.keys(this.connectedPlayers)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var p = _step7.value;
 
                     gameStatus.players[p] = {
                         frameRate: 0
                     };
                 }
             } catch (err) {
-                _didIteratorError6 = true;
-                _iteratorError6 = err;
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                        _iterator6.return();
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                        _iterator7.return();
                     }
                 } finally {
-                    if (_didIteratorError6) {
-                        throw _iteratorError6;
+                    if (_didIteratorError7) {
+                        throw _iteratorError7;
                     }
                 }
             }

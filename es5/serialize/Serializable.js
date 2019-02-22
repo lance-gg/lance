@@ -107,7 +107,7 @@ var Serializable = function () {
                         if (netScheme[property].type === _BaseTypes2.default.TYPES.STRING) {
                             // derive the size of the string
                             localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
-                            if (this[property] !== null) localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
+                            if (this[property] !== null && this[property] !== undefined) localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
                         } else if (netScheme[property].type === _BaseTypes2.default.TYPES.CLASSINSTANCE) {
                             // derive the size of the included class
                             var objectInstanceBufferOffset = this[property].serialize(serializer, { dry: true }).bufferOffset;

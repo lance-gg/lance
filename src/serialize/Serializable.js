@@ -76,7 +76,7 @@ class Serializable {
                 if (netScheme[property].type === BaseTypes.TYPES.STRING) {
                     // derive the size of the string
                     localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
-                    if (this[property] !== null)
+                    if (this[property] !== null && this[property] !== undefined)
                         localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
                 } else if (netScheme[property].type === BaseTypes.TYPES.CLASSINSTANCE) {
                     // derive the size of the included class

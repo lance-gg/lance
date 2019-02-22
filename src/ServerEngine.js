@@ -257,19 +257,19 @@ class ServerEngine {
         const room = this.rooms[roomName];
         let player = null;
         if (!room) {
-            this.trace.error(() => `cannot assign player to non-existant room ${roomName}`);
+            this.gameEngine.trace.error(() => `cannot assign player to non-existant room ${roomName}`);
         }
-        for (const p in Object.keys(this.connectedPlayers)) {
-            if (p.socket.playerId === playerId)
+        for (const p of Object.keys(this.connectedPlayers)) {
+            if (this.connectedPlayers[p].socket.playerId === playerId)
                 player = this.connectedPlayers[p];
         }
         if (!player) {
-            this.trace.error(() => `cannot assign non-existant playerId ${playerId} to room ${roomName}`);
+            this.gameEngine.trace.error(() => `cannot assign non-existant playerId ${playerId} to room ${roomName}`);
         }
         const roomUpdate = { playerId: playerId, from: player.roomName, to: roomName };
         player.socket.emit('roomUpdate', roomUpdate);
         this.gameEngine.emit('server__roomUpdate', roomUpdate);
-        this.trace.info(() => `ROOM UPDATE: playerId ${playerId} from room ${player.roomName} to room ${roomName}`);
+        this.gameEngine.trace.info(() => `ROOM UPDATE: playerId ${playerId} from room ${player.roomName} to room ${roomName}`);
         player.roomName = roomName;
     }
 

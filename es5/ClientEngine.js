@@ -187,6 +187,10 @@ var ClientEngine = function () {
                     _this.socket.on('worldUpdate', function (worldData) {
                         _this.inboundMessages.push(worldData);
                     });
+
+                    _this.socket.on('roomUpdate', function (roomData) {
+                        _this.gameEngine.emit('client__roomUpdate', roomData);
+                    });
                 });
             };
 
