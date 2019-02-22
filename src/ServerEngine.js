@@ -5,7 +5,6 @@ import Serializer from './serialize/Serializer';
 import NetworkTransmitter from './network/NetworkTransmitter';
 import NetworkMonitor from './network/NetworkMonitor';
 
-const DEFAULT_ROOM = 'lobby';
 /**
  * ServerEngine is the main server-side singleton code.
  * Extend this class with your own server-side logic, and
@@ -66,8 +65,13 @@ class ServerEngine {
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
         this.networkMonitor = new NetworkMonitor();
 
+        /**
+         * Default room name
+         * @member {String} DEFAULT_ROOM_NAME
+         */
+        this.DEFAULT_ROOM_NAME = '/lobby';
         this.rooms = {};
-        this.createRoom(DEFAULT_ROOM);
+        this.createRoom(this.DEFAULT_ROOM_NAME);
         this.connectedPlayers = {};
         this.playerInputQueues = {};
         this.pendingAtomicEvents = [];
@@ -154,7 +158,7 @@ class ServerEngine {
             this.gameEngine.world.stepCount % this.options.updateRate === 0) {
 
             const roomPlayers = Object.keys(this.connectedPlayers)
-                .filter(p => this.connectedPlayers[p].room === room);
+                .filter(p => this.connectedPlayers[p].roomName === roomName);
 
             // if at least one player is new, we should send a full payload
             let diffUpdate = true;
@@ -265,12 +269,13 @@ class ServerEngine {
         const roomUpdate = { playerId: playerId, from: player.roomName, to: roomName };
         player.socket.emit('roomUpdate', roomUpdate);
         this.gameEngine.emit('server__roomUpdate', roomUpdate);
-        player.room = this.rooms[room];
+        this.trace.info(() => `ROOM UPDATE: playerId ${playerId} from room ${player.roomName} to room ${roomName}`);
+        player.roomName = roomName;
     }
 
     // handle the object creation
     onObjectAdded(obj) {
-        obj._roomName = obj._roomName || DEFAULT_ROOM;
+        obj._roomName = obj._roomName || this.DEFAULT_ROOM_NAME;
         this.networkTransmitter.addNetworkedEvent('objectCreate', {
             stepCount: this.gameEngine.world.stepCount,
             objectInstance: obj
@@ -302,7 +307,7 @@ class ServerEngine {
         this.connectedPlayers[socket.id] = {
             socket: socket,
             state: 'new',
-            room: this.rooms[DEFAULT_ROOM]
+            roomName: this.DEFAULT_ROOM_NAME
         };
 
         let playerId = this.getPlayerId(socket);
