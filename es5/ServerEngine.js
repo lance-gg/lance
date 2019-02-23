@@ -432,6 +432,8 @@ var ServerEngine = function () {
                 this.gameEngine.trace.error(function () {
                     return 'cannot assign player to non-existant room ' + roomName;
                 });
+                console.error('player ' + playerId + ' assigned to room [' + roomName + '] which isn\'t defined');
+                return;
             }
             var _iteratorNormalCompletion6 = true;
             var _didIteratorError6 = false;
