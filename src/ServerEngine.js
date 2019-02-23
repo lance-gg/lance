@@ -262,6 +262,8 @@ class ServerEngine {
         let player = null;
         if (!room) {
             this.gameEngine.trace.error(() => `cannot assign player to non-existant room ${roomName}`);
+            console.error(`player ${playerId} assigned to room [${roomName}] which isn't defined`);
+            return;
         }
         for (const p of Object.keys(this.connectedPlayers)) {
             if (this.connectedPlayers[p].socket.playerId === playerId)
