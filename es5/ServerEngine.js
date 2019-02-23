@@ -61,6 +61,7 @@ var ServerEngine = function () {
      * @param {Object} options - server options
      * @param {Number} options.stepRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
+     * @param {Number} options.fullSyncRate - rate at which full-syncs are sent, in step count
      * @param {String} options.tracesPath - path where traces should go
      * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
      * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
@@ -72,6 +73,7 @@ var ServerEngine = function () {
         this.options = Object.assign({
             updateRate: 6,
             stepRate: 60,
+            fullSyncRate: 20,
             timeoutInterval: 180,
             updateOnObjectCreation: true,
             tracesPath: '',
@@ -271,7 +273,7 @@ var ServerEngine = function () {
                         }
                     }
 
-                    // also, one in twenty syncs is a full update
+                    // also, one in N syncs is a full update, or a special request
                 } catch (err) {
                     _didIteratorError3 = true;
                     _iteratorError3 = err;
@@ -287,7 +289,7 @@ var ServerEngine = function () {
                     }
                 }
 
-                if (room.syncCounter++ % 20 === 0) diffUpdate = false;
+                if (room.syncCounter++ % this.options.fullSyncRate === 0 || room.requestFullSync) diffUpdate = false;
 
                 var payload = this.serializeUpdate(roomName, { diffUpdate: diffUpdate });
                 this.gameEngine.trace.info(function () {
@@ -320,6 +322,7 @@ var ServerEngine = function () {
 
                 this.networkTransmitter.clearPayload();
                 room.requestImmediateSync = false;
+                room.requestFullSync = false;
             }
         }
 
@@ -470,6 +473,8 @@ var ServerEngine = function () {
                 return 'ROOM UPDATE: playerId ' + playerId + ' from room ' + player.roomName + ' to room ' + roomName;
             });
             player.roomName = roomName;
+            room.requestImmediateSync = true;
+            room.requestFullSync = true;
         }
 
         // handle the object creation
