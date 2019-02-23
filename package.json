@@ -1,7 +1,14 @@
 {
   "name": "lance-gg",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "description": "A Node.js based real-time multiplayer game server",
+  "scripts": {
+    "docs": "jsdoc -c jsdoc.conf.json",
+    "build": "rollup --config rollup.config.js",
+    "test-all": "mocha test/EndToEnd/",
+    "test-serializer": "mocha ./test/serializer/",
+    "test": "mocha ./test/serializer/ --compilers js:babel-core/register"
+  },
   "keywords": [
     "pixijs",
     "pixi",
@@ -48,15 +55,12 @@
     "url": "https://github.com/lance-gg/lance/issues"
   },
   "homepage": "https://github.com/lance-gg/lance#readme",
-  "scripts": {
-    "docs": "jsdoc -c jsdoc.conf.json",
-    "build": "babel src --out-dir es5",
-    "test-all": "mocha test/EndToEnd/",
-    "test-serializer": "mocha ./test/serializer/",
-    "test": "mocha ./test/serializer/ --compilers js:babel-core/register"
-  },
   "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/plugin-proposal-class-properties": "^7.3.3",
+    "@babel/preset-env": "^7.3.1",
     "babel-core": "^6.25.0",
+    "babel-plugin-module-resolver": "^3.2.0",
     "babel-preset-env": "^1.7.0",
     "chai": "^3.5.0",
     "docmeta": "OpherV/docmeta",
@@ -67,6 +71,8 @@
     "lance-docs-template": "github:lance-gg/lance-docs-template",
     "mocha": "^5.2.0",
     "query-string": "^4.3.1",
+    "rollup": "^1.2.3",
+    "rollup-plugin-babel": "^4.3.2",
     "should": "^11.0.0"
   }
 }
