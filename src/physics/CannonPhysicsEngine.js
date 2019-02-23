@@ -1,5 +1,5 @@
 import PhysicsEngine from './PhysicsEngine';
-import CANNON from 'cannon';
+import * as CANNON from 'cannon';
 
 /**
  * CannonPhysicsEngine is a three-dimensional lightweight physics engine

@@ -30,7 +30,7 @@
   "dependencies": {
     "babel-cli": "^6.26.0",
     "cannon": "^0.6.2",
-    "eventemitter3": "^1.2.0",
+    "eventemitter3": "^3.1.0",
     "jsdoc": "^3.5.5",
     "mkdirp": "^0.5.1",
     "p2": "^0.7.1",
@@ -73,6 +73,10 @@
     "query-string": "^4.3.1",
     "rollup": "^1.2.3",
     "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-commonjs": "^9.2.1",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-resolve": "^4.0.1",
     "should": "^11.0.0"
   }
 }

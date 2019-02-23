@@ -2,7 +2,7 @@ import HSHG from './HSHG';
 
 // Collision detection based on Hierarchical Spatial Hash Grid
 // uses this implementation https://gist.github.com/kirbysayshi/1760774
-export default class HSHGCollisionDetection {
+class HSHGCollisionDetection {
 
     constructor(options) {
         this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);
@@ -72,4 +72,4 @@ function getArrayPairId(arrayPair) {
     return sortedArrayPair[0].id + '-' + sortedArrayPair[1].id;
 }
 
-module.exports = HSHGCollisionDetection;
+export default HSHGCollisionDetection;

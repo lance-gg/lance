@@ -1,5 +1,5 @@
 import GameWorld from './GameWorld';
-import EventEmitter from 'eventemitter3';
+import * as EventEmitter from 'eventemitter3';
 import Timer from './game/Timer';
 import Trace from './lib/Trace';
 
