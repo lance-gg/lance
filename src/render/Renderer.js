@@ -1,5 +1,3 @@
-import EventEmitter from 'eventemitter3';
-
 let singleton = null;
 
 const TIME_RESET_THRESHOLD = 100;
@@ -27,9 +25,6 @@ class Renderer {
         this.gameEngine.on('client__stepReset', () => { this.doReset = true; });
         gameEngine.on('objectAdded', this.addObject.bind(this));
         gameEngine.on('objectDestroyed', this.removeObject.bind(this));
-
-        // mixin for EventEmitter
-        Object.assign(this, EventEmitter.prototype);
 
         // the singleton renderer has been created
         singleton = this;

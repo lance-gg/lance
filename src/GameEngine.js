@@ -1,5 +1,5 @@
 import GameWorld from './GameWorld';
-import * as EventEmitter from 'eventemitter3';
+import EventEmitter from 'events';
 import Timer from './game/Timer';
 import Trace from './lib/Trace';
 
@@ -52,6 +52,7 @@ class GameEngine {
         this.playerId = NaN;
 
         // set up event emitting and interface
+        // let eventEmitter = new EventEmitter3.default();
         let eventEmitter = new EventEmitter();
 
         /**
