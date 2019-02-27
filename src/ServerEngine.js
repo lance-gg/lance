@@ -1,4 +1,5 @@
 import fs from 'fs';
+import mkdirp from 'mkdirp';
 import Utils from './lib/Utils';
 import Scheduler from './lib/Scheduler';
 import Serializer from './serialize/Serializer';
@@ -50,7 +51,7 @@ class ServerEngine {
         }, options);
         if (this.options.tracesPath !== '') {
             this.options.tracesPath += '/';
-            require('mkdirp').sync(this.options.tracesPath);
+            mkdirp.sync(this.options.tracesPath);
         }
 
         this.io = io;
