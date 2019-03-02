@@ -20,7 +20,6 @@ export default [
         input: 'src/package/clientExports.js',
         output: { file: 'dist/client/lance-gg.js', format: 'umd', name: 'Client' },
         plugins: [
-            // builtins(),
             resolve({ browser: true, preferBuiltins: false }),
             babel({ exclude: '**/node_modules/**' }),
             pjson(),
