@@ -6,7 +6,7 @@ import pjson from 'rollup-plugin-json';
 export default [
     {
         // server build
-        input: 'src/server.js',
+        input: 'src/package/serverExports.js',
         external: ['fs', 'bufferutil', 'utf-8-validate'],
         output: { file: 'dist/server/lance-gg.js', format: 'cjs', name: 'Server' },
         plugins: [
@@ -17,7 +17,7 @@ export default [
         ]
     },
     {
-        input: 'src/client.js',
+        input: 'src/package/clientExports.js',
         output: { file: 'dist/client/lance-gg.js', format: 'umd', name: 'Client' },
         plugins: [
             // builtins(),
