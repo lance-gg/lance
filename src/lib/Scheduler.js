@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import EventEmitter from 'event-emitter';
 
 const SIXTY_PER_SEC = 1000 / 60;
 const LOOP_SLOW_THRESH = 0.3;
@@ -28,12 +28,13 @@ export default class Scheduler {
         this.requestedDelay = 0;
         this.delayCounter = 0;
 
-        // build an event emitter
+        // mixin for EventEmitter
         let eventEmitter = new EventEmitter();
         this.on = eventEmitter.on;
         this.once = eventEmitter.once;
         this.removeListener = eventEmitter.removeListener;
         this.emit = eventEmitter.emit;
+
     }
 
     // in same cases, setTimeout is ignored by the browser,

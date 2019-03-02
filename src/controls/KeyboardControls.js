@@ -1,5 +1,3 @@
-import EventEmitter from 'eventemitter3';
-
 // based on http://keycode.info/
 
 // keyboard handling
@@ -174,7 +172,7 @@ const keyCodeTable = {
 class KeyboardControls {
 
     constructor(clientEngine) {
-        Object.assign(this, EventEmitter.prototype);
+
         this.clientEngine = clientEngine;
         this.gameEngine = clientEngine.gameEngine;
 

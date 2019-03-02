@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import EventEmitter from 'event-emitter';
 
 /**
  * Measures network performance between the client and the server
@@ -8,7 +8,11 @@ export default class NetworkMonitor {
 
     constructor() {
         // mixin for EventEmitter
-        Object.assign(this, EventEmitter.prototype);
+        let eventEmitter = new EventEmitter();
+        this.on = eventEmitter.on;
+        this.once = eventEmitter.once;
+        this.removeListener = eventEmitter.removeListener;
+        this.emit = eventEmitter.emit;
     }
 
     // client
@@ -20,7 +24,7 @@ export default class NetworkMonitor {
         this.movingRTTAverageFrame = [];
         this.movingFPSAverageSize = clientEngine.options.healthCheckRTTSample;
         this.clientEngine = clientEngine;
-        clientEngine.socket.on("RTTResponse", this.onReceivedRTTQuery.bind(this));
+        clientEngine.socket.on('RTTResponse', this.onReceivedRTTQuery.bind(this));
         setInterval(this.sendRTTQuery.bind(this), clientEngine.options.healthCheckInterval);
     }
 
@@ -38,11 +42,11 @@ export default class NetworkMonitor {
         if (this.movingRTTAverageFrame.length > this.movingFPSAverageSize) {
             this.movingRTTAverageFrame.shift();
         }
-        this.movingRTTAverage = this.movingRTTAverageFrame.reduce((a,b) => a + b) / this.movingRTTAverageFrame.length;
-        this.emit('RTTUpdate',{
+        this.movingRTTAverage = this.movingRTTAverageFrame.reduce((a, b) => a + b) / this.movingRTTAverageFrame.length;
+        this.emit('RTTUpdate', {
             RTT: RTT,
             RTTAverage: this.movingRTTAverage
-        })
+        });
     }
 
     // server
@@ -51,7 +55,7 @@ export default class NetworkMonitor {
     }
 
     respondToRTTQuery(socket, queryId) {
-        socket.emit("RTTResponse", queryId);
+        socket.emit('RTTResponse', queryId);
     }
 
 }

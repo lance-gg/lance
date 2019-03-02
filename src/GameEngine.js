@@ -1,5 +1,5 @@
 import GameWorld from './GameWorld';
-import EventEmitter from 'events';
+import EventEmitter from 'event-emitter';
 import Timer from './game/Timer';
 import Trace from './lib/Trace';
 
@@ -34,7 +34,6 @@ class GameEngine {
       */
     constructor(options) {
 
-        // TODO I think we should discuss this whole globals issues
         // place the game engine in the LANCE globals
         const isServerSide = (typeof window === 'undefined');
         const glob = isServerSide ? global : window;
@@ -52,7 +51,6 @@ class GameEngine {
         this.playerId = NaN;
 
         // set up event emitting and interface
-        // let eventEmitter = new EventEmitter3.default();
         let eventEmitter = new EventEmitter();
 
         /**
