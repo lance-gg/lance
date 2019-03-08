@@ -1,162 +1,37 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var fs = _interopDefault(require('fs'));
-var path = _interopDefault(require('path'));
-
-function _typeof(obj) {
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function (obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof(obj);
-}
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-
-  return _assertThisInitialized(self);
-}
-
-function _superPropBase(object, property) {
-  while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = _getPrototypeOf(object);
-    if (object === null) break;
-  }
-
-  return object;
-}
-
-function _get(target, property, receiver) {
-  if (typeof Reflect !== "undefined" && Reflect.get) {
-    _get = Reflect.get;
-  } else {
-    _get = function _get(target, property, receiver) {
-      var base = _superPropBase(target, property);
-
-      if (!base) return;
-      var desc = Object.getOwnPropertyDescriptor(base, property);
-
-      if (desc.get) {
-        return desc.get.call(receiver);
-      }
-
-      return desc.value;
-    };
-  }
-
-  return _get(target, property, receiver || target);
-}
+import fs from 'fs';
+import path from 'path';
 
 /**
  * This class represents an instance of the game world,
  * where all data pertaining to the current state of the
  * world is saved.
  */
-var GameWorld =
-/*#__PURE__*/
-function () {
-  /**
-   * Constructor of the World instance
-   */
-  function GameWorld() {
-    _classCallCheck(this, GameWorld);
+class GameWorld {
 
-    this.stepCount = 0;
-    this.objects = {};
-    this.playerCount = 0;
-    this.idCount = 0;
-  }
-  /**
-   * Gets a new, fresh and unused id that can be used for a new object
-   * @return {Number} the new id
-   */
-
-
-  _createClass(GameWorld, [{
-    key: "getNewId",
-    value: function getNewId() {
-      var possibleId = this.idCount; // find a free id
-
-      while (possibleId in this.objects) {
-        possibleId++;
-      }
-
-      this.idCount = possibleId + 1;
-      return possibleId;
+    /**
+     * Constructor of the World instance
+     */
+    constructor() {
+        this.stepCount = 0;
+        this.objects = {};
+        this.playerCount = 0;
+        this.idCount = 0;
     }
+
+    /**
+     * Gets a new, fresh and unused id that can be used for a new object
+     * @return {Number} the new id
+     */
+    getNewId() {
+        let possibleId = this.idCount;
+        // find a free id
+        while (possibleId in this.objects)
+            possibleId++;
+
+        this.idCount = possibleId + 1;
+        return possibleId;
+    }
+
     /**
      * Returns all the game world objects which match a criteria
      * @param {Object} query The query object
@@ -167,100 +42,87 @@ function () {
      * @param {Boolean} [query.returnSingle] Return the first object matched
      * @returns {Array | Object} All game objects which match all the query parameters, or the first match if returnSingle was specified
      */
+    queryObjects(query) {
+        let queriedObjects = [];
 
-  }, {
-    key: "queryObjects",
-    value: function queryObjects(query) {
-      var queriedObjects = []; // todo this is currently a somewhat inefficient implementation for API testing purposes.
-      // It should be implemented with cached dictionaries like in nano-ecs
+        // todo this is currently a somewhat inefficient implementation for API testing purposes.
+        // It should be implemented with cached dictionaries like in nano-ecs
+        this.forEachObject((id, object) => {
+            let conditions = [];
 
-      this.forEachObject(function (id, object) {
-        var conditions = []; // object id condition
+            // object id condition
+            conditions.push(!('id' in query) || query.id !== null && object.id === query.id);
 
-        conditions.push(!('id' in query) || query.id !== null && object.id === query.id); // player id condition
+            // player id condition
+            conditions.push(!('playerId' in query) || query.playerId !== null && object.playerId === query.playerId);
 
-        conditions.push(!('playerId' in query) || query.playerId !== null && object.playerId === query.playerId); // instance type conditio
+            // instance type conditio
+            conditions.push(!('instanceType' in query) || query.instanceType !== null && object instanceof query.instanceType);
 
-        conditions.push(!('instanceType' in query) || query.instanceType !== null && object instanceof query.instanceType); // components conditions
+            // components conditions
+            if ('components' in query) {
+                query.components.forEach(componentClass => {
+                    conditions.push(object.hasComponent(componentClass));
+                });
+            }
 
-        if ('components' in query) {
-          query.components.forEach(function (componentClass) {
-            conditions.push(object.hasComponent(componentClass));
-          });
-        } // all conditions are true, object is qualified for the query
+            // all conditions are true, object is qualified for the query
+            if (conditions.every(value => value)) {
+                queriedObjects.push(object);
+                if (query.returnSingle) return false;
+            }
+        });
 
-
-        if (conditions.every(function (value) {
-          return value;
-        })) {
-          queriedObjects.push(object);
-          if (query.returnSingle) return false;
+        // return a single object or null
+        if (query.returnSingle) {
+            return queriedObjects.length > 0 ? queriedObjects[0] : null;
         }
-      }); // return a single object or null
 
-      if (query.returnSingle) {
-        return queriedObjects.length > 0 ? queriedObjects[0] : null;
-      }
-
-      return queriedObjects;
+        return queriedObjects;
     }
+
     /**
      * Returns The first game object encountered which matches a criteria.
      * Syntactic sugar for {@link queryObject} with `returnSingle: true`
      * @param query See queryObjects
      * @returns {Object}
      */
-
-  }, {
-    key: "queryObject",
-    value: function queryObject(query) {
-      return this.queryObjects(Object.assign(query, {
-        returnSingle: true
-      }));
+    queryObject(query) {
+        return this.queryObjects(Object.assign(query, {
+            returnSingle: true
+        }));
     }
+
     /**
      * Add an object to the game world
      * @param {Object} object object to add
      */
-
-  }, {
-    key: "addObject",
-    value: function addObject(object) {
-      this.objects[object.id] = object;
+    addObject(object) {
+        this.objects[object.id] = object;
     }
+
     /**
      * Remove an object from the game world
      * @param {number} id id of the object to remove
      */
-
-  }, {
-    key: "removeObject",
-    value: function removeObject(id) {
-      delete this.objects[id];
+    removeObject(id) {
+        delete this.objects[id];
     }
+
     /**
      * World object iterator.
      * Invoke callback(objId, obj) for each object
      *
      * @param {function} callback function receives id and object. If callback returns false, the iteration will cease
      */
-
-  }, {
-    key: "forEachObject",
-    value: function forEachObject(callback) {
-      var _arr = Object.keys(this.objects);
-
-      for (var _i = 0; _i < _arr.length; _i++) {
-        var id = _arr[_i];
-        var returnValue = callback(id, this.objects[id]); // TODO: the key should be Number(id)
-
-        if (returnValue === false) break;
-      }
+    forEachObject(callback) {
+        for (let id of Object.keys(this.objects)) {
+            let returnValue = callback(id, this.objects[id]);  // TODO: the key should be Number(id)
+            if (returnValue === false) break;
+        }
     }
-  }]);
 
-  return GameWorld;
-}();
+}
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -572,102 +434,106 @@ var eventEmitter_1 = eventEmitter.methods;
 //   - Timer.run(waitSteps, cb)
 //   - Timer.repeat(waitSteps, count, cb) // count=null=>forever
 //   - Timer.cancel(cb)
-var Timer =
-/*#__PURE__*/
-function () {
-  function Timer() {
-    _classCallCheck(this, Timer);
+class Timer {
 
-    this.currentTime = 0;
-    this.isActive = false;
-    this.idCounter = 0;
-    this.events = {};
-  }
+    constructor() {
+        this.currentTime = 0;
+        this.isActive = false;
+        this.idCounter = 0;
 
-  _createClass(Timer, [{
-    key: "play",
-    value: function play() {
-      this.isActive = true;
+        this.events = {};
     }
-  }, {
-    key: "tick",
-    value: function tick() {
-      var event;
-      var eventId;
 
-      if (this.isActive) {
-        this.currentTime++;
+    play() {
+        this.isActive = true;
+    }
 
-        for (eventId in this.events) {
-          event = this.events[eventId];
+    tick() {
+        let event;
+        let eventId;
 
-          if (event) {
-            if (event.type == 'repeat') {
-              if ((this.currentTime - event.startOffset) % event.time == 0) {
-                event.callback.apply(event.thisContext, event.args);
-              }
+        if (this.isActive) {
+            this.currentTime++;
+
+            for (eventId in this.events) {
+                event = this.events[eventId];
+                if (event) {
+
+                    if (event.type == 'repeat') {
+                        if ((this.currentTime - event.startOffset) % event.time == 0) {
+                            event.callback.apply(event.thisContext, event.args);
+                        }
+                    }
+                    if (event.type == 'single') {
+                        if ((this.currentTime - event.startOffset) % event.time == 0) {
+                            event.callback.apply(event.thisContext, event.args);
+                            event.destroy();
+                        }
+                    }
+
+                }
+
             }
-
-            if (event.type == 'single') {
-              if ((this.currentTime - event.startOffset) % event.time == 0) {
-                event.callback.apply(event.thisContext, event.args);
-                event.destroy();
-              }
-            }
-          }
         }
-      }
     }
-  }, {
-    key: "destroyEvent",
-    value: function destroyEvent(eventId) {
-      delete this.events[eventId];
+
+    destroyEvent(eventId) {
+        delete this.events[eventId];
     }
-  }, {
-    key: "loop",
-    value: function loop(time, callback) {
-      var timerEvent = new TimerEvent(this, TimerEvent.TYPES.repeat, time, callback);
-      this.events[timerEvent.id] = timerEvent;
-      return timerEvent;
+
+    loop(time, callback) {
+        let timerEvent = new TimerEvent(this,
+            TimerEvent.TYPES.repeat,
+            time,
+            callback
+        );
+
+        this.events[timerEvent.id] = timerEvent;
+
+        return timerEvent;
     }
-  }, {
-    key: "add",
-    value: function add(time, callback, thisContext, args) {
-      var timerEvent = new TimerEvent(this, TimerEvent.TYPES.single, time, callback, thisContext, args);
-      this.events[timerEvent.id] = timerEvent;
-      return timerEvent;
-    } // todo implement timer delete all events
 
-  }, {
-    key: "destroy",
-    value: function destroy(id) {
-      delete this.events[id];
+    add(time, callback, thisContext, args) {
+        let timerEvent = new TimerEvent(this,
+            TimerEvent.TYPES.single,
+            time,
+            callback,
+            thisContext,
+            args
+        );
+
+        this.events[timerEvent.id] = timerEvent;
+        return timerEvent;
     }
-  }]);
 
-  return Timer;
-}(); // timer event
+    // todo implement timer delete all events
 
-var TimerEvent = function TimerEvent(timer, type, time, callback, thisContext, args) {
-  _classCallCheck(this, TimerEvent);
+    destroy(id) {
+        delete this.events[id];
+    }
+}
 
-  this.id = ++timer.idCounter;
-  this.timer = timer;
-  this.type = type;
-  this.time = time;
-  this.callback = callback;
-  this.startOffset = timer.currentTime;
-  this.thisContext = thisContext;
-  this.args = args;
+// timer event
+class TimerEvent {
+    constructor(timer, type, time, callback, thisContext, args) {
+        this.id = ++timer.idCounter;
+        this.timer = timer;
+        this.type = type;
+        this.time = time;
+        this.callback = callback;
+        this.startOffset = timer.currentTime;
+        this.thisContext = thisContext;
+        this.args = args;
 
-  this.destroy = function () {
-    this.timer.destroy(this.id);
-  };
-};
+        this.destroy = function() {
+            this.timer.destroy(this.id);
+        };
+    }
+}
 
 TimerEvent.TYPES = {
-  repeat: 'repeat',
-  single: 'single'
+    repeat: 'repeat',
+    single: 'single'
 };
 
 /**
@@ -677,128 +543,94 @@ TimerEvent.TYPES = {
  * example, setting traceLevel to Trace.TRACE_INFO will cause info,
  * warn, and error traces to be recorded.
  */
-var Trace =
-/*#__PURE__*/
-function () {
-  function Trace(options) {
-    _classCallCheck(this, Trace);
+class Trace {
 
-    this.options = Object.assign({
-      traceLevel: this.TRACE_DEBUG
-    }, options);
-    this.traceBuffer = [];
-    this.step = 'initializing'; // syntactic sugar functions
+    constructor(options) {
 
-    this.error = this.trace.bind(this, Trace.TRACE_ERROR);
-    this.warn = this.trace.bind(this, Trace.TRACE_WARN);
-    this.info = this.trace.bind(this, Trace.TRACE_INFO);
-    this.debug = this.trace.bind(this, Trace.TRACE_DEBUG);
-    this.trace = this.trace.bind(this, Trace.TRACE_ALL);
-  }
-  /**
-   * Include all trace levels.
-   * @memberof Trace
-   * @member {Number} TRACE_ALL
-   */
+        this.options = Object.assign({
+            traceLevel: this.TRACE_DEBUG
+        }, options);
 
+        this.traceBuffer = [];
+        this.step = 'initializing';
 
-  _createClass(Trace, [{
-    key: "trace",
-    value: function trace(level, dataCB) {
-      // all traces must be functions which return strings
-      if (typeof dataCB !== 'function') {
-        throw new Error("Lance trace was called but instead of passing a function, it received a [".concat(_typeof(dataCB), "]"));
-      }
+        // syntactic sugar functions
+        this.error = this.trace.bind(this, Trace.TRACE_ERROR);
+        this.warn = this.trace.bind(this, Trace.TRACE_WARN);
+        this.info = this.trace.bind(this, Trace.TRACE_INFO);
+        this.debug = this.trace.bind(this, Trace.TRACE_DEBUG);
+        this.trace = this.trace.bind(this, Trace.TRACE_ALL);
+    }
 
-      if (level < this.options.traceLevel) return;
-      this.traceBuffer.push({
-        data: dataCB(),
-        level: level,
-        step: this.step,
-        time: new Date()
-      });
-    }
-  }, {
-    key: "rotate",
-    value: function rotate() {
-      var buffer = this.traceBuffer;
-      this.traceBuffer = [];
-      return buffer;
-    }
-  }, {
-    key: "setStep",
-    value: function setStep(s) {
-      this.step = s;
-    }
-  }, {
-    key: "length",
-    get: function get() {
-      return this.traceBuffer.length;
-    }
-  }], [{
-    key: "TRACE_ALL",
-    get: function get() {
-      return 0;
-    }
     /**
-     * Include debug traces and higher.
+     * Include all trace levels.
      * @memberof Trace
-     * @member {Number} TRACE_DEBUG
+     * @member {Number} TRACE_ALL
      */
+    static get TRACE_ALL() { return 0; }
 
-  }, {
-    key: "TRACE_DEBUG",
-    get: function get() {
-      return 1;
+     /**
+      * Include debug traces and higher.
+      * @memberof Trace
+      * @member {Number} TRACE_DEBUG
+      */
+    static get TRACE_DEBUG() { return 1; }
+
+     /**
+      * Include info traces and higher.
+      * @memberof Trace
+      * @member {Number} TRACE_INFO
+      */
+    static get TRACE_INFO() { return 2; }
+
+     /**
+      * Include warn traces and higher.
+      * @memberof Trace
+      * @member {Number} TRACE_WARN
+      */
+    static get TRACE_WARN() { return 3; }
+
+     /**
+      * Include error traces and higher.
+      * @memberof Trace
+      * @member {Number} TRACE_ERROR
+      */
+    static get TRACE_ERROR() { return 4; }
+
+     /**
+      * Disable all tracing.
+      * @memberof Trace
+      * @member {Number} TRACE_NONE
+      */
+    static get TRACE_NONE() { return 1000; }
+
+    trace(level, dataCB) {
+
+         // all traces must be functions which return strings
+        if (typeof dataCB !== 'function') {
+            throw new Error(`Lance trace was called but instead of passing a function, it received a [${typeof dataCB}]`);
+        }
+
+        if (level < this.options.traceLevel)
+            return;
+
+        this.traceBuffer.push({ data: dataCB(), level, step: this.step, time: new Date() });
     }
-    /**
-     * Include info traces and higher.
-     * @memberof Trace
-     * @member {Number} TRACE_INFO
-     */
 
-  }, {
-    key: "TRACE_INFO",
-    get: function get() {
-      return 2;
+    rotate() {
+        let buffer = this.traceBuffer;
+        this.traceBuffer = [];
+        return buffer;
     }
-    /**
-     * Include warn traces and higher.
-     * @memberof Trace
-     * @member {Number} TRACE_WARN
-     */
 
-  }, {
-    key: "TRACE_WARN",
-    get: function get() {
-      return 3;
+    get length() {
+        return this.traceBuffer.length;
     }
-    /**
-     * Include error traces and higher.
-     * @memberof Trace
-     * @member {Number} TRACE_ERROR
-     */
 
-  }, {
-    key: "TRACE_ERROR",
-    get: function get() {
-      return 4;
+    setStep(s) {
+        this.step = s;
     }
-    /**
-     * Disable all tracing.
-     * @memberof Trace
-     * @member {Number} TRACE_NONE
-     */
-
-  }, {
-    key: "TRACE_NONE",
-    get: function get() {
-      return 1000;
-    }
-  }]);
-
-  return Trace;
-}();
+}
 
 /**
  * The GameEngine contains the game logic.  Extend this class
@@ -819,141 +651,127 @@ function () {
  * and therefore clients must resolve server updates which conflict
  * with client-side predictions.
  */
+class GameEngine {
 
-var GameEngine =
-/*#__PURE__*/
-function () {
-  /**
-    * Create a game engine instance.  This needs to happen
-    * once on the server, and once on each client.
-    *
-    * @param {Object} options - options object
-    * @param {Number} options.traceLevel - the trace level from 0 to 5.  Lower value traces more.
-    * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
-    */
-  function GameEngine(options) {
-    _classCallCheck(this, GameEngine);
-
-    // place the game engine in the LANCE globals
-    var isServerSide = typeof window === 'undefined';
-    var glob = isServerSide ? global : window;
-    glob.LANCE = {
-      gameEngine: this
-    }; // set options
-
-    var defaultOpts = {
-      GameWorld: GameWorld,
-      traceLevel: Trace.TRACE_NONE
-    };
-    if (!isServerSide) defaultOpts.clientIDSpace = 1000000;
-    this.options = Object.assign(defaultOpts, options);
     /**
-     * client's player ID, as a string. If running on the client, this is set at runtime by the clientEngine
-     * @member {String}
-     */
-
-    this.playerId = NaN; // set up event emitting and interface
-
-    var eventEmitter$1 = new eventEmitter();
-    /**
-     * Register a handler for an event
-     *
-     * @method on
-     * @memberof GameEngine
-     * @instance
-     * @param {String} eventName - name of the event
-     * @param {Function} eventHandler - handler function
-     */
-
-    this.on = eventEmitter$1.on;
-    /**
-     * Register a handler for an event, called just once (if at all)
-     *
-     * @method once
-     * @memberof GameEngine
-     * @instance
-     * @param {String} eventName - name of the event
-     * @param {Function} eventHandler - handler function
-     */
-
-    this.once = eventEmitter$1.once;
-    /**
-     * Remove a handler
-     *
-     * @method removeListener
-     * @memberof GameEngine
-     * @instance
-     * @param {String} eventName - name of the event
-     * @param {Function} eventHandler - handler function
-     */
-
-    this.removeListener = eventEmitter$1.removeListener;
-    this.emit = eventEmitter$1.emit; // set up trace
-
-    this.trace = new Trace({
-      traceLevel: this.options.traceLevel
-    });
-  }
-
-  _createClass(GameEngine, [{
-    key: "findLocalShadow",
-    value: function findLocalShadow(serverObj) {
-      var _arr = Object.keys(this.world.objects);
-
-      for (var _i = 0; _i < _arr.length; _i++) {
-        var localId = _arr[_i];
-        if (Number(localId) < this.options.clientIDSpace) continue;
-        var localObj = this.world.objects[localId];
-        if (localObj.hasOwnProperty('inputId') && localObj.inputId === serverObj.inputId) return localObj;
-      }
-
-      return null;
-    }
-  }, {
-    key: "initWorld",
-    value: function initWorld(worldSettings) {
-      this.world = new GameWorld(); // on the client we have a different ID space
-
-      if (this.options.clientIDSpace) {
-        this.world.idCount = this.options.clientIDSpace;
-      }
-      /**
-      * The worldSettings defines the game world constants, such
-      * as width, height, depth, etc. such that all other classes
-      * can reference these values.
-      * @member {Object} worldSettings
-      * @memberof GameEngine
+      * Create a game engine instance.  This needs to happen
+      * once on the server, and once on each client.
+      *
+      * @param {Object} options - options object
+      * @param {Number} options.traceLevel - the trace level from 0 to 5.  Lower value traces more.
+      * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
       */
+    constructor(options) {
 
+        // place the game engine in the LANCE globals
+        const isServerSide = (typeof window === 'undefined');
+        const glob = isServerSide ? global : window;
+        glob.LANCE = { gameEngine: this };
 
-      this.worldSettings = Object.assign({}, worldSettings);
+        // set options
+        const defaultOpts = { GameWorld: GameWorld, traceLevel: Trace.TRACE_NONE };
+        if (!isServerSide) defaultOpts.clientIDSpace = 1000000;
+        this.options = Object.assign(defaultOpts, options);
+
+        /**
+         * client's player ID, as a string. If running on the client, this is set at runtime by the clientEngine
+         * @member {String}
+         */
+        this.playerId = NaN;
+
+        // set up event emitting and interface
+        let eventEmitter$1 = new eventEmitter();
+
+        /**
+         * Register a handler for an event
+         *
+         * @method on
+         * @memberof GameEngine
+         * @instance
+         * @param {String} eventName - name of the event
+         * @param {Function} eventHandler - handler function
+         */
+        this.on = eventEmitter$1.on;
+
+        /**
+         * Register a handler for an event, called just once (if at all)
+         *
+         * @method once
+         * @memberof GameEngine
+         * @instance
+         * @param {String} eventName - name of the event
+         * @param {Function} eventHandler - handler function
+         */
+        this.once = eventEmitter$1.once;
+
+        /**
+         * Remove a handler
+         *
+         * @method removeListener
+         * @memberof GameEngine
+         * @instance
+         * @param {String} eventName - name of the event
+         * @param {Function} eventHandler - handler function
+         */
+        this.removeListener = eventEmitter$1.removeListener;
+
+        this.emit = eventEmitter$1.emit;
+
+        // set up trace
+        this.trace = new Trace({ traceLevel: this.options.traceLevel });
     }
+
+    findLocalShadow(serverObj) {
+
+        for (let localId of Object.keys(this.world.objects)) {
+            if (Number(localId) < this.options.clientIDSpace) continue;
+            let localObj = this.world.objects[localId];
+            if (localObj.hasOwnProperty('inputId') && localObj.inputId === serverObj.inputId)
+                return localObj;
+        }
+
+        return null;
+    }
+
+    initWorld(worldSettings) {
+
+        this.world = new GameWorld();
+
+        // on the client we have a different ID space
+        if (this.options.clientIDSpace) {
+            this.world.idCount = this.options.clientIDSpace;
+        }
+
+        /**
+        * The worldSettings defines the game world constants, such
+        * as width, height, depth, etc. such that all other classes
+        * can reference these values.
+        * @member {Object} worldSettings
+        * @memberof GameEngine
+        */
+        this.worldSettings = Object.assign({}, worldSettings);
+    }
+
     /**
       * Start the game. This method runs on both server
       * and client. Extending the start method is useful
       * for setting up the game's worldSettings attribute,
       * and registering methods on the event handler.
       */
+    start() {
+        this.trace.info(() => '========== game engine started ==========');
+        this.initWorld();
 
-  }, {
-    key: "start",
-    value: function start() {
-      var _this = this;
+        // create the default timer
+        this.timer = new Timer();
+        this.timer.play();
+        this.on('postStep', (step, isReenact) => {
+            if (!isReenact) this.timer.tick();
+        });
 
-      this.trace.info(function () {
-        return '========== game engine started ==========';
-      });
-      this.initWorld(); // create the default timer
-
-      this.timer = new Timer();
-      this.timer.play();
-      this.on('postStep', function (step, isReenact) {
-        if (!isReenact) _this.timer.tick();
-      });
-      this.emit('start', {
-        timestamp: new Date().getTime()
-      });
+        this.emit('start', { timestamp: (new Date()).getTime() });
     }
+
     /**
       * Single game step.
       *
@@ -962,58 +780,47 @@ function () {
       * @param {Number} dt - elapsed time since last step was called.  (optional)
       * @param {Boolean} physicsOnly - do a physics step only, no game logic
       */
+    step(isReenact, t, dt, physicsOnly) {
+        // physics-only step
+        if (physicsOnly) {
+            if (dt) dt /= 1000; // physics engines work in seconds
+            this.physicsEngine.step(dt, objectFilter);
+            return;
+        }
 
-  }, {
-    key: "step",
-    value: function step(isReenact, t, dt, physicsOnly) {
-      var _this2 = this;
+        // emit preStep event
+        if (isReenact === undefined)
+            throw new Error('game engine does not forward argument isReenact to super class');
 
-      // physics-only step
-      if (physicsOnly) {
-        if (dt) dt /= 1000; // physics engines work in seconds
+        isReenact = Boolean(isReenact);
+        let step = ++this.world.stepCount;
+        let clientIDSpace = this.options.clientIDSpace;
+        this.emit('preStep', { step, isReenact, dt });
 
-        this.physicsEngine.step(dt, objectFilter);
-        return;
-      } // emit preStep event
+        // skip physics for shadow objects during re-enactment
+        function objectFilter(o) {
+            return !isReenact || o.id < clientIDSpace;
+        }
 
+        // physics step
+        if (this.physicsEngine && !this.ignorePhysics) {
+            if (dt) dt /= 1000; // physics engines work in seconds
+            this.physicsEngine.step(dt, objectFilter);
+        }
 
-      if (isReenact === undefined) throw new Error('game engine does not forward argument isReenact to super class');
-      isReenact = Boolean(isReenact);
-      var step = ++this.world.stepCount;
-      var clientIDSpace = this.options.clientIDSpace;
-      this.emit('preStep', {
-        step: step,
-        isReenact: isReenact,
-        dt: dt
-      }); // skip physics for shadow objects during re-enactment
-
-      function objectFilter(o) {
-        return !isReenact || o.id < clientIDSpace;
-      } // physics step
-
-
-      if (this.physicsEngine && !this.ignorePhysics) {
-        if (dt) dt /= 1000; // physics engines work in seconds
-
-        this.physicsEngine.step(dt, objectFilter);
-      } // for each object
-      // - apply incremental bending
-      // - refresh object positions after physics
-
-
-      this.world.forEachObject(function (id, o) {
-        if (typeof o.refreshFromPhysics === 'function') o.refreshFromPhysics();
-
-        _this2.trace.trace(function () {
-          return "object[".concat(id, "] after ").concat(isReenact ? 'reenact' : 'step', " : ").concat(o.toString());
+        // for each object
+        // - apply incremental bending
+        // - refresh object positions after physics
+        this.world.forEachObject((id, o) => {
+            if (typeof o.refreshFromPhysics === 'function')
+                o.refreshFromPhysics();
+            this.trace.trace(() => `object[${id}] after ${isReenact ? 'reenact' : 'step'} : ${o.toString()}`);
         });
-      }); // emit postStep event
 
-      this.emit('postStep', {
-        step: step,
-        isReenact: isReenact
-      });
+        // emit postStep event
+        this.emit('postStep', { step, isReenact });
     }
+
     /**
      * Add object to the game world.
      * On the client side, the object may not be created, if the server copy
@@ -1023,39 +830,37 @@ function () {
      * @param {Object} object - the object.
      * @return {Object} object - the final object.
      */
+    addObjectToWorld(object) {
 
-  }, {
-    key: "addObjectToWorld",
-    value: function addObjectToWorld(object) {
-      // if we are asked to create a local shadow object
-      // the server copy may already have arrived.
-      if (Number(object.id) >= this.options.clientIDSpace) {
-        var serverCopyArrived = false;
-        this.world.forEachObject(function (id, o) {
-          if (o.hasOwnProperty('inputId') && o.inputId === object.inputId) {
-            serverCopyArrived = true;
-            return false;
-          }
-        });
-
-        if (serverCopyArrived) {
-          this.trace.info(function () {
-            return "========== shadow object NOT added ".concat(object.toString(), " ==========");
-          });
-          return null;
+        // if we are asked to create a local shadow object
+        // the server copy may already have arrived.
+        if (Number(object.id) >= this.options.clientIDSpace) {
+            let serverCopyArrived = false;
+            this.world.forEachObject((id, o) => {
+                if (o.hasOwnProperty('inputId') && o.inputId === object.inputId) {
+                    serverCopyArrived = true;
+                    return false;
+                }
+            });
+            if (serverCopyArrived) {
+                this.trace.info(() => `========== shadow object NOT added ${object.toString()} ==========`);
+                return null;
+            }
         }
-      }
 
-      this.world.addObject(object); // tell the object to join the game, by creating
-      // its corresponding physical entities and renderer entities.
+        this.world.addObject(object);
 
-      if (typeof object.onAddToWorld === 'function') object.onAddToWorld(this);
-      this.emit('objectAdded', object);
-      this.trace.info(function () {
-        return "========== object added ".concat(object.toString(), " ==========");
-      });
-      return object;
+        // tell the object to join the game, by creating
+        // its corresponding physical entities and renderer entities.
+        if (typeof object.onAddToWorld === 'function')
+            object.onAddToWorld(this);
+
+        this.emit('objectAdded', object);
+        this.trace.info(() => `========== object added ${object.toString()} ==========`);
+
+        return object;
     }
+
     /**
      * Override this function to implement input handling.
      * This method will be called on the specific client where the
@@ -1077,49 +882,42 @@ function () {
      * @param {Number} playerId - the player ID
      * @param {Boolean} isServer - indicate if this function is being called on the server side
      */
-
-  }, {
-    key: "processInput",
-    value: function processInput(inputDesc, playerId, isServer) {
-      this.trace.info(function () {
-        return "game engine processing input[".concat(inputDesc.messageIndex, "] <").concat(inputDesc.input, "> from playerId ").concat(playerId);
-      });
+    processInput(inputDesc, playerId, isServer) {
+        this.trace.info(() => `game engine processing input[${inputDesc.messageIndex}] <${inputDesc.input}> from playerId ${playerId}`);
     }
+
     /**
      * Remove an object from the game world.
      *
      * @param {Object|String} objectId - the object or object ID
      */
+    removeObjectFromWorld(objectId) {
 
-  }, {
-    key: "removeObjectFromWorld",
-    value: function removeObjectFromWorld(objectId) {
-      if (_typeof(objectId) === 'object') objectId = objectId.id;
-      var object = this.world.objects[objectId];
+        if (typeof objectId === 'object') objectId = objectId.id;
+        let object = this.world.objects[objectId];
 
-      if (!object) {
-        throw new Error("Game attempted to remove a game object which doesn't (or never did) exist, id=".concat(objectId));
-      }
+        if (!object) {
+            throw new Error(`Game attempted to remove a game object which doesn't (or never did) exist, id=${objectId}`);
+        }
+        this.trace.info(() => `========== destroying object ${object.toString()} ==========`);
 
-      this.trace.info(function () {
-        return "========== destroying object ".concat(object.toString(), " ==========");
-      });
-      if (typeof object.onRemoveFromWorld === 'function') object.onRemoveFromWorld(this);
-      this.emit('objectDestroyed', object);
-      this.world.removeObject(objectId);
+        if (typeof object.onRemoveFromWorld === 'function')
+            object.onRemoveFromWorld(this);
+
+        this.emit('objectDestroyed', object);
+        this.world.removeObject(objectId);
     }
+
     /**
      * Check if a given object is owned by the player on this client
      *
      * @param {Object} object the game object to check
      * @return {Boolean} true if the game object is owned by the player on this client
      */
-
-  }, {
-    key: "isOwnedByPlayer",
-    value: function isOwnedByPlayer(object) {
-      return object.playerId == this.playerId;
+    isOwnedByPlayer(object) {
+        return (object.playerId == this.playerId);
     }
+
     /**
      * Register Game Object Classes
      *
@@ -1131,56 +929,41 @@ function () {
      *
      * @param {Serializer} serializer - the serializer
      */
+    registerClasses(serializer) {
+    }
 
-  }, {
-    key: "registerClasses",
-    value: function registerClasses(serializer) {}
     /**
      * Decide whether the player game is over by returning an Object, need to be implemented
      *
      * @return {Object} truthful if the game is over for the player and the object is returned as GameOver data
      */
-
-  }, {
-    key: "getPlayerGameOverResult",
-    value: function getPlayerGameOverResult() {
-      return null;
+    getPlayerGameOverResult() {
+        return null;
     }
-  }]);
-
-  return GameEngine;
-}();
+}
 
 // The base Physics Engine class defines the expected interface
 // for all physics engines
-var PhysicsEngine =
-/*#__PURE__*/
-function () {
-  function PhysicsEngine(options) {
-    _classCallCheck(this, PhysicsEngine);
+class PhysicsEngine {
 
-    this.options = options;
-    this.gameEngine = options.gameEngine;
+    constructor(options) {
+        this.options = options;
+        this.gameEngine = options.gameEngine;
 
-    if (!options.gameEngine) {
-      console.warn('Physics engine initialized without gameEngine!');
+        if (!options.gameEngine) {
+            console.warn('Physics engine initialized without gameEngine!');
+        }
     }
-  }
-  /**
-   * A single Physics step.
-   *
-   * @param {Number} dt - time elapsed since last step
-   * @param {Function} objectFilter - a test function which filters which objects should move
-   */
 
+    /**
+     * A single Physics step.
+     *
+     * @param {Number} dt - time elapsed since last step
+     * @param {Function} objectFilter - a test function which filters which objects should move
+     */
+    step(dt, objectFilter) {}
 
-  _createClass(PhysicsEngine, [{
-    key: "step",
-    value: function step(dt, objectFilter) {}
-  }]);
-
-  return PhysicsEngine;
-}();
+}
 
 /* global P2_ARRAY_TYPE */
 
@@ -12606,34 +12389,34 @@ var _package = {
 };
 
 var _package$1 = /*#__PURE__*/Object.freeze({
-  _from: _from,
-  _id: _id,
-  _inBundle: _inBundle,
-  _integrity: _integrity,
-  _location: _location,
-  _phantomChildren: _phantomChildren,
-  _requested: _requested,
-  _requiredBy: _requiredBy,
-  _resolved: _resolved,
-  _shasum: _shasum,
-  _spec: _spec,
-  _where: _where,
-  author: author,
-  bugs: bugs,
-  bundleDependencies: bundleDependencies,
-  dependencies: dependencies,
-  deprecated: deprecated,
-  description: description,
-  devDependencies: devDependencies,
-  engines: engines,
-  homepage: homepage,
-  keywords: keywords,
-  licenses: licenses,
-  main: main,
-  name: name,
-  repository: repository,
-  version: version,
-  default: _package
+    _from: _from,
+    _id: _id,
+    _inBundle: _inBundle,
+    _integrity: _integrity,
+    _location: _location,
+    _phantomChildren: _phantomChildren,
+    _requested: _requested,
+    _requiredBy: _requiredBy,
+    _resolved: _resolved,
+    _shasum: _shasum,
+    _spec: _spec,
+    _where: _where,
+    author: author,
+    bugs: bugs,
+    bundleDependencies: bundleDependencies,
+    dependencies: dependencies,
+    deprecated: deprecated,
+    description: description,
+    devDependencies: devDependencies,
+    engines: engines,
+    homepage: homepage,
+    keywords: keywords,
+    licenses: licenses,
+    main: main,
+    name: name,
+    repository: repository,
+    version: version,
+    default: _package
 });
 
 var OverlapKeeperRecord_1 = OverlapKeeperRecord;
@@ -14603,130 +14386,89 @@ var p2_45 = p2_1.version;
 /**
  * CannonPhysicsEngine is a three-dimensional lightweight physics engine
  */
+class P2PhysicsEngine extends PhysicsEngine {
 
-var P2PhysicsEngine =
-/*#__PURE__*/
-function (_PhysicsEngine) {
-  _inherits(P2PhysicsEngine, _PhysicsEngine);
+    constructor(options) {
+        super(options);
 
-  function P2PhysicsEngine(options) {
-    var _this;
-
-    _classCallCheck(this, P2PhysicsEngine);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(P2PhysicsEngine).call(this, options));
-    _this.options.dt = _this.options.dt || 1 / 60;
-    _this.world = new p2_1.World({
-      gravity: [0, 0]
-    });
-    _this.p2 = p2_1;
-    return _this;
-  } // entry point for a single step of the Simple Physics
-
-
-  _createClass(P2PhysicsEngine, [{
-    key: "step",
-    value: function step(dt, objectFilter) {
-      this.world.step(dt || this.options.dt);
-    } // add a circle
-
-  }, {
-    key: "addCircle",
-    value: function addCircle(radius, mass) {
-      // create a body, add shape, add to world
-      var body = new p2_1.Body({
-        mass: mass,
-        position: [0, 0]
-      });
-      body.addShape(new p2_1.Circle({
-        radius: radius
-      }));
-      this.world.addBody(body);
-      return body;
+        this.options.dt = this.options.dt || (1 / 60);
+        this.world = new p2_1.World({ gravity: [0, 0] });
+        this.p2 = p2_1;
     }
-  }, {
-    key: "addBox",
-    value: function addBox(width, height, mass) {
-      // create a body, add shape, add to world
-      var body = new p2_1.Body({
-        mass: mass,
-        position: [0, 0]
-      });
-      body.addShape(new p2_1.Box({
-        width: width,
-        height: height
-      }));
-      this.world.addBody(body);
-      return body;
+
+    // entry point for a single step of the Simple Physics
+    step(dt, objectFilter) {
+        this.world.step(dt || this.options.dt);
     }
-  }, {
-    key: "removeObject",
-    value: function removeObject(obj) {
-      this.world.removeBody(obj);
+
+    // add a circle
+    addCircle(radius, mass) {
+
+        // create a body, add shape, add to world
+        let body = new p2_1.Body({ mass, position: [0, 0] });
+        body.addShape(new p2_1.Circle({ radius }));
+        this.world.addBody(body);
+
+        return body;
     }
-  }]);
 
-  return P2PhysicsEngine;
-}(PhysicsEngine);
+    addBox(width, height, mass) {
 
-var Utils$1 =
-/*#__PURE__*/
-function () {
-  function Utils() {
-    _classCallCheck(this, Utils);
-  }
+        // create a body, add shape, add to world
+        let body = new p2_1.Body({ mass, position: [0, 0] });
+        body.addShape(new p2_1.Box({ width, height }));
+        this.world.addBody(body);
 
-  _createClass(Utils, null, [{
-    key: "hashStr",
-    value: function hashStr(str, bits) {
-      var hash = 5381;
-      var i = str.length;
-      bits = bits ? bits : 8;
-
-      while (i) {
-        hash = hash * 33 ^ str.charCodeAt(--i);
-      }
-
-      hash = hash >>> 0;
-      hash = hash % (Math.pow(2, bits) - 1); // JavaScript does bitwise operations (like XOR, above) on 32-bit signed
-      // integers. Since we want the results to be always positive, convert the
-      // signed int to an unsigned by doing an unsigned bitshift. */
-
-      return hash;
+        return body;
     }
-  }, {
-    key: "arrayBuffersEqual",
-    value: function arrayBuffersEqual(buf1, buf2) {
-      if (buf1.byteLength !== buf2.byteLength) return false;
-      var dv1 = new Int8Array(buf1);
-      var dv2 = new Int8Array(buf2);
 
-      for (var i = 0; i !== buf1.byteLength; i++) {
-        if (dv1[i] !== dv2[i]) return false;
-      }
-
-      return true;
+    removeObject(obj) {
+        this.world.removeBody(obj);
     }
-  }, {
-    key: "httpGetPromise",
-    value: function httpGetPromise(url) {
-      return new Promise(function (resolve, reject) {
-        var req = new XMLHttpRequest();
-        req.open('GET', url, true);
+}
 
-        req.onload = function () {
-          if (req.status >= 200 && req.status < 400) resolve(JSON.parse(req.responseText));else reject();
-        };
+class Utils$1 {
 
-        req.onerror = function () {};
+    static hashStr(str, bits) {
+        let hash = 5381;
+        let i = str.length;
+        bits = bits ? bits : 8;
 
-        req.send();
-      });
+        while (i) {
+            hash = (hash * 33) ^ str.charCodeAt(--i);
+        }
+        hash = hash >>> 0;
+        hash = hash % (Math.pow(2, bits) - 1);
+
+        // JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+        // integers. Since we want the results to be always positive, convert the
+        // signed int to an unsigned by doing an unsigned bitshift. */
+        return hash;
     }
-  }]);
 
-  return Utils;
-}();
+    static arrayBuffersEqual(buf1, buf2) {
+        if (buf1.byteLength !== buf2.byteLength) return false;
+        let dv1 = new Int8Array(buf1);
+        let dv2 = new Int8Array(buf2);
+        for (let i = 0; i !== buf1.byteLength; i++) {
+            if (dv1[i] !== dv2[i]) return false;
+        }
+        return true;
+    }
+
+    static httpGetPromise(url) {
+        return new Promise((resolve, reject) => {
+            let req = new XMLHttpRequest();
+            req.open('GET', url, true);
+            req.onload = () => {
+                if (req.status >= 200 && req.status < 400) resolve(JSON.parse(req.responseText));
+                else reject();
+            };
+            req.onerror = () => {};
+            req.send();
+        });
+    }
+}
 
 /**
  * The BaseTypes class defines the base types used in lance.
@@ -14746,9 +14488,8 @@ function () {
  *         };
  *     }
  */
-var BaseTypes = function BaseTypes() {
-  _classCallCheck(this, BaseTypes);
-};
+class BaseTypes {}
+
 /**
  * @type {object}
  * @property {string} FLOAT32 Seriablizable float
@@ -14760,76 +14501,66 @@ var BaseTypes = function BaseTypes() {
  * @property {string} CLASSINSTANCE Seriablizable class. Make sure you register all the classes included in this way.
  * @property {string} LIST Seriablizable list.  In the netScheme definition, if an attribute is defined as a list, the itemType should also be defined.
  */
-
-
 BaseTypes.TYPES = {
+
   /**
    * Seriablizable float
    * @alias TYPES.FLOAT32
    * @memberof! BaseTypes#
    */
-  FLOAT32: 'FLOAT32',
+    FLOAT32: 'FLOAT32',
 
-  /**
-   * Seriablizable 32-bit int
-   * @alias TYPES.INT32
-   * @memberof! BaseTypes#
-   */
-  INT32: 'INT32',
+    /**
+     * Seriablizable 32-bit int
+     * @alias TYPES.INT32
+     * @memberof! BaseTypes#
+     */
+    INT32: 'INT32',
 
-  /**
-   * Seriablizable 16-bit int
-   * @alias TYPES.INT16
-   * @memberof! BaseTypes#
-   */
-  INT16: 'INT16',
+    /**
+     * Seriablizable 16-bit int
+     * @alias TYPES.INT16
+     * @memberof! BaseTypes#
+     */
+    INT16: 'INT16',
 
-  /**
-   * Seriablizable 8-bit int
-   * @alias TYPES.INT8
-   * @memberof! BaseTypes#
-   */
-  INT8: 'INT8',
+    /**
+     * Seriablizable 8-bit int
+     * @alias TYPES.INT8
+     * @memberof! BaseTypes#
+     */
+    INT8: 'INT8',
 
-  /**
-   * Seriablizable unsigned 8-bit int
-   * @alias TYPES.UINT8
-   * @memberof! BaseTypes#
-   */
-  UINT8: 'UINT8',
+    /**
+     * Seriablizable unsigned 8-bit int
+     * @alias TYPES.UINT8
+     * @memberof! BaseTypes#
+     */
+    UINT8: 'UINT8',
 
-  /**
-   * Seriablizable string
-   * @alias TYPES.STRING
-   * @memberof! BaseTypes#
-   */
-  STRING: 'STRING',
+    /**
+     * Seriablizable string
+     * @alias TYPES.STRING
+     * @memberof! BaseTypes#
+     */
+    STRING: 'STRING',
 
-  /**
-   * Seriablizable class.  Make sure you registered the classes included in this way.
-   * @alias TYPES.CLASSINSTANCE
-   * @memberof! BaseTypes#
-   */
-  CLASSINSTANCE: 'CLASSINSTANCE',
+    /**
+     * Seriablizable class.  Make sure you registered the classes included in this way.
+     * @alias TYPES.CLASSINSTANCE
+     * @memberof! BaseTypes#
+     */
+    CLASSINSTANCE: 'CLASSINSTANCE',
 
-  /**
-   * Seriablizable list.
-   * @alias TYPES.LIST
-   * @memberof! BaseTypes#
-   */
-  LIST: 'LIST'
+    /**
+     * Seriablizable list.
+     * @alias TYPES.LIST
+     * @memberof! BaseTypes#
+     */
+    LIST: 'LIST'
 };
 
-var Serializable =
-/*#__PURE__*/
-function () {
-  function Serializable() {
-    _classCallCheck(this, Serializable);
-  }
-
-  _createClass(Serializable, [{
-    key: "serialize",
-
+class Serializable {
     /**
      *  Class can be serialized using either:
      * - a class based netScheme
@@ -14843,263 +14574,179 @@ function () {
      * @param {String} options.dry [optional] - Does not actually write to the buffer (useful to gather serializeable size)
      * @return {Object} the serialized object.  Contains attributes: dataBuffer - buffer which contains the serialized data;  bufferOffset - offset where the serialized data starts.
      */
-    value: function serialize(serializer, options) {
-      options = Object.assign({
-        bufferOffset: 0
-      }, options);
-      var netScheme;
-      var dataBuffer;
-      var dataView;
-      var classId = 0;
-      var bufferOffset = options.bufferOffset;
-      var localBufferOffset = 0; // used for counting the bufferOffset
-      // instance classId
+    serialize(serializer, options) {
+        options = Object.assign({
+            bufferOffset: 0
+        }, options);
 
-      if (this.classId) {
-        classId = this.classId;
-      } else {
-        classId = Utils$1.hashStr(this.constructor.name);
-      } // instance netScheme
+        let netScheme;
+        let dataBuffer;
+        let dataView;
+        let classId = 0;
+        let bufferOffset = options.bufferOffset;
+        let localBufferOffset = 0; // used for counting the bufferOffset
 
-
-      if (this.netScheme) {
-        netScheme = this.netScheme;
-      } else if (this.constructor.netScheme) {
-        netScheme = this.constructor.netScheme;
-      } else {
-        // todo define behaviour when a netScheme is undefined
-        console.warn('no netScheme defined! This will result in awful performance');
-      } // TODO: currently we serialize every node twice, once to calculate the size
-      //       of the buffers and once to write them out.  This can be reduced to
-      //       a single pass by starting with a large (and static) ArrayBuffer and
-      //       recursively building it up.
-      // buffer has one Uint8Array for class id, then payload
-
-
-      if (options.dataBuffer == null && options.dry != true) {
-        var bufferSize = this.serialize(serializer, {
-          dry: true
-        }).bufferOffset;
-        dataBuffer = new ArrayBuffer(bufferSize);
-      } else {
-        dataBuffer = options.dataBuffer;
-      }
-
-      if (options.dry != true) {
-        dataView = new DataView(dataBuffer); // first set the id of the class, so that the deserializer can fetch information about it
-
-        dataView.setUint8(bufferOffset + localBufferOffset, classId);
-      } // advance the offset counter
-
-
-      localBufferOffset += Uint8Array.BYTES_PER_ELEMENT;
-
-      if (netScheme) {
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = Object.keys(netScheme).sort()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var property = _step.value;
-
-            // write the property to buffer
-            if (options.dry != true) {
-              serializer.writeDataView(dataView, this[property], bufferOffset + localBufferOffset, netScheme[property]);
-            }
-
-            if (netScheme[property].type === BaseTypes.TYPES.STRING) {
-              // derive the size of the string
-              localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
-              if (this[property] !== null && this[property] !== undefined) localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
-            } else if (netScheme[property].type === BaseTypes.TYPES.CLASSINSTANCE) {
-              // derive the size of the included class
-              var objectInstanceBufferOffset = this[property].serialize(serializer, {
-                dry: true
-              }).bufferOffset;
-              localBufferOffset += objectInstanceBufferOffset;
-            } else if (netScheme[property].type === BaseTypes.TYPES.LIST) {
-              // derive the size of the list
-              // list starts with number of elements
-              localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
-              var _iteratorNormalCompletion2 = true;
-              var _didIteratorError2 = false;
-              var _iteratorError2 = undefined;
-
-              try {
-                for (var _iterator2 = this[property][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                  var item = _step2.value;
-
-                  // todo inelegant, currently doesn't support list of lists
-                  if (netScheme[property].itemType === BaseTypes.TYPES.CLASSINSTANCE) {
-                    var listBufferOffset = item.serialize(serializer, {
-                      dry: true
-                    }).bufferOffset;
-                    localBufferOffset += listBufferOffset;
-                  } else if (netScheme[property].itemType === BaseTypes.TYPES.STRING) {
-                    // size includes string length plus double-byte characters
-                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT * (1 + item.length);
-                  } else {
-                    localBufferOffset += serializer.getTypeByteSize(netScheme[property].itemType);
-                  }
-                }
-              } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                    _iterator2.return();
-                  }
-                } finally {
-                  if (_didIteratorError2) {
-                    throw _iteratorError2;
-                  }
-                }
-              }
-            } else {
-              // advance offset
-              localBufferOffset += serializer.getTypeByteSize(netScheme[property].type);
-            }
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
+        // instance classId
+        if (this.classId) {
+            classId = this.classId;
+        } else {
+            classId = Utils$1.hashStr(this.constructor.name);
         }
-      }
 
-      return {
-        dataBuffer: dataBuffer,
-        bufferOffset: localBufferOffset
-      };
-    } // build a clone of this object with pruned strings (if necessary)
+        // instance netScheme
+        if (this.netScheme) {
+            netScheme = this.netScheme;
+        } else if (this.constructor.netScheme) {
+            netScheme = this.constructor.netScheme;
+        } else {
+            // todo define behaviour when a netScheme is undefined
+            console.warn('no netScheme defined! This will result in awful performance');
+        }
 
-  }, {
-    key: "prunedStringsClone",
-    value: function prunedStringsClone(serializer, prevObject) {
-      var _this = this;
+        // TODO: currently we serialize every node twice, once to calculate the size
+        //       of the buffers and once to write them out.  This can be reduced to
+        //       a single pass by starting with a large (and static) ArrayBuffer and
+        //       recursively building it up.
+        // buffer has one Uint8Array for class id, then payload
+        if (options.dataBuffer == null && options.dry != true) {
+            let bufferSize = this.serialize(serializer, { dry: true }).bufferOffset;
+            dataBuffer = new ArrayBuffer(bufferSize);
+        } else {
+            dataBuffer = options.dataBuffer;
+        }
 
-      if (!prevObject) return this;
-      prevObject = serializer.deserialize(prevObject).obj; // get list of string properties which changed
+        if (options.dry != true) {
+            dataView = new DataView(dataBuffer);
+            // first set the id of the class, so that the deserializer can fetch information about it
+            dataView.setUint8(bufferOffset + localBufferOffset, classId);
+        }
 
-      var netScheme = this.constructor.netScheme;
+        // advance the offset counter
+        localBufferOffset += Uint8Array.BYTES_PER_ELEMENT;
 
-      var isString = function isString(p) {
-        return netScheme[p].type === BaseTypes.TYPES.STRING;
-      };
+        if (netScheme) {
+            for (let property of Object.keys(netScheme).sort()) {
 
-      var hasChanged = function hasChanged(p) {
-        return prevObject[p] !== _this[p];
-      };
+                // write the property to buffer
+                if (options.dry != true) {
+                    serializer.writeDataView(dataView, this[property], bufferOffset + localBufferOffset, netScheme[property]);
+                }
 
-      var changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
-      if (changedStrings.length == 0) return this; // build a clone with pruned strings
+                if (netScheme[property].type === BaseTypes.TYPES.STRING) {
+                    // derive the size of the string
+                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                    if (this[property] !== null && this[property] !== undefined)
+                        localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
+                } else if (netScheme[property].type === BaseTypes.TYPES.CLASSINSTANCE) {
+                    // derive the size of the included class
+                    let objectInstanceBufferOffset = this[property].serialize(serializer, { dry: true }).bufferOffset;
+                    localBufferOffset += objectInstanceBufferOffset;
+                } else if (netScheme[property].type === BaseTypes.TYPES.LIST) {
+                    // derive the size of the list
+                    // list starts with number of elements
+                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
-      var prunedCopy = new this.constructor(null, {
-        id: null
-      });
+                    for (let item of this[property]) {
+                        // todo inelegant, currently doesn't support list of lists
+                        if (netScheme[property].itemType === BaseTypes.TYPES.CLASSINSTANCE) {
+                            let listBufferOffset = item.serialize(serializer, { dry: true }).bufferOffset;
+                            localBufferOffset += listBufferOffset;
+                        } else if (netScheme[property].itemType === BaseTypes.TYPES.STRING) {
+                            // size includes string length plus double-byte characters
+                            localBufferOffset += Uint16Array.BYTES_PER_ELEMENT * (1 + item.length);
+                        } else {
+                            localBufferOffset += serializer.getTypeByteSize(netScheme[property].itemType);
+                        }
+                    }
+                } else {
+                    // advance offset
+                    localBufferOffset += serializer.getTypeByteSize(netScheme[property].type);
+                }
 
-      var _arr = Object.keys(netScheme);
+            }
+        }
 
-      for (var _i = 0; _i < _arr.length; _i++) {
-        var p = _arr[_i];
-        prunedCopy[p] = changedStrings.indexOf(p) < 0 ? this[p] : null;
-      }
-
-      return prunedCopy;
+        return { dataBuffer, bufferOffset: localBufferOffset };
     }
-  }, {
-    key: "syncTo",
-    value: function syncTo(other) {
-      var netScheme = this.constructor.netScheme;
 
-      var _arr2 = Object.keys(netScheme);
+    // build a clone of this object with pruned strings (if necessary)
+    prunedStringsClone(serializer, prevObject) {
 
-      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        var p = _arr2[_i2];
-        // ignore classes and lists
-        if (netScheme[p].type === BaseTypes.TYPES.LIST || netScheme[p].type === BaseTypes.TYPES.CLASSINSTANCE) continue; // strings might be pruned
+        if (!prevObject) return this;
+        prevObject = serializer.deserialize(prevObject).obj;
 
-        if (netScheme[p].type === BaseTypes.TYPES.STRING) {
-          if (typeof other[p] === 'string') this[p] = other[p];
-          continue;
-        } // all other values are copied
+        // get list of string properties which changed
+        let netScheme = this.constructor.netScheme;
+        let isString = p => netScheme[p].type === BaseTypes.TYPES.STRING;
+        let hasChanged = p => prevObject[p] !== this[p];
+        let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
+        if (changedStrings.length == 0) return this;
 
+        // build a clone with pruned strings
+        let prunedCopy = new this.constructor(null, { id: null });
+        for (let p of Object.keys(netScheme))
+            prunedCopy[p] = changedStrings.indexOf(p) < 0 ? this[p] : null;
 
-        this[p] = other[p];
-      }
+        return prunedCopy;
     }
-  }]);
 
-  return Serializable;
-}();
+    syncTo(other) {
+        let netScheme = this.constructor.netScheme;
+        for (let p of Object.keys(netScheme)) {
+
+            // ignore classes and lists
+            if (netScheme[p].type === BaseTypes.TYPES.LIST || netScheme[p].type === BaseTypes.TYPES.CLASSINSTANCE)
+                continue;
+
+            // strings might be pruned
+            if (netScheme[p].type === BaseTypes.TYPES.STRING) {
+                if (typeof other[p] === 'string') this[p] = other[p];
+                continue;
+            }
+
+            // all other values are copied
+            this[p] = other[p];
+        }
+    }
+
+}
 
 /**
  * A TwoVector is a geometric object which is completely described
  * by two values.
  */
+class TwoVector extends Serializable {
 
-var TwoVector =
-/*#__PURE__*/
-function (_Serializable) {
-  _inherits(TwoVector, _Serializable);
-
-  _createClass(TwoVector, null, [{
-    key: "netScheme",
-    get: function get() {
-      return {
-        x: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        y: {
-          type: BaseTypes.TYPES.FLOAT32
-        }
-      };
+    static get netScheme() {
+        return {
+            x: { type: BaseTypes.TYPES.FLOAT32 },
+            y: { type: BaseTypes.TYPES.FLOAT32 }
+        };
     }
+
     /**
     * Creates an instance of a TwoVector.
     * @param {Number} x - first value
     * @param {Number} y - second value
     * @return {TwoVector} v - the new TwoVector
     */
+    constructor(x, y) {
+        super();
+        this.x = x;
+        this.y = y;
 
-  }]);
-
-  function TwoVector(x, y) {
-    var _this;
-
-    _classCallCheck(this, TwoVector);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TwoVector).call(this));
-    _this.x = x;
-    _this.y = y;
-    return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
-  }
-  /**
-   * Formatted textual description of the TwoVector.
-   * @return {String} description
-   */
-
-
-  _createClass(TwoVector, [{
-    key: "toString",
-    value: function toString() {
-      function round3(x) {
-        return Math.round(x * 1000) / 1000;
-      }
-
-      return "[".concat(round3(this.x), ", ").concat(round3(this.y), "]");
+        return this;
     }
+
+    /**
+     * Formatted textual description of the TwoVector.
+     * @return {String} description
+     */
+    toString() {
+        function round3(x) { return Math.round(x * 1000) / 1000; }
+        return `[${round3(this.x)}, ${round3(this.y)}]`;
+    }
+
     /**
      * Set TwoVector values
      *
@@ -15107,111 +14754,99 @@ function (_Serializable) {
      * @param {Number} y y-value
      * @return {TwoVector} returns self
      */
+    set(x, y) {
+        this.x = x;
+        this.y = y;
+        return this;
+    }
 
-  }, {
-    key: "set",
-    value: function set(x, y) {
-      this.x = x;
-      this.y = y;
-      return this;
+    multiply(other) {
+        this.x *= other.x;
+        this.y *= other.y;
+
+        return this;
     }
-  }, {
-    key: "multiply",
-    value: function multiply(other) {
-      this.x *= other.x;
-      this.y *= other.y;
-      return this;
-    }
+
     /**
      * Multiply this TwoVector by a scalar
      *
      * @param {Number} s the scale
      * @return {TwoVector} returns self
      */
+    multiplyScalar(s) {
+        this.x *= s;
+        this.y *= s;
 
-  }, {
-    key: "multiplyScalar",
-    value: function multiplyScalar(s) {
-      this.x *= s;
-      this.y *= s;
-      return this;
+        return this;
     }
+
     /**
      * Add other vector to this vector
      *
      * @param {TwoVector} other the other vector
      * @return {TwoVector} returns self
      */
+    add(other) {
+        this.x += other.x;
+        this.y += other.y;
 
-  }, {
-    key: "add",
-    value: function add(other) {
-      this.x += other.x;
-      this.y += other.y;
-      return this;
+        return this;
     }
+
     /**
      * Subtract other vector to this vector
      *
      * @param {TwoVector} other the other vector
      * @return {TwoVector} returns self
      */
+    subtract(other) {
+        this.x -= other.x;
+        this.y -= other.y;
 
-  }, {
-    key: "subtract",
-    value: function subtract(other) {
-      this.x -= other.x;
-      this.y -= other.y;
-      return this;
+        return this;
     }
+
     /**
      * Get vector length
      *
      * @return {Number} length of this vector
      */
-
-  }, {
-    key: "length",
-    value: function length() {
-      return Math.sqrt(this.x * this.x + this.y * this.y);
+    length() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
+
     /**
      * Normalize this vector, in-place
      *
      * @return {TwoVector} returns self
      */
-
-  }, {
-    key: "normalize",
-    value: function normalize() {
-      this.multiplyScalar(1 / this.length());
-      return this;
+    normalize() {
+        this.multiplyScalar(1 / this.length());
+        return this;
     }
+
     /**
      * Copy values from another TwoVector into this TwoVector
      *
      * @param {TwoVector} sourceObj the other vector
      * @return {TwoVector} returns self
      */
+    copy(sourceObj) {
+        this.x = sourceObj.x;
+        this.y = sourceObj.y;
 
-  }, {
-    key: "copy",
-    value: function copy(sourceObj) {
-      this.x = sourceObj.x;
-      this.y = sourceObj.y;
-      return this;
+        return this;
     }
+
     /**
      * Create a clone of this vector
      *
      * @return {TwoVector} returns clone
      */
-
-  }, {
-    key: "clone",
-    value: function clone() {
-      return new TwoVector(this.x, this.y);
+    clone() {
+        return new TwoVector(this.x, this.y);
     }
+
     /**
      * Apply in-place lerp (linear interpolation) to this TwoVector
      * towards another TwoVector
@@ -15219,14 +14854,13 @@ function (_Serializable) {
      * @param {Number} p The percentage to interpolate
      * @return {TwoVector} returns self
      */
+    lerp(target, p) {
+        this.x += (target.x - this.x) * p;
+        this.y += (target.y - this.y) * p;
 
-  }, {
-    key: "lerp",
-    value: function lerp(target, p) {
-      this.x += (target.x - this.x) * p;
-      this.y += (target.y - this.y) * p;
-      return this;
+        return this;
     }
+
     /**
      * Get bending Delta Vector
      * towards another TwoVector
@@ -15238,29 +14872,27 @@ function (_Serializable) {
      * @param {Number} options.max No more than this value
      * @return {TwoVector} returns new Incremental Vector
      */
+    getBendingDelta(target, options) {
+        let increment = target.clone();
+        increment.subtract(this);
+        increment.multiplyScalar(options.percent);
 
-  }, {
-    key: "getBendingDelta",
-    value: function getBendingDelta(target, options) {
-      var increment = target.clone();
-      increment.subtract(this);
-      increment.multiplyScalar(options.percent); // check for max case
+        // check for max case
+        if (((typeof options.max === 'number') && increment.length() > options.max) ||
+            ((typeof options.min === 'number') && increment.length() < options.min)) {
+            return new TwoVector(0, 0);
+        }
 
-      if (typeof options.max === 'number' && increment.length() > options.max || typeof options.min === 'number' && increment.length() < options.min) {
-        return new TwoVector(0, 0);
-      } // divide into increments
+        // divide into increments
+        increment.multiplyScalar(1 / options.increments);
 
-
-      increment.multiplyScalar(1 / options.increments);
-      return increment;
+        return increment;
     }
-  }]);
-
-  return TwoVector;
-}(Serializable);
+}
 
 // Hierarchical Spatial Hash Grid: HSHG
 // source: https://gist.github.com/kirbysayshi/1760774
+
 // ---------------------------------------------------------------------
 // GLOBAL FUNCTIONS
 // ---------------------------------------------------------------------
@@ -15280,252 +14912,272 @@ function (_Serializable) {
  * @return  void   desc
  */
 function update_RECOMPUTE() {
-  var i, obj, grid, meta, objAABB, newObjHash; // for each object
 
-  for (i = 0; i < this._globalObjects.length; i++) {
-    obj = this._globalObjects[i];
-    meta = obj.HSHG;
-    grid = meta.grid; // recompute hash
+    var i,
+        obj,
+        grid,
+        meta,
+        objAABB,
+        newObjHash;
 
-    objAABB = obj.getAABB();
-    newObjHash = grid.toHash(objAABB.min[0], objAABB.min[1]);
+    // for each object
+    for (i = 0; i < this._globalObjects.length; i++) {
+        obj = this._globalObjects[i];
+        meta = obj.HSHG;
+        grid = meta.grid;
 
-    if (newObjHash !== meta.hash) {
-      // grid position has changed, update!
-      grid.removeObject(obj);
-      grid.addObject(obj, newObjHash);
+        // recompute hash
+        objAABB = obj.getAABB();
+        newObjHash = grid.toHash(objAABB.min[0], objAABB.min[1]);
+
+        if (newObjHash !== meta.hash) {
+            // grid position has changed, update!
+            grid.removeObject(obj);
+            grid.addObject(obj, newObjHash);
+        }
     }
-  }
-} // not implemented yet :)
+}
 
+// not implemented yet :)
+function update_REMOVEALL() {
 
-function update_REMOVEALL() {}
+}
 
 function testAABBOverlap(objA, objB) {
-  var a = objA.getAABB(),
-      b = objB.getAABB(); // if(a.min[0] > b.max[0] || a.min[1] > b.max[1] || a.min[2] > b.max[2]
-  // || a.max[0] < b.min[0] || a.max[1] < b.min[1] || a.max[2] < b.min[2]){
+    var a = objA.getAABB(),
+        b = objB.getAABB();
 
-  if (a.min[0] > b.max[0] || a.min[1] > b.max[1] || a.max[0] < b.min[0] || a.max[1] < b.min[1]) {
-    return false;
-  }
+    // if(a.min[0] > b.max[0] || a.min[1] > b.max[1] || a.min[2] > b.max[2]
+    // || a.max[0] < b.min[0] || a.max[1] < b.min[1] || a.max[2] < b.min[2]){
 
-  return true;
+    if (a.min[0] > b.max[0] || a.min[1] > b.max[1] ||
+        a.max[0] < b.min[0] || a.max[1] < b.min[1]) {
+        return false;
+    }
+    return true;
+
 }
 
 function getLongestAABBEdge(min, max) {
-  return Math.max(Math.abs(max[0] - min[0]), Math.abs(max[1] - min[1]) // ,Math.abs(max[2] - min[2])
-  );
-} // ---------------------------------------------------------------------
+    return Math.max(
+        Math.abs(max[0] - min[0])
+        , Math.abs(max[1] - min[1])
+        // ,Math.abs(max[2] - min[2])
+    );
+}
+
+// ---------------------------------------------------------------------
 // ENTITIES
 // ---------------------------------------------------------------------
 
-
 function HSHG() {
-  this.MAX_OBJECT_CELL_DENSITY = 1 / 8; // objects / cells
 
-  this.INITIAL_GRID_LENGTH = 256; // 16x16
+    this.MAX_OBJECT_CELL_DENSITY = 1 / 8; // objects / cells
+    this.INITIAL_GRID_LENGTH = 256; // 16x16
+    this.HIERARCHY_FACTOR = 2;
+    this.HIERARCHY_FACTOR_SQRT = Math.SQRT2;
+    this.UPDATE_METHOD = update_RECOMPUTE; // or update_REMOVEALL
 
-  this.HIERARCHY_FACTOR = 2;
-  this.HIERARCHY_FACTOR_SQRT = Math.SQRT2;
-  this.UPDATE_METHOD = update_RECOMPUTE; // or update_REMOVEALL
+    this._grids = [];
+    this._globalObjects = [];
+}
 
-  this._grids = [];
-  this._globalObjects = [];
-} // HSHG.prototype.init = function(){
+// HSHG.prototype.init = function(){
 //	this._grids = [];
 //	this._globalObjects = [];
 // }
 
-
 HSHG.prototype.addObject = function (obj) {
-  var x,
-      i,
-      cellSize,
-      objAABB = obj.getAABB(),
-      objSize = getLongestAABBEdge(objAABB.min, objAABB.max),
-      oneGrid,
-      newGrid; // for HSHG metadata
+    var x, i,
+        cellSize,
+        objAABB = obj.getAABB(),
+        objSize = getLongestAABBEdge(objAABB.min, objAABB.max),
+        oneGrid, newGrid;
 
-  obj.HSHG = {
-    globalObjectsIndex: this._globalObjects.length
-  }; // add to global object array
+    // for HSHG metadata
+    obj.HSHG = {
+        globalObjectsIndex: this._globalObjects.length
+    };
 
-  this._globalObjects.push(obj);
+    // add to global object array
+    this._globalObjects.push(obj);
 
-  if (this._grids.length == 0) {
-    // no grids exist yet
-    cellSize = objSize * this.HIERARCHY_FACTOR_SQRT;
-    newGrid = new Grid(cellSize, this.INITIAL_GRID_LENGTH, this);
-    newGrid.initCells();
-    newGrid.addObject(obj);
+    if (this._grids.length == 0) {
+        // no grids exist yet
+        cellSize = objSize * this.HIERARCHY_FACTOR_SQRT;
+        newGrid = new Grid(cellSize, this.INITIAL_GRID_LENGTH, this);
+        newGrid.initCells();
+        newGrid.addObject(obj);
 
-    this._grids.push(newGrid);
-  } else {
-    x = 0; // grids are sorted by cellSize, smallest to largest
+        this._grids.push(newGrid);
+    } else {
+        x = 0;
 
-    for (i = 0; i < this._grids.length; i++) {
-      oneGrid = this._grids[i];
-      x = oneGrid.cellSize;
-
-      if (objSize < x) {
-        x /= this.HIERARCHY_FACTOR;
-
-        if (objSize < x) {
-          // find appropriate size
-          while (objSize < x) {
-            x /= this.HIERARCHY_FACTOR;
-          }
-
-          newGrid = new Grid(x * this.HIERARCHY_FACTOR, this.INITIAL_GRID_LENGTH, this);
-          newGrid.initCells(); // assign obj to grid
-
-          newGrid.addObject(obj); // insert grid into list of grids directly before oneGrid
-
-          this._grids.splice(i, 0, newGrid);
-        } else {
-          // insert obj into grid oneGrid
-          oneGrid.addObject(obj);
+        // grids are sorted by cellSize, smallest to largest
+        for (i = 0; i < this._grids.length; i++) {
+            oneGrid = this._grids[i];
+            x = oneGrid.cellSize;
+            if (objSize < x) {
+                x /= this.HIERARCHY_FACTOR;
+                if (objSize < x) {
+                    // find appropriate size
+                    while (objSize < x) {
+                        x /= this.HIERARCHY_FACTOR;
+                    }
+                    newGrid = new Grid(x * this.HIERARCHY_FACTOR, this.INITIAL_GRID_LENGTH, this);
+                    newGrid.initCells();
+                    // assign obj to grid
+                    newGrid.addObject(obj);
+                    // insert grid into list of grids directly before oneGrid
+                    this._grids.splice(i, 0, newGrid);
+                } else {
+                    // insert obj into grid oneGrid
+                    oneGrid.addObject(obj);
+                }
+                return;
+            }
         }
 
-        return;
-      }
+        while (objSize >= x) {
+            x *= this.HIERARCHY_FACTOR;
+        }
+
+        newGrid = new Grid(x, this.INITIAL_GRID_LENGTH, this);
+        newGrid.initCells();
+        // insert obj into grid
+        newGrid.addObject(obj);
+        // add newGrid as last element in grid list
+        this._grids.push(newGrid);
     }
-
-    while (objSize >= x) {
-      x *= this.HIERARCHY_FACTOR;
-    }
-
-    newGrid = new Grid(x, this.INITIAL_GRID_LENGTH, this);
-    newGrid.initCells(); // insert obj into grid
-
-    newGrid.addObject(obj); // add newGrid as last element in grid list
-
-    this._grids.push(newGrid);
-  }
 };
 
 HSHG.prototype.removeObject = function (obj) {
-  var meta = obj.HSHG,
-      globalObjectsIndex,
-      replacementObj;
+    var meta = obj.HSHG,
+        globalObjectsIndex,
+        replacementObj;
 
-  if (meta === undefined) {
-    throw Error(obj + ' was not in the HSHG.');
-    return;
-  } // remove object from global object list
+    if (meta === undefined) {
+        throw Error(obj + ' was not in the HSHG.');
+        return;
+    }
 
+    // remove object from global object list
+    globalObjectsIndex = meta.globalObjectsIndex;
+    if (globalObjectsIndex === this._globalObjects.length - 1) {
+        this._globalObjects.pop();
+    } else {
+        replacementObj = this._globalObjects.pop();
+        replacementObj.HSHG.globalObjectsIndex = globalObjectsIndex;
+        this._globalObjects[globalObjectsIndex] = replacementObj;
+    }
 
-  globalObjectsIndex = meta.globalObjectsIndex;
+    meta.grid.removeObject(obj);
 
-  if (globalObjectsIndex === this._globalObjects.length - 1) {
-    this._globalObjects.pop();
-  } else {
-    replacementObj = this._globalObjects.pop();
-    replacementObj.HSHG.globalObjectsIndex = globalObjectsIndex;
-    this._globalObjects[globalObjectsIndex] = replacementObj;
-  }
-
-  meta.grid.removeObject(obj); // remove meta data
-
-  delete obj.HSHG;
+    // remove meta data
+    delete obj.HSHG;
 };
 
 HSHG.prototype.update = function () {
-  this.UPDATE_METHOD.call(this);
+    this.UPDATE_METHOD.call(this);
 };
 
 HSHG.prototype.queryForCollisionPairs = function (broadOverlapTestCallback) {
-  var i,
-      j,
-      k,
-      l,
-      c,
-      grid,
-      cell,
-      objA,
-      objB,
-      offset,
-      adjacentCell,
-      biggerGrid,
-      objAAABB,
-      objAHashInBiggerGrid,
-      possibleCollisions = []; // default broad test to internal aabb overlap test
 
-  var broadOverlapTest = broadOverlapTestCallback || testAABBOverlap; // for all grids ordered by cell size ASC
+    var i, j, k, l, c,
+        grid,
+        cell,
+        objA,
+        objB,
+        offset,
+        adjacentCell,
+        biggerGrid,
+        objAAABB,
+        objAHashInBiggerGrid,
+        possibleCollisions = [];
 
-  for (i = 0; i < this._grids.length; i++) {
-    grid = this._grids[i]; // for each cell of the grid that is occupied
+    // default broad test to internal aabb overlap test
+    let broadOverlapTest = broadOverlapTestCallback || testAABBOverlap;
 
-    for (j = 0; j < grid.occupiedCells.length; j++) {
-      cell = grid.occupiedCells[j]; // collide all objects within the occupied cell
+    // for all grids ordered by cell size ASC
+    for (i = 0; i < this._grids.length; i++) {
+        grid = this._grids[i];
 
-      for (k = 0; k < cell.objectContainer.length; k++) {
-        objA = cell.objectContainer[k];
+        // for each cell of the grid that is occupied
+        for (j = 0; j < grid.occupiedCells.length; j++) {
+            cell = grid.occupiedCells[j];
 
-        for (l = k + 1; l < cell.objectContainer.length; l++) {
-          objB = cell.objectContainer[l];
-
-          if (broadOverlapTest(objA, objB) === true) {
-            possibleCollisions.push([objA, objB]);
-          }
-        }
-      } // for the first half of all adjacent cells (offset 4 is the current cell)
-
-
-      for (c = 0; c < 4; c++) {
-        offset = cell.neighborOffsetArray[c]; // if(offset === null) { continue; }
-
-        adjacentCell = grid.allCells[cell.allCellsIndex + offset]; // collide all objects in cell with adjacent cell
-
-        for (k = 0; k < cell.objectContainer.length; k++) {
-          objA = cell.objectContainer[k];
-
-          for (l = 0; l < adjacentCell.objectContainer.length; l++) {
-            objB = adjacentCell.objectContainer[l];
-
-            if (broadOverlapTest(objA, objB) === true) {
-              possibleCollisions.push([objA, objB]);
+            // collide all objects within the occupied cell
+            for (k = 0; k < cell.objectContainer.length; k++) {
+                objA = cell.objectContainer[k];
+                for (l = k + 1; l < cell.objectContainer.length; l++) {
+                    objB = cell.objectContainer[l];
+                    if (broadOverlapTest(objA, objB) === true) {
+                        possibleCollisions.push([objA, objB]);
+                    }
+                }
             }
-          }
-        }
-      }
-    } // forall objects that are stored in this grid
 
+            // for the first half of all adjacent cells (offset 4 is the current cell)
+            for (c = 0; c < 4; c++) {
+                offset = cell.neighborOffsetArray[c];
 
-    for (j = 0; j < grid.allObjects.length; j++) {
-      objA = grid.allObjects[j];
-      objAAABB = objA.getAABB(); // for all grids with cellsize larger than grid
+                // if(offset === null) { continue; }
 
-      for (k = i + 1; k < this._grids.length; k++) {
-        biggerGrid = this._grids[k];
-        objAHashInBiggerGrid = biggerGrid.toHash(objAAABB.min[0], objAAABB.min[1]);
-        cell = biggerGrid.allCells[objAHashInBiggerGrid]; // check objA against every object in all cells in offset array of cell
-        // for all adjacent cells...
+                adjacentCell = grid.allCells[cell.allCellsIndex + offset];
 
-        for (c = 0; c < cell.neighborOffsetArray.length; c++) {
-          offset = cell.neighborOffsetArray[c]; // if(offset === null) { continue; }
-
-          adjacentCell = biggerGrid.allCells[cell.allCellsIndex + offset]; // for all objects in the adjacent cell...
-
-          for (l = 0; l < adjacentCell.objectContainer.length; l++) {
-            objB = adjacentCell.objectContainer[l]; // test against object A
-
-            if (broadOverlapTest(objA, objB) === true) {
-              possibleCollisions.push([objA, objB]);
+                // collide all objects in cell with adjacent cell
+                for (k = 0; k < cell.objectContainer.length; k++) {
+                    objA = cell.objectContainer[k];
+                    for (l = 0; l < adjacentCell.objectContainer.length; l++) {
+                        objB = adjacentCell.objectContainer[l];
+                        if (broadOverlapTest(objA, objB) === true) {
+                            possibleCollisions.push([objA, objB]);
+                        }
+                    }
+                }
             }
-          }
         }
-      }
+
+        // forall objects that are stored in this grid
+        for (j = 0; j < grid.allObjects.length; j++) {
+            objA = grid.allObjects[j];
+            objAAABB = objA.getAABB();
+
+            // for all grids with cellsize larger than grid
+            for (k = i + 1; k < this._grids.length; k++) {
+                biggerGrid = this._grids[k];
+                objAHashInBiggerGrid = biggerGrid.toHash(objAAABB.min[0], objAAABB.min[1]);
+                cell = biggerGrid.allCells[objAHashInBiggerGrid];
+
+                // check objA against every object in all cells in offset array of cell
+                // for all adjacent cells...
+                for (c = 0; c < cell.neighborOffsetArray.length; c++) {
+                    offset = cell.neighborOffsetArray[c];
+
+                    // if(offset === null) { continue; }
+
+                    adjacentCell = biggerGrid.allCells[cell.allCellsIndex + offset];
+
+                    // for all objects in the adjacent cell...
+                    for (l = 0; l < adjacentCell.objectContainer.length; l++) {
+                        objB = adjacentCell.objectContainer[l];
+                        // test against object A
+                        if (broadOverlapTest(objA, objB) === true) {
+                            possibleCollisions.push([objA, objB]);
+                        }
+                    }
+                }
+            }
+        }
     }
-  } // return list of object pairs
 
-
-  return possibleCollisions;
+    // return list of object pairs
+    return possibleCollisions;
 };
 
 HSHG.update_RECOMPUTE = update_RECOMPUTE;
 HSHG.update_REMOVEALL = update_REMOVEALL;
+
 /**
  * Grid
  *
@@ -15535,495 +15187,503 @@ HSHG.update_REMOVEALL = update_REMOVEALL;
  * @param    HSHG parentHierarchy    the HSHG to which this grid belongs
  * @return  void
  */
-
 function Grid(cellSize, cellCount, parentHierarchy) {
-  this.cellSize = cellSize;
-  this.inverseCellSize = 1 / cellSize;
-  this.rowColumnCount = ~~Math.sqrt(cellCount);
-  this.xyHashMask = this.rowColumnCount - 1;
-  this.occupiedCells = [];
-  this.allCells = Array(this.rowColumnCount * this.rowColumnCount);
-  this.allObjects = [];
-  this.sharedInnerOffsets = [];
-  this._parentHierarchy = parentHierarchy || null;
+    this.cellSize = cellSize;
+    this.inverseCellSize = 1 / cellSize;
+    this.rowColumnCount = ~~Math.sqrt(cellCount);
+    this.xyHashMask = this.rowColumnCount - 1;
+    this.occupiedCells = [];
+    this.allCells = Array(this.rowColumnCount * this.rowColumnCount);
+    this.allObjects = [];
+    this.sharedInnerOffsets = [];
+
+    this._parentHierarchy = parentHierarchy || null;
 }
 
 Grid.prototype.initCells = function () {
-  // TODO: inner/unique offset rows 0 and 2 may need to be
-  // swapped due to +y being "down" vs "up"
-  var i,
-      gridLength = this.allCells.length,
-      x,
-      y,
-      wh = this.rowColumnCount,
-      isOnRightEdge,
-      isOnLeftEdge,
-      isOnTopEdge,
-      isOnBottomEdge,
-      innerOffsets = [// y+ down offsets
-  // -1 + -wh, -wh, -wh + 1,
-  // -1, 0, 1,
-  // wh - 1, wh, wh + 1
-  // y+ up offsets
-  wh - 1, wh, wh + 1, -1, 0, 1, -1 + -wh, -wh, -wh + 1],
-      leftOffset,
-      rightOffset,
-      topOffset,
-      bottomOffset,
-      uniqueOffsets = [],
-      cell;
-  this.sharedInnerOffsets = innerOffsets; // init all cells, creating offset arrays as needed
 
-  for (i = 0; i < gridLength; i++) {
-    cell = new Cell(); // compute row (y) and column (x) for an index
+    // TODO: inner/unique offset rows 0 and 2 may need to be
+    // swapped due to +y being "down" vs "up"
 
-    y = ~~(i / this.rowColumnCount);
-    x = ~~(i - y * this.rowColumnCount); // reset / init
+    var i,
+        gridLength = this.allCells.length,
+        x, y,
+        wh = this.rowColumnCount,
+        isOnRightEdge, isOnLeftEdge, isOnTopEdge, isOnBottomEdge,
+        innerOffsets = [
+            // y+ down offsets
+            // -1 + -wh, -wh, -wh + 1,
+            // -1, 0, 1,
+            // wh - 1, wh, wh + 1
 
-    isOnRightEdge = false;
-    isOnLeftEdge = false;
-    isOnTopEdge = false;
-    isOnBottomEdge = false; // right or left edge cell
+            // y+ up offsets
+            wh - 1, wh, wh + 1,
+            -1, 0, 1,
+            -1 + -wh, -wh, -wh + 1
+        ],
+        leftOffset, rightOffset, topOffset, bottomOffset,
+        uniqueOffsets = [],
+        cell;
 
-    if ((x + 1) % this.rowColumnCount == 0) {
-      isOnRightEdge = true;
-    } else if (x % this.rowColumnCount == 0) {
-      isOnLeftEdge = true;
-    } // top or bottom edge cell
+    this.sharedInnerOffsets = innerOffsets;
 
+    // init all cells, creating offset arrays as needed
 
-    if ((y + 1) % this.rowColumnCount == 0) {
-      isOnTopEdge = true;
-    } else if (y % this.rowColumnCount == 0) {
-      isOnBottomEdge = true;
-    } // if cell is edge cell, use unique offsets, otherwise use inner offsets
+    for (i = 0; i < gridLength; i++) {
 
+        cell = new Cell();
+        // compute row (y) and column (x) for an index
+        y = ~~(i / this.rowColumnCount);
+        x = ~~(i - (y * this.rowColumnCount));
 
-    if (isOnRightEdge || isOnLeftEdge || isOnTopEdge || isOnBottomEdge) {
-      // figure out cardinal offsets first
-      rightOffset = isOnRightEdge === true ? -wh + 1 : 1;
-      leftOffset = isOnLeftEdge === true ? wh - 1 : -1;
-      topOffset = isOnTopEdge === true ? -gridLength + wh : wh;
-      bottomOffset = isOnBottomEdge === true ? gridLength - wh : -wh; // diagonals are composites of the cardinals
+        // reset / init
+        isOnRightEdge = false;
+        isOnLeftEdge = false;
+        isOnTopEdge = false;
+        isOnBottomEdge = false;
 
-      uniqueOffsets = [// y+ down offset
-      // leftOffset + bottomOffset, bottomOffset, rightOffset + bottomOffset,
-      // leftOffset, 0, rightOffset,
-      // leftOffset + topOffset, topOffset, rightOffset + topOffset
-      // y+ up offset
-      leftOffset + topOffset, topOffset, rightOffset + topOffset, leftOffset, 0, rightOffset, leftOffset + bottomOffset, bottomOffset, rightOffset + bottomOffset];
-      cell.neighborOffsetArray = uniqueOffsets;
-    } else {
-      cell.neighborOffsetArray = this.sharedInnerOffsets;
+        // right or left edge cell
+        if ((x + 1) % this.rowColumnCount == 0) {
+            isOnRightEdge = true;
+        } else if (x % this.rowColumnCount == 0) {
+            isOnLeftEdge = true;
+        }
+
+        // top or bottom edge cell
+        if ((y + 1) % this.rowColumnCount == 0) {
+            isOnTopEdge = true;
+        } else if (y % this.rowColumnCount == 0) {
+            isOnBottomEdge = true;
+        }
+
+        // if cell is edge cell, use unique offsets, otherwise use inner offsets
+        if (isOnRightEdge || isOnLeftEdge || isOnTopEdge || isOnBottomEdge) {
+
+            // figure out cardinal offsets first
+            rightOffset = isOnRightEdge === true ? -wh + 1 : 1;
+            leftOffset = isOnLeftEdge === true ? wh - 1 : -1;
+            topOffset = isOnTopEdge === true ? -gridLength + wh : wh;
+            bottomOffset = isOnBottomEdge === true ? gridLength - wh : -wh;
+
+            // diagonals are composites of the cardinals
+            uniqueOffsets = [
+                // y+ down offset
+                // leftOffset + bottomOffset, bottomOffset, rightOffset + bottomOffset,
+                // leftOffset, 0, rightOffset,
+                // leftOffset + topOffset, topOffset, rightOffset + topOffset
+
+                // y+ up offset
+                leftOffset + topOffset, topOffset, rightOffset + topOffset,
+                leftOffset, 0, rightOffset,
+                leftOffset + bottomOffset, bottomOffset, rightOffset + bottomOffset
+            ];
+
+            cell.neighborOffsetArray = uniqueOffsets;
+        } else {
+            cell.neighborOffsetArray = this.sharedInnerOffsets;
+        }
+
+        cell.allCellsIndex = i;
+        this.allCells[i] = cell;
     }
-
-    cell.allCellsIndex = i;
-    this.allCells[i] = cell;
-  }
 };
 
 Grid.prototype.toHash = function (x, y, z) {
-  var i, xHash, yHash;
+    var i, xHash, yHash;
 
-  if (x < 0) {
-    i = -x * this.inverseCellSize;
-    xHash = this.rowColumnCount - 1 - (~~i & this.xyHashMask);
-  } else {
-    i = x * this.inverseCellSize;
-    xHash = ~~i & this.xyHashMask;
-  }
+    if (x < 0) {
+        i = (-x) * this.inverseCellSize;
+        xHash = this.rowColumnCount - 1 - (~~i & this.xyHashMask);
+    } else {
+        i = x * this.inverseCellSize;
+        xHash = ~~i & this.xyHashMask;
+    }
 
-  if (y < 0) {
-    i = -y * this.inverseCellSize;
-    yHash = this.rowColumnCount - 1 - (~~i & this.xyHashMask);
-  } else {
-    i = y * this.inverseCellSize;
-    yHash = ~~i & this.xyHashMask;
-  } // if(z < 0){
-  //	i = (-z) * this.inverseCellSize;
-  //	zHash = this.rowColumnCount - 1 - ( ~~i & this.xyHashMask );
-  // } else {
-  //	i = z * this.inverseCellSize;
-  //	zHash = ~~i & this.xyHashMask;
-  // }
+    if (y < 0) {
+        i = (-y) * this.inverseCellSize;
+        yHash = this.rowColumnCount - 1 - (~~i & this.xyHashMask);
+    } else {
+        i = y * this.inverseCellSize;
+        yHash = ~~i & this.xyHashMask;
+    }
 
+    // if(z < 0){
+    //	i = (-z) * this.inverseCellSize;
+    //	zHash = this.rowColumnCount - 1 - ( ~~i & this.xyHashMask );
+    // } else {
+    //	i = z * this.inverseCellSize;
+    //	zHash = ~~i & this.xyHashMask;
+    // }
 
-  return xHash + yHash * this.rowColumnCount; // + zHash * this.rowColumnCount * this.rowColumnCount;
+    return xHash + yHash * this.rowColumnCount;
+    // + zHash * this.rowColumnCount * this.rowColumnCount;
 };
 
 Grid.prototype.addObject = function (obj, hash) {
-  var objAABB, objHash, targetCell; // technically, passing this in this should save some computational effort when updating objects
+    var objAABB,
+        objHash,
+        targetCell;
 
-  if (hash !== undefined) {
-    objHash = hash;
-  } else {
-    objAABB = obj.getAABB();
-    objHash = this.toHash(objAABB.min[0], objAABB.min[1]);
-  }
+    // technically, passing this in this should save some computational effort when updating objects
+    if (hash !== undefined) {
+        objHash = hash;
+    } else {
+        objAABB = obj.getAABB();
+        objHash = this.toHash(objAABB.min[0], objAABB.min[1]);
+    }
+    targetCell = this.allCells[objHash];
 
-  targetCell = this.allCells[objHash];
+    if (targetCell.objectContainer.length === 0) {
+        // insert this cell into occupied cells list
+        targetCell.occupiedCellsIndex = this.occupiedCells.length;
+        this.occupiedCells.push(targetCell);
+    }
 
-  if (targetCell.objectContainer.length === 0) {
-    // insert this cell into occupied cells list
-    targetCell.occupiedCellsIndex = this.occupiedCells.length;
-    this.occupiedCells.push(targetCell);
-  } // add meta data to obj, for fast update/removal
+    // add meta data to obj, for fast update/removal
+    obj.HSHG.objectContainerIndex = targetCell.objectContainer.length;
+    obj.HSHG.hash = objHash;
+    obj.HSHG.grid = this;
+    obj.HSHG.allGridObjectsIndex = this.allObjects.length;
+    // add obj to cell
+    targetCell.objectContainer.push(obj);
 
+    // we can assume that the targetCell is already a member of the occupied list
 
-  obj.HSHG.objectContainerIndex = targetCell.objectContainer.length;
-  obj.HSHG.hash = objHash;
-  obj.HSHG.grid = this;
-  obj.HSHG.allGridObjectsIndex = this.allObjects.length; // add obj to cell
+    // add to grid-global object list
+    this.allObjects.push(obj);
 
-  targetCell.objectContainer.push(obj); // we can assume that the targetCell is already a member of the occupied list
-  // add to grid-global object list
-
-  this.allObjects.push(obj); // do test for grid density
-
-  if (this.allObjects.length / this.allCells.length > this._parentHierarchy.MAX_OBJECT_CELL_DENSITY) {
-    // grid must be increased in size
-    this.expandGrid();
-  }
+    // do test for grid density
+    if (this.allObjects.length / this.allCells.length > this._parentHierarchy.MAX_OBJECT_CELL_DENSITY) {
+        // grid must be increased in size
+        this.expandGrid();
+    }
 };
 
 Grid.prototype.removeObject = function (obj) {
-  var meta = obj.HSHG,
-      hash,
-      containerIndex,
-      allGridObjectsIndex,
-      cell,
-      replacementCell,
-      replacementObj;
-  hash = meta.hash;
-  containerIndex = meta.objectContainerIndex;
-  allGridObjectsIndex = meta.allGridObjectsIndex;
-  cell = this.allCells[hash]; // remove object from cell object container
+    var meta = obj.HSHG,
+        hash,
+        containerIndex,
+        allGridObjectsIndex,
+        cell,
+        replacementCell,
+        replacementObj;
 
-  if (cell.objectContainer.length === 1) {
-    // this is the last object in the cell, so reset it
-    cell.objectContainer.length = 0; // remove cell from occupied list
+    hash = meta.hash;
+    containerIndex = meta.objectContainerIndex;
+    allGridObjectsIndex = meta.allGridObjectsIndex;
+    cell = this.allCells[hash];
 
-    if (cell.occupiedCellsIndex === this.occupiedCells.length - 1) {
-      // special case if the cell is the newest in the list
-      this.occupiedCells.pop();
+    // remove object from cell object container
+    if (cell.objectContainer.length === 1) {
+        // this is the last object in the cell, so reset it
+        cell.objectContainer.length = 0;
+
+        // remove cell from occupied list
+        if (cell.occupiedCellsIndex === this.occupiedCells.length - 1) {
+            // special case if the cell is the newest in the list
+            this.occupiedCells.pop();
+        } else {
+            replacementCell = this.occupiedCells.pop();
+            replacementCell.occupiedCellsIndex = cell.occupiedCellsIndex;
+            this.occupiedCells[cell.occupiedCellsIndex] = replacementCell;
+        }
+
+        cell.occupiedCellsIndex = null;
     } else {
-      replacementCell = this.occupiedCells.pop();
-      replacementCell.occupiedCellsIndex = cell.occupiedCellsIndex;
-      this.occupiedCells[cell.occupiedCellsIndex] = replacementCell;
+        // there is more than one object in the container
+        if (containerIndex === cell.objectContainer.length - 1) {
+            // special case if the obj is the newest in the container
+            cell.objectContainer.pop();
+        } else {
+            replacementObj = cell.objectContainer.pop();
+            replacementObj.HSHG.objectContainerIndex = containerIndex;
+            cell.objectContainer[containerIndex] = replacementObj;
+        }
     }
 
-    cell.occupiedCellsIndex = null;
-  } else {
-    // there is more than one object in the container
-    if (containerIndex === cell.objectContainer.length - 1) {
-      // special case if the obj is the newest in the container
-      cell.objectContainer.pop();
+    // remove object from grid object list
+    if (allGridObjectsIndex === this.allObjects.length - 1) {
+        this.allObjects.pop();
     } else {
-      replacementObj = cell.objectContainer.pop();
-      replacementObj.HSHG.objectContainerIndex = containerIndex;
-      cell.objectContainer[containerIndex] = replacementObj;
+        replacementObj = this.allObjects.pop();
+        replacementObj.HSHG.allGridObjectsIndex = allGridObjectsIndex;
+        this.allObjects[allGridObjectsIndex] = replacementObj;
     }
-  } // remove object from grid object list
-
-
-  if (allGridObjectsIndex === this.allObjects.length - 1) {
-    this.allObjects.pop();
-  } else {
-    replacementObj = this.allObjects.pop();
-    replacementObj.HSHG.allGridObjectsIndex = allGridObjectsIndex;
-    this.allObjects[allGridObjectsIndex] = replacementObj;
-  }
 };
 
 Grid.prototype.expandGrid = function () {
-  var i,
-      currentCellCount = this.allCells.length,
-      currentRowColumnCount = this.rowColumnCount,
-      currentXYHashMask = this.xyHashMask,
-      newCellCount = currentCellCount * 4,
-      // double each dimension
-  newRowColumnCount = ~~Math.sqrt(newCellCount),
-      newXYHashMask = newRowColumnCount - 1,
-      allObjects = this.allObjects.slice(0);
- // remove all objects
+    var i, currentCellCount = this.allCells.length,
+        currentRowColumnCount = this.rowColumnCount,
+        currentXYHashMask = this.xyHashMask,
 
-  for (i = 0; i < allObjects.length; i++) {
-    this.removeObject(allObjects[i]);
-  } // reset grid values, set new grid to be 4x larger than last
+        newCellCount = currentCellCount * 4, // double each dimension
+        newRowColumnCount = ~~Math.sqrt(newCellCount),
+        newXYHashMask = newRowColumnCount - 1,
+        allObjects = this.allObjects.slice(0); // duplicate array, not objects contained
 
+    // remove all objects
+    for (i = 0; i < allObjects.length; i++) {
+        this.removeObject(allObjects[i]);
+    }
 
-  this.rowColumnCount = newRowColumnCount;
-  this.allCells = Array(this.rowColumnCount * this.rowColumnCount);
-  this.xyHashMask = newXYHashMask; // initialize new cells
+    // reset grid values, set new grid to be 4x larger than last
+    this.rowColumnCount = newRowColumnCount;
+    this.allCells = Array(this.rowColumnCount * this.rowColumnCount);
+    this.xyHashMask = newXYHashMask;
 
-  this.initCells(); // re-add all objects to grid
+    // initialize new cells
+    this.initCells();
 
-  for (i = 0; i < allObjects.length; i++) {
-    this.addObject(allObjects[i]);
-  }
+    // re-add all objects to grid
+    for (i = 0; i < allObjects.length; i++) {
+        this.addObject(allObjects[i]);
+    }
 };
+
 /**
  * A cell of the grid
  *
  * @constructor
  * @return  void   desc
  */
-
-
 function Cell() {
-  this.objectContainer = [];
-  this.neighborOffsetArray;
-  this.occupiedCellsIndex = null;
-  this.allCellsIndex = null;
-} // ---------------------------------------------------------------------
+    this.objectContainer = [];
+    this.neighborOffsetArray;
+    this.occupiedCellsIndex = null;
+    this.allCellsIndex = null;
+}
+
+// ---------------------------------------------------------------------
 // EXPORTS
 // ---------------------------------------------------------------------
 
-
 HSHG._private = {
-  Grid: Grid,
-  Cell: Cell,
-  testAABBOverlap: testAABBOverlap,
-  getLongestAABBEdge: getLongestAABBEdge
+    Grid: Grid,
+    Cell: Cell,
+    testAABBOverlap: testAABBOverlap,
+    getLongestAABBEdge: getLongestAABBEdge
 };
 
+// Collision detection based on Hierarchical Spatial Hash Grid
 // uses this implementation https://gist.github.com/kirbysayshi/1760774
+class HSHGCollisionDetection {
 
-var HSHGCollisionDetection =
-/*#__PURE__*/
-function () {
-  function HSHGCollisionDetection(options) {
-    _classCallCheck(this, HSHGCollisionDetection);
-
-    this.options = Object.assign({
-      COLLISION_DISTANCE: 28
-    }, options);
-  }
-
-  _createClass(HSHGCollisionDetection, [{
-    key: "init",
-    value: function init(options) {
-      var _this = this;
-
-      this.gameEngine = options.gameEngine;
-      this.grid = new HSHG();
-      this.previousCollisionPairs = {};
-      this.stepCollidingPairs = {};
-      this.gameEngine.on('objectAdded', function (obj) {
-        // add the gameEngine obj the the spatial grid
-        _this.grid.addObject(obj);
-      });
-      this.gameEngine.on('objectDestroyed', function (obj) {
-        // add the gameEngine obj the the spatial grid
-        _this.grid.removeObject(obj);
-      });
+    constructor(options) {
+        this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);
     }
-  }, {
-    key: "detect",
-    value: function detect() {
-      this.grid.update();
-      this.stepCollidingPairs = this.grid.queryForCollisionPairs().reduce(function (accumulator, currentValue, i) {
-        var pairId = getArrayPairId(currentValue);
-        accumulator[pairId] = {
-          o1: currentValue[0],
-          o2: currentValue[1]
-        };
-        return accumulator;
-      }, {});
 
-      var _arr = Object.keys(this.previousCollisionPairs);
+    init(options) {
+        this.gameEngine = options.gameEngine;
+        this.grid = new HSHG();
+        this.previousCollisionPairs = {};
+        this.stepCollidingPairs = {};
 
-      for (var _i = 0; _i < _arr.length; _i++) {
-        var pairId = _arr[_i];
-        var pairObj = this.previousCollisionPairs[pairId]; // existed in previous pairs, but not during this step: this pair stopped colliding
+        this.gameEngine.on('objectAdded', obj => {
+            // add the gameEngine obj the the spatial grid
+            this.grid.addObject(obj);
+        });
 
-        if (pairId in this.stepCollidingPairs === false) {
-          this.gameEngine.emit('collisionStop', pairObj);
-        }
-      }
-
-      var _arr2 = Object.keys(this.stepCollidingPairs);
-
-      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        var _pairId = _arr2[_i2];
-        var _pairObj = this.stepCollidingPairs[_pairId]; // didn't exist in previous pairs, but exists now: this is a new colliding pair
-
-        if (_pairId in this.previousCollisionPairs === false) {
-          this.gameEngine.emit('collisionStart', _pairObj);
-        }
-      }
-
-      this.previousCollisionPairs = this.stepCollidingPairs;
+        this.gameEngine.on('objectDestroyed', obj => {
+            // add the gameEngine obj the the spatial grid
+            this.grid.removeObject(obj);
+        });
     }
+
+    detect() {
+        this.grid.update();
+        this.stepCollidingPairs = this.grid.queryForCollisionPairs().reduce((accumulator, currentValue, i) => {
+            let pairId = getArrayPairId(currentValue);
+            accumulator[pairId] = { o1: currentValue[0], o2: currentValue[1] };
+            return accumulator;
+        }, {});
+
+        for (let pairId of Object.keys(this.previousCollisionPairs)) {
+            let pairObj = this.previousCollisionPairs[pairId];
+
+            // existed in previous pairs, but not during this step: this pair stopped colliding
+            if (pairId in this.stepCollidingPairs === false) {
+                this.gameEngine.emit('collisionStop', pairObj);
+            }
+        }
+
+        for (let pairId of Object.keys(this.stepCollidingPairs)) {
+            let pairObj = this.stepCollidingPairs[pairId];
+
+            // didn't exist in previous pairs, but exists now: this is a new colliding pair
+            if (pairId in this.previousCollisionPairs === false) {
+                this.gameEngine.emit('collisionStart', pairObj);
+            }
+        }
+
+        this.previousCollisionPairs = this.stepCollidingPairs;
+    }
+
     /**
      * checks wheter two objects are currently colliding
      * @param {Object} o1 first object
      * @param {Object} o2 second object
      * @return {boolean} are the two objects colliding?
      */
-
-  }, {
-    key: "areObjectsColliding",
-    value: function areObjectsColliding(o1, o2) {
-      return getArrayPairId([o1, o2]) in this.stepCollidingPairs;
+    areObjectsColliding(o1, o2) {
+        return getArrayPairId([o1, o2]) in this.stepCollidingPairs;
     }
-  }]);
 
-  return HSHGCollisionDetection;
-}();
+}
 
 function getArrayPairId(arrayPair) {
-  // make sure to get the same id regardless of object order
-  var sortedArrayPair = arrayPair.slice(0).sort();
-  return sortedArrayPair[0].id + '-' + sortedArrayPair[1].id;
+    // make sure to get the same id regardless of object order
+    let sortedArrayPair = arrayPair.slice(0).sort();
+    return sortedArrayPair[0].id + '-' + sortedArrayPair[1].id;
 }
 
-var differenceVector = new TwoVector(); // The collision detection of SimplePhysicsEngine is a brute-force approach
+let differenceVector = new TwoVector();
 
-var BruteForceCollisionDetection =
-/*#__PURE__*/
-function () {
-  function BruteForceCollisionDetection(options) {
-    _classCallCheck(this, BruteForceCollisionDetection);
+// The collision detection of SimplePhysicsEngine is a brute-force approach
+class BruteForceCollisionDetection {
 
-    this.options = Object.assign({
-      autoResolve: true
-    }, options);
-    this.collisionPairs = {};
-  }
-
-  _createClass(BruteForceCollisionDetection, [{
-    key: "init",
-    value: function init(options) {
-      this.gameEngine = options.gameEngine;
+    constructor(options) {
+        this.options = Object.assign({
+            autoResolve: true
+        }, options);
+        this.collisionPairs = {};
     }
-  }, {
-    key: "findCollision",
-    value: function findCollision(o1, o2) {
-      // static objects don't collide
-      if (o1.isStatic && o2.isStatic) return false; // allow a collision checker function
 
-      if (typeof o1.collidesWith === 'function') {
-        if (!o1.collidesWith(o2)) return false;
-      } // radius-based collision
-
-
-      if (this.options.collisionDistance) {
-        differenceVector.copy(o1.position).subtract(o2.position);
-        return differenceVector.length() < this.options.collisionDistance;
-      } // check for no-collision first
-
-
-      var o1Box = getBox(o1);
-      var o2Box = getBox(o2);
-      if (o1Box.xMin > o2Box.xMax || o1Box.yMin > o2Box.yMax || o2Box.xMin > o1Box.xMax || o2Box.yMin > o1Box.yMax) return false;
-      if (!this.options.autoResolve) return true; // need to auto-resolve
-
-      var shiftY1 = o2Box.yMax - o1Box.yMin;
-      var shiftY2 = o1Box.yMax - o2Box.yMin;
-      var shiftX1 = o2Box.xMax - o1Box.xMin;
-      var shiftX2 = o1Box.xMax - o2Box.xMin;
-      var smallestYShift = Math.min(Math.abs(shiftY1), Math.abs(shiftY2));
-      var smallestXShift = Math.min(Math.abs(shiftX1), Math.abs(shiftX2)); // choose to apply the smallest shift which solves the collision
-
-      if (smallestYShift < smallestXShift) {
-        if (o1Box.yMin > o2Box.yMin && o1Box.yMin < o2Box.yMax) {
-          if (o2.isStatic) o1.position.y += shiftY1;else if (o1.isStatic) o2.position.y -= shiftY1;else {
-            o1.position.y += shiftY1 / 2;
-            o2.position.y -= shiftY1 / 2;
-          }
-        } else if (o1Box.yMax > o2Box.yMin && o1Box.yMax < o2Box.yMax) {
-          if (o2.isStatic) o1.position.y -= shiftY2;else if (o1.isStatic) o2.position.y += shiftY2;else {
-            o1.position.y -= shiftY2 / 2;
-            o2.position.y += shiftY2 / 2;
-          }
-        }
-
-        o1.velocity.y = 0;
-        o2.velocity.y = 0;
-      } else {
-        if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
-          if (o2.isStatic) o1.position.x += shiftX1;else if (o1.isStatic) o2.position.x -= shiftX1;else {
-            o1.position.x += shiftX1 / 2;
-            o2.position.x -= shiftX1 / 2;
-          }
-        } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
-          if (o2.isStatic) o1.position.x -= shiftX2;else if (o1.isStatic) o2.position.x += shiftX2;else {
-            o1.position.x -= shiftX2 / 2;
-            o2.position.x += shiftX2 / 2;
-          }
-        }
-
-        o1.velocity.x = 0;
-        o2.velocity.x = 0;
-      }
-
-      return true;
-    } // check if pair (id1, id2) have collided
-
-  }, {
-    key: "checkPair",
-    value: function checkPair(id1, id2) {
-      var objects = this.gameEngine.world.objects;
-      var o1 = objects[id1];
-      var o2 = objects[id2]; // make sure that objects actually exist. might have been destroyed
-
-      if (!o1 || !o2) return;
-      var pairId = [id1, id2].join(',');
-
-      if (this.findCollision(o1, o2)) {
-        if (!(pairId in this.collisionPairs)) {
-          this.collisionPairs[pairId] = true;
-          this.gameEngine.emit('collisionStart', {
-            o1: o1,
-            o2: o2
-          });
-        }
-      } else if (pairId in this.collisionPairs) {
-        this.gameEngine.emit('collisionStop', {
-          o1: o1,
-          o2: o2
-        });
-        delete this.collisionPairs[pairId];
-      }
-    } // detect by checking all pairs
-
-  }, {
-    key: "detect",
-    value: function detect() {
-      var objects = this.gameEngine.world.objects;
-      var keys = Object.keys(objects); // delete non existant object pairs
-
-      for (var pairId in this.collisionPairs) {
-        if (this.collisionPairs.hasOwnProperty(pairId)) if (keys.indexOf(pairId.split(',')[0]) === -1 || keys.indexOf(pairId.split(',')[1]) === -1) delete this.collisionPairs[pairId];
-      } // check all pairs
-
-
-      for (var _i = 0; _i < keys.length; _i++) {
-        var k1 = keys[_i];
-
-        for (var _i2 = 0; _i2 < keys.length; _i2++) {
-          var k2 = keys[_i2];
-          if (k2 > k1) this.checkPair(k1, k2);
-        }
-      }
+    init(options) {
+        this.gameEngine = options.gameEngine;
     }
-  }]);
 
-  return BruteForceCollisionDetection;
-}(); // get bounding box of object o
+    findCollision(o1, o2) {
 
+        // static objects don't collide
+        if (o1.isStatic && o2.isStatic)
+            return false;
+
+        // allow a collision checker function
+        if (typeof o1.collidesWith === 'function') {
+            if (!o1.collidesWith(o2))
+                return false;
+        }
+
+        // radius-based collision
+        if (this.options.collisionDistance) {
+            differenceVector.copy(o1.position).subtract(o2.position);
+            return differenceVector.length() < this.options.collisionDistance;
+        }
+
+        // check for no-collision first
+        let o1Box = getBox(o1);
+        let o2Box = getBox(o2);
+        if (o1Box.xMin > o2Box.xMax ||
+            o1Box.yMin > o2Box.yMax ||
+            o2Box.xMin > o1Box.xMax ||
+            o2Box.yMin > o1Box.yMax)
+            return false;
+
+        if (!this.options.autoResolve)
+            return true;
+
+        // need to auto-resolve
+        let shiftY1 = o2Box.yMax - o1Box.yMin;
+        let shiftY2 = o1Box.yMax - o2Box.yMin;
+        let shiftX1 = o2Box.xMax - o1Box.xMin;
+        let shiftX2 = o1Box.xMax - o2Box.xMin;
+        let smallestYShift = Math.min(Math.abs(shiftY1), Math.abs(shiftY2));
+        let smallestXShift = Math.min(Math.abs(shiftX1), Math.abs(shiftX2));
+
+        // choose to apply the smallest shift which solves the collision
+        if (smallestYShift < smallestXShift) {
+            if (o1Box.yMin > o2Box.yMin && o1Box.yMin < o2Box.yMax) {
+                if (o2.isStatic) o1.position.y += shiftY1;
+                else if (o1.isStatic) o2.position.y -= shiftY1;
+                else {
+                    o1.position.y += shiftY1 / 2;
+                    o2.position.y -= shiftY1 / 2;
+                }
+            } else if (o1Box.yMax > o2Box.yMin && o1Box.yMax < o2Box.yMax) {
+                if (o2.isStatic) o1.position.y -= shiftY2;
+                else if (o1.isStatic) o2.position.y += shiftY2;
+                else {
+                    o1.position.y -= shiftY2 / 2;
+                    o2.position.y += shiftY2 / 2;
+                }
+            }
+            o1.velocity.y = 0;
+            o2.velocity.y = 0;
+        } else {
+            if (o1Box.xMin > o2Box.xMin && o1Box.xMin < o2Box.xMax) {
+                if (o2.isStatic) o1.position.x += shiftX1;
+                else if (o1.isStatic) o2.position.x -= shiftX1;
+                else {
+                    o1.position.x += shiftX1 / 2;
+                    o2.position.x -= shiftX1 / 2;
+                }
+            } else if (o1Box.xMax > o2Box.xMin && o1Box.xMax < o2Box.xMax) {
+                if (o2.isStatic) o1.position.x -= shiftX2;
+                else if (o1.isStatic) o2.position.x += shiftX2;
+                else {
+                    o1.position.x -= shiftX2 / 2;
+                    o2.position.x += shiftX2 / 2;
+                }
+            }
+            o1.velocity.x = 0;
+            o2.velocity.x = 0;
+        }
+
+        return true;
+    }
+
+    // check if pair (id1, id2) have collided
+    checkPair(id1, id2) {
+        let objects = this.gameEngine.world.objects;
+        let o1 = objects[id1];
+        let o2 = objects[id2];
+
+        // make sure that objects actually exist. might have been destroyed
+        if (!o1 || !o2) return;
+        let pairId = [id1, id2].join(',');
+
+        if (this.findCollision(o1, o2)) {
+            if (!(pairId in this.collisionPairs)) {
+                this.collisionPairs[pairId] = true;
+                this.gameEngine.emit('collisionStart', { o1, o2 });
+            }
+        } else if (pairId in this.collisionPairs) {
+            this.gameEngine.emit('collisionStop', { o1, o2 });
+            delete this.collisionPairs[pairId];
+        }
+    }
+
+    // detect by checking all pairs
+    detect() {
+        let objects = this.gameEngine.world.objects;
+        let keys = Object.keys(objects);
+
+        // delete non existant object pairs
+        for (let pairId in this.collisionPairs)
+            if (this.collisionPairs.hasOwnProperty(pairId))
+                if (keys.indexOf(pairId.split(',')[0]) === -1 || keys.indexOf(pairId.split(',')[1]) === -1)
+                    delete this.collisionPairs[pairId];
+
+        // check all pairs
+        for (let k1 of keys)
+            for (let k2 of keys)
+                if (k2 > k1) this.checkPair(k1, k2);
+    }
+}
+
+// get bounding box of object o
 function getBox(o) {
-  return {
-    xMin: o.position.x,
-    xMax: o.position.x + o.width,
-    yMin: o.position.y,
-    yMax: o.position.y + o.height
-  };
+    return {
+        xMin: o.position.x,
+        xMax: o.position.x + o.width,
+        yMin: o.position.y,
+        yMax: o.position.y + o.height
+    };
 }
 
-var dv = new TwoVector();
-var dx = new TwoVector();
+let dv = new TwoVector();
+let dx = new TwoVector();
+
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
@@ -16033,148 +15693,123 @@ var dx = new TwoVector();
  * with only one foot on the platform, it won't fall over. This is a desired
  * game behaviour in platformer games.
  */
+class SimplePhysicsEngine extends PhysicsEngine {
 
-var SimplePhysicsEngine =
-/*#__PURE__*/
-function (_PhysicsEngine) {
-  _inherits(SimplePhysicsEngine, _PhysicsEngine);
-
-  /**
-  * Creates an instance of the Simple Physics Engine.
-  * @param {Object} options - physics options
-  * @param {Object} options.collisions - collision options
-  * @param {String} options.collisions.type - can be set to "HSHG" or "bruteForce".  Default is Brute-Force collision detection.
-  * @param {Number} options.collisions.collisionDistance - for brute force, this can be set for a simple distance-based (radius) collision detection.
-  * @param {Boolean} options.collisions.autoResolve - for brute force collision, colliding objects should be moved apart
-  * @param {TwoVector} options.gravity - TwoVector instance which describes gravity, which will be added to the velocity of all objects at every step.  For example TwoVector(0, -0.01)
-  */
-  function SimplePhysicsEngine(options) {
-    var _this;
-
-    _classCallCheck(this, SimplePhysicsEngine);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SimplePhysicsEngine).call(this, options)); // todo does this mean both modules always get loaded?
-
-    if (options.collisions && options.collisions.type === 'HSHG') {
-      _this.collisionDetection = new HSHGCollisionDetection(options.collisions);
-    } else {
-      _this.collisionDetection = new BruteForceCollisionDetection(options.collisions);
-    }
     /**
-     * The actor's name.
-     * @memberof SimplePhysicsEngine
-     * @member {TwoVector} gravity affecting all objects
-     */
+    * Creates an instance of the Simple Physics Engine.
+    * @param {Object} options - physics options
+    * @param {Object} options.collisions - collision options
+    * @param {String} options.collisions.type - can be set to "HSHG" or "bruteForce".  Default is Brute-Force collision detection.
+    * @param {Number} options.collisions.collisionDistance - for brute force, this can be set for a simple distance-based (radius) collision detection.
+    * @param {Boolean} options.collisions.autoResolve - for brute force collision, colliding objects should be moved apart
+    * @param {TwoVector} options.gravity - TwoVector instance which describes gravity, which will be added to the velocity of all objects at every step.  For example TwoVector(0, -0.01)
+    */
+    constructor(options) {
+        super(options);
 
-
-    _this.gravity = new TwoVector(0, 0);
-    if (options.gravity) _this.gravity.copy(options.gravity);
-    var collisionOptions = Object.assign({
-      gameEngine: _this.gameEngine
-    }, options.collisionOptions);
-
-    _this.collisionDetection.init(collisionOptions);
-
-    return _this;
-  } // a single object advances, based on:
-  // isRotatingRight, isRotatingLeft, isAccelerating, current velocity
-  // wrap-around the world if necessary
-
-
-  _createClass(SimplePhysicsEngine, [{
-    key: "objectStep",
-    value: function objectStep(o, dt) {
-      // calculate factor
-      if (dt === 0) return;
-      if (dt) dt /= 1 / 60;else dt = 1; // TODO: worldsettings is a hack.  Find all places which use it in all games
-      // and come up with a better solution.  for example an option sent to the physics Engine
-      // with a "worldWrap:true" options
-      // replace with a "worldBounds" parameter to the PhysicsEngine constructor
-
-      var worldSettings = this.gameEngine.worldSettings; // TODO: remove this code in version 4: these attributes are deprecated
-
-      if (o.isRotatingRight) {
-        o.angle += o.rotationSpeed;
-      }
-
-      if (o.isRotatingLeft) {
-        o.angle -= o.rotationSpeed;
-      } // TODO: remove this code in version 4: these attributes are deprecated
-
-
-      if (o.angle >= 360) {
-        o.angle -= 360;
-      }
-
-      if (o.angle < 0) {
-        o.angle += 360;
-      } // TODO: remove this code in version 4: these attributes are deprecated
-
-
-      if (o.isAccelerating) {
-        var rad = o.angle * (Math.PI / 180);
-        dv.set(Math.cos(rad), Math.sin(rad)).multiplyScalar(o.acceleration).multiplyScalar(dt);
-        o.velocity.add(dv);
-      } // apply gravity
-
-
-      if (!o.isStatic) o.velocity.add(this.gravity);
-      var velMagnitude = o.velocity.length();
-
-      if (o.maxSpeed !== null && velMagnitude > o.maxSpeed) {
-        o.velocity.multiplyScalar(o.maxSpeed / velMagnitude);
-      }
-
-      o.isAccelerating = false;
-      o.isRotatingLeft = false;
-      o.isRotatingRight = false;
-      dx.copy(o.velocity).multiplyScalar(dt);
-      o.position.add(dx);
-      o.velocity.multiply(o.friction); // wrap around the world edges
-
-      if (worldSettings.worldWrap) {
-        if (o.position.x >= worldSettings.width) {
-          o.position.x -= worldSettings.width;
+        // todo does this mean both modules always get loaded?
+        if (options.collisions && options.collisions.type === 'HSHG') {
+            this.collisionDetection = new HSHGCollisionDetection(options.collisions);
+        } else {
+            this.collisionDetection = new BruteForceCollisionDetection(options.collisions);
         }
 
-        if (o.position.y >= worldSettings.height) {
-          o.position.y -= worldSettings.height;
-        }
+        /**
+         * The actor's name.
+         * @memberof SimplePhysicsEngine
+         * @member {TwoVector} gravity affecting all objects
+         */
+        this.gravity = new TwoVector(0, 0);
 
-        if (o.position.x < 0) {
-          o.position.x += worldSettings.width;
-        }
+        if (options.gravity)
+            this.gravity.copy(options.gravity);
 
-        if (o.position.y < 0) {
-          o.position.y += worldSettings.height;
-        }
-      }
-    } // entry point for a single step of the Simple Physics
-
-  }, {
-    key: "step",
-    value: function step(dt, objectFilter) {
-      // each object should advance
-      var objects = this.gameEngine.world.objects;
-
-      var _arr = Object.keys(objects);
-
-      for (var _i = 0; _i < _arr.length; _i++) {
-        var objId = _arr[_i];
-        // shadow objects are not re-enacted
-        var ob = objects[objId];
-        if (!objectFilter(ob)) continue; // run the object step
-
-        this.objectStep(ob, dt);
-      } // emit event on collision
-
-
-      this.collisionDetection.detect(this.gameEngine);
+        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, options.collisionOptions);
+        this.collisionDetection.init(collisionOptions);
     }
-  }]);
 
-  return SimplePhysicsEngine;
-}(PhysicsEngine);
+    // a single object advances, based on:
+    // isRotatingRight, isRotatingLeft, isAccelerating, current velocity
+    // wrap-around the world if necessary
+    objectStep(o, dt) {
+
+        // calculate factor
+        if (dt === 0)
+            return;
+
+        if (dt)
+            dt /= (1 / 60);
+        else
+            dt = 1;
+
+        // TODO: worldsettings is a hack.  Find all places which use it in all games
+        // and come up with a better solution.  for example an option sent to the physics Engine
+        // with a "worldWrap:true" options
+        // replace with a "worldBounds" parameter to the PhysicsEngine constructor
+
+        let worldSettings = this.gameEngine.worldSettings;
+
+        // TODO: remove this code in version 4: these attributes are deprecated
+        if (o.isRotatingRight) { o.angle += o.rotationSpeed; }
+        if (o.isRotatingLeft) { o.angle -= o.rotationSpeed; }
+
+        // TODO: remove this code in version 4: these attributes are deprecated
+        if (o.angle >= 360) { o.angle -= 360; }
+        if (o.angle < 0) { o.angle += 360; }
+
+        // TODO: remove this code in version 4: these attributes are deprecated
+        if (o.isAccelerating) {
+            let rad = o.angle * (Math.PI / 180);
+            dv.set(Math.cos(rad), Math.sin(rad)).multiplyScalar(o.acceleration).multiplyScalar(dt);
+            o.velocity.add(dv);
+        }
+
+        // apply gravity
+        if (!o.isStatic) o.velocity.add(this.gravity);
+
+        let velMagnitude = o.velocity.length();
+        if ((o.maxSpeed !== null) && (velMagnitude > o.maxSpeed)) {
+            o.velocity.multiplyScalar(o.maxSpeed / velMagnitude);
+        }
+
+        o.isAccelerating = false;
+        o.isRotatingLeft = false;
+        o.isRotatingRight = false;
+
+        dx.copy(o.velocity).multiplyScalar(dt);
+        o.position.add(dx);
+
+        o.velocity.multiply(o.friction);
+
+        // wrap around the world edges
+        if (worldSettings.worldWrap) {
+            if (o.position.x >= worldSettings.width) { o.position.x -= worldSettings.width; }
+            if (o.position.y >= worldSettings.height) { o.position.y -= worldSettings.height; }
+            if (o.position.x < 0) { o.position.x += worldSettings.width; }
+            if (o.position.y < 0) { o.position.y += worldSettings.height; }
+        }
+    }
+
+    // entry point for a single step of the Simple Physics
+    step(dt, objectFilter) {
+
+        // each object should advance
+        let objects = this.gameEngine.world.objects;
+        for (let objId of Object.keys(objects)) {
+
+            // shadow objects are not re-enacted
+            let ob = objects[objId];
+            if (!objectFilter(ob))
+                continue;
+
+            // run the object step
+            this.objectStep(ob, dt);
+        }
+
+        // emit event on collision
+        this.collisionDetection.detect(this.gameEngine);
+    }
+}
 
 /**
  * GameObject is the base class of all game objects.
@@ -16183,290 +15818,226 @@ function (_PhysicsEngine) {
  * Game developers will use one of the subclasses such as DynamicObject,
  * or PhysicalObject.
  */
+class GameObject extends Serializable {
 
-var GameObject =
-/*#__PURE__*/
-function (_Serializable) {
-  _inherits(GameObject, _Serializable);
-
-  _createClass(GameObject, null, [{
-    key: "netScheme",
-    get: function get() {
-      return {
-        id: {
-          type: BaseTypes.TYPES.INT32
-        }
-      };
+    static get netScheme() {
+        return {
+            id: { type: BaseTypes.TYPES.INT32 }
+        };
     }
+
     /**
     * Creates an instance of a game object.
     * @param {GameEngine} gameEngine - the gameEngine this object will be used in
     * @param {Object} options - options for instantiation of the GameObject
     * @param {Number} id - if set, the new instantiated object will be set to this id instead of being generated a new one. Use with caution!
     */
+    constructor(gameEngine, options) {
+        super();
+        /**
+         * The gameEngine this object will be used in
+         * @member {GameEngine}
+         */
+        this.gameEngine = gameEngine;
 
-  }]);
+        /**
+        * ID of this object's instance.
+        * There are three cases of instance creation which can occur:
+        * 1. In the normal case, the constructor is asked to assign an ID which is unique
+        * across the entire game world, including the server and all the clients.
+        * 2. In extrapolation mode, the client may have an object instance which does not
+        * yet exist on the server, these objects are known as shadow objects.  Their IDs must
+        * be allocated from a different range.
+        * 3. Also, temporary objects are created on the client side each time a sync is received.
+        * These are used for interpolation purposes and as bending targets of position, velocity,
+        * angular velocity, and orientation.  In this case the id will be set to null.
+        * @member {Number}
+        */
+        this.id = null;
+        if (options && 'id' in options)
+            this.id = options.id;
+        else if (this.gameEngine)
+            this.id = this.gameEngine.world.getNewId();
 
-  function GameObject(gameEngine, options) {
-    var _this;
+        this.components = {};
+    }
 
-    _classCallCheck(this, GameObject);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(GameObject).call(this));
     /**
-     * The gameEngine this object will be used in
-     * @member {GameEngine}
+     * Called after the object is added to to the game world.
+     * This is the right place to add renderer sub-objects, physics sub-objects
+     * and any other resources that should be created
+     * @param {GameEngine} gameEngine the game engine
      */
+    onAddToWorld(gameEngine) {}
 
-    _this.gameEngine = gameEngine;
-    /**
-    * ID of this object's instance.
-    * There are three cases of instance creation which can occur:
-    * 1. In the normal case, the constructor is asked to assign an ID which is unique
-    * across the entire game world, including the server and all the clients.
-    * 2. In extrapolation mode, the client may have an object instance which does not
-    * yet exist on the server, these objects are known as shadow objects.  Their IDs must
-    * be allocated from a different range.
-    * 3. Also, temporary objects are created on the client side each time a sync is received.
-    * These are used for interpolation purposes and as bending targets of position, velocity,
-    * angular velocity, and orientation.  In this case the id will be set to null.
-    * @member {Number}
-    */
-
-    _this.id = null;
-    if (options && 'id' in options) _this.id = options.id;else if (_this.gameEngine) _this.id = _this.gameEngine.world.getNewId();
-    _this.components = {};
-    return _this;
-  }
-  /**
-   * Called after the object is added to to the game world.
-   * This is the right place to add renderer sub-objects, physics sub-objects
-   * and any other resources that should be created
-   * @param {GameEngine} gameEngine the game engine
-   */
-
-
-  _createClass(GameObject, [{
-    key: "onAddToWorld",
-    value: function onAddToWorld(gameEngine) {}
     /**
      * Called after the object is removed from game-world.
      * This is where renderer sub-objects and any other resources should be freed
      * @param {GameEngine} gameEngine the game engine
      */
+    onRemoveFromWorld(gameEngine) {}
 
-  }, {
-    key: "onRemoveFromWorld",
-    value: function onRemoveFromWorld(gameEngine) {}
     /**
      * Formatted textual description of the game object.
      * @return {String} description - a string description
      */
-
-  }, {
-    key: "toString",
-    value: function toString() {
-      return "game-object[".concat(this.id, "]");
+    toString() {
+        return `game-object[${this.id}]`;
     }
+
     /**
      * Formatted textual description of the game object's current bending properties.
      * @return {String} description - a string description
      */
-
-  }, {
-    key: "bendingToString",
-    value: function bendingToString() {
-      return 'no bending';
+    bendingToString() {
+        return 'no bending';
     }
-  }, {
-    key: "saveState",
-    value: function saveState(other) {
-      this.savedCopy = new this.constructor(this.gameEngine, {
-        id: null
-      });
-      this.savedCopy.syncTo(other ? other : this);
-    }
-    /**
-     * Bending is defined as the amount of error correction that will be applied
-     * on the client side to a given object's physical attributes, incrementally,
-     * by the time the next server broadcast is expected to arrive.
-     *
-     * When this percentage is 0.0, the client always ignores the server object's value.
-     * When this percentage is 1.0, the server object's attributes will be applied in full.
-     *
-     * The GameObject bending attribute is implemented as a getter, and can provide
-     * distinct values for position, velocity, angle, and angularVelocity.
-     * And in each case, you can also provide overrides for local objects,
-     * these attributes will be called, respectively, positionLocal, velocityLocal,
-     * angleLocal, angularVelocityLocal.
-     *
-     * @example
-     * get bending() {
-     *   return {
-     *     position: { percent: 1.0, min: 0.0 },
-     *     velocity: { percent: 0.0, min: 0.0 },
-     *     angularVelocity: { percent: 0.0 },
-     *     angleLocal: { percent: 1.0 }
-     *   }
-     * };
-     *
-     * @memberof GameObject
-     * @member {Object} bending
-     */
 
-  }, {
-    key: "bendToCurrentState",
+    saveState(other) {
+        this.savedCopy = (new this.constructor(this.gameEngine, { id: null }));
+        this.savedCopy.syncTo(other ? other : this);
+    }
+   /**
+    * Bending is defined as the amount of error correction that will be applied
+    * on the client side to a given object's physical attributes, incrementally,
+    * by the time the next server broadcast is expected to arrive.
+    *
+    * When this percentage is 0.0, the client always ignores the server object's value.
+    * When this percentage is 1.0, the server object's attributes will be applied in full.
+    *
+    * The GameObject bending attribute is implemented as a getter, and can provide
+    * distinct values for position, velocity, angle, and angularVelocity.
+    * And in each case, you can also provide overrides for local objects,
+    * these attributes will be called, respectively, positionLocal, velocityLocal,
+    * angleLocal, angularVelocityLocal.
+    *
+    * @example
+    * get bending() {
+    *   return {
+    *     position: { percent: 1.0, min: 0.0 },
+    *     velocity: { percent: 0.0, min: 0.0 },
+    *     angularVelocity: { percent: 0.0 },
+    *     angleLocal: { percent: 1.0 }
+    *   }
+    * };
+    *
+    * @memberof GameObject
+    * @member {Object} bending
+    */
+    get bending() {
+        return {
+            position: { percent: 1.0, min: 0.0 },
+            velocity: { percent: 0.0, min: 0.0 },
+            angularVelocity: { percent: 0.0 },
+            angleLocal: { percent: 1.0 }
+        };
+    }
+
     // TODO:
     // rather than pass worldSettings on each bend, they could
     // be passed in on the constructor just once.
-    value: function bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
-      if (this.savedCopy) {
-        this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
-      }
-
-      this.savedCopy = null;
+    bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
+        if (this.savedCopy) {
+            this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
+        }
+        this.savedCopy = null;
     }
-  }, {
-    key: "bendToCurrent",
-    value: function bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {}
+
+    bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
+    }
+
     /**
      * synchronize this object to the state of an other object, by copying all the netscheme variables.
      * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
      * @param {GameObject} other the other object to synchronize to
      */
-
-  }, {
-    key: "syncTo",
-    value: function syncTo(other) {
-      _get(_getPrototypeOf(GameObject.prototype), "syncTo", this).call(this, other);
-    } // copy physical attributes to physics sub-object
-
-  }, {
-    key: "refreshToPhysics",
-    value: function refreshToPhysics() {} // copy physical attributes from physics sub-object
-
-  }, {
-    key: "refreshFromPhysics",
-    value: function refreshFromPhysics() {} // apply a single bending increment
-
-  }, {
-    key: "applyIncrementalBending",
-    value: function applyIncrementalBending() {} // clean up resources
-
-  }, {
-    key: "destroy",
-    value: function destroy() {}
-  }, {
-    key: "addComponent",
-    value: function addComponent(componentInstance) {
-      componentInstance.parentObject = this;
-      this.components[componentInstance.constructor.name] = componentInstance; // a gameEngine might not exist if this class is instantiated by the serializer
-
-      if (this.gameEngine) {
-        this.gameEngine.emit('componentAdded', this, componentInstance);
-      }
+    syncTo(other) {
+        super.syncTo(other);
     }
-  }, {
-    key: "removeComponent",
-    value: function removeComponent(componentName) {
-      // todo cleanup of the component ?
-      delete this.components[componentName]; // a gameEngine might not exist if this class is instantiated by the serializer
 
-      if (this.gameEngine) {
-        this.gameEngine.emit('componentRemoved', this, componentName);
-      }
+    // copy physical attributes to physics sub-object
+    refreshToPhysics() {}
+
+    // copy physical attributes from physics sub-object
+    refreshFromPhysics() {}
+
+    // apply a single bending increment
+    applyIncrementalBending() { }
+
+    // clean up resources
+    destroy() {}
+
+    addComponent(componentInstance) {
+        componentInstance.parentObject = this;
+        this.components[componentInstance.constructor.name] = componentInstance;
+
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentAdded', this, componentInstance);
+        }
     }
+
+    removeComponent(componentName) {
+        // todo cleanup of the component ?
+        delete this.components[componentName];
+
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentRemoved', this, componentName);
+        }
+    }
+
     /**
      * Check whether this game object has a certain component
      * @param {Object} componentClass the comp
      * @return {Boolean} true if the gameObject contains this component
      */
-
-  }, {
-    key: "hasComponent",
-    value: function hasComponent(componentClass) {
-      return componentClass.name in this.components;
+    hasComponent(componentClass) {
+        return componentClass.name in this.components;
     }
-  }, {
-    key: "getComponent",
-    value: function getComponent(componentClass) {
-      return this.components[componentClass.name];
+
+    getComponent(componentClass) {
+        return this.components[componentClass.name];
     }
-  }, {
-    key: "bending",
-    get: function get() {
-      return {
-        position: {
-          percent: 1.0,
-          min: 0.0
-        },
-        velocity: {
-          percent: 0.0,
-          min: 0.0
-        },
-        angularVelocity: {
-          percent: 0.0
-        },
-        angleLocal: {
-          percent: 1.0
-        }
-      };
-    }
-  }]);
 
-  return GameObject;
-}(Serializable);
+}
 
-var MathUtils =
-/*#__PURE__*/
-function () {
-  function MathUtils() {
-    _classCallCheck(this, MathUtils);
-  }
+class MathUtils {
 
-  _createClass(MathUtils, null, [{
-    key: "interpolate",
     // interpolate from start to end, advancing "percent" of the way
-    value: function interpolate(start, end, percent) {
-      return (end - start) * percent + start;
-    } // interpolate from start to end, advancing "percent" of the way
+    static interpolate(start, end, percent) {
+        return (end - start) * percent + start;
+    }
+
+    // interpolate from start to end, advancing "percent" of the way
     //
     // returns just the delta. i.e. the value that must be added to the start value
+    static interpolateDelta(start, end, percent) {
+        return (end - start) * percent;
+    }
 
-  }, {
-    key: "interpolateDelta",
-    value: function interpolateDelta(start, end, percent) {
-      return (end - start) * percent;
-    } // interpolate from start to end, advancing "percent" of the way
+    // interpolate from start to end, advancing "percent" of the way
     // and noting that the dimension wraps around {x >= wrapMin, x < wrapMax}
     //
     // returns just the delta. i.e. the value that must be added to the start value
-
-  }, {
-    key: "interpolateDeltaWithWrapping",
-    value: function interpolateDeltaWithWrapping(start, end, percent, wrapMin, wrapMax) {
-      var wrapTest = wrapMax - wrapMin;
-      if (start - end > wrapTest / 2) end += wrapTest;else if (end - start > wrapTest / 2) start += wrapTest;
-
-      if (Math.abs(start - end) > wrapTest / 3) {
-        console.log('wrap interpolation is close to limit.  Not sure which edge to wrap to.');
-      }
-
-      return (end - start) * percent;
+    static interpolateDeltaWithWrapping(start, end, percent, wrapMin, wrapMax) {
+        let wrapTest = wrapMax - wrapMin;
+        if (start - end > wrapTest / 2) end += wrapTest;
+        else if (end - start > wrapTest / 2) start += wrapTest;
+        if (Math.abs(start - end) > wrapTest / 3) {
+            console.log('wrap interpolation is close to limit.  Not sure which edge to wrap to.');
+        }
+        return (end - start) * percent;
     }
-  }, {
-    key: "interpolateWithWrapping",
-    value: function interpolateWithWrapping(start, end, percent, wrapMin, wrapMax) {
-      var interpolatedVal = start + this.interpolateDeltaWithWrapping(start, end, percent, wrapMin, wrapMax);
-      var wrapLength = wrapMax - wrapMin;
-      if (interpolatedVal >= wrapLength) interpolatedVal -= wrapLength;
-      if (interpolatedVal < 0) interpolatedVal += wrapLength;
-      return interpolatedVal;
-    }
-  }]);
 
-  return MathUtils;
-}();
+    static interpolateWithWrapping(start, end, percent, wrapMin, wrapMax) {
+        let interpolatedVal = start + this.interpolateDeltaWithWrapping(start, end, percent, wrapMin, wrapMax);
+        let wrapLength = wrapMax - wrapMin;
+        if (interpolatedVal >= wrapLength) interpolatedVal -= wrapLength;
+        if (interpolatedVal < 0) interpolatedVal += wrapLength;
+        return interpolatedVal;
+    }
+}
 
 /**
  * DynamicObject is the base class of the game's objects, for games which
@@ -16479,14 +16050,7 @@ function () {
  * allow the client to extrapolate the position
  * of dynamic objects in-between server updates.
  */
-
-var DynamicObject =
-/*#__PURE__*/
-function (_GameObject) {
-  _inherits(DynamicObject, _GameObject);
-
-  _createClass(DynamicObject, null, [{
-    key: "netScheme",
+class DynamicObject extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -16510,31 +16074,18 @@ function (_GameObject) {
     *         }, super.netScheme);
     *     }
     */
-    get: function get() {
-      return Object.assign({
-        playerId: {
-          type: BaseTypes.TYPES.INT16
-        },
-        position: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        },
-        width: {
-          type: BaseTypes.TYPES.INT16
-        },
-        height: {
-          type: BaseTypes.TYPES.INT16
-        },
-        isStatic: {
-          type: BaseTypes.TYPES.UINT8
-        },
-        velocity: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        },
-        angle: {
-          type: BaseTypes.TYPES.FLOAT32
-        }
-      }, _get(_getPrototypeOf(DynamicObject), "netScheme", this));
+    static get netScheme() {
+        return Object.assign({
+            playerId: { type: BaseTypes.TYPES.INT16 },
+            position: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            width: { type: BaseTypes.TYPES.INT16 },
+            height: { type: BaseTypes.TYPES.INT16 },
+            isStatic: { type: BaseTypes.TYPES.UINT8 },
+            velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angle: { type: BaseTypes.TYPES.FLOAT32 }
+        }, super.netScheme);
     }
+
     /**
     * Creates an instance of a dynamic object.
     * NOTE: all subclasses of this class must comply with this constructor signature.
@@ -16548,114 +16099,109 @@ function (_GameObject) {
     * @param {Number} props.height - object height
     * @param {Number} props.width - object width
     */
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options);
 
-  }]);
+        /**
+        * ID of player who created this object
+        * @member {Number}
+        */
+        this.playerId = (props && props.playerId) ? props.playerId : 0;
 
-  function DynamicObject(gameEngine, options, props) {
-    var _this;
+        this.bendingIncrements = 0;
 
-    _classCallCheck(this, DynamicObject);
+        this.position = new TwoVector(0, 0);
+        this.velocity = new TwoVector(0, 0);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(DynamicObject).call(this, gameEngine, options));
-    /**
-    * ID of player who created this object
-    * @member {Number}
-    */
+        /**
+         * Object width for collision detection purposes. Default is 1
+         * @member {Number}
+         */
+        this.width = (props && props.width) ? props.width : 1;
 
-    _this.playerId = props && props.playerId ? props.playerId : 0;
-    _this.bendingIncrements = 0;
-    _this.position = new TwoVector(0, 0);
-    _this.velocity = new TwoVector(0, 0);
-    /**
-     * Object width for collision detection purposes. Default is 1
-     * @member {Number}
-     */
+        /**
+         * Object height for collision detection purposes. Default is 1
+         * @member {Number}
+         */
+        this.height = (props && props.height) ? props.height : 1;
 
-    _this.width = props && props.width ? props.width : 1;
-    /**
-     * Object height for collision detection purposes. Default is 1
-     * @member {Number}
-     */
+        /**
+         * Determine if the object is static (i.e. it never moves, like a wall). The value 0 implies the object is dynamic.  Default is 0 (dynamic).
+         * @member {Number}
+         */
+        this.isStatic = (props && props.isStatic) ? props.isStatic : 0;
 
-    _this.height = props && props.height ? props.height : 1;
-    /**
-     * Determine if the object is static (i.e. it never moves, like a wall). The value 0 implies the object is dynamic.  Default is 0 (dynamic).
-     * @member {Number}
-     */
+        /**
+         * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
+         * @member {TwoVector}
+         */
+        this.friction = new TwoVector(1, 1);
 
-    _this.isStatic = props && props.isStatic ? props.isStatic : 0;
-    /**
-     * The friction coefficient. Velocity is multiplied by this for each step. Default is (1,1)
-     * @member {TwoVector}
-     */
+        /**
+        * playerId
+        * @member {Number}
+        */
+        if (props && props.playerId) this.playerId = props.playerId;
 
-    _this.friction = new TwoVector(1, 1);
-    /**
-    * playerId
-    * @member {Number}
-    */
+        /**
+        * position
+        * @member {TwoVector}
+        */
+        if (props && props.position) this.position.copy(props.position);
 
-    if (props && props.playerId) _this.playerId = props.playerId;
-    /**
-    * position
-    * @member {TwoVector}
-    */
+        /**
+        * velocity
+        * @member {TwoVector}
+        */
+        if (props && props.velocity) this.velocity.copy(props.velocity);
 
-    if (props && props.position) _this.position.copy(props.position);
-    /**
-    * velocity
-    * @member {TwoVector}
-    */
+        /**
+        * object orientation angle in degrees
+        * @member {Number}
+        */
+        this.angle = 90;
 
-    if (props && props.velocity) _this.velocity.copy(props.velocity);
-    /**
-    * object orientation angle in degrees
-    * @member {Number}
-    */
+        /**
+        * @deprecated since version 3.0.8
+        * should rotate left by {@link DynamicObject#rotationSpeed} on next step
+        * @member {Boolean}
+        */
+        this.isRotatingLeft = false;
 
-    _this.angle = 90;
-    /**
-    * @deprecated since version 3.0.8
-    * should rotate left by {@link DynamicObject#rotationSpeed} on next step
-    * @member {Boolean}
-    */
+        /**
+        * @deprecated since version 3.0.8
+        * should rotate right by {@link DynamicObject#rotationSpeed} on next step
+        * @member {Boolean}
+        */
+        this.isRotatingRight = false;
 
-    _this.isRotatingLeft = false;
-    /**
-    * @deprecated since version 3.0.8
-    * should rotate right by {@link DynamicObject#rotationSpeed} on next step
-    * @member {Boolean}
-    */
+        /**
+        * @deprecated since version 3.0.8
+        * should accelerate by {@link DynamicObject#acceleration} on next step
+        * @member {Boolean}
+        */
+        this.isAccelerating = false;
 
-    _this.isRotatingRight = false;
-    /**
-    * @deprecated since version 3.0.8
-    * should accelerate by {@link DynamicObject#acceleration} on next step
-    * @member {Boolean}
-    */
+        /**
+        * @deprecated since version 3.0.8
+        * angle rotation per step
+        * @member {Number}
+        */
+        this.rotationSpeed = 2.5;
 
-    _this.isAccelerating = false;
-    /**
-    * @deprecated since version 3.0.8
-    * angle rotation per step
-    * @member {Number}
-    */
+        /**
+        * @deprecated since version 3.0.8
+        * acceleration per step
+        * @member {Number}
+        */
+        this.acceleration = 0.1;
 
-    _this.rotationSpeed = 2.5;
-    /**
-    * @deprecated since version 3.0.8
-    * acceleration per step
-    * @member {Number}
-    */
+        this.deceleration = 0.99;
+    }
 
-    _this.acceleration = 0.1;
-    _this.deceleration = 0.99;
-    return _this;
-  } // convenience getters
-
-
-  _createClass(DynamicObject, [{
-    key: "toString",
+    // convenience getters
+    get x() { return this.position.x; }
+    get y() { return this.position.y; }
 
     /**
      * Formatted textual description of the dynamic object.
@@ -16664,13 +16210,11 @@ function (_GameObject) {
      *
      * @return {String} description - a string describing the DynamicObject
      */
-    value: function toString() {
-      function round3(x) {
-        return Math.round(x * 1000) / 1000;
-      }
-
-      return "".concat(this.constructor.name, "[").concat(this.id, "] player").concat(this.playerId, " Pos=").concat(this.position, " Vel=").concat(this.velocity, " angle").concat(round3(this.angle));
+    toString() {
+        function round3(x) { return Math.round(x * 1000) / 1000; }
+        return `${this.constructor.name}[${this.id}] player${this.playerId} Pos=${this.position} Vel=${this.velocity} angle${round3(this.angle)}`;
     }
+
     /**
      * Each object class can define its own bending overrides.
      * return an object which can include attributes: position, velocity,
@@ -16679,199 +16223,159 @@ function (_GameObject) {
      *
      * @return {Object} bending - an object with bending paramters
      */
-
-  }, {
-    key: "turnRight",
+    get bending() {
+        return {
+            // example:
+            // position: { percent: 0.8, min: 0.0, max: 4.0 },
+            // velocity: { percent: 0.4, min: 0.0 },
+            // angleLocal: { percent: 0.0 }
+        };
+    }
 
     /**
     * turn object clock-wise
     * @param {Number} deltaAngle - the angle to turn, in degrees
     * @return {DynamicObject} return this object
     */
-    value: function turnRight(deltaAngle) {
-      this.angle += deltaAngle;
-
-      if (this.angle >= 360) {
-        this.angle -= 360;
-      }
-
-      if (this.angle < 0) {
-        this.angle += 360;
-      }
-
-      return this;
+    turnRight(deltaAngle) {
+        this.angle += deltaAngle;
+        if (this.angle >= 360) { this.angle -= 360; }
+        if (this.angle < 0) { this.angle += 360; }
+        return this;
     }
+
     /**
     * turn object counter-clock-wise
     * @param {Number} deltaAngle - the angle to turn, in degrees
     * @return {DynamicObject} return this object
     */
-
-  }, {
-    key: "turnLeft",
-    value: function turnLeft(deltaAngle) {
-      return this.turnRight(-deltaAngle);
+    turnLeft(deltaAngle) {
+        return this.turnRight(-deltaAngle);
     }
+
     /**
     * accelerate along the direction that the object is facing
     * @param {Number} acceleration - the acceleration
     * @return {DynamicObject} return this object
     */
+    accelerate(acceleration) {
+        let rad = this.angle * (Math.PI / 180);
+        let dv = new TwoVector(Math.cos(rad), Math.sin(rad));
+        dv.multiplyScalar(acceleration);
+        this.velocity.add(dv);
 
-  }, {
-    key: "accelerate",
-    value: function accelerate(acceleration) {
-      var rad = this.angle * (Math.PI / 180);
-      var dv = new TwoVector(Math.cos(rad), Math.sin(rad));
-      dv.multiplyScalar(acceleration);
-      this.velocity.add(dv);
-      return this;
+        return this;
     }
+
     /**
      * Formatted textual description of the game object's current bending properties.
      * @return {String} description - a string description
      */
-
-  }, {
-    key: "bendingToString",
-    value: function bendingToString() {
-      if (this.bendingIncrements) return "\u0394Pos=".concat(this.bendingPositionDelta, " \u0394Vel=").concat(this.bendingVelocityDelta, " \u0394Angle=").concat(this.bendingAngleDelta, " increments=").concat(this.bendingIncrements);
-      return 'no bending';
+    bendingToString() {
+        if (this.bendingIncrements)
+            return `ΔPos=${this.bendingPositionDelta} ΔVel=${this.bendingVelocityDelta} ΔAngle=${this.bendingAngleDelta} increments=${this.bendingIncrements}`;
+        return 'no bending';
     }
+
     /**
     * The maximum velocity allowed.  If returns null then ignored.
     * @memberof DynamicObject
     * @member {Number} maxSpeed
     */
-
-  }, {
-    key: "syncTo",
+    get maxSpeed() { return null; }
 
     /**
     * Copy the netscheme variables from another DynamicObject
     * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
     * @param {DynamicObject} other DynamicObject
     */
-    value: function syncTo(other) {
-      _get(_getPrototypeOf(DynamicObject.prototype), "syncTo", this).call(this, other);
-
-      this.position.copy(other.position);
-      this.velocity.copy(other.velocity);
-      this.width = other.width;
-      this.height = other.height;
-      this.bendingAngle = other.bendingAngle;
-      this.rotationSpeed = other.rotationSpeed;
-      this.acceleration = other.acceleration;
-      this.deceleration = other.deceleration;
+    syncTo(other) {
+        super.syncTo(other);
+        this.position.copy(other.position);
+        this.velocity.copy(other.velocity);
+        this.width = other.width;
+        this.height = other.height;
+        this.bendingAngle = other.bendingAngle;
+        this.rotationSpeed = other.rotationSpeed;
+        this.acceleration = other.acceleration;
+        this.deceleration = other.deceleration;
     }
-  }, {
-    key: "bendToCurrent",
-    value: function bendToCurrent(original, percent, worldSettings, isLocal, increments) {
-      var bending = {
-        increments: increments,
-        percent: percent
-      }; // if the object has defined a bending multiples for this object, use them
 
-      var positionBending = Object.assign({}, bending, this.bending.position);
-      var velocityBending = Object.assign({}, bending, this.bending.velocity);
-      var angleBending = Object.assign({}, bending, this.bending.angle);
+    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
 
-      if (isLocal) {
-        Object.assign(positionBending, this.bending.positionLocal);
-        Object.assign(velocityBending, this.bending.velocityLocal);
-        Object.assign(angleBending, this.bending.angleLocal);
-      } // get the incremental delta position & velocity
+        let bending = { increments, percent };
+        // if the object has defined a bending multiples for this object, use them
+        let positionBending = Object.assign({}, bending, this.bending.position);
+        let velocityBending = Object.assign({}, bending, this.bending.velocity);
+        let angleBending = Object.assign({}, bending, this.bending.angle);
 
+        if (isLocal) {
+            Object.assign(positionBending, this.bending.positionLocal);
+            Object.assign(velocityBending, this.bending.velocityLocal);
+            Object.assign(angleBending, this.bending.angleLocal);
+        }
 
-      this.incrementScale = percent / increments;
-      this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
-      this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
-      this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 360) / increments;
-      this.bendingTarget = new this.constructor();
-      this.bendingTarget.syncTo(this); // revert to original
+        // get the incremental delta position & velocity
+        this.incrementScale = percent / increments;
+        this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
+        this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
+        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 360) / increments;
 
-      this.position.copy(original.position);
-      this.velocity.copy(original.velocity);
-      this.angle = original.angle; // keep parameters
+        this.bendingTarget = (new this.constructor());
+        this.bendingTarget.syncTo(this);
 
-      this.bendingIncrements = increments;
-      this.bendingOptions = bending;
+        // revert to original
+        this.position.copy(original.position);
+        this.velocity.copy(original.velocity);
+        this.angle = original.angle;
+
+        // keep parameters
+        this.bendingIncrements = increments;
+        this.bendingOptions = bending;
     }
-  }, {
-    key: "applyIncrementalBending",
-    value: function applyIncrementalBending(stepDesc) {
-      if (this.bendingIncrements === 0) return;
-      var timeFactor = 1;
-      if (stepDesc && stepDesc.dt) timeFactor = stepDesc.dt / (1000 / 60);
-      var posDelta = this.bendingPositionDelta.clone().multiplyScalar(timeFactor);
-      var velDelta = this.bendingVelocityDelta.clone().multiplyScalar(timeFactor);
-      this.position.add(posDelta);
-      this.velocity.add(velDelta);
-      this.angle += this.bendingAngleDelta * timeFactor;
-      this.bendingIncrements--;
+
+    applyIncrementalBending(stepDesc) {
+        if (this.bendingIncrements === 0)
+            return;
+
+        let timeFactor = 1;
+        if (stepDesc && stepDesc.dt)
+            timeFactor = stepDesc.dt / (1000 / 60);
+
+        const posDelta = this.bendingPositionDelta.clone().multiplyScalar(timeFactor);
+        const velDelta = this.bendingVelocityDelta.clone().multiplyScalar(timeFactor);
+        this.position.add(posDelta);
+        this.velocity.add(velDelta);
+        this.angle += (this.bendingAngleDelta * timeFactor);
+
+        this.bendingIncrements--;
     }
-  }, {
-    key: "getAABB",
-    value: function getAABB() {
-      // todo take rotation into account
-      // registration point is in the middle
-      return {
-        min: [this.x - this.width / 2, this.y - this.height / 2],
-        max: [this.x + this.width / 2, this.y + this.height / 2]
-      };
+
+    getAABB() {
+        // todo take rotation into account
+        // registration point is in the middle
+        return {
+            min: [this.x - this.width / 2, this.y - this.height / 2],
+            max: [this.x + this.width / 2, this.y + this.height / 2]
+        };
     }
+
     /**
     * Determine if this object will collide with another object.
     * Only applicable on "bruteForce" physics engine.
     * @param {DynamicObject} other DynamicObject
     * @return {Boolean} true if the two objects collide
     */
+    collidesWith(other) {
+        return true;
+    }
 
-  }, {
-    key: "collidesWith",
-    value: function collidesWith(other) {
-      return true;
-    }
-  }, {
-    key: "x",
-    get: function get() {
-      return this.position.x;
-    }
-  }, {
-    key: "y",
-    get: function get() {
-      return this.position.y;
-    }
-  }, {
-    key: "bending",
-    get: function get() {
-      return {// example:
-        // position: { percent: 0.8, min: 0.0, max: 4.0 },
-        // velocity: { percent: 0.4, min: 0.0 },
-        // angleLocal: { percent: 0.0 }
-      };
-    }
-  }, {
-    key: "maxSpeed",
-    get: function get() {
-      return null;
-    }
-  }]);
-
-  return DynamicObject;
-}(GameObject);
+}
 
 /**
  * The PhysicalObject2D is the base class for physical game objects in 2D Physics
  */
-
-var PhysicalObject2D =
-/*#__PURE__*/
-function (_GameObject) {
-  _inherits(PhysicalObject2D, _GameObject);
-
-  _createClass(PhysicalObject2D, null, [{
-    key: "netScheme",
+class PhysicalObject2D extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -16895,28 +16399,17 @@ function (_GameObject) {
     *         }, super.netScheme);
     *     }
     */
-    get: function get() {
-      return Object.assign({
-        playerId: {
-          type: BaseTypes.TYPES.INT16
-        },
-        mass: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        position: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        },
-        angle: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        velocity: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        },
-        angularVelocity: {
-          type: BaseTypes.TYPES.FLOAT32
-        }
-      }, _get(_getPrototypeOf(PhysicalObject2D), "netScheme", this));
+    static get netScheme() {
+        return Object.assign({
+            playerId: { type: BaseTypes.TYPES.INT16 },
+            mass: { type: BaseTypes.TYPES.FLOAT32 },
+            position: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angle: { type: BaseTypes.TYPES.FLOAT32 },
+            velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angularVelocity: { type: BaseTypes.TYPES.FLOAT32 }
+        }, super.netScheme);
     }
+
     /**
     * Creates an instance of a physical object.
     * Override to provide starting values for position, velocity, angle and angular velocity.
@@ -16932,44 +16425,37 @@ function (_GameObject) {
     * @param {Number} props.mass - the mass
     * @param {Number} props.angularVelocity - angular velocity
     */
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options);
+        this.playerId = 0;
+        this.bendingIncrements = 0;
 
-  }]);
+        // set default position, velocity and quaternion
+        this.position = new TwoVector(0, 0);
+        this.velocity = new TwoVector(0, 0);
+        this.angle = 0;
+        this.angularVelocity = 0;
+        this.mass = 0;
 
-  function PhysicalObject2D(gameEngine, options, props) {
-    var _this;
+        // use values if provided
+        props = props || {};
+        if (props.playerId) this.playerId = props.playerId;
+        if (props.position) this.position.copy(props.position);
+        if (props.velocity) this.velocity.copy(props.velocity);
+        if (props.angle) this.angle = props.angle;
+        if (props.angularVelocity) this.angularVelocity = props.angularVelocity;
+        if (props.mass) this.mass = props.mass;
 
-    _classCallCheck(this, PhysicalObject2D);
+        this.class = PhysicalObject2D;
+    }
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(PhysicalObject2D).call(this, gameEngine, options));
-    _this.playerId = 0;
-    _this.bendingIncrements = 0; // set default position, velocity and quaternion
+    /**
+     * Called after the object is added to to the game world.
+     * This is the right place to add renderer sub-objects, physics sub-objects
+     * and any other resources that should be created
+     */
+    onAddToWorld() {}
 
-    _this.position = new TwoVector(0, 0);
-    _this.velocity = new TwoVector(0, 0);
-    _this.angle = 0;
-    _this.angularVelocity = 0;
-    _this.mass = 0; // use values if provided
-
-    props = props || {};
-    if (props.playerId) _this.playerId = props.playerId;
-    if (props.position) _this.position.copy(props.position);
-    if (props.velocity) _this.velocity.copy(props.velocity);
-    if (props.angle) _this.angle = props.angle;
-    if (props.angularVelocity) _this.angularVelocity = props.angularVelocity;
-    if (props.mass) _this.mass = props.mass;
-    _this.class = PhysicalObject2D;
-    return _this;
-  }
-  /**
-   * Called after the object is added to to the game world.
-   * This is the right place to add renderer sub-objects, physics sub-objects
-   * and any other resources that should be created
-   */
-
-
-  _createClass(PhysicalObject2D, [{
-    key: "onAddToWorld",
-    value: function onAddToWorld() {}
     /**
      * Formatted textual description of the dynamic object.
      * The output of this method is used to describe each instance in the traces,
@@ -16977,16 +16463,14 @@ function (_GameObject) {
      *
      * @return {String} description - a string describing the PhysicalObject2D
      */
-
-  }, {
-    key: "toString",
-    value: function toString() {
-      var p = this.position.toString();
-      var v = this.velocity.toString();
-      var a = this.angle;
-      var av = this.angularVelocity;
-      return "phyObj2D[".concat(this.id, "] player").concat(this.playerId, " Pos=").concat(p, " Vel=").concat(v, " Ang=").concat(a, " AVel=").concat(av);
+    toString() {
+        let p = this.position.toString();
+        let v = this.velocity.toString();
+        let a = this.angle;
+        let av = this.angularVelocity;
+        return `phyObj2D[${this.id}] player${this.playerId} Pos=${p} Vel=${v} Ang=${a} AVel=${av}`;
     }
+
     /**
      * Each object class can define its own bending overrides.
      * return an object which can include attributes: position, velocity,
@@ -16995,180 +16479,167 @@ function (_GameObject) {
      *
      * @return {Object} bending - an object with bending paramters
      */
+    get bending() {
+        return {
+            // example:
+            // position: { percent: 0.8, min: 0.0, max: 4.0 },
+            // velocity: { percent: 0.4, min: 0.0 },
+            // angularVelocity: { percent: 0.0 },
+            // angleLocal: { percent: 0.0 }
+        };
+    }
 
-  }, {
-    key: "bendingToString",
     // display object's physical attributes as a string
     // for debugging purposes mostly
-    value: function bendingToString() {
-      if (this.bendingIncrements) return "\u0394Pos=".concat(this.bendingPositionDelta, " \u0394Vel=").concat(this.bendingVelocityDelta, " \u0394Angle=").concat(this.bendingAngleDelta, " increments=").concat(this.bendingIncrements);
-      return 'no bending';
-    } // derive and save the bending increment parameters:
+    bendingToString() {
+        if (this.bendingIncrements)
+            return `ΔPos=${this.bendingPositionDelta} ΔVel=${this.bendingVelocityDelta} ΔAngle=${this.bendingAngleDelta} increments=${this.bendingIncrements}`;
+        return 'no bending';
+    }
+
+    // derive and save the bending increment parameters:
     // - bendingPositionDelta
     // - bendingVelocityDelta
     // - bendingAVDelta
     // - bendingAngleDelta
     // these can later be used to "bend" incrementally from the state described
     // by "original" to the state described by "self"
+    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
 
-  }, {
-    key: "bendToCurrent",
-    value: function bendToCurrent(original, percent, worldSettings, isLocal, increments) {
-      var bending = {
-        increments: increments,
-        percent: percent
-      }; // if the object has defined a bending multiples for this object, use them
+        let bending = { increments, percent };
+        // if the object has defined a bending multiples for this object, use them
+        let positionBending = Object.assign({}, bending, this.bending.position);
+        let velocityBending = Object.assign({}, bending, this.bending.velocity);
+        let angleBending = Object.assign({}, bending, this.bending.angle);
+        let avBending = Object.assign({}, bending, this.bending.angularVelocity);
 
-      var positionBending = Object.assign({}, bending, this.bending.position);
-      var velocityBending = Object.assign({}, bending, this.bending.velocity);
-      var angleBending = Object.assign({}, bending, this.bending.angle);
-      var avBending = Object.assign({}, bending, this.bending.angularVelocity); // check for local object overrides to bendingTarget
+        // check for local object overrides to bendingTarget
+        if (isLocal) {
+            Object.assign(positionBending, this.bending.positionLocal);
+            Object.assign(velocityBending, this.bending.velocityLocal);
+            Object.assign(angleBending, this.bending.angleLocal);
+            Object.assign(avBending, this.bending.angularVelocityLocal);
+        }
 
-      if (isLocal) {
-        Object.assign(positionBending, this.bending.positionLocal);
-        Object.assign(velocityBending, this.bending.velocityLocal);
-        Object.assign(angleBending, this.bending.angleLocal);
-        Object.assign(avBending, this.bending.angularVelocityLocal);
-      } // get the incremental delta position & velocity
+        // get the incremental delta position & velocity
+        this.incrementScale = percent / increments;
+        this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
+        this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
 
+        // get the incremental angular-velocity
+        this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * avBending.percent;
 
-      this.incrementScale = percent / increments;
-      this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
-      this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending); // get the incremental angular-velocity
+        // get the incremental angle correction
+        this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 2 * Math.PI) / increments;
 
-      this.bendingAVDelta = (this.angularVelocity - original.angularVelocity) * this.incrementScale * avBending.percent; // get the incremental angle correction
+        this.bendingTarget = (new this.constructor());
+        this.bendingTarget.syncTo(this);
 
-      this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 2 * Math.PI) / increments;
-      this.bendingTarget = new this.constructor();
-      this.bendingTarget.syncTo(this); // revert to original
+        // revert to original
+        this.position.copy(original.position);
+        this.angle = original.angle;
+        this.angularVelocity = original.angularVelocity;
+        this.velocity.copy(original.velocity);
 
-      this.position.copy(original.position);
-      this.angle = original.angle;
-      this.angularVelocity = original.angularVelocity;
-      this.velocity.copy(original.velocity);
-      this.bendingIncrements = increments;
-      this.bendingOptions = bending;
-      this.refreshToPhysics();
+        this.bendingIncrements = increments;
+        this.bendingOptions = bending;
+
+        this.refreshToPhysics();
     }
-  }, {
-    key: "syncTo",
-    value: function syncTo(other, options) {
-      _get(_getPrototypeOf(PhysicalObject2D.prototype), "syncTo", this).call(this, other);
 
-      this.position.copy(other.position);
-      this.angle = other.angle;
-      this.angularVelocity = other.angularVelocity;
+    syncTo(other, options) {
 
-      if (!options || !options.keepVelocity) {
-        this.velocity.copy(other.velocity);
-      }
+        super.syncTo(other);
 
-      if (this.physicsObj) this.refreshToPhysics();
-    } // update position, angle, angular velocity, and velocity from new physical state.
+        this.position.copy(other.position);
+        this.angle = other.angle;
+        this.angularVelocity = other.angularVelocity;
 
-  }, {
-    key: "refreshFromPhysics",
-    value: function refreshFromPhysics() {
-      this.copyVector(this.physicsObj.position, this.position);
-      this.copyVector(this.physicsObj.velocity, this.velocity);
-      this.angle = this.physicsObj.angle;
-      this.angularVelocity = this.physicsObj.angularVelocity;
-    } // generic vector copy.  We need this because different
+        if (!options || !options.keepVelocity) {
+            this.velocity.copy(other.velocity);
+        }
+
+        if (this.physicsObj) this.refreshToPhysics();
+    }
+
+    // update position, angle, angular velocity, and velocity from new physical state.
+    refreshFromPhysics() {
+        this.copyVector(this.physicsObj.position, this.position);
+        this.copyVector(this.physicsObj.velocity, this.velocity);
+        this.angle = this.physicsObj.angle;
+        this.angularVelocity = this.physicsObj.angularVelocity;
+    }
+
+    // generic vector copy.  We need this because different
     // physics engines have different implementations.
     // TODO: Better implementation: the physics engine implementor
     // should define copyFromLanceVector and copyToLanceVector
+    copyVector(source, target) {
+        let sourceVec = source;
+        if (typeof source[0] === 'number' && typeof source[1] === 'number')
+            sourceVec = { x: source[0], y: source[1] };
 
-  }, {
-    key: "copyVector",
-    value: function copyVector(source, target) {
-      var sourceVec = source;
-      if (typeof source[0] === 'number' && typeof source[1] === 'number') sourceVec = {
-        x: source[0],
-        y: source[1]
-      };
-
-      if (typeof target.copy === 'function') {
-        target.copy(sourceVec);
-      } else if (target instanceof Float32Array) {
-        target[0] = sourceVec.x;
-        target[1] = sourceVec.y;
-      } else {
-        target.x = sourceVec.x;
-        target.y = sourceVec.y;
-      }
-    } // update position, angle, angular velocity, and velocity from new game state.
-
-  }, {
-    key: "refreshToPhysics",
-    value: function refreshToPhysics() {
-      this.copyVector(this.position, this.physicsObj.position);
-      this.copyVector(this.velocity, this.physicsObj.velocity);
-      this.physicsObj.angle = this.angle;
-      this.physicsObj.angularVelocity = this.angularVelocity;
-    } // apply one increment of bending
-
-  }, {
-    key: "applyIncrementalBending",
-    value: function applyIncrementalBending(stepDesc) {
-      if (this.bendingIncrements === 0) return;
-      var timeFactor = 1;
-      if (stepDesc && stepDesc.dt) timeFactor = stepDesc.dt / (1000 / 60);
-      var posDelta = this.bendingPositionDelta.clone().multiplyScalar(timeFactor);
-      var velDelta = this.bendingVelocityDelta.clone().multiplyScalar(timeFactor);
-      this.position.add(posDelta);
-      this.velocity.add(velDelta);
-      this.angularVelocity += this.bendingAVDelta * timeFactor;
-      this.angle += this.bendingAngleDelta * timeFactor;
-      this.bendingIncrements--;
-    } // interpolate implementation
-
-  }, {
-    key: "interpolate",
-    value: function interpolate(nextObj, percent) {
-      // slerp to target position
-      this.position.lerp(nextObj.position, percent);
-      this.angle = MathUtils.interpolateDeltaWithWrapping(this.angle, nextObj.angle, percent, 0, 2 * Math.PI);
+        if (typeof target.copy === 'function') {
+            target.copy(sourceVec);
+        } else if (target instanceof Float32Array) {
+            target[0] = sourceVec.x;
+            target[1] = sourceVec.y;
+        } else {
+            target.x = sourceVec.x;
+            target.y = sourceVec.y;
+        }
     }
-  }, {
-    key: "bending",
-    get: function get() {
-      return {// example:
-        // position: { percent: 0.8, min: 0.0, max: 4.0 },
-        // velocity: { percent: 0.4, min: 0.0 },
-        // angularVelocity: { percent: 0.0 },
-        // angleLocal: { percent: 0.0 }
-      };
-    }
-  }]);
 
-  return PhysicalObject2D;
-}(GameObject);
+    // update position, angle, angular velocity, and velocity from new game state.
+    refreshToPhysics() {
+        this.copyVector(this.position, this.physicsObj.position);
+        this.copyVector(this.velocity, this.physicsObj.velocity);
+        this.physicsObj.angle = this.angle;
+        this.physicsObj.angularVelocity = this.angularVelocity;
+    }
+
+    // apply one increment of bending
+    applyIncrementalBending(stepDesc) {
+        if (this.bendingIncrements === 0)
+            return;
+
+        let timeFactor = 1;
+        if (stepDesc && stepDesc.dt)
+            timeFactor = stepDesc.dt / (1000 / 60);
+
+        const posDelta = this.bendingPositionDelta.clone().multiplyScalar(timeFactor);
+        const velDelta = this.bendingVelocityDelta.clone().multiplyScalar(timeFactor);
+        this.position.add(posDelta);
+        this.velocity.add(velDelta);
+        this.angularVelocity += (this.bendingAVDelta * timeFactor);
+        this.angle += (this.bendingAngleDelta * timeFactor);
+
+        this.bendingIncrements--;
+    }
+
+    // interpolate implementation
+    interpolate(nextObj, percent) {
+
+        // slerp to target position
+        this.position.lerp(nextObj.position, percent);
+        this.angle = MathUtils.interpolateDeltaWithWrapping(this.angle, nextObj.angle, percent, 0, 2 * Math.PI);
+    }
+}
 
 /**
  * A ThreeVector is a geometric object which is completely described
  * by three values.
  */
+class ThreeVector extends Serializable {
 
-var ThreeVector =
-/*#__PURE__*/
-function (_Serializable) {
-  _inherits(ThreeVector, _Serializable);
-
-  _createClass(ThreeVector, null, [{
-    key: "netScheme",
-    get: function get() {
-      return {
-        x: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        y: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        z: {
-          type: BaseTypes.TYPES.FLOAT32
-        }
-      };
+    static get netScheme() {
+        return {
+            x: { type: BaseTypes.TYPES.FLOAT32 },
+            y: { type: BaseTypes.TYPES.FLOAT32 },
+            z: { type: BaseTypes.TYPES.FLOAT32 }
+        };
     }
+
     /**
     * Creates an instance of a ThreeVector.
     * @param {Number} x - first value
@@ -17176,118 +16647,95 @@ function (_Serializable) {
     * @param {Number} z - second value
     * @return {ThreeVector} v - the new ThreeVector
     */
+    constructor(x, y, z) {
+        super();
+        this.x = x;
+        this.y = y;
+        this.z = z;
 
-  }]);
-
-  function ThreeVector(x, y, z) {
-    var _this;
-
-    _classCallCheck(this, ThreeVector);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(ThreeVector).call(this));
-    _this.x = x;
-    _this.y = y;
-    _this.z = z;
-    return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
-  }
-  /**
-   * Formatted textual description of the ThreeVector.
-   * @return {String} description
-   */
-
-
-  _createClass(ThreeVector, [{
-    key: "toString",
-    value: function toString() {
-      function round3(x) {
-        return Math.round(x * 1000) / 1000;
-      }
-
-      return "[".concat(round3(this.x), ", ").concat(round3(this.y), ", ").concat(round3(this.z), "]");
+        return this;
     }
+
+    /**
+     * Formatted textual description of the ThreeVector.
+     * @return {String} description
+     */
+    toString() {
+        function round3(x) { return Math.round(x * 1000) / 1000; }
+        return `[${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)}]`;
+    }
+
     /**
      * Multiply this ThreeVector by a scalar
      *
      * @param {Number} s the scale
      * @return {ThreeVector} returns self
      */
-
-  }, {
-    key: "multiplyScalar",
-    value: function multiplyScalar(s) {
-      this.x *= s;
-      this.y *= s;
-      this.z *= s;
-      return this;
+    multiplyScalar(s) {
+        this.x *= s;
+        this.y *= s;
+        this.z *= s;
+        return this;
     }
+
     /**
      * Get vector length
      *
      * @return {Number} length of this vector
      */
-
-  }, {
-    key: "length",
-    value: function length() {
-      return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    length() {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
+
     /**
      * Add other vector to this vector
      *
      * @param {ThreeVector} other the other vector
      * @return {ThreeVector} returns self
      */
-
-  }, {
-    key: "add",
-    value: function add(other) {
-      this.x += other.x;
-      this.y += other.y;
-      this.z += other.z;
-      return this;
+    add(other) {
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+        return this;
     }
+
     /**
      * Subtract other vector from this vector
      *
      * @param {ThreeVector} other the other vector
      * @return {ThreeVector} returns self
      */
-
-  }, {
-    key: "subtract",
-    value: function subtract(other) {
-      this.x -= other.x;
-      this.y -= other.y;
-      this.z -= other.z;
-      return this;
+    subtract(other) {
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+        return this;
     }
+
     /**
      * Normalize this vector, in-place
      *
      * @return {ThreeVector} returns self
      */
-
-  }, {
-    key: "normalize",
-    value: function normalize() {
-      this.multiplyScalar(1 / this.length());
-      return this;
+    normalize() {
+        this.multiplyScalar(1 / this.length());
+        return this;
     }
+
     /**
      * Copy values from another ThreeVector into this ThreeVector
      *
      * @param {ThreeVector} sourceObj the other vector
      * @return {ThreeVector} returns self
      */
-
-  }, {
-    key: "copy",
-    value: function copy(sourceObj) {
-      this.x = sourceObj.x;
-      this.y = sourceObj.y;
-      this.z = sourceObj.z;
-      return this;
+    copy(sourceObj) {
+        this.x = sourceObj.x;
+        this.y = sourceObj.y;
+        this.z = sourceObj.z;
+        return this;
     }
+
     /**
      * Set ThreeVector values
      *
@@ -17296,26 +16744,22 @@ function (_Serializable) {
      * @param {Number} z z-value
      * @return {ThreeVector} returns self
      */
-
-  }, {
-    key: "set",
-    value: function set(x, y, z) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      return this;
+    set(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
     }
+
     /**
      * Create a clone of this vector
      *
      * @return {ThreeVector} returns clone
      */
-
-  }, {
-    key: "clone",
-    value: function clone() {
-      return new ThreeVector(this.x, this.y, this.z);
+    clone() {
+        return new ThreeVector(this.x, this.y, this.z);
     }
+
     /**
      * Apply in-place lerp (linear interpolation) to this ThreeVector
      * towards another ThreeVector
@@ -17323,15 +16767,13 @@ function (_Serializable) {
      * @param {Number} p The percentage to interpolate
      * @return {ThreeVector} returns self
      */
-
-  }, {
-    key: "lerp",
-    value: function lerp(target, p) {
-      this.x += (target.x - this.x) * p;
-      this.y += (target.y - this.y) * p;
-      this.z += (target.z - this.z) * p;
-      return this;
+    lerp(target, p) {
+        this.x += (target.x - this.x) * p;
+        this.y += (target.y - this.y) * p;
+        this.z += (target.z - this.z) * p;
+        return this;
     }
+
     /**
      * Get bending Delta Vector
      * towards another ThreeVector
@@ -17343,56 +16785,41 @@ function (_Serializable) {
      * @param {Number} options.max No more than this value
      * @return {ThreeVector} returns new Incremental Vector
      */
+    getBendingDelta(target, options) {
+        let increment = target.clone();
+        increment.subtract(this);
+        increment.multiplyScalar(options.percent);
 
-  }, {
-    key: "getBendingDelta",
-    value: function getBendingDelta(target, options) {
-      var increment = target.clone();
-      increment.subtract(this);
-      increment.multiplyScalar(options.percent); // check for max case
+        // check for max case
+        if ((options.max && increment.length() > options.max) ||
+            (options.max && increment.length() < options.min)) {
+            return new ThreeVector(0, 0, 0);
+        }
 
-      if (options.max && increment.length() > options.max || options.max && increment.length() < options.min) {
-        return new ThreeVector(0, 0, 0);
-      } // divide into increments
+        // divide into increments
+        increment.multiplyScalar(1 / options.increments);
 
-
-      increment.multiplyScalar(1 / options.increments);
-      return increment;
+        return increment;
     }
-  }]);
+}
 
-  return ThreeVector;
-}(Serializable);
+const MAX_DEL_THETA = 0.2;
 
-var MAX_DEL_THETA = 0.2;
 /**
  * A Quaternion is a geometric object which can be used to
  * represent a three-dimensional rotation.
  */
+class Quaternion extends Serializable {
 
-var Quaternion =
-/*#__PURE__*/
-function (_Serializable) {
-  _inherits(Quaternion, _Serializable);
-
-  _createClass(Quaternion, null, [{
-    key: "netScheme",
-    get: function get() {
-      return {
-        w: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        x: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        y: {
-          type: BaseTypes.TYPES.FLOAT32
-        },
-        z: {
-          type: BaseTypes.TYPES.FLOAT32
-        }
-      };
+    static get netScheme() {
+        return {
+            w: { type: BaseTypes.TYPES.FLOAT32 },
+            x: { type: BaseTypes.TYPES.FLOAT32 },
+            y: { type: BaseTypes.TYPES.FLOAT32 },
+            z: { type: BaseTypes.TYPES.FLOAT32 }
+        };
     }
+
     /**
     * Creates an instance of a Quaternion.
     * @param {Number} w - first value
@@ -17401,54 +16828,40 @@ function (_Serializable) {
     * @param {Number} z - fourth value
     * @return {Quaternion} v - the new Quaternion
     */
+    constructor(w, x, y, z) {
+        super();
+        this.w = w;
+        this.x = x;
+        this.y = y;
+        this.z = z;
 
-  }]);
-
-  function Quaternion(w, x, y, z) {
-    var _this;
-
-    _classCallCheck(this, Quaternion);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Quaternion).call(this));
-    _this.w = w;
-    _this.x = x;
-    _this.y = y;
-    _this.z = z;
-    return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
-  }
-  /**
-   * Formatted textual description of the Quaternion.
-   * @return {String} description
-   */
-
-
-  _createClass(Quaternion, [{
-    key: "toString",
-    value: function toString() {
-      function round3(x) {
-        return Math.round(x * 1000) / 1000;
-      }
-
-      {
-        var axisAngle = this.toAxisAngle();
-        return "[".concat(round3(axisAngle.angle), ",").concat(axisAngle.axis.toString(), "]");
-      }
-
-      return "[".concat(round3(this.w), ", ").concat(round3(this.x), ", ").concat(round3(this.y), ", ").concat(round3(this.z), "]");
+        return this;
     }
+
+    /**
+     * Formatted textual description of the Quaternion.
+     * @return {String} description
+     */
+    toString() {
+        function round3(x) { return Math.round(x * 1000) / 1000; }
+        {
+            let axisAngle = this.toAxisAngle();
+            return `[${round3(axisAngle.angle)},${axisAngle.axis.toString()}]`;
+        }
+        return `[${round3(this.w)}, ${round3(this.x)}, ${round3(this.y)}, ${round3(this.z)}]`;
+    }
+
     /**
      * copy values from another quaternion into this quaternion
      *
      * @param {Quaternion} sourceObj the quaternion to copy from
      * @return {Quaternion} returns self
      */
-
-  }, {
-    key: "copy",
-    value: function copy(sourceObj) {
-      this.set(sourceObj.w, sourceObj.x, sourceObj.y, sourceObj.z);
-      return this;
+    copy(sourceObj) {
+        this.set(sourceObj.w, sourceObj.x, sourceObj.y, sourceObj.z);
+        return this;
     }
+
     /**
      * set quaternion values
      *
@@ -17458,67 +16871,57 @@ function (_Serializable) {
      * @param {Number} z z-value
      * @return {Quaternion} returns self
      */
+    set(w, x, y, z) {
+        this.w = w;
+        this.x = x;
+        this.y = y;
+        this.z = z;
 
-  }, {
-    key: "set",
-    value: function set(w, x, y, z) {
-      this.w = w;
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      return this;
+        return this;
     }
+
     /**
      * return an axis-angle representation of this quaternion
      *
      * @return {Object} contains two attributes: axis (ThreeVector) and angle.
      */
+    toAxisAngle() {
 
-  }, {
-    key: "toAxisAngle",
-    value: function toAxisAngle() {
-      // assuming quaternion normalised then w is less than 1, so term always positive.
-      var axis = new ThreeVector(1, 0, 0);
-      this.normalize();
-      var angle = 2 * Math.acos(this.w);
-      var s = Math.sqrt(1 - this.w * this.w);
-
-      if (s > 0.001) {
-        var divS = 1 / s;
-        axis.x = this.x * divS;
-        axis.y = this.y * divS;
-        axis.z = this.z * divS;
-      }
-
-      if (s > Math.PI) {
-        s -= 2 * Math.PI;
-      }
-
-      return {
-        axis: axis,
-        angle: angle
-      };
+        // assuming quaternion normalised then w is less than 1, so term always positive.
+        let axis = new ThreeVector(1, 0, 0);
+        this.normalize();
+        let angle = 2 * Math.acos(this.w);
+        let s = Math.sqrt(1 - this.w * this.w);
+        if (s > 0.001) {
+            let divS = 1 / s;
+            axis.x = this.x * divS;
+            axis.y = this.y * divS;
+            axis.z = this.z * divS;
+        }
+        if (s > Math.PI) {
+            s -= 2 * Math.PI;
+        }
+        return { axis, angle };
     }
-  }, {
-    key: "normalize",
-    value: function normalize() {
-      var l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
 
-      if (l === 0) {
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.w = 0;
-      } else {
-        l = 1 / l;
-        this.x *= l;
-        this.y *= l;
-        this.z *= l;
-        this.w *= l;
-      }
+    normalize() {
+        let l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        if (l === 0) {
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            this.w = 0;
+        } else {
+            l = 1 / l;
+            this.x *= l;
+            this.y *= l;
+            this.z *= l;
+            this.w *= l;
+        }
 
-      return this;
+        return this;
     }
+
     /**
      * set the values of this quaternion from an axis/angle representation
      *
@@ -17526,63 +16929,53 @@ function (_Serializable) {
      * @param {Number} angle angle in radians
      * @return {Quaternion} returns self
      */
+    setFromAxisAngle(axis, angle) {
 
-  }, {
-    key: "setFromAxisAngle",
-    value: function setFromAxisAngle(axis, angle) {
-      if (angle < 0) angle += Math.PI * 2;
-      var halfAngle = angle * 0.5;
-      var s = Math.sin(halfAngle);
-      this.x = axis.x * s;
-      this.y = axis.y * s;
-      this.z = axis.z * s;
-      this.w = Math.cos(halfAngle);
-      return this;
+        if (angle < 0)
+            angle += Math.PI * 2;
+        let halfAngle = angle * 0.5;
+        let s = Math.sin(halfAngle);
+        this.x = axis.x * s;
+        this.y = axis.y * s;
+        this.z = axis.z * s;
+        this.w = Math.cos(halfAngle);
+
+        return this;
     }
+
     /**
      * conjugate the quaternion, in-place
      *
      * @return {Quaternion} returns self
      */
-
-  }, {
-    key: "conjugate",
-    value: function conjugate() {
-      this.x *= -1;
-      this.y *= -1;
-      this.z *= -1;
-      return this;
+    conjugate() {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
+        return this;
     }
-    /* eslint-disable */
 
+    /* eslint-disable */
     /**
      * multiply this quaternion by another, in-place
      *
      * @param {Quaternion} other The other quaternion
      * @return {Quaternion} returns self
      */
+    multiply(other) {
+        let aw = this.w, ax = this.x, ay = this.y, az = this.z;
+        let bw = other.w, bx = other.x, by = other.y, bz = other.z;
 
-  }, {
-    key: "multiply",
-    value: function multiply(other) {
-      var aw = this.w,
-          ax = this.x,
-          ay = this.y,
-          az = this.z;
-      var bw = other.w,
-          bx = other.x,
-          by = other.y,
-          bz = other.z;
-      this.x = ax * bw + aw * bx + ay * bz - az * by;
-      this.y = ay * bw + aw * by + az * bx - ax * bz;
-      this.z = az * bw + aw * bz + ax * by - ay * bx;
-      this.w = aw * bw - ax * bx - ay * by - az * bz;
-      return this;
+        this.x = ax * bw + aw * bx + ay * bz - az * by;
+        this.y = ay * bw + aw * by + az * bx - ax * bz;
+        this.z = az * bw + aw * bz + ax * by - ay * bx;
+        this.w = aw * bw - ax * bx - ay * by - az * bz;
+
+        return this;
     }
     /* eslint-enable */
 
     /* eslint-disable */
-
     /**
      * Apply in-place slerp (spherical linear interpolation) to this quaternion,
      * towards another quaternion.
@@ -17591,69 +16984,54 @@ function (_Serializable) {
      * @param {Number} bending The percentage to interpolate
      * @return {Quaternion} returns self
      */
+    slerp(target, bending) {
 
-  }, {
-    key: "slerp",
-    value: function slerp(target, bending) {
-      if (bending <= 0) return this;
-      if (bending >= 1) return this.copy(target);
-      var aw = this.w,
-          ax = this.x,
-          ay = this.y,
-          az = this.z;
-      var bw = target.w,
-          bx = target.x,
-          by = target.y,
-          bz = target.z;
-      var cosHalfTheta = aw * bw + ax * bx + ay * by + az * bz;
+        if (bending <= 0) return this;
+        if (bending >= 1) return this.copy(target);
 
-      if (cosHalfTheta < 0) {
-        this.set(-bw, -bx, -by, -bz);
-        cosHalfTheta = -cosHalfTheta;
-      } else {
-        this.copy(target);
-      }
+        let aw = this.w, ax = this.x, ay = this.y, az = this.z;
+        let bw = target.w, bx = target.x, by = target.y, bz = target.z;
 
-      if (cosHalfTheta >= 1.0) {
-        this.set(aw, ax, ay, az);
+        let cosHalfTheta = aw*bw + ax*bx + ay*by + az*bz;
+        if (cosHalfTheta < 0) {
+            this.set(-bw, -bx, -by, -bz);
+            cosHalfTheta = -cosHalfTheta;
+        } else {
+            this.copy(target);
+        }
+
+        if (cosHalfTheta >= 1.0) {
+            this.set(aw, ax, ay, az);
+            return this;
+        }
+
+        let sqrSinHalfTheta = 1.0 - cosHalfTheta*cosHalfTheta;
+        if (sqrSinHalfTheta < Number.EPSILON) {
+            let s = 1 - bending;
+            this.set(s*aw + bending*this.w, s*ax + bending*this.x, s*ay + bending*this.y, s*az + bending*this.z);
+            return this.normalize();
+        }
+
+        let sinHalfTheta = Math.sqrt(sqrSinHalfTheta);
+        let halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
+        let delTheta = bending * halfTheta;
+        if (Math.abs(delTheta) > MAX_DEL_THETA)
+            delTheta = MAX_DEL_THETA * Math.sign(delTheta);
+        let ratioA = Math.sin(halfTheta - delTheta)/sinHalfTheta;
+        let ratioB = Math.sin(delTheta)/sinHalfTheta;
+        this.set(aw*ratioA + this.w*ratioB,
+            ax*ratioA + this.x*ratioB,
+            ay*ratioA + this.y*ratioB,
+            az*ratioA + this.z*ratioB);
         return this;
-      }
-
-      var sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
-
-      if (sqrSinHalfTheta < Number.EPSILON) {
-        var s = 1 - bending;
-        this.set(s * aw + bending * this.w, s * ax + bending * this.x, s * ay + bending * this.y, s * az + bending * this.z);
-        return this.normalize();
-      }
-
-      var sinHalfTheta = Math.sqrt(sqrSinHalfTheta);
-      var halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
-      var delTheta = bending * halfTheta;
-      if (Math.abs(delTheta) > MAX_DEL_THETA) delTheta = MAX_DEL_THETA * Math.sign(delTheta);
-      var ratioA = Math.sin(halfTheta - delTheta) / sinHalfTheta;
-      var ratioB = Math.sin(delTheta) / sinHalfTheta;
-      this.set(aw * ratioA + this.w * ratioB, ax * ratioA + this.x * ratioB, ay * ratioA + this.y * ratioB, az * ratioA + this.z * ratioB);
-      return this;
     }
     /* eslint-enable */
-
-  }]);
-
-  return Quaternion;
-}(Serializable);
+}
 
 /**
  * The PhysicalObject3D is the base class for physical game objects
  */
-
-var PhysicalObject3D =
-/*#__PURE__*/
-function (_GameObject) {
-  _inherits(PhysicalObject3D, _GameObject);
-
-  _createClass(PhysicalObject3D, null, [{
-    key: "netScheme",
+class PhysicalObject3D extends GameObject {
 
     /**
     * The netScheme is a dictionary of attributes in this game
@@ -17677,25 +17055,16 @@ function (_GameObject) {
     *         }, super.netScheme);
     *     }
     */
-    get: function get() {
-      return Object.assign({
-        playerId: {
-          type: BaseTypes.TYPES.INT16
-        },
-        position: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        },
-        quaternion: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        },
-        velocity: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        },
-        angularVelocity: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        }
-      }, _get(_getPrototypeOf(PhysicalObject3D), "netScheme", this));
+    static get netScheme() {
+        return Object.assign({
+            playerId: { type: BaseTypes.TYPES.INT16 },
+            position: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            quaternion: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
+            angularVelocity: { type: BaseTypes.TYPES.CLASSINSTANCE }
+        }, super.netScheme);
     }
+
     /**
     * Creates an instance of a physical object.
     * Override to provide starting values for position, velocity, quaternion and angular velocity.
@@ -17710,170 +17079,163 @@ function (_GameObject) {
     * @param {Quaternion} props.quaternion - orientation quaternion
     * @param {ThreeVector} props.angularVelocity - 3-vector representation of angular velocity
     */
+    constructor(gameEngine, options, props) {
+        super(gameEngine, options);
+        this.playerId = 0;
+        this.bendingIncrements = 0;
 
-  }]);
+        // set default position, velocity and quaternion
+        this.position = new ThreeVector(0, 0, 0);
+        this.velocity = new ThreeVector(0, 0, 0);
+        this.quaternion = new Quaternion(1, 0, 0, 0);
+        this.angularVelocity = new ThreeVector(0, 0, 0);
 
-  function PhysicalObject3D(gameEngine, options, props) {
-    var _this;
+        // use values if provided
+        props = props || {};
+        if (props.position) this.position.copy(props.position);
+        if (props.velocity) this.velocity.copy(props.velocity);
+        if (props.quaternion) this.quaternion.copy(props.quaternion);
+        if (props.angularVelocity) this.angularVelocity.copy(props.angularVelocity);
 
-    _classCallCheck(this, PhysicalObject3D);
+        this.class = PhysicalObject3D;
+    }
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(PhysicalObject3D).call(this, gameEngine, options));
-    _this.playerId = 0;
-    _this.bendingIncrements = 0; // set default position, velocity and quaternion
+    /**
+     * Formatted textual description of the dynamic object.
+     * The output of this method is used to describe each instance in the traces,
+     * which significantly helps in debugging.
+     *
+     * @return {String} description - a string describing the PhysicalObject3D
+     */
+    toString() {
+        let p = this.position.toString();
+        let v = this.velocity.toString();
+        let q = this.quaternion.toString();
+        let a = this.angularVelocity.toString();
+        return `phyObj[${this.id}] player${this.playerId} Pos${p} Vel${v} Dir${q} AVel${a}`;
+    }
 
-    _this.position = new ThreeVector(0, 0, 0);
-    _this.velocity = new ThreeVector(0, 0, 0);
-    _this.quaternion = new Quaternion(1, 0, 0, 0);
-    _this.angularVelocity = new ThreeVector(0, 0, 0); // use values if provided
-
-    props = props || {};
-    if (props.position) _this.position.copy(props.position);
-    if (props.velocity) _this.velocity.copy(props.velocity);
-    if (props.quaternion) _this.quaternion.copy(props.quaternion);
-    if (props.angularVelocity) _this.angularVelocity.copy(props.angularVelocity);
-    _this.class = PhysicalObject3D;
-    return _this;
-  }
-  /**
-   * Formatted textual description of the dynamic object.
-   * The output of this method is used to describe each instance in the traces,
-   * which significantly helps in debugging.
-   *
-   * @return {String} description - a string describing the PhysicalObject3D
-   */
-
-
-  _createClass(PhysicalObject3D, [{
-    key: "toString",
-    value: function toString() {
-      var p = this.position.toString();
-      var v = this.velocity.toString();
-      var q = this.quaternion.toString();
-      var a = this.angularVelocity.toString();
-      return "phyObj[".concat(this.id, "] player").concat(this.playerId, " Pos").concat(p, " Vel").concat(v, " Dir").concat(q, " AVel").concat(a);
-    } // display object's physical attributes as a string
+    // display object's physical attributes as a string
     // for debugging purposes mostly
+    bendingToString() {
+        if (this.bendingOptions)
+            return `bend=${this.bendingOptions.percent} deltaPos=${this.bendingPositionDelta} deltaVel=${this.bendingVelocityDelta} deltaQuat=${this.bendingQuaternionDelta}`;
+        return 'no bending';
+    }
 
-  }, {
-    key: "bendingToString",
-    value: function bendingToString() {
-      if (this.bendingOptions) return "bend=".concat(this.bendingOptions.percent, " deltaPos=").concat(this.bendingPositionDelta, " deltaVel=").concat(this.bendingVelocityDelta, " deltaQuat=").concat(this.bendingQuaternionDelta);
-      return 'no bending';
-    } // derive and save the bending increment parameters:
+    // derive and save the bending increment parameters:
     // - bendingPositionDelta
     // - bendingAVDelta
     // - bendingQuaternionDelta
     // these can later be used to "bend" incrementally from the state described
     // by "original" to the state described by "self"
+    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
 
-  }, {
-    key: "bendToCurrent",
-    value: function bendToCurrent(original, percent, worldSettings, isLocal, increments) {
-      var bending = {
-        increments: increments,
-        percent: percent
-      }; // if the object has defined a bending multiples for this object, use them
+        let bending = { increments, percent };
+        // if the object has defined a bending multiples for this object, use them
+        let positionBending = Object.assign({}, bending, this.bending.position);
+        let velocityBending = Object.assign({}, bending, this.bending.velocity);
 
-      var positionBending = Object.assign({}, bending, this.bending.position);
-      var velocityBending = Object.assign({}, bending, this.bending.velocity); // check for local object overrides to bendingTarget
+        // check for local object overrides to bendingTarget
+        if (isLocal) {
+            Object.assign(positionBending, this.bending.positionLocal);
+            Object.assign(velocityBending, this.bending.velocityLocal);
+        }
 
-      if (isLocal) {
-        Object.assign(positionBending, this.bending.positionLocal);
-        Object.assign(velocityBending, this.bending.velocityLocal);
-      } // get the incremental delta position & velocity
+        // get the incremental delta position & velocity
+        this.incrementScale = percent / increments;
+        this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
+        this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
+        this.bendingAVDelta = new ThreeVector(0, 0, 0);
 
+        // get the incremental quaternion rotation
+        this.bendingQuaternionDelta = (new Quaternion()).copy(original.quaternion).conjugate();
+        this.bendingQuaternionDelta.multiply(this.quaternion);
 
-      this.incrementScale = percent / increments;
-      this.bendingPositionDelta = original.position.getBendingDelta(this.position, positionBending);
-      this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
-      this.bendingAVDelta = new ThreeVector(0, 0, 0); // get the incremental quaternion rotation
+        let axisAngle = this.bendingQuaternionDelta.toAxisAngle();
+        axisAngle.angle *= this.incrementScale;
+        this.bendingQuaternionDelta.setFromAxisAngle(axisAngle.axis, axisAngle.angle);
 
-      this.bendingQuaternionDelta = new Quaternion().copy(original.quaternion).conjugate();
-      this.bendingQuaternionDelta.multiply(this.quaternion);
-      var axisAngle = this.bendingQuaternionDelta.toAxisAngle();
-      axisAngle.angle *= this.incrementScale;
-      this.bendingQuaternionDelta.setFromAxisAngle(axisAngle.axis, axisAngle.angle);
-      this.bendingTarget = new this.constructor();
-      this.bendingTarget.syncTo(this);
-      this.position.copy(original.position);
-      this.quaternion.copy(original.quaternion);
-      this.angularVelocity.copy(original.angularVelocity);
-      this.bendingIncrements = increments;
-      this.bendingOptions = bending;
-      this.refreshToPhysics();
+        this.bendingTarget = (new this.constructor());
+        this.bendingTarget.syncTo(this);
+
+        this.position.copy(original.position);
+        this.quaternion.copy(original.quaternion);
+        this.angularVelocity.copy(original.angularVelocity);
+
+        this.bendingIncrements = increments;
+        this.bendingOptions = bending;
+
+        this.refreshToPhysics();
     }
-  }, {
-    key: "syncTo",
-    value: function syncTo(other, options) {
-      _get(_getPrototypeOf(PhysicalObject3D.prototype), "syncTo", this).call(this, other);
 
-      this.position.copy(other.position);
-      this.quaternion.copy(other.quaternion);
-      this.angularVelocity.copy(other.angularVelocity);
+    syncTo(other, options) {
 
-      if (!options || !options.keepVelocity) {
-        this.velocity.copy(other.velocity);
-      }
+        super.syncTo(other);
 
-      if (this.physicsObj) this.refreshToPhysics();
-    } // update position, quaternion, and velocity from new physical state.
+        this.position.copy(other.position);
+        this.quaternion.copy(other.quaternion);
+        this.angularVelocity.copy(other.angularVelocity);
 
-  }, {
-    key: "refreshFromPhysics",
-    value: function refreshFromPhysics() {
-      this.position.copy(this.physicsObj.position);
-      this.quaternion.copy(this.physicsObj.quaternion);
-      this.velocity.copy(this.physicsObj.velocity);
-      this.angularVelocity.copy(this.physicsObj.angularVelocity);
-    } // update position, quaternion, and velocity from new game state.
+        if (!options || !options.keepVelocity) {
+            this.velocity.copy(other.velocity);
+        }
 
-  }, {
-    key: "refreshToPhysics",
-    value: function refreshToPhysics() {
-      this.physicsObj.position.copy(this.position);
-      this.physicsObj.quaternion.copy(this.quaternion);
-      this.physicsObj.velocity.copy(this.velocity);
-      this.physicsObj.angularVelocity.copy(this.angularVelocity);
-    } // apply one increment of bending
-
-  }, {
-    key: "applyIncrementalBending",
-    value: function applyIncrementalBending(stepDesc) {
-      if (this.bendingIncrements === 0) return;
-
-      if (stepDesc && stepDesc.dt) {
-        var timeFactor = stepDesc.dt / (1000 / 60); // TODO: use clone() below.  it's cleaner
-
-        var posDelta = new ThreeVector().copy(this.bendingPositionDelta).multiplyScalar(timeFactor);
-        var avDelta = new ThreeVector().copy(this.bendingAVDelta).multiplyScalar(timeFactor);
-        this.position.add(posDelta);
-        this.angularVelocity.add(avDelta); // one approach to orientation bending is slerp:
-
-        this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.8);
-      } else {
-        this.position.add(this.bendingPositionDelta);
-        this.angularVelocity.add(this.bendingAVDelta);
-        this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
-      } // alternative: fixed delta-quaternion correction
-      // TODO: adjust quaternion bending to dt timefactor precision
-      // this.quaternion.multiply(this.bendingQuaternionDelta);
-
-
-      this.bendingIncrements--;
-    } // interpolate implementation
-
-  }, {
-    key: "interpolate",
-    value: function interpolate(nextObj, percent) {
-      // slerp to target position
-      this.position.lerp(nextObj.position, percent);
-      this.quaternion.slerp(nextObj.quaternion, percent);
+        if (this.physicsObj)
+            this.refreshToPhysics();
     }
-  }]);
 
-  return PhysicalObject3D;
-}(GameObject);
+    // update position, quaternion, and velocity from new physical state.
+    refreshFromPhysics() {
+        this.position.copy(this.physicsObj.position);
+        this.quaternion.copy(this.physicsObj.quaternion);
+        this.velocity.copy(this.physicsObj.velocity);
+        this.angularVelocity.copy(this.physicsObj.angularVelocity);
+    }
+
+    // update position, quaternion, and velocity from new game state.
+    refreshToPhysics() {
+        this.physicsObj.position.copy(this.position);
+        this.physicsObj.quaternion.copy(this.quaternion);
+        this.physicsObj.velocity.copy(this.velocity);
+        this.physicsObj.angularVelocity.copy(this.angularVelocity);
+    }
+
+    // apply one increment of bending
+    applyIncrementalBending(stepDesc) {
+        if (this.bendingIncrements === 0)
+            return;
+
+        if (stepDesc && stepDesc.dt) {
+            const timeFactor = stepDesc.dt / (1000 / 60);
+            // TODO: use clone() below.  it's cleaner
+            const posDelta = (new ThreeVector()).copy(this.bendingPositionDelta).multiplyScalar(timeFactor);
+            const avDelta = (new ThreeVector()).copy(this.bendingAVDelta).multiplyScalar(timeFactor);
+            this.position.add(posDelta);
+            this.angularVelocity.add(avDelta);
+
+            // one approach to orientation bending is slerp:
+            this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale * timeFactor * 0.8);
+        } else {
+            this.position.add(this.bendingPositionDelta);
+            this.angularVelocity.add(this.bendingAVDelta);
+            this.quaternion.slerp(this.bendingTarget.quaternion, this.incrementScale);
+        }
+
+        // alternative: fixed delta-quaternion correction
+        // TODO: adjust quaternion bending to dt timefactor precision
+        // this.quaternion.multiply(this.bendingQuaternionDelta);
+        this.bendingIncrements--;
+    }
+
+    // interpolate implementation
+    interpolate(nextObj, percent) {
+
+        // slerp to target position
+        this.position.lerp(nextObj.position, percent);
+        this.quaternion.slerp(nextObj.quaternion, percent);
+    }
+}
 
 var _0777 = parseInt('0777', 8);
 
@@ -17972,694 +17334,551 @@ mkdirP.sync = function sync (p, opts, made) {
     return made;
 };
 
-var SIXTY_PER_SEC = 1000 / 60;
-var LOOP_SLOW_THRESH = 0.3;
-var LOOP_SLOW_COUNT = 10;
+const SIXTY_PER_SEC = 1000 / 60;
+const LOOP_SLOW_THRESH = 0.3;
+const LOOP_SLOW_COUNT = 10;
+
 /**
  * Scheduler class
  *
  */
+class Scheduler {
 
-var Scheduler =
-/*#__PURE__*/
-function () {
-  /**
-   * schedule a function to be called
-   *
-   * @param {Object} options the options
-   * @param {Function} options.tick the function to be called
-   * @param {Number} options.period number of milliseconds between each invocation, not including the function's execution time
-   * @param {Number} options.delay number of milliseconds to add when delaying or hurrying the execution
-   */
-  function Scheduler(options) {
-    _classCallCheck(this, Scheduler);
-
-    this.options = Object.assign({
-      tick: null,
-      period: SIXTY_PER_SEC,
-      delay: SIXTY_PER_SEC / 3
-    }, options);
-    this.nextExecTime = null;
-    this.requestedDelay = 0;
-    this.delayCounter = 0; // mixin for EventEmitter
-
-    var eventEmitter$1 = new eventEmitter();
-    this.on = eventEmitter$1.on;
-    this.once = eventEmitter$1.once;
-    this.removeListener = eventEmitter$1.removeListener;
-    this.emit = eventEmitter$1.emit;
-  } // in same cases, setTimeout is ignored by the browser,
-  // this is known to happen during the first 100ms of a touch event
-  // on android chrome.  Double-check the game loop using requestAnimationFrame
-
-
-  _createClass(Scheduler, [{
-    key: "nextTickChecker",
-    value: function nextTickChecker() {
-      var currentTime = new Date().getTime();
-
-      if (currentTime > this.nextExecTime) {
-        this.delayCounter++;
-        this.callTick();
-        this.nextExecTime = currentTime + this.options.stepPeriod;
-      }
-
-      window.requestAnimationFrame(this.nextTickChecker.bind(this));
-    }
-  }, {
-    key: "nextTick",
-    value: function nextTick() {
-      var stepStartTime = new Date().getTime();
-
-      if (stepStartTime > this.nextExecTime + this.options.period * LOOP_SLOW_THRESH) {
-        this.delayCounter++;
-      } else this.delayCounter = 0;
-
-      this.callTick();
-      this.nextExecTime = stepStartTime + this.options.period + this.requestedDelay;
-      this.requestedDelay = 0;
-      setTimeout(this.nextTick.bind(this), this.nextExecTime - new Date().getTime());
-    }
-  }, {
-    key: "callTick",
-    value: function callTick() {
-      if (this.delayCounter >= LOOP_SLOW_COUNT) {
-        this.emit('loopRunningSlow');
+    /**
+     * schedule a function to be called
+     *
+     * @param {Object} options the options
+     * @param {Function} options.tick the function to be called
+     * @param {Number} options.period number of milliseconds between each invocation, not including the function's execution time
+     * @param {Number} options.delay number of milliseconds to add when delaying or hurrying the execution
+     */
+    constructor(options) {
+        this.options = Object.assign({
+            tick: null,
+            period: SIXTY_PER_SEC,
+            delay: SIXTY_PER_SEC / 3
+        }, options);
+        this.nextExecTime = null;
+        this.requestedDelay = 0;
         this.delayCounter = 0;
-      }
 
-      this.options.tick();
+        // mixin for EventEmitter
+        let eventEmitter$1 = new eventEmitter();
+        this.on = eventEmitter$1.on;
+        this.once = eventEmitter$1.once;
+        this.removeListener = eventEmitter$1.removeListener;
+        this.emit = eventEmitter$1.emit;
+
     }
+
+    // in same cases, setTimeout is ignored by the browser,
+    // this is known to happen during the first 100ms of a touch event
+    // on android chrome.  Double-check the game loop using requestAnimationFrame
+    nextTickChecker() {
+        let currentTime = (new Date()).getTime();
+        if (currentTime > this.nextExecTime) {
+            this.delayCounter++;
+            this.callTick();
+            this.nextExecTime = currentTime + this.options.stepPeriod;
+        }
+        window.requestAnimationFrame(this.nextTickChecker.bind(this));
+    }
+
+    nextTick() {
+        let stepStartTime = (new Date()).getTime();
+        if (stepStartTime > this.nextExecTime + this.options.period * LOOP_SLOW_THRESH) {
+            this.delayCounter++;
+        } else
+            this.delayCounter = 0;
+
+        this.callTick();
+        this.nextExecTime = stepStartTime + this.options.period + this.requestedDelay;
+        this.requestedDelay = 0;
+        setTimeout(this.nextTick.bind(this), this.nextExecTime - (new Date()).getTime());
+    }
+
+    callTick() {
+        if (this.delayCounter >= LOOP_SLOW_COUNT) {
+            this.emit('loopRunningSlow');
+            this.delayCounter = 0;
+        }
+        this.options.tick();
+    }
+
     /**
      * start the schedule
      * @return {Scheduler} returns this scheduler instance
      */
-
-  }, {
-    key: "start",
-    value: function start() {
-      setTimeout(this.nextTick.bind(this));
-      if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === 'object' && typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(this.nextTickChecker.bind(this));
-      return this;
+    start() {
+        setTimeout(this.nextTick.bind(this));
+        if (typeof window === 'object' && typeof window.requestAnimationFrame === 'function')
+            window.requestAnimationFrame(this.nextTickChecker.bind(this));
+        return this;
     }
+
     /**
      * delay next execution
      */
-
-  }, {
-    key: "delayTick",
-    value: function delayTick() {
-      this.requestedDelay += this.options.delay;
+    delayTick() {
+        this.requestedDelay += this.options.delay;
     }
+
     /**
      * hurry the next execution
      */
-
-  }, {
-    key: "hurryTick",
-    value: function hurryTick() {
-      this.requestedDelay -= this.options.delay;
+    hurryTick() {
+        this.requestedDelay -= this.options.delay;
     }
-  }]);
+}
 
-  return Scheduler;
-}();
+const MAX_UINT_16 = 0xFFFF;
 
-var MAX_UINT_16 = 0xFFFF;
 /**
  * The Serializer is responsible for serializing the game world and its
  * objects on the server, before they are sent to each client.  On the client side the
  * Serializer deserializes these objects.
  *
  */
+class Serializer {
 
-var Serializer =
-/*#__PURE__*/
-function () {
-  function Serializer() {
-    _classCallCheck(this, Serializer);
-
-    this.registeredClasses = {};
-    this.customTypes = {};
-    this.registerClass(TwoVector);
-    this.registerClass(ThreeVector);
-    this.registerClass(Quaternion);
-  }
-  /**
-   * Adds a custom primitive to the serializer instance.
-   * This will enable you to use it in an object's netScheme
-   * @param customType
-   */
-  // TODO: the function below is not used, and it is not clear what that
-  // first argument is supposed to be
-
-
-  _createClass(Serializer, [{
-    key: "addCustomType",
-    value: function addCustomType(customType) {
-      this.customTypes[customType.type] = customType;
+    constructor() {
+        this.registeredClasses = {};
+        this.customTypes = {};
+        this.registerClass(TwoVector);
+        this.registerClass(ThreeVector);
+        this.registerClass(Quaternion);
     }
+
+    /**
+     * Adds a custom primitive to the serializer instance.
+     * This will enable you to use it in an object's netScheme
+     * @param customType
+     */
+    // TODO: the function below is not used, and it is not clear what that
+    // first argument is supposed to be
+    addCustomType(customType) {
+        this.customTypes[customType.type] = customType;
+    }
+
     /**
      * Checks if type can be assigned by value.
      * @param {String} type Type to Checks
      * @return {Boolean} True if type can be assigned
      */
-
-  }, {
-    key: "registerClass",
+    static typeCanAssign(type) {
+        return type !== BaseTypes.TYPES.CLASSINSTANCE && type !== BaseTypes.TYPES.LIST;
+    }
 
     /**
      * Registers a new class with the serializer, so it may be deserialized later
      * @param {Function} classObj reference to the class (not an instance!)
      * @param {String} classId Unit specifying a class ID
      */
-    value: function registerClass(classObj, classId) {
-      // if no classId is specified, hash one from the class name
-      classId = classId ? classId : Utils$1.hashStr(classObj.name);
+    registerClass(classObj, classId) {
+        // if no classId is specified, hash one from the class name
+        classId = classId ? classId : Utils$1.hashStr(classObj.name);
+        if (this.registeredClasses[classId]) {
+            console.error(`Serializer: accidental override of classId ${classId} when registering class`, classObj);
+        }
 
-      if (this.registeredClasses[classId]) {
-        console.error("Serializer: accidental override of classId ".concat(classId, " when registering class"), classObj);
-      }
-
-      this.registeredClasses[classId] = classObj;
+        this.registeredClasses[classId] = classObj;
     }
-  }, {
-    key: "deserialize",
-    value: function deserialize(dataBuffer, byteOffset) {
-      byteOffset = byteOffset ? byteOffset : 0;
-      var localByteOffset = 0;
-      var dataView = new DataView(dataBuffer);
-      var objectClassId = dataView.getUint8(byteOffset + localByteOffset); // todo if classId is 0 - take care of dynamic serialization.
 
-      var objectClass = this.registeredClasses[objectClassId];
+    deserialize(dataBuffer, byteOffset) {
+        byteOffset = byteOffset ? byteOffset : 0;
+        let localByteOffset = 0;
 
-      if (objectClass == null) {
-        console.error('Serializer: Found a class which was not registered.  Please use serializer.registerClass() to register all serialized classes.');
-      }
+        let dataView = new DataView(dataBuffer);
 
-      localByteOffset += Uint8Array.BYTES_PER_ELEMENT; // advance the byteOffset after the classId
-      // create de-referenced instance of the class. gameEngine and id will be 'tacked on' later at the sync strategies
+        let objectClassId = dataView.getUint8(byteOffset + localByteOffset);
 
-      var obj = new objectClass(null, {
-        id: null
-      });
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = Object.keys(objectClass.netScheme).sort()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var property = _step.value;
-          var read = this.readDataView(dataView, byteOffset + localByteOffset, objectClass.netScheme[property]);
-          obj[property] = read.data;
-          localByteOffset += read.bufferSize;
+        // todo if classId is 0 - take care of dynamic serialization.
+        let objectClass = this.registeredClasses[objectClassId];
+        if (objectClass == null) {
+            console.error('Serializer: Found a class which was not registered.  Please use serializer.registerClass() to register all serialized classes.');
         }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
 
-      return {
-        obj: obj,
-        byteOffset: localByteOffset
-      };
+        localByteOffset += Uint8Array.BYTES_PER_ELEMENT; // advance the byteOffset after the classId
+
+        // create de-referenced instance of the class. gameEngine and id will be 'tacked on' later at the sync strategies
+        let obj = new objectClass(null, { id: null });
+        for (let property of Object.keys(objectClass.netScheme).sort()) {
+            let read = this.readDataView(dataView, byteOffset + localByteOffset, objectClass.netScheme[property]);
+            obj[property] = read.data;
+            localByteOffset += read.bufferSize;
+        }
+
+        return { obj, byteOffset: localByteOffset };
     }
-  }, {
-    key: "writeDataView",
-    value: function writeDataView(dataView, value, bufferOffset, netSchemProp) {
-      if (netSchemProp.type === BaseTypes.TYPES.FLOAT32) {
-        dataView.setFloat32(bufferOffset, value);
-      } else if (netSchemProp.type === BaseTypes.TYPES.INT32) {
-        dataView.setInt32(bufferOffset, value);
-      } else if (netSchemProp.type === BaseTypes.TYPES.INT16) {
-        dataView.setInt16(bufferOffset, value);
-      } else if (netSchemProp.type === BaseTypes.TYPES.INT8) {
-        dataView.setInt8(bufferOffset, value);
-      } else if (netSchemProp.type === BaseTypes.TYPES.UINT8) {
-        dataView.setUint8(bufferOffset, value);
-      } else if (netSchemProp.type === BaseTypes.TYPES.STRING) {
-        //   MAX_UINT_16 is a reserved (length) value which indicates string hasn't changed
-        if (value === null) {
-          dataView.setUint16(bufferOffset, MAX_UINT_16);
-        } else {
-          var strLen = value.length;
-          dataView.setUint16(bufferOffset, strLen);
-          var localBufferOffset = 2;
 
-          for (var i = 0; i < strLen; i++) {
-            dataView.setUint16(bufferOffset + localBufferOffset + i * 2, value.charCodeAt(i));
-          }
-        }
-      } else if (netSchemProp.type === BaseTypes.TYPES.CLASSINSTANCE) {
-        value.serialize(this, {
-          dataBuffer: dataView.buffer,
-          bufferOffset: bufferOffset
-        });
-      } else if (netSchemProp.type === BaseTypes.TYPES.LIST) {
-        var _localBufferOffset = 0; // a list is comprised of the number of items followed by the items
+    writeDataView(dataView, value, bufferOffset, netSchemProp) {
+        if (netSchemProp.type === BaseTypes.TYPES.FLOAT32) {
+            dataView.setFloat32(bufferOffset, value);
+        } else if (netSchemProp.type === BaseTypes.TYPES.INT32) {
+            dataView.setInt32(bufferOffset, value);
+        } else if (netSchemProp.type === BaseTypes.TYPES.INT16) {
+            dataView.setInt16(bufferOffset, value);
+        } else if (netSchemProp.type === BaseTypes.TYPES.INT8) {
+            dataView.setInt8(bufferOffset, value);
+        } else if (netSchemProp.type === BaseTypes.TYPES.UINT8) {
+            dataView.setUint8(bufferOffset, value);
+        } else if (netSchemProp.type === BaseTypes.TYPES.STRING) {
 
-        dataView.setUint16(bufferOffset + _localBufferOffset, value.length);
-        _localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-
-        try {
-          for (var _iterator2 = value[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var item = _step2.value;
-
-            // TODO: inelegant, currently doesn't support list of lists
-            if (netSchemProp.itemType === BaseTypes.TYPES.CLASSINSTANCE) {
-              var serializedObj = item.serialize(this, {
+            //   MAX_UINT_16 is a reserved (length) value which indicates string hasn't changed
+            if (value === null) {
+                dataView.setUint16(bufferOffset, MAX_UINT_16);
+            } else {
+                let strLen = value.length;
+                dataView.setUint16(bufferOffset, strLen);
+                let localBufferOffset = 2;
+                for (let i = 0; i < strLen; i++)
+                    dataView.setUint16(bufferOffset + localBufferOffset + i * 2, value.charCodeAt(i));
+            }
+        } else if (netSchemProp.type === BaseTypes.TYPES.CLASSINSTANCE) {
+            value.serialize(this, {
                 dataBuffer: dataView.buffer,
-                bufferOffset: bufferOffset + _localBufferOffset
-              });
-              _localBufferOffset += serializedObj.bufferOffset;
-            } else if (netSchemProp.itemType === BaseTypes.TYPES.STRING) {
-              //   MAX_UINT_16 is a reserved (length) value which indicates string hasn't changed
-              if (item === null) {
-                dataView.setUint16(bufferOffset + _localBufferOffset, MAX_UINT_16);
-                _localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
-              } else {
-                var _strLen = item.length;
-                dataView.setUint16(bufferOffset + _localBufferOffset, _strLen);
-                _localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                bufferOffset: bufferOffset
+            });
+        } else if (netSchemProp.type === BaseTypes.TYPES.LIST) {
+            let localBufferOffset = 0;
 
-                for (var _i = 0; _i < _strLen; _i++) {
-                  dataView.setUint16(bufferOffset + _localBufferOffset + _i * 2, item.charCodeAt(_i));
+            // a list is comprised of the number of items followed by the items
+            dataView.setUint16(bufferOffset + localBufferOffset, value.length);
+            localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+
+            for (let item of value) {
+                // TODO: inelegant, currently doesn't support list of lists
+                if (netSchemProp.itemType === BaseTypes.TYPES.CLASSINSTANCE) {
+                    let serializedObj = item.serialize(this, {
+                        dataBuffer: dataView.buffer,
+                        bufferOffset: bufferOffset + localBufferOffset
+                    });
+                    localBufferOffset += serializedObj.bufferOffset;
+                } else if (netSchemProp.itemType === BaseTypes.TYPES.STRING) {
+                    //   MAX_UINT_16 is a reserved (length) value which indicates string hasn't changed
+                    if (item === null) {
+                        dataView.setUint16(bufferOffset + localBufferOffset, MAX_UINT_16);
+                        localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                    } else {
+                        let strLen = item.length;
+                        dataView.setUint16(bufferOffset + localBufferOffset, strLen);
+                        localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                        for (let i = 0; i < strLen; i++)
+                            dataView.setUint16(bufferOffset + localBufferOffset + i * 2, item.charCodeAt(i));
+                        localBufferOffset += Uint16Array.BYTES_PER_ELEMENT * strLen;
+                    }
+                } else {
+                    this.writeDataView(dataView, item, bufferOffset + localBufferOffset, { type: netSchemProp.itemType });
+                    localBufferOffset += this.getTypeByteSize(netSchemProp.itemType);
                 }
-
-                _localBufferOffset += Uint16Array.BYTES_PER_ELEMENT * _strLen;
-              }
-            } else {
-              this.writeDataView(dataView, item, bufferOffset + _localBufferOffset, {
-                type: netSchemProp.itemType
-              });
-              _localBufferOffset += this.getTypeByteSize(netSchemProp.itemType);
             }
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
-      } else if (this.customTypes[netSchemProp.type]) {
-        // this is a custom data property which needs to define its own write method
-        this.customTypes[netSchemProp.type].writeDataView(dataView, value, bufferOffset);
-      } else {
-        console.error("No custom property ".concat(netSchemProp.type, " found!"));
-      }
-    }
-  }, {
-    key: "readDataView",
-    value: function readDataView(dataView, bufferOffset, netSchemProp) {
-      var data, bufferSize;
-
-      if (netSchemProp.type === BaseTypes.TYPES.FLOAT32) {
-        data = dataView.getFloat32(bufferOffset);
-        bufferSize = this.getTypeByteSize(netSchemProp.type);
-      } else if (netSchemProp.type === BaseTypes.TYPES.INT32) {
-        data = dataView.getInt32(bufferOffset);
-        bufferSize = this.getTypeByteSize(netSchemProp.type);
-      } else if (netSchemProp.type === BaseTypes.TYPES.INT16) {
-        data = dataView.getInt16(bufferOffset);
-        bufferSize = this.getTypeByteSize(netSchemProp.type);
-      } else if (netSchemProp.type === BaseTypes.TYPES.INT8) {
-        data = dataView.getInt8(bufferOffset);
-        bufferSize = this.getTypeByteSize(netSchemProp.type);
-      } else if (netSchemProp.type === BaseTypes.TYPES.UINT8) {
-        data = dataView.getUint8(bufferOffset);
-        bufferSize = this.getTypeByteSize(netSchemProp.type);
-      } else if (netSchemProp.type === BaseTypes.TYPES.STRING) {
-        var length = dataView.getUint16(bufferOffset);
-        var localBufferOffset = Uint16Array.BYTES_PER_ELEMENT;
-        bufferSize = localBufferOffset;
-
-        if (length === MAX_UINT_16) {
-          data = null;
+        } else if (this.customTypes[netSchemProp.type]) {
+            // this is a custom data property which needs to define its own write method
+            this.customTypes[netSchemProp.type].writeDataView(dataView, value, bufferOffset);
         } else {
-          var a = [];
-
-          for (var i = 0; i < length; i++) {
-            a[i] = dataView.getUint16(bufferOffset + localBufferOffset + i * 2);
-          }
-
-          data = String.fromCharCode.apply(null, a);
-          bufferSize += length * Uint16Array.BYTES_PER_ELEMENT;
-        }
-      } else if (netSchemProp.type === BaseTypes.TYPES.CLASSINSTANCE) {
-        var deserializeData = this.deserialize(dataView.buffer, bufferOffset);
-        data = deserializeData.obj;
-        bufferSize = deserializeData.byteOffset;
-      } else if (netSchemProp.type === BaseTypes.TYPES.LIST) {
-        var _localBufferOffset2 = 0;
-        var items = [];
-        var itemCount = dataView.getUint16(bufferOffset + _localBufferOffset2);
-        _localBufferOffset2 += Uint16Array.BYTES_PER_ELEMENT;
-
-        for (var x = 0; x < itemCount; x++) {
-          var read = this.readDataView(dataView, bufferOffset + _localBufferOffset2, {
-            type: netSchemProp.itemType
-          });
-          items.push(read.data);
-          _localBufferOffset2 += read.bufferSize;
+            console.error(`No custom property ${netSchemProp.type} found!`);
         }
 
-        data = items;
-        bufferSize = _localBufferOffset2;
-      } else if (this.customTypes[netSchemProp.type] != null) {
-        // this is a custom data property which needs to define its own read method
-        data = this.customTypes[netSchemProp.type].readDataView(dataView, bufferOffset);
-      } else {
-        console.error("No custom property ".concat(netSchemProp.type, " found!"));
-      }
-
-      return {
-        data: data,
-        bufferSize: bufferSize
-      };
     }
-  }, {
-    key: "getTypeByteSize",
-    value: function getTypeByteSize(type) {
-      switch (type) {
-        case BaseTypes.TYPES.FLOAT32:
-          {
-            return Float32Array.BYTES_PER_ELEMENT;
-          }
 
-        case BaseTypes.TYPES.INT32:
-          {
-            return Int32Array.BYTES_PER_ELEMENT;
-          }
+    readDataView(dataView, bufferOffset, netSchemProp) {
+        let data, bufferSize;
 
-        case BaseTypes.TYPES.INT16:
-          {
-            return Int16Array.BYTES_PER_ELEMENT;
-          }
-
-        case BaseTypes.TYPES.INT8:
-          {
-            return Int8Array.BYTES_PER_ELEMENT;
-          }
-
-        case BaseTypes.TYPES.UINT8:
-          {
-            return Uint8Array.BYTES_PER_ELEMENT;
-          }
-        // not one of the basic properties
-
-        default:
-          {
-            if (type === undefined) {
-              throw 'netScheme property declared without type attribute!';
-            } else if (this.customTypes[type] === null) {
-              throw "netScheme property ".concat(type, " undefined! Did you forget to add it to the serializer?");
+        if (netSchemProp.type === BaseTypes.TYPES.FLOAT32) {
+            data = dataView.getFloat32(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
+        } else if (netSchemProp.type === BaseTypes.TYPES.INT32) {
+            data = dataView.getInt32(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
+        } else if (netSchemProp.type === BaseTypes.TYPES.INT16) {
+            data = dataView.getInt16(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
+        } else if (netSchemProp.type === BaseTypes.TYPES.INT8) {
+            data = dataView.getInt8(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
+        } else if (netSchemProp.type === BaseTypes.TYPES.UINT8) {
+            data = dataView.getUint8(bufferOffset);
+            bufferSize = this.getTypeByteSize(netSchemProp.type);
+        } else if (netSchemProp.type === BaseTypes.TYPES.STRING) {
+            let length = dataView.getUint16(bufferOffset);
+            let localBufferOffset = Uint16Array.BYTES_PER_ELEMENT;
+            bufferSize = localBufferOffset;
+            if (length === MAX_UINT_16) {
+                data = null;
             } else {
-              return this.customTypes[type].BYTES_PER_ELEMENT;
+                let a = [];
+                for (let i = 0; i < length; i++)
+                    a[i] = dataView.getUint16(bufferOffset + localBufferOffset + i * 2);
+                data = String.fromCharCode.apply(null, a);
+                bufferSize += length * Uint16Array.BYTES_PER_ELEMENT;
             }
-          }
-      }
-    }
-  }], [{
-    key: "typeCanAssign",
-    value: function typeCanAssign(type) {
-      return type !== BaseTypes.TYPES.CLASSINSTANCE && type !== BaseTypes.TYPES.LIST;
-    }
-  }]);
+        } else if (netSchemProp.type === BaseTypes.TYPES.CLASSINSTANCE) {
+            var deserializeData = this.deserialize(dataView.buffer, bufferOffset);
+            data = deserializeData.obj;
+            bufferSize = deserializeData.byteOffset;
+        } else if (netSchemProp.type === BaseTypes.TYPES.LIST) {
+            let localBufferOffset = 0;
 
-  return Serializer;
-}();
+            let items = [];
+            let itemCount = dataView.getUint16(bufferOffset + localBufferOffset);
+            localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
 
-var NetworkedEventFactory =
-/*#__PURE__*/
-function () {
-  function NetworkedEventFactory(serializer, eventName, options) {
-    _classCallCheck(this, NetworkedEventFactory);
+            for (let x = 0; x < itemCount; x++) {
+                let read = this.readDataView(dataView, bufferOffset + localBufferOffset, { type: netSchemProp.itemType });
+                items.push(read.data);
+                localBufferOffset += read.bufferSize;
+            }
 
-    options = Object.assign({}, options);
-    this.seriazlier = serializer;
-    this.options = options;
-    this.eventName = eventName;
-    this.netScheme = options.netScheme;
-  }
-  /**
-   * Creates a new networkedEvent
-   * @param {Object} payload an object representing the payload to be transferred over the wire
-   * @return {Serializable} the new networkedEvent object
-   */
-
-
-  _createClass(NetworkedEventFactory, [{
-    key: "create",
-    value: function create(payload) {
-      var networkedEvent = new Serializable();
-      networkedEvent.classId = Utils$1.hashStr(this.eventName);
-
-      if (this.netScheme) {
-        networkedEvent.netScheme = Object.assign({}, this.netScheme); // copy properties from the networkedEvent instance to its ad-hoc netsScheme
-
-        var _arr = Object.keys(this.netScheme);
-
-        for (var _i = 0; _i < _arr.length; _i++) {
-          var property = _arr[_i];
-          networkedEvent[property] = payload[property];
+            data = items;
+            bufferSize = localBufferOffset;
+        } else if (this.customTypes[netSchemProp.type] != null) {
+            // this is a custom data property which needs to define its own read method
+            data = this.customTypes[netSchemProp.type].readDataView(dataView, bufferOffset);
+        } else {
+            console.error(`No custom property ${netSchemProp.type} found!`);
         }
-      }
 
-      return networkedEvent;
+        return { data: data, bufferSize: bufferSize };
     }
-  }]);
 
-  return NetworkedEventFactory;
-}();
+    getTypeByteSize(type) {
+
+        switch (type) {
+        case BaseTypes.TYPES.FLOAT32: {
+            return Float32Array.BYTES_PER_ELEMENT;
+        }
+        case BaseTypes.TYPES.INT32: {
+            return Int32Array.BYTES_PER_ELEMENT;
+        }
+        case BaseTypes.TYPES.INT16: {
+            return Int16Array.BYTES_PER_ELEMENT;
+        }
+        case BaseTypes.TYPES.INT8: {
+            return Int8Array.BYTES_PER_ELEMENT;
+        }
+        case BaseTypes.TYPES.UINT8: {
+            return Uint8Array.BYTES_PER_ELEMENT;
+        }
+
+        // not one of the basic properties
+        default: {
+            if (type === undefined) {
+                throw 'netScheme property declared without type attribute!';
+            } else if (this.customTypes[type] === null) {
+                throw `netScheme property ${type} undefined! Did you forget to add it to the serializer?`;
+            } else {
+                return this.customTypes[type].BYTES_PER_ELEMENT;
+            }
+        }
+
+        }
+
+    }
+}
+
+class NetworkedEventFactory {
+
+    constructor(serializer, eventName, options) {
+        options = Object.assign({}, options);
+
+        this.seriazlier = serializer;
+        this.options = options;
+
+        this.eventName = eventName;
+        this.netScheme = options.netScheme;
+
+    }
+
+    /**
+     * Creates a new networkedEvent
+     * @param {Object} payload an object representing the payload to be transferred over the wire
+     * @return {Serializable} the new networkedEvent object
+     */
+    create(payload) {
+        let networkedEvent = new Serializable();
+        networkedEvent.classId = Utils$1.hashStr(this.eventName);
+
+        if (this.netScheme) {
+            networkedEvent.netScheme = Object.assign({}, this.netScheme);
+
+            // copy properties from the networkedEvent instance to its ad-hoc netsScheme
+            for (let property of Object.keys(this.netScheme)) {
+                networkedEvent[property] = payload[property];
+            }
+
+        }
+
+        return networkedEvent;
+    }
+
+}
 
 /**
  * Defines a collection of NetworkEvents to be transmitted over the wire
  */
+class NetworkedEventCollection extends Serializable {
 
-var NetworkedEventCollection =
-/*#__PURE__*/
-function (_Serializable) {
-  _inherits(NetworkedEventCollection, _Serializable);
+    static get netScheme() {
+        return {
+            events: {
+                type: BaseTypes.TYPES.LIST,
+                itemType: BaseTypes.TYPES.CLASSINSTANCE
+            },
+        };
+    }
 
-  _createClass(NetworkedEventCollection, null, [{
-    key: "netScheme",
-    get: function get() {
-      return {
-        events: {
-          type: BaseTypes.TYPES.LIST,
-          itemType: BaseTypes.TYPES.CLASSINSTANCE
+    constructor(events) {
+        super();
+        this.events = events || [];
+    }
+
+}
+
+class NetworkTransmitter {
+
+    constructor(serializer) {
+        this.serializer = serializer;
+
+        this.registeredEvents = [];
+
+        this.serializer.registerClass(NetworkedEventCollection);
+
+        this.registerNetworkedEventFactory('objectUpdate', {
+            netScheme: {
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                objectInstance: { type: BaseTypes.TYPES.CLASSINSTANCE }
+            }
+        });
+
+        this.registerNetworkedEventFactory('objectCreate', {
+            netScheme: {
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                objectInstance: { type: BaseTypes.TYPES.CLASSINSTANCE }
+            }
+        });
+
+        this.registerNetworkedEventFactory('objectDestroy', {
+            netScheme: {
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                objectInstance: { type: BaseTypes.TYPES.CLASSINSTANCE }
+            }
+        });
+
+        this.registerNetworkedEventFactory('syncHeader', {
+            netScheme: {
+                stepCount: { type: BaseTypes.TYPES.INT32 },
+                fullUpdate: { type: BaseTypes.TYPES.UINT8 }
+            }
+        });
+
+        this.networkedEventCollection = new NetworkedEventCollection();
+    }
+
+    registerNetworkedEventFactory(eventName, options) {
+        options = Object.assign({}, options);
+
+        let classHash = Utils$1.hashStr(eventName);
+
+        let networkedEventPrototype = function() {};
+        networkedEventPrototype.prototype.classId = classHash;
+        networkedEventPrototype.prototype.eventName = eventName;
+        networkedEventPrototype.netScheme = options.netScheme;
+
+        this.serializer.registerClass(networkedEventPrototype, classHash);
+
+        this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);
+    }
+
+    addNetworkedEvent(eventName, payload) {
+        if (!this.registeredEvents[eventName]) {
+            console.error(`NetworkTransmitter: no such event ${eventName}`);
+            return null;
         }
-      };
+
+        let stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
+        this.networkedEventCollection.events.push(stagedNetworkedEvent);
+
+        return stagedNetworkedEvent;
     }
-  }]);
 
-  function NetworkedEventCollection(events) {
-    var _this;
+    serializePayload() {
+        if (this.networkedEventCollection.events.length === 0)
+            return null;
 
-    _classCallCheck(this, NetworkedEventCollection);
+        let dataBuffer = this.networkedEventCollection.serialize(this.serializer);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(NetworkedEventCollection).call(this));
-    _this.events = events || [];
-    return _this;
-  }
-
-  return NetworkedEventCollection;
-}(Serializable);
-
-var NetworkTransmitter =
-/*#__PURE__*/
-function () {
-  function NetworkTransmitter(serializer) {
-    _classCallCheck(this, NetworkTransmitter);
-
-    this.serializer = serializer;
-    this.registeredEvents = [];
-    this.serializer.registerClass(NetworkedEventCollection);
-    this.registerNetworkedEventFactory('objectUpdate', {
-      netScheme: {
-        stepCount: {
-          type: BaseTypes.TYPES.INT32
-        },
-        objectInstance: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        }
-      }
-    });
-    this.registerNetworkedEventFactory('objectCreate', {
-      netScheme: {
-        stepCount: {
-          type: BaseTypes.TYPES.INT32
-        },
-        objectInstance: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        }
-      }
-    });
-    this.registerNetworkedEventFactory('objectDestroy', {
-      netScheme: {
-        stepCount: {
-          type: BaseTypes.TYPES.INT32
-        },
-        objectInstance: {
-          type: BaseTypes.TYPES.CLASSINSTANCE
-        }
-      }
-    });
-    this.registerNetworkedEventFactory('syncHeader', {
-      netScheme: {
-        stepCount: {
-          type: BaseTypes.TYPES.INT32
-        },
-        fullUpdate: {
-          type: BaseTypes.TYPES.UINT8
-        }
-      }
-    });
-    this.networkedEventCollection = new NetworkedEventCollection();
-  }
-
-  _createClass(NetworkTransmitter, [{
-    key: "registerNetworkedEventFactory",
-    value: function registerNetworkedEventFactory(eventName, options) {
-      options = Object.assign({}, options);
-      var classHash = Utils$1.hashStr(eventName);
-
-      var networkedEventPrototype = function networkedEventPrototype() {};
-
-      networkedEventPrototype.prototype.classId = classHash;
-      networkedEventPrototype.prototype.eventName = eventName;
-      networkedEventPrototype.netScheme = options.netScheme;
-      this.serializer.registerClass(networkedEventPrototype, classHash);
-      this.registeredEvents[eventName] = new NetworkedEventFactory(this.serializer, eventName, options);
+        return dataBuffer;
     }
-  }, {
-    key: "addNetworkedEvent",
-    value: function addNetworkedEvent(eventName, payload) {
-      if (!this.registeredEvents[eventName]) {
-        console.error("NetworkTransmitter: no such event ".concat(eventName));
-        return null;
-      }
 
-      var stagedNetworkedEvent = this.registeredEvents[eventName].create(payload);
-      this.networkedEventCollection.events.push(stagedNetworkedEvent);
-      return stagedNetworkedEvent;
+    deserializePayload(payload) {
+        return this.serializer.deserialize(payload.dataBuffer).obj;
     }
-  }, {
-    key: "serializePayload",
-    value: function serializePayload() {
-      if (this.networkedEventCollection.events.length === 0) return null;
-      var dataBuffer = this.networkedEventCollection.serialize(this.serializer);
-      return dataBuffer;
-    }
-  }, {
-    key: "deserializePayload",
-    value: function deserializePayload(payload) {
-      return this.serializer.deserialize(payload.dataBuffer).obj;
-    }
-  }, {
-    key: "clearPayload",
-    value: function clearPayload() {
-      this.networkedEventCollection.events = [];
-    }
-  }]);
 
-  return NetworkTransmitter;
-}();
+    clearPayload() {
+        this.networkedEventCollection.events = [];
+    }
+
+}
 
 /**
  * Measures network performance between the client and the server
  * Represents both the client and server portions of NetworkMonitor
  */
+class NetworkMonitor {
 
-var NetworkMonitor =
-/*#__PURE__*/
-function () {
-  function NetworkMonitor() {
-    _classCallCheck(this, NetworkMonitor);
-
-    // mixin for EventEmitter
-    var eventEmitter$1 = new eventEmitter();
-    this.on = eventEmitter$1.on;
-    this.once = eventEmitter$1.once;
-    this.removeListener = eventEmitter$1.removeListener;
-    this.emit = eventEmitter$1.emit;
-  } // client
-
-
-  _createClass(NetworkMonitor, [{
-    key: "registerClient",
-    value: function registerClient(clientEngine) {
-      this.queryIdCounter = 0;
-      this.RTTQueries = {};
-      this.movingRTTAverage = 0;
-      this.movingRTTAverageFrame = [];
-      this.movingFPSAverageSize = clientEngine.options.healthCheckRTTSample;
-      this.clientEngine = clientEngine;
-      clientEngine.socket.on('RTTResponse', this.onReceivedRTTQuery.bind(this));
-      setInterval(this.sendRTTQuery.bind(this), clientEngine.options.healthCheckInterval);
+    constructor() {
+        // mixin for EventEmitter
+        let eventEmitter$1 = new eventEmitter();
+        this.on = eventEmitter$1.on;
+        this.once = eventEmitter$1.once;
+        this.removeListener = eventEmitter$1.removeListener;
+        this.emit = eventEmitter$1.emit;
     }
-  }, {
-    key: "sendRTTQuery",
-    value: function sendRTTQuery() {
-      // todo implement cleanup of older timestamp
-      this.RTTQueries[this.queryIdCounter] = new Date().getTime();
-      this.clientEngine.socket.emit('RTTQuery', this.queryIdCounter);
-      this.queryIdCounter++;
+
+    // client
+    registerClient(clientEngine) {
+        this.queryIdCounter = 0;
+        this.RTTQueries = {};
+
+        this.movingRTTAverage = 0;
+        this.movingRTTAverageFrame = [];
+        this.movingFPSAverageSize = clientEngine.options.healthCheckRTTSample;
+        this.clientEngine = clientEngine;
+        clientEngine.socket.on('RTTResponse', this.onReceivedRTTQuery.bind(this));
+        setInterval(this.sendRTTQuery.bind(this), clientEngine.options.healthCheckInterval);
     }
-  }, {
-    key: "onReceivedRTTQuery",
-    value: function onReceivedRTTQuery(queryId) {
-      var RTT = new Date().getTime() - this.RTTQueries[queryId];
-      this.movingRTTAverageFrame.push(RTT);
 
-      if (this.movingRTTAverageFrame.length > this.movingFPSAverageSize) {
-        this.movingRTTAverageFrame.shift();
-      }
-
-      this.movingRTTAverage = this.movingRTTAverageFrame.reduce(function (a, b) {
-        return a + b;
-      }) / this.movingRTTAverageFrame.length;
-      this.emit('RTTUpdate', {
-        RTT: RTT,
-        RTTAverage: this.movingRTTAverage
-      });
-    } // server
-
-  }, {
-    key: "registerPlayerOnServer",
-    value: function registerPlayerOnServer(socket) {
-      socket.on('RTTQuery', this.respondToRTTQuery.bind(this, socket));
+    sendRTTQuery() {
+        // todo implement cleanup of older timestamp
+        this.RTTQueries[this.queryIdCounter] = new Date().getTime();
+        this.clientEngine.socket.emit('RTTQuery', this.queryIdCounter);
+        this.queryIdCounter++;
     }
-  }, {
-    key: "respondToRTTQuery",
-    value: function respondToRTTQuery(socket, queryId) {
-      socket.emit('RTTResponse', queryId);
-    }
-  }]);
 
-  return NetworkMonitor;
-}();
+    onReceivedRTTQuery(queryId) {
+        let RTT = (new Date().getTime()) - this.RTTQueries[queryId];
+
+        this.movingRTTAverageFrame.push(RTT);
+        if (this.movingRTTAverageFrame.length > this.movingFPSAverageSize) {
+            this.movingRTTAverageFrame.shift();
+        }
+        this.movingRTTAverage = this.movingRTTAverageFrame.reduce((a, b) => a + b) / this.movingRTTAverageFrame.length;
+        this.emit('RTTUpdate', {
+            RTT: RTT,
+            RTTAverage: this.movingRTTAverage
+        });
+    }
+
+    // server
+    registerPlayerOnServer(socket) {
+        socket.on('RTTQuery', this.respondToRTTQuery.bind(this, socket));
+    }
+
+    respondToRTTQuery(socket, queryId) {
+        socket.emit('RTTResponse', queryId);
+    }
+
+}
 
 /**
  * ServerEngine is the main server-side singleton code.
@@ -18678,293 +17897,207 @@ function () {
  * connections and dis-connections, emitting periodic game-state
  * updates, and capturing remote user inputs.
  */
+class ServerEngine {
 
-var ServerEngine =
-/*#__PURE__*/
-function () {
-  /**
-   * create a ServerEngine instance
-   *
-   * @param {SocketIO} io - the SocketIO server
-   * @param {GameEngine} gameEngine - instance of GameEngine
-   * @param {Object} options - server options
-   * @param {Number} options.stepRate - number of steps per second
-   * @param {Number} options.updateRate - number of steps in each update (sync)
-   * @param {String} options.tracesPath - path where traces should go
-   * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
-   * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
-   * @return {ServerEngine} serverEngine - self
-   */
-  function ServerEngine(io, gameEngine, options) {
-    _classCallCheck(this, ServerEngine);
+    /**
+     * create a ServerEngine instance
+     *
+     * @param {SocketIO} io - the SocketIO server
+     * @param {GameEngine} gameEngine - instance of GameEngine
+     * @param {Object} options - server options
+     * @param {Number} options.stepRate - number of steps per second
+     * @param {Number} options.updateRate - number of steps in each update (sync)
+     * @param {String} options.tracesPath - path where traces should go
+     * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
+     * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
+     * @return {ServerEngine} serverEngine - self
+     */
+    constructor(io, gameEngine, options) {
+        this.options = Object.assign({
+            updateRate: 6,
+            stepRate: 60,
+            timeoutInterval: 180,
+            updateOnObjectCreation: true,
+            tracesPath: '',
+            debug: {
+                serverSendLag: false
+            }
+        }, options);
+        if (this.options.tracesPath !== '') {
+            this.options.tracesPath += '/';
+            mkdirp.sync(this.options.tracesPath);
+        }
 
-    this.options = Object.assign({
-      updateRate: 6,
-      stepRate: 60,
-      timeoutInterval: 180,
-      updateOnObjectCreation: true,
-      tracesPath: '',
-      debug: {
-        serverSendLag: false
-      }
-    }, options);
+        this.io = io;
 
-    if (this.options.tracesPath !== '') {
-      this.options.tracesPath += '/';
-      mkdirp.sync(this.options.tracesPath);
+        /**
+         * reference to game engine
+         * @member {GameEngine}
+         */
+        this.serializer = new Serializer();
+        this.gameEngine = gameEngine;
+        this.gameEngine.registerClasses(this.serializer);
+        this.networkTransmitter = new NetworkTransmitter(this.serializer);
+        this.networkMonitor = new NetworkMonitor();
+
+        /**
+         * Default room name
+         * @member {String} DEFAULT_ROOM_NAME
+         */
+        this.DEFAULT_ROOM_NAME = '/lobby';
+        this.rooms = {};
+        this.createRoom(this.DEFAULT_ROOM_NAME);
+        this.connectedPlayers = {};
+        this.playerInputQueues = {};
+        this.pendingAtomicEvents = [];
+        this.objMemory = {};
+
+        io.on('connection', this.onPlayerConnected.bind(this));
+        this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
+        this.gameEngine.on('objectDestroyed', this.onObjectDestroyed.bind(this));
+
+        return this;
     }
 
-    this.io = io;
-    /**
-     * reference to game engine
-     * @member {GameEngine}
-     */
+    // start the ServerEngine
+    start() {
+        this.gameEngine.start();
+        this.gameEngine.emit('server__init');
 
-    this.serializer = new Serializer();
-    this.gameEngine = gameEngine;
-    this.gameEngine.registerClasses(this.serializer);
-    this.networkTransmitter = new NetworkTransmitter(this.serializer);
-    this.networkMonitor = new NetworkMonitor();
-    /**
-     * Default room name
-     * @member {String} DEFAULT_ROOM_NAME
-     */
-
-    this.DEFAULT_ROOM_NAME = '/lobby';
-    this.rooms = {};
-    this.createRoom(this.DEFAULT_ROOM_NAME);
-    this.connectedPlayers = {};
-    this.playerInputQueues = {};
-    this.pendingAtomicEvents = [];
-    this.objMemory = {};
-    io.on('connection', this.onPlayerConnected.bind(this));
-    this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
-    this.gameEngine.on('objectDestroyed', this.onObjectDestroyed.bind(this));
-    return this;
-  } // start the ServerEngine
-
-
-  _createClass(ServerEngine, [{
-    key: "start",
-    value: function start() {
-      this.gameEngine.start();
-      this.gameEngine.emit('server__init');
-      var schedulerConfig = {
-        tick: this.step.bind(this),
-        period: 1000 / this.options.stepRate,
-        delay: 4
-      };
-      this.scheduler = new Scheduler(schedulerConfig).start();
-    } // every server step starts here
-
-  }, {
-    key: "step",
-    value: function step() {
-      var _this = this;
-
-      // first update the trace state
-      this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
-      this.gameEngine.emit('server__preStep', this.gameEngine.world.stepCount + 1);
-      this.serverTime = new Date().getTime(); // for each player, replay all the inputs in the oldest step
-
-      var _arr = Object.keys(this.playerInputQueues);
-
-      var _loop = function _loop() {
-        var playerIdStr = _arr[_i];
-        var playerId = Number(playerIdStr);
-        var inputQueue = _this.playerInputQueues[playerId];
-        var queueSteps = Object.keys(inputQueue);
-        var minStep = Math.min.apply(null, queueSteps); // check that there are inputs for this step,
-        // and that we have reached/passed this step
-
-        if (queueSteps.length > 0 && minStep <= _this.gameEngine.world.stepCount) {
-          inputQueue[minStep].forEach(function (input) {
-            _this.gameEngine.emit('server__processInput', {
-              input: input,
-              playerId: playerId
-            });
-
-            _this.gameEngine.emit('processInput', {
-              input: input,
-              playerId: playerId
-            });
-
-            _this.gameEngine.processInput(input, playerId, true);
-          });
-          delete inputQueue[minStep];
-        }
-      };
-
-      for (var _i = 0; _i < _arr.length; _i++) {
-        _loop();
-      } // run the game engine step
-
-
-      this.gameEngine.step(false, this.serverTime / 1000); // synchronize the state to all clients
-
-      Object.keys(this.rooms).map(this.syncStateToClients.bind(this)); // remove memory-objects which no longer exist
-
-      var _arr2 = Object.keys(this.objMemory);
-
-      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        var objId = _arr2[_i2];
-
-        if (!(objId in this.gameEngine.world.objects)) {
-          delete this.objMemory[objId];
-        }
-      } // step is done on the server side
-
-
-      this.gameEngine.emit('server__postStep', this.gameEngine.world.stepCount);
-
-      if (this.gameEngine.trace.length) {
-        var traceData = this.gameEngine.trace.rotate();
-        var traceString = '';
-        traceData.forEach(function (t) {
-          traceString += "[".concat(t.time.toISOString(), "]").concat(t.step, ">").concat(t.data, "\n");
-        });
-        fs.appendFile("".concat(this.options.tracesPath, "server.trace"), traceString, function (err) {
-          if (err) throw err;
-        });
-      }
+        let schedulerConfig = {
+            tick: this.step.bind(this),
+            period: 1000 / this.options.stepRate,
+            delay: 4
+        };
+        this.scheduler = new Scheduler(schedulerConfig).start();
     }
-  }, {
-    key: "syncStateToClients",
-    value: function syncStateToClients(roomName) {
-      var _this2 = this;
 
-      // update clients only at the specified step interval, as defined in options
-      // or if this room needs to sync
-      var room = this.rooms[roomName];
+    // every server step starts here
+    step() {
 
-      if (room.requestImmediateSync || this.gameEngine.world.stepCount % this.options.updateRate === 0) {
-        var roomPlayers = Object.keys(this.connectedPlayers).filter(function (p) {
-          return _this2.connectedPlayers[p].roomName === roomName;
-        }); // if at least one player is new, we should send a full payload
+        // first update the trace state
+        this.gameEngine.trace.setStep(this.gameEngine.world.stepCount + 1);
+        this.gameEngine.emit('server__preStep', this.gameEngine.world.stepCount + 1);
 
-        var diffUpdate = true;
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
+        this.serverTime = (new Date().getTime());
 
-        try {
-          for (var _iterator = roomPlayers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var socketId = _step.value;
-            var player = this.connectedPlayers[socketId];
+        // for each player, replay all the inputs in the oldest step
+        for (let playerIdStr of Object.keys(this.playerInputQueues)) {
+            let playerId = Number(playerIdStr);
+            let inputQueue = this.playerInputQueues[playerId];
+            let queueSteps = Object.keys(inputQueue);
+            let minStep = Math.min.apply(null, queueSteps);
 
-            if (player.state === 'new') {
-              player.state = 'synced';
-              diffUpdate = false;
+            // check that there are inputs for this step,
+            // and that we have reached/passed this step
+            if (queueSteps.length > 0 && minStep <= this.gameEngine.world.stepCount) {
+                inputQueue[minStep].forEach(input => {
+                    this.gameEngine.emit('server__processInput', { input, playerId });
+                    this.gameEngine.emit('processInput', { input, playerId });
+                    this.gameEngine.processInput(input, playerId, true);
+                });
+                delete inputQueue[minStep];
             }
-          } // also, one in twenty syncs is a full update
-
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
         }
 
-        if (room.syncCounter++ % 20 === 0) diffUpdate = false;
-        var payload = this.serializeUpdate(roomName, {
-          diffUpdate: diffUpdate
-        });
-        this.gameEngine.trace.info(function () {
-          return "========== sending world update ".concat(_this2.gameEngine.world.stepCount, " to room ").concat(roomName, " is delta update: ").concat(diffUpdate, " ==========");
-        });
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
+        // run the game engine step
+        this.gameEngine.step(false, this.serverTime / 1000);
 
-        try {
-          for (var _iterator2 = roomPlayers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var _socketId = _step2.value;
+        // synchronize the state to all clients
+        Object.keys(this.rooms).map(this.syncStateToClients.bind(this));
 
-            this.connectedPlayers[_socketId].socket.emit('worldUpdate', payload);
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-              _iterator2.return();
+        // remove memory-objects which no longer exist
+        for (let objId of Object.keys(this.objMemory)) {
+            if (!(objId in this.gameEngine.world.objects)) {
+                delete this.objMemory[objId];
             }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
         }
 
-        this.networkTransmitter.clearPayload();
-        room.requestImmediateSync = false;
-      }
-    } // create a serialized package of the game world
+        // step is done on the server side
+        this.gameEngine.emit('server__postStep', this.gameEngine.world.stepCount);
+
+        if (this.gameEngine.trace.length) {
+            let traceData = this.gameEngine.trace.rotate();
+            let traceString = '';
+            traceData.forEach(t => { traceString += `[${t.time.toISOString()}]${t.step}>${t.data}\n`; });
+            fs.appendFile(`${this.options.tracesPath}server.trace`, traceString, err => { if (err) throw err; });
+        }
+    }
+
+    syncStateToClients(roomName) {
+
+        // update clients only at the specified step interval, as defined in options
+        // or if this room needs to sync
+        const room = this.rooms[roomName];
+        if (room.requestImmediateSync ||
+            this.gameEngine.world.stepCount % this.options.updateRate === 0) {
+
+            const roomPlayers = Object.keys(this.connectedPlayers)
+                .filter(p => this.connectedPlayers[p].roomName === roomName);
+
+            // if at least one player is new, we should send a full payload
+            let diffUpdate = true;
+            for (const socketId of roomPlayers) {
+                const player = this.connectedPlayers[socketId];
+                if (player.state === 'new') {
+                    player.state = 'synced';
+                    diffUpdate = false;
+                }
+            }
+
+            // also, one in twenty syncs is a full update
+            if (room.syncCounter++ % 20 === 0) diffUpdate = false;
+
+            const payload = this.serializeUpdate(roomName, { diffUpdate });
+            this.gameEngine.trace.info(() => `========== sending world update ${this.gameEngine.world.stepCount} to room ${roomName} is delta update: ${diffUpdate} ==========`);
+            for (const socketId of roomPlayers)
+                this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
+            this.networkTransmitter.clearPayload();
+            room.requestImmediateSync = false;
+        }
+    }
+
+    // create a serialized package of the game world
     // TODO: this process could be made much much faster if the buffer creation and
     //       size calculation are done in a single phase, along with string pruning.
+    serializeUpdate(roomName, options) {
+        let world = this.gameEngine.world;
+        let diffUpdate = Boolean(options && options.diffUpdate);
 
-  }, {
-    key: "serializeUpdate",
-    value: function serializeUpdate(roomName, options) {
-      var world = this.gameEngine.world;
-      var diffUpdate = Boolean(options && options.diffUpdate); // add this sync header
-      // currently this is just the sync step count
-
-      this.networkTransmitter.addNetworkedEvent('syncHeader', {
-        stepCount: world.stepCount,
-        fullUpdate: Number(!diffUpdate)
-      });
-      var roomObjects = Object.keys(world.objects).filter(function (o) {
-        return world.objects[o]._roomName === roomName;
-      });
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-
-      try {
-        for (var _iterator3 = roomObjects[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var objId = _step3.value;
-          var obj = world.objects[objId];
-          var prevObject = this.objMemory[objId]; // if the object (in serialized form) hasn't changed, move on
-
-          if (diffUpdate) {
-            var s = obj.serialize(this.serializer);
-            if (prevObject && Utils$1.arrayBuffersEqual(s.dataBuffer, prevObject)) continue;else this.objMemory[objId] = s.dataBuffer; // prune strings which haven't changed
-
-            obj = obj.prunedStringsClone(this.serializer, prevObject);
-          }
-
-          this.networkTransmitter.addNetworkedEvent('objectUpdate', {
+        // add this sync header
+        // currently this is just the sync step count
+        this.networkTransmitter.addNetworkedEvent('syncHeader', {
             stepCount: world.stepCount,
-            objectInstance: obj
-          });
-        }
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
+            fullUpdate: Number(!diffUpdate)
+        });
 
-      return this.networkTransmitter.serializePayload();
+        const roomObjects = Object.keys(world.objects)
+            .filter(o => world.objects[o]._roomName === roomName);
+        for (let objId of roomObjects) {
+            let obj = world.objects[objId];
+            let prevObject = this.objMemory[objId];
+
+            // if the object (in serialized form) hasn't changed, move on
+            if (diffUpdate) {
+                let s = obj.serialize(this.serializer);
+                if (prevObject && Utils$1.arrayBuffersEqual(s.dataBuffer, prevObject))
+                    continue;
+                else
+                    this.objMemory[objId] = s.dataBuffer;
+
+                // prune strings which haven't changed
+                obj = obj.prunedStringsClone(this.serializer, prevObject);
+            }
+
+            this.networkTransmitter.addNetworkedEvent('objectUpdate', {
+                stepCount: world.stepCount,
+                objectInstance: obj
+            });
+        }
+
+        return this.networkTransmitter.serializePayload();
     }
+
     /**
      * Create a room
      *
@@ -18975,207 +18108,175 @@ function () {
      *
      * @param {String} roomName - the new room name
      */
-
-  }, {
-    key: "createRoom",
-    value: function createRoom(roomName) {
-      this.rooms[roomName] = {
-        syncCounter: 0,
-        requestImmediateSync: false
-      };
+    createRoom(roomName) {
+        this.rooms[roomName] = { syncCounter: 0, requestImmediateSync: false };
     }
+
     /**
      * Assign an object to a room
      *
      * @param {Object} obj - the object to move
      * @param {String} roomName - the target room
      */
-
-  }, {
-    key: "assignObjectToRoom",
-    value: function assignObjectToRoom(obj, roomName) {
-      obj._roomName = roomName;
+    assignObjectToRoom(obj, roomName) {
+        obj._roomName = roomName;
     }
+
     /**
      * Assign a player to a room
      *
      * @param {Number} playerId - the playerId
      * @param {String} roomName - the target room
      */
-
-  }, {
-    key: "assignPlayerToRoom",
-    value: function assignPlayerToRoom(playerId, roomName) {
-      var room = this.rooms[roomName];
-      var player = null;
-
-      if (!room) {
-        this.gameEngine.trace.error(function () {
-          return "cannot assign player to non-existant room ".concat(roomName);
-        });
-        console.error("player ".concat(playerId, " assigned to room [").concat(roomName, "] which isn't defined"));
-        return;
-      }
-
-      var _arr3 = Object.keys(this.connectedPlayers);
-
-      for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
-        var p = _arr3[_i3];
-        if (this.connectedPlayers[p].socket.playerId === playerId) player = this.connectedPlayers[p];
-      }
-
-      if (!player) {
-        this.gameEngine.trace.error(function () {
-          return "cannot assign non-existant playerId ".concat(playerId, " to room ").concat(roomName);
-        });
-      }
-
-      var roomUpdate = {
-        playerId: playerId,
-        from: player.roomName,
-        to: roomName
-      };
-      player.socket.emit('roomUpdate', roomUpdate);
-      this.gameEngine.emit('server__roomUpdate', roomUpdate);
-      this.gameEngine.trace.info(function () {
-        return "ROOM UPDATE: playerId ".concat(playerId, " from room ").concat(player.roomName, " to room ").concat(roomName);
-      });
-      player.roomName = roomName;
-    } // handle the object creation
-
-  }, {
-    key: "onObjectAdded",
-    value: function onObjectAdded(obj) {
-      obj._roomName = obj._roomName || this.DEFAULT_ROOM_NAME;
-      this.networkTransmitter.addNetworkedEvent('objectCreate', {
-        stepCount: this.gameEngine.world.stepCount,
-        objectInstance: obj
-      });
-
-      if (this.options.updateOnObjectCreation) {
-        this.rooms[obj._roomName].requestImmediateSync = true;
-      }
-    } // handle the object creation
-
-  }, {
-    key: "onObjectDestroyed",
-    value: function onObjectDestroyed(obj) {
-      this.networkTransmitter.addNetworkedEvent('objectDestroy', {
-        stepCount: this.gameEngine.world.stepCount,
-        objectInstance: obj
-      });
+    assignPlayerToRoom(playerId, roomName) {
+        const room = this.rooms[roomName];
+        let player = null;
+        if (!room) {
+            this.gameEngine.trace.error(() => `cannot assign player to non-existant room ${roomName}`);
+            console.error(`player ${playerId} assigned to room [${roomName}] which isn't defined`);
+            return;
+        }
+        for (const p of Object.keys(this.connectedPlayers)) {
+            if (this.connectedPlayers[p].socket.playerId === playerId)
+                player = this.connectedPlayers[p];
+        }
+        if (!player) {
+            this.gameEngine.trace.error(() => `cannot assign non-existant playerId ${playerId} to room ${roomName}`);
+        }
+        const roomUpdate = { playerId: playerId, from: player.roomName, to: roomName };
+        player.socket.emit('roomUpdate', roomUpdate);
+        this.gameEngine.emit('server__roomUpdate', roomUpdate);
+        this.gameEngine.trace.info(() => `ROOM UPDATE: playerId ${playerId} from room ${player.roomName} to room ${roomName}`);
+        player.roomName = roomName;
     }
-  }, {
-    key: "getPlayerId",
-    value: function getPlayerId(socket) {} // handle new player connection
 
-  }, {
-    key: "onPlayerConnected",
-    value: function onPlayerConnected(socket) {
-      var that = this;
-      console.log('Client connected'); // save player
-
-      this.connectedPlayers[socket.id] = {
-        socket: socket,
-        state: 'new',
-        roomName: this.DEFAULT_ROOM_NAME
-      };
-      var playerId = this.getPlayerId(socket);
-
-      if (!playerId) {
-        playerId = ++this.gameEngine.world.playerCount;
-      }
-
-      socket.playerId = playerId;
-      socket.lastHandledInput = null;
-      socket.joinTime = new Date().getTime();
-      this.resetIdleTimeout(socket);
-      console.log('Client Connected', socket.id);
-      var playerEvent = {
-        id: socket.id,
-        playerId: playerId,
-        joinTime: socket.joinTime,
-        disconnectTime: 0
-      };
-      this.gameEngine.emit('server__playerJoined', playerEvent);
-      this.gameEngine.emit('playerJoined', playerEvent);
-      socket.emit('playerJoined', playerEvent);
-      socket.on('disconnect', function () {
-        playerEvent.disconnectTime = new Date().getTime();
-        that.onPlayerDisconnected(socket.id, playerId);
-        that.gameEngine.emit('server__playerDisconnected', playerEvent);
-        that.gameEngine.emit('playerDisconnected', playerEvent);
-      }); // todo rename, use number instead of name
-
-      socket.on('move', function (data) {
-        that.onReceivedInput(data, socket);
-      }); // we got a packet of trace data, write it out to a side-file
-
-      socket.on('trace', function (traceData) {
-        traceData = JSON.parse(traceData);
-        var traceString = '';
-        traceData.forEach(function (t) {
-          traceString += "[".concat(t.time, "]").concat(t.step, ">").concat(t.data, "\n");
+    // handle the object creation
+    onObjectAdded(obj) {
+        obj._roomName = obj._roomName || this.DEFAULT_ROOM_NAME;
+        this.networkTransmitter.addNetworkedEvent('objectCreate', {
+            stepCount: this.gameEngine.world.stepCount,
+            objectInstance: obj
         });
-        fs.appendFile("".concat(that.options.tracesPath, "client.").concat(playerId, ".trace"), traceString, function (err) {
-          if (err) throw err;
+
+        if (this.options.updateOnObjectCreation) {
+            this.rooms[obj._roomName].requestImmediateSync = true;
+        }
+    }
+
+    // handle the object creation
+    onObjectDestroyed(obj) {
+        this.networkTransmitter.addNetworkedEvent('objectDestroy', {
+            stepCount: this.gameEngine.world.stepCount,
+            objectInstance: obj
         });
-      });
-      this.networkMonitor.registerPlayerOnServer(socket);
-    } // handle player timeout
+    }
 
-  }, {
-    key: "onPlayerTimeout",
-    value: function onPlayerTimeout(socket) {
-      console.log("Client timed out after ".concat(this.options.timeoutInterval, " seconds"), socket.id);
-      socket.disconnect();
-    } // handle player dis-connection
+    getPlayerId(socket) {
+    }
 
-  }, {
-    key: "onPlayerDisconnected",
-    value: function onPlayerDisconnected(socketId, playerId) {
-      delete this.connectedPlayers[socketId];
-      console.log('Client disconnected');
-    } // resets the idle timeout for a given player
+    // handle new player connection
+    onPlayerConnected(socket) {
+        let that = this;
 
-  }, {
-    key: "resetIdleTimeout",
-    value: function resetIdleTimeout(socket) {
-      var _this3 = this;
+        console.log('Client connected');
 
-      if (socket.idleTimeout) clearTimeout(socket.idleTimeout);
+        // save player
+        this.connectedPlayers[socket.id] = {
+            socket: socket,
+            state: 'new',
+            roomName: this.DEFAULT_ROOM_NAME
+        };
 
-      if (this.options.timeoutInterval > 0) {
-        socket.idleTimeout = setTimeout(function () {
-          _this3.onPlayerTimeout(socket);
-        }, this.options.timeoutInterval * 1000);
-      }
-    } // add an input to the input-queue for the specific player
+        let playerId = this.getPlayerId(socket);
+        if (!playerId) {
+            playerId = ++this.gameEngine.world.playerCount;
+        }
+        socket.playerId = playerId;
+
+        socket.lastHandledInput = null;
+        socket.joinTime = (new Date()).getTime();
+        this.resetIdleTimeout(socket);
+
+        console.log('Client Connected', socket.id);
+
+        let playerEvent = { id: socket.id, playerId, joinTime: socket.joinTime, disconnectTime: 0 };
+        this.gameEngine.emit('server__playerJoined', playerEvent);
+        this.gameEngine.emit('playerJoined', playerEvent);
+        socket.emit('playerJoined', playerEvent);
+
+        socket.on('disconnect', function() {
+            playerEvent.disconnectTime = (new Date()).getTime();
+            that.onPlayerDisconnected(socket.id, playerId);
+            that.gameEngine.emit('server__playerDisconnected', playerEvent);
+            that.gameEngine.emit('playerDisconnected', playerEvent);
+        });
+
+        // todo rename, use number instead of name
+        socket.on('move', function(data) {
+            that.onReceivedInput(data, socket);
+        });
+
+        // we got a packet of trace data, write it out to a side-file
+        socket.on('trace', function(traceData) {
+            traceData = JSON.parse(traceData);
+            let traceString = '';
+            traceData.forEach(t => { traceString += `[${t.time}]${t.step}>${t.data}\n`; });
+            fs.appendFile(`${that.options.tracesPath}client.${playerId}.trace`, traceString, err => { if (err) throw err; });
+        });
+
+        this.networkMonitor.registerPlayerOnServer(socket);
+    }
+
+    // handle player timeout
+    onPlayerTimeout(socket) {
+        console.log(`Client timed out after ${this.options.timeoutInterval} seconds`, socket.id);
+        socket.disconnect();
+    }
+
+    // handle player dis-connection
+    onPlayerDisconnected(socketId, playerId) {
+        delete this.connectedPlayers[socketId];
+        console.log('Client disconnected');
+    }
+
+    // resets the idle timeout for a given player
+    resetIdleTimeout(socket) {
+        if (socket.idleTimeout) clearTimeout(socket.idleTimeout);
+        if (this.options.timeoutInterval > 0) {
+            socket.idleTimeout = setTimeout(() => {
+                this.onPlayerTimeout(socket);
+            }, this.options.timeoutInterval * 1000);
+        }
+    }
+
+    // add an input to the input-queue for the specific player
     // each queue is key'd by step, because there may be multiple inputs
     // per step
+    queueInputForPlayer(data, playerId) {
 
-  }, {
-    key: "queueInputForPlayer",
-    value: function queueInputForPlayer(data, playerId) {
-      // create an input queue for this player, if one doesn't already exist
-      if (!this.playerInputQueues.hasOwnProperty(playerId)) this.playerInputQueues[playerId] = {};
-      var queue = this.playerInputQueues[playerId]; // create an array of inputs for this step, if one doesn't already exist
+        // create an input queue for this player, if one doesn't already exist
+        if (!this.playerInputQueues.hasOwnProperty(playerId))
+            this.playerInputQueues[playerId] = {};
+        let queue = this.playerInputQueues[playerId];
 
-      if (!queue[data.step]) queue[data.step] = []; // add the input to the player's queue
+        // create an array of inputs for this step, if one doesn't already exist
+        if (!queue[data.step]) queue[data.step] = [];
 
-      queue[data.step].push(data);
-    } // an input has been received from a client, queue it for next step
-
-  }, {
-    key: "onReceivedInput",
-    value: function onReceivedInput(data, socket) {
-      if (this.connectedPlayers[socket.id]) {
-        this.connectedPlayers[socket.id].socket.lastHandledInput = data.messageIndex;
-      }
-
-      this.resetIdleTimeout(socket);
-      this.queueInputForPlayer(data, socket.playerId);
+        // add the input to the player's queue
+        queue[data.step].push(data);
     }
+
+    // an input has been received from a client, queue it for next step
+    onReceivedInput(data, socket) {
+        if (this.connectedPlayers[socket.id]) {
+            this.connectedPlayers[socket.id].socket.lastHandledInput = data.messageIndex;
+        }
+
+        this.resetIdleTimeout(socket);
+
+        this.queueInputForPlayer(data, socket.playerId);
+    }
+
     /**
      * Report game status
      * This method is only relevant if the game uses MatchMaker functionality.
@@ -19183,46 +18284,28 @@ function () {
      *
      * @return {String} Stringified game status object.
      */
-
-  }, {
-    key: "gameStatus",
-    value: function gameStatus() {
-      var gameStatus = {
-        numPlayers: Object.keys(this.connectedPlayers).length,
-        upTime: 0,
-        cpuLoad: 0,
-        memoryLoad: 0,
-        players: {}
-      };
-
-      var _arr4 = Object.keys(this.connectedPlayers);
-
-      for (var _i4 = 0; _i4 < _arr4.length; _i4++) {
-        var p = _arr4[_i4];
-        gameStatus.players[p] = {
-          frameRate: 0
+    gameStatus() {
+        let gameStatus = {
+            numPlayers: Object.keys(this.connectedPlayers).length,
+            upTime: 0,
+            cpuLoad: 0,
+            memoryLoad: 0,
+            players: {}
         };
-      }
 
-      return JSON.stringify(gameStatus);
+        for (let p of Object.keys(this.connectedPlayers)) {
+            gameStatus.players[p] = {
+                frameRate: 0,
+            };
+        }
+
+        return JSON.stringify(gameStatus);
     }
-  }]);
 
-  return ServerEngine;
-}();
+}
 
 var lib = {
-  Trace: Trace
+    Trace
 };
 
-exports.GameEngine = GameEngine;
-exports.GameWorld = GameWorld;
-exports.P2PhysicsEngine = P2PhysicsEngine;
-exports.SimplePhysicsEngine = SimplePhysicsEngine;
-exports.BaseTypes = BaseTypes;
-exports.TwoVector = TwoVector;
-exports.DynamicObject = DynamicObject;
-exports.PhysicalObject2D = PhysicalObject2D;
-exports.PhysicalObject3D = PhysicalObject3D;
-exports.ServerEngine = ServerEngine;
-exports.Lib = lib;
+export { GameEngine, GameWorld, P2PhysicsEngine, SimplePhysicsEngine, BaseTypes, TwoVector, DynamicObject, PhysicalObject2D, PhysicalObject3D, ServerEngine, lib as Lib };
