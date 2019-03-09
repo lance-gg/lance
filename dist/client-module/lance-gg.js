@@ -1,8 +1,10 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = global || self, factory(global.Client = {}));
-}(this, function (exports) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('http')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'http'], factory) :
+    (global = global || self, factory(global.Client = {}, global.http));
+}(this, function (exports, http) { 'use strict';
+
+    http = http && http.hasOwnProperty('default') ? http['default'] : http;
 
     /**
      * This class represents an instance of the game world,
@@ -12316,7 +12318,7 @@
     var _resolved = "https://registry.npmjs.org/p2/-/p2-0.7.1.tgz";
     var _shasum = "25f2474d9bc3a6d3140a1da26a67c9e118ac9543";
     var _spec = "p2@^0.7.1";
-    var _where = "/mnt/c/work/git/lance";
+    var _where = "C:\\work\\git\\lance";
     var author = {
     	name: "Stefan Hedman",
     	email: "schteppe@gmail.com",
@@ -22296,13 +22298,7 @@
       }
     };
 
-    var empty$2 = {};
-
-    var empty$3 = /*#__PURE__*/Object.freeze({
-        default: empty$2
-    });
-
-    var require$$1 = getCjsExportFromNamespace(empty$3);
+    var require$$1 = {};
 
     /**
      * Module dependencies.
@@ -25553,7 +25549,14 @@
      */
     class NetworkMonitor {
 
-        constructor() {
+        constructor(server) {
+
+            // server-side keep game name
+            if (server) {
+                this.server = server;
+                this.gameName = Object.getPrototypeOf(server.gameEngine).constructor.name;
+            }
+
             // mixin for EventEmitter
             let eventEmitter$1 = new eventEmitter();
             this.on = eventEmitter$1.on;
@@ -25599,6 +25602,9 @@
         // server
         registerPlayerOnServer(socket) {
             socket.on('RTTQuery', this.respondToRTTQuery.bind(this, socket));
+            if (this.server && this.server.options.countConnections) {
+                http.get(`http://ping.games-eu.lance.gg:2000/${this.gameName}`).on('error', () => {});
+            }
         }
 
         respondToRTTQuery(socket, queryId) {

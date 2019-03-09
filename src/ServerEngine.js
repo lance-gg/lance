@@ -34,6 +34,7 @@ class ServerEngine {
      * @param {Number} options.stepRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
      * @param {String} options.tracesPath - path where traces should go
+     * @param {Boolean} options.countConnections - should ping player connections to lance.gg
      * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
      * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
      * @return {ServerEngine} serverEngine - self
@@ -45,6 +46,7 @@ class ServerEngine {
             timeoutInterval: 180,
             updateOnObjectCreation: true,
             tracesPath: '',
+            countConnections: true,
             debug: {
                 serverSendLag: false
             }
@@ -64,7 +66,7 @@ class ServerEngine {
         this.gameEngine = gameEngine;
         this.gameEngine.registerClasses(this.serializer);
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
-        this.networkMonitor = new NetworkMonitor();
+        this.networkMonitor = new NetworkMonitor(this);
 
         /**
          * Default room name

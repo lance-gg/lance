@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
 
 /**
  * This class represents an instance of the game world,
@@ -12311,7 +12312,7 @@ var _requiredBy = [
 var _resolved = "https://registry.npmjs.org/p2/-/p2-0.7.1.tgz";
 var _shasum = "25f2474d9bc3a6d3140a1da26a67c9e118ac9543";
 var _spec = "p2@^0.7.1";
-var _where = "/mnt/c/work/git/lance";
+var _where = "C:\\work\\git\\lance";
 var author = {
 	name: "Stefan Hedman",
 	email: "schteppe@gmail.com",
@@ -17826,7 +17827,14 @@ class NetworkTransmitter {
  */
 class NetworkMonitor {
 
-    constructor() {
+    constructor(server) {
+
+        // server-side keep game name
+        if (server) {
+            this.server = server;
+            this.gameName = Object.getPrototypeOf(server.gameEngine).constructor.name;
+        }
+
         // mixin for EventEmitter
         let eventEmitter$1 = new eventEmitter();
         this.on = eventEmitter$1.on;
@@ -17872,6 +17880,9 @@ class NetworkMonitor {
     // server
     registerPlayerOnServer(socket) {
         socket.on('RTTQuery', this.respondToRTTQuery.bind(this, socket));
+        if (this.server && this.server.options.countConnections) {
+            http.get(`http://ping.games-eu.lance.gg:2000/${this.gameName}`).on('error', () => {});
+        }
     }
 
     respondToRTTQuery(socket, queryId) {
@@ -17908,6 +17919,7 @@ class ServerEngine {
      * @param {Number} options.stepRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
      * @param {String} options.tracesPath - path where traces should go
+     * @param {Boolean} options.countConnections - should ping player connections to lance.gg
      * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
      * @param {Number} options.timeoutInterval=180 - number of seconds after which a player is automatically disconnected if no input is received. Set to 0 for no timeout
      * @return {ServerEngine} serverEngine - self
@@ -17919,6 +17931,7 @@ class ServerEngine {
             timeoutInterval: 180,
             updateOnObjectCreation: true,
             tracesPath: '',
+            countConnections: true,
             debug: {
                 serverSendLag: false
             }
@@ -17938,7 +17951,7 @@ class ServerEngine {
         this.gameEngine = gameEngine;
         this.gameEngine.registerClasses(this.serializer);
         this.networkTransmitter = new NetworkTransmitter(this.serializer);
-        this.networkMonitor = new NetworkMonitor();
+        this.networkMonitor = new NetworkMonitor(this);
 
         /**
          * Default room name

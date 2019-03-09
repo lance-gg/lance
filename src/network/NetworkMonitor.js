@@ -1,4 +1,5 @@
 import EventEmitter from 'event-emitter';
+import http from 'http';
 
 /**
  * Measures network performance between the client and the server
@@ -6,7 +7,14 @@ import EventEmitter from 'event-emitter';
  */
 export default class NetworkMonitor {
 
-    constructor() {
+    constructor(server) {
+
+        // server-side keep game name
+        if (server) {
+            this.server = server;
+            this.gameName = Object.getPrototypeOf(server.gameEngine).constructor.name;
+        }
+
         // mixin for EventEmitter
         let eventEmitter = new EventEmitter();
         this.on = eventEmitter.on;
@@ -52,6 +60,9 @@ export default class NetworkMonitor {
     // server
     registerPlayerOnServer(socket) {
         socket.on('RTTQuery', this.respondToRTTQuery.bind(this, socket));
+        if (this.server && this.server.options.countConnections) {
+            http.get(`http://ping.games-eu.lance.gg:2000/${this.gameName}`).on('error', () => {});
+        }
     }
 
     respondToRTTQuery(socket, queryId) {
