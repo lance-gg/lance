@@ -1,25 +1,24 @@
 
 ## Current Release
 
-### r3.0.0 - *Majorana* - July 2018
-* 2D engine support - P2
-* New sample game Asteroids
-* Interpolation mode
-* Generic bending code
+### r4.0.0 - *Noether* - March 2019
 
+* adds rollup-js for native modules
+* one-page games
+* support for rooms (game object name-spacing)
 
 ## Future Releases
 
 All releases listed here, along with their planned release dates and their listed contents, are a statement of intentions, and are provided with no guarantee whatsoever.  Lance is an open-source project and as such depends on the available time of its developers.  The roadmap is subject to change at any time.
 
-### r4.0.0 - *Noether* - December 2018
+### r5.0.0 - *Noether* - December 2019
 
 ## Roadmap Candidates
 
 * entity-component-system redesign
 * UDP via WebRTC
-* one-page games
-* support for rooms (game object name-spacing)
+* Electron support
+* MatterJS support
 * Automated Cloud Deploy system for Lance game servers
 * Proper testing framework
 * Better debug tools:
@@ -27,6 +26,12 @@ All releases listed here, along with their planned release dates and their liste
     * shows GUI that allow scrubbing through time to see values over time of client state, server state, interpolated/extrapolated state
 
 ## Past Releases
+
+### r3.0.0 - *Majorana* - July 2018
+* 2D engine support - P2
+* New sample game Asteroids
+* Interpolation mode
+* Generic bending code
 
 ### r2.0.1 - *Spinor* - February 2018
 * ES6 Modules support
