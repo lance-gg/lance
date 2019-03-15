@@ -18748,7 +18748,6 @@ function () {
     this.createRoom(this.DEFAULT_ROOM_NAME);
     this.connectedPlayers = {};
     this.playerInputQueues = {};
-    this.pendingAtomicEvents = [];
     this.objMemory = {};
     io.on('connection', this.onPlayerConnected.bind(this));
     this.gameEngine.on('objectAdded', this.onObjectAdded.bind(this));
