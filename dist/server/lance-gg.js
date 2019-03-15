@@ -18701,6 +18701,7 @@ function () {
    * @param {Object} options - server options
    * @param {Number} options.stepRate - number of steps per second
    * @param {Number} options.updateRate - number of steps in each update (sync)
+   * @param {Number} options.fullSyncRate - rate at which full-syncs are sent, in step count
    * @param {String} options.tracesPath - path where traces should go
    * @param {Boolean} options.countConnections - should ping player connections to lance.gg
    * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
@@ -18713,6 +18714,7 @@ function () {
     this.options = Object.assign({
       updateRate: 6,
       stepRate: 60,
+      fullSyncRate: 20,
       timeoutInterval: 180,
       updateOnObjectCreation: true,
       tracesPath: '',
@@ -18868,7 +18870,7 @@ function () {
               player.state = 'synced';
               diffUpdate = false;
             }
-          } // also, one in twenty syncs is a full update
+          } // also, one in N syncs is a full update, or a special request
 
         } catch (err) {
           _didIteratorError = true;
@@ -18885,7 +18887,7 @@ function () {
           }
         }
 
-        if (room.syncCounter++ % 20 === 0) diffUpdate = false;
+        if (room.syncCounter++ % this.options.fullSyncRate === 0 || room.requestFullSync) diffUpdate = false;
         var payload = this.serializeUpdate(roomName, {
           diffUpdate: diffUpdate
         });
@@ -18919,6 +18921,7 @@ function () {
 
         this.networkTransmitter.clearPayload();
         room.requestImmediateSync = false;
+        room.requestFullSync = false;
       }
     } // create a serialized package of the game world
     // TODO: this process could be made much much faster if the buffer creation and
@@ -19053,6 +19056,8 @@ function () {
         return "ROOM UPDATE: playerId ".concat(playerId, " from room ").concat(player.roomName, " to room ").concat(roomName);
       });
       player.roomName = roomName;
+      room.requestImmediateSync = true;
+      room.requestFullSync = true;
     } // handle the object creation
 
   }, {

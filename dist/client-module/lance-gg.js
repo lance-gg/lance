@@ -17908,7 +17908,7 @@
       var obj = uri;
 
       // default to window.location
-      loc = loc || (typeof location !== 'undefined' && location);
+      loc = loc || commonjsGlobal.location;
       if (null == uri) uri = loc.protocol + '//' + loc.host;
 
       // relative path support
@@ -17957,159 +17957,6 @@
       return obj;
     }
 
-    /**
-     * Helpers.
-     */
-
-    var s$1 = 1000;
-    var m$1 = s$1 * 60;
-    var h$1 = m$1 * 60;
-    var d$1 = h$1 * 24;
-    var y$1 = d$1 * 365.25;
-
-    /**
-     * Parse or format the given `val`.
-     *
-     * Options:
-     *
-     *  - `long` verbose formatting [false]
-     *
-     * @param {String|Number} val
-     * @param {Object} [options]
-     * @throws {Error} throw an error if val is not a non-empty string or a number
-     * @return {String|Number}
-     * @api public
-     */
-
-    var ms$1 = function(val, options) {
-      options = options || {};
-      var type = typeof val;
-      if (type === 'string' && val.length > 0) {
-        return parse$1(val);
-      } else if (type === 'number' && isNaN(val) === false) {
-        return options.long ? fmtLong$1(val) : fmtShort$1(val);
-      }
-      throw new Error(
-        'val is not a non-empty string or a valid number. val=' +
-          JSON.stringify(val)
-      );
-    };
-
-    /**
-     * Parse the given `str` and return milliseconds.
-     *
-     * @param {String} str
-     * @return {Number}
-     * @api private
-     */
-
-    function parse$1(str) {
-      str = String(str);
-      if (str.length > 100) {
-        return;
-      }
-      var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
-        str
-      );
-      if (!match) {
-        return;
-      }
-      var n = parseFloat(match[1]);
-      var type = (match[2] || 'ms').toLowerCase();
-      switch (type) {
-        case 'years':
-        case 'year':
-        case 'yrs':
-        case 'yr':
-        case 'y':
-          return n * y$1;
-        case 'days':
-        case 'day':
-        case 'd':
-          return n * d$1;
-        case 'hours':
-        case 'hour':
-        case 'hrs':
-        case 'hr':
-        case 'h':
-          return n * h$1;
-        case 'minutes':
-        case 'minute':
-        case 'mins':
-        case 'min':
-        case 'm':
-          return n * m$1;
-        case 'seconds':
-        case 'second':
-        case 'secs':
-        case 'sec':
-        case 's':
-          return n * s$1;
-        case 'milliseconds':
-        case 'millisecond':
-        case 'msecs':
-        case 'msec':
-        case 'ms':
-          return n;
-        default:
-          return undefined;
-      }
-    }
-
-    /**
-     * Short format for `ms`.
-     *
-     * @param {Number} ms
-     * @return {String}
-     * @api private
-     */
-
-    function fmtShort$1(ms) {
-      if (ms >= d$1) {
-        return Math.round(ms / d$1) + 'd';
-      }
-      if (ms >= h$1) {
-        return Math.round(ms / h$1) + 'h';
-      }
-      if (ms >= m$1) {
-        return Math.round(ms / m$1) + 'm';
-      }
-      if (ms >= s$1) {
-        return Math.round(ms / s$1) + 's';
-      }
-      return ms + 'ms';
-    }
-
-    /**
-     * Long format for `ms`.
-     *
-     * @param {Number} ms
-     * @return {String}
-     * @api private
-     */
-
-    function fmtLong$1(ms) {
-      return plural$1(ms, d$1, 'day') ||
-        plural$1(ms, h$1, 'hour') ||
-        plural$1(ms, m$1, 'minute') ||
-        plural$1(ms, s$1, 'second') ||
-        ms + ' ms';
-    }
-
-    /**
-     * Pluralization helper.
-     */
-
-    function plural$1(ms, n, name) {
-      if (ms < n) {
-        return;
-      }
-      if (ms < n * 1.5) {
-        return Math.floor(ms / n) + ' ' + name;
-      }
-      return Math.ceil(ms / n) + ' ' + name + 's';
-    }
-
     var debug$2 = createCommonjsModule(function (module, exports) {
     /**
      * This is the common logic for both the Node.js and web browser
@@ -18123,7 +17970,7 @@
     exports.disable = disable;
     exports.enable = enable;
     exports.enabled = enabled;
-    exports.humanize = ms$1;
+    exports.humanize = ms;
 
     /**
      * Active `debug` instances.
@@ -18723,12 +18570,16 @@
 
     var isBuffer = isBuf;
 
-    var withNativeBuffer = typeof Buffer === 'function' && typeof Buffer.isBuffer === 'function';
-    var withNativeArrayBuffer = typeof ArrayBuffer === 'function';
+    var withNativeBuffer = typeof commonjsGlobal.Buffer === 'function' && typeof commonjsGlobal.Buffer.isBuffer === 'function';
+    var withNativeArrayBuffer = typeof commonjsGlobal.ArrayBuffer === 'function';
 
-    var isView = function (obj) {
-      return typeof ArrayBuffer.isView === 'function' ? ArrayBuffer.isView(obj) : (obj.buffer instanceof ArrayBuffer);
-    };
+    var isView = (function () {
+      if (withNativeArrayBuffer && typeof commonjsGlobal.ArrayBuffer.isView === 'function') {
+        return commonjsGlobal.ArrayBuffer.isView;
+      } else {
+        return function (obj) { return obj.buffer instanceof commonjsGlobal.ArrayBuffer; };
+      }
+    })();
 
     /**
      * Returns true if obj is a buffer or an arraybuffer.
@@ -18737,8 +18588,8 @@
      */
 
     function isBuf(obj) {
-      return (withNativeBuffer && Buffer.isBuffer(obj)) ||
-              (withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj)));
+      return (withNativeBuffer && commonjsGlobal.Buffer.isBuffer(obj)) ||
+              (withNativeArrayBuffer && (obj instanceof commonjsGlobal.ArrayBuffer || isView(obj)));
     }
 
     /*global Blob,File*/
@@ -18750,8 +18601,8 @@
 
 
     var toString$1 = Object.prototype.toString;
-    var withNativeBlob = typeof Blob === 'function' || (typeof Blob !== 'undefined' && toString$1.call(Blob) === '[object BlobConstructor]');
-    var withNativeFile = typeof File === 'function' || (typeof File !== 'undefined' && toString$1.call(File) === '[object FileConstructor]');
+    var withNativeBlob = typeof commonjsGlobal.Blob === 'function' || toString$1.call(commonjsGlobal.Blob) === '[object BlobConstructor]';
+    var withNativeFile = typeof commonjsGlobal.File === 'function' || toString$1.call(commonjsGlobal.File) === '[object FileConstructor]';
 
     /**
      * Replaces every Buffer | ArrayBuffer in packet with a numbered placeholder.
@@ -19120,7 +18971,7 @@
     componentEmitter(Decoder.prototype);
 
     /**
-     * Decodes an encoded packet string into packet JSON.
+     * Decodes an ecoded packet string into packet JSON.
      *
      * @param {String} obj - encoded packet
      * @return {Object} packet
@@ -19141,7 +18992,8 @@
         } else { // non-binary full packet
           this.emit('decoded', packet);
         }
-      } else if (isBuffer(obj) || obj.base64) { // raw binary data
+      }
+      else if (isBuffer(obj) || obj.base64) { // raw binary data
         if (!this.reconstructor) {
           throw new Error('got binary data when not reconstructing a packet');
         } else {
@@ -19151,7 +19003,8 @@
             this.emit('decoded', packet);
           }
         }
-      } else {
+      }
+      else {
         throw new Error('Unknown type: ' + obj);
       }
     };
@@ -19369,7 +19222,7 @@
 
       if (!xdomain) {
         try {
-          return new self[['Active'].concat('Object').join('X')]('Microsoft.XMLHTTP');
+          return new commonjsGlobal[['Active'].concat('Object').join('X')]('Microsoft.XMLHTTP');
         } catch (e) { }
       }
     };
@@ -19523,216 +19376,254 @@
 
     function noop$1() {}
 
-    /*! https://mths.be/utf8js v2.1.2 by @mathias */
+    var utf8 = createCommonjsModule(function (module, exports) {
+    (function(root) {
 
-    var stringFromCharCode = String.fromCharCode;
+    	// Detect free variables `exports`
+    	var freeExports = exports;
 
-    // Taken from https://mths.be/punycode
-    function ucs2decode(string) {
-    	var output = [];
-    	var counter = 0;
-    	var length = string.length;
-    	var value;
-    	var extra;
-    	while (counter < length) {
-    		value = string.charCodeAt(counter++);
-    		if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-    			// high surrogate, and there is a next character
-    			extra = string.charCodeAt(counter++);
-    			if ((extra & 0xFC00) == 0xDC00) { // low surrogate
-    				output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+    	// Detect free variable `module`
+    	var freeModule = module &&
+    		module.exports == freeExports && module;
+
+    	// Detect free variable `global`, from Node.js or Browserified code,
+    	// and use it as `root`
+    	var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal;
+    	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+    		root = freeGlobal;
+    	}
+
+    	/*--------------------------------------------------------------------------*/
+
+    	var stringFromCharCode = String.fromCharCode;
+
+    	// Taken from https://mths.be/punycode
+    	function ucs2decode(string) {
+    		var output = [];
+    		var counter = 0;
+    		var length = string.length;
+    		var value;
+    		var extra;
+    		while (counter < length) {
+    			value = string.charCodeAt(counter++);
+    			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+    				// high surrogate, and there is a next character
+    				extra = string.charCodeAt(counter++);
+    				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+    					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+    				} else {
+    					// unmatched surrogate; only append this code unit, in case the next
+    					// code unit is the high surrogate of a surrogate pair
+    					output.push(value);
+    					counter--;
+    				}
     			} else {
-    				// unmatched surrogate; only append this code unit, in case the next
-    				// code unit is the high surrogate of a surrogate pair
     				output.push(value);
-    				counter--;
     			}
-    		} else {
-    			output.push(value);
     		}
+    		return output;
     	}
-    	return output;
-    }
 
-    // Taken from https://mths.be/punycode
-    function ucs2encode(array) {
-    	var length = array.length;
-    	var index = -1;
-    	var value;
-    	var output = '';
-    	while (++index < length) {
-    		value = array[index];
-    		if (value > 0xFFFF) {
-    			value -= 0x10000;
-    			output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
-    			value = 0xDC00 | value & 0x3FF;
+    	// Taken from https://mths.be/punycode
+    	function ucs2encode(array) {
+    		var length = array.length;
+    		var index = -1;
+    		var value;
+    		var output = '';
+    		while (++index < length) {
+    			value = array[index];
+    			if (value > 0xFFFF) {
+    				value -= 0x10000;
+    				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+    				value = 0xDC00 | value & 0x3FF;
+    			}
+    			output += stringFromCharCode(value);
     		}
-    		output += stringFromCharCode(value);
+    		return output;
     	}
-    	return output;
-    }
 
-    function checkScalarValue(codePoint, strict) {
-    	if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
-    		if (strict) {
-    			throw Error(
-    				'Lone surrogate U+' + codePoint.toString(16).toUpperCase() +
-    				' is not a scalar value'
-    			);
+    	function checkScalarValue(codePoint, strict) {
+    		if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+    			if (strict) {
+    				throw Error(
+    					'Lone surrogate U+' + codePoint.toString(16).toUpperCase() +
+    					' is not a scalar value'
+    				);
+    			}
+    			return false;
     		}
-    		return false;
+    		return true;
     	}
-    	return true;
-    }
-    /*--------------------------------------------------------------------------*/
+    	/*--------------------------------------------------------------------------*/
 
-    function createByte(codePoint, shift) {
-    	return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
-    }
+    	function createByte(codePoint, shift) {
+    		return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
+    	}
 
-    function encodeCodePoint(codePoint, strict) {
-    	if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
-    		return stringFromCharCode(codePoint);
-    	}
-    	var symbol = '';
-    	if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
-    		symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
-    	}
-    	else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
-    		if (!checkScalarValue(codePoint, strict)) {
-    			codePoint = 0xFFFD;
+    	function encodeCodePoint(codePoint, strict) {
+    		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
+    			return stringFromCharCode(codePoint);
     		}
-    		symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
-    		symbol += createByte(codePoint, 6);
-    	}
-    	else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
-    		symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
-    		symbol += createByte(codePoint, 12);
-    		symbol += createByte(codePoint, 6);
-    	}
-    	symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
-    	return symbol;
-    }
-
-    function utf8encode(string, opts) {
-    	opts = opts || {};
-    	var strict = false !== opts.strict;
-
-    	var codePoints = ucs2decode(string);
-    	var length = codePoints.length;
-    	var index = -1;
-    	var codePoint;
-    	var byteString = '';
-    	while (++index < length) {
-    		codePoint = codePoints[index];
-    		byteString += encodeCodePoint(codePoint, strict);
-    	}
-    	return byteString;
-    }
-
-    /*--------------------------------------------------------------------------*/
-
-    function readContinuationByte() {
-    	if (byteIndex >= byteCount) {
-    		throw Error('Invalid byte index');
-    	}
-
-    	var continuationByte = byteArray[byteIndex] & 0xFF;
-    	byteIndex++;
-
-    	if ((continuationByte & 0xC0) == 0x80) {
-    		return continuationByte & 0x3F;
-    	}
-
-    	// If we end up here, it’s not a continuation byte
-    	throw Error('Invalid continuation byte');
-    }
-
-    function decodeSymbol(strict) {
-    	var byte1;
-    	var byte2;
-    	var byte3;
-    	var byte4;
-    	var codePoint;
-
-    	if (byteIndex > byteCount) {
-    		throw Error('Invalid byte index');
-    	}
-
-    	if (byteIndex == byteCount) {
-    		return false;
-    	}
-
-    	// Read first byte
-    	byte1 = byteArray[byteIndex] & 0xFF;
-    	byteIndex++;
-
-    	// 1-byte sequence (no continuation bytes)
-    	if ((byte1 & 0x80) == 0) {
-    		return byte1;
-    	}
-
-    	// 2-byte sequence
-    	if ((byte1 & 0xE0) == 0xC0) {
-    		byte2 = readContinuationByte();
-    		codePoint = ((byte1 & 0x1F) << 6) | byte2;
-    		if (codePoint >= 0x80) {
-    			return codePoint;
-    		} else {
-    			throw Error('Invalid continuation byte');
+    		var symbol = '';
+    		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
+    			symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
     		}
-    	}
-
-    	// 3-byte sequence (may include unpaired surrogates)
-    	if ((byte1 & 0xF0) == 0xE0) {
-    		byte2 = readContinuationByte();
-    		byte3 = readContinuationByte();
-    		codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
-    		if (codePoint >= 0x0800) {
-    			return checkScalarValue(codePoint, strict) ? codePoint : 0xFFFD;
-    		} else {
-    			throw Error('Invalid continuation byte');
+    		else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
+    			if (!checkScalarValue(codePoint, strict)) {
+    				codePoint = 0xFFFD;
+    			}
+    			symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
+    			symbol += createByte(codePoint, 6);
     		}
-    	}
-
-    	// 4-byte sequence
-    	if ((byte1 & 0xF8) == 0xF0) {
-    		byte2 = readContinuationByte();
-    		byte3 = readContinuationByte();
-    		byte4 = readContinuationByte();
-    		codePoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) |
-    			(byte3 << 0x06) | byte4;
-    		if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
-    			return codePoint;
+    		else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
+    			symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
+    			symbol += createByte(codePoint, 12);
+    			symbol += createByte(codePoint, 6);
     		}
+    		symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
+    		return symbol;
     	}
 
-    	throw Error('Invalid UTF-8 detected');
-    }
+    	function utf8encode(string, opts) {
+    		opts = opts || {};
+    		var strict = false !== opts.strict;
 
-    var byteArray;
-    var byteCount;
-    var byteIndex;
-    function utf8decode(byteString, opts) {
-    	opts = opts || {};
-    	var strict = false !== opts.strict;
-
-    	byteArray = ucs2decode(byteString);
-    	byteCount = byteArray.length;
-    	byteIndex = 0;
-    	var codePoints = [];
-    	var tmp;
-    	while ((tmp = decodeSymbol(strict)) !== false) {
-    		codePoints.push(tmp);
+    		var codePoints = ucs2decode(string);
+    		var length = codePoints.length;
+    		var index = -1;
+    		var codePoint;
+    		var byteString = '';
+    		while (++index < length) {
+    			codePoint = codePoints[index];
+    			byteString += encodeCodePoint(codePoint, strict);
+    		}
+    		return byteString;
     	}
-    	return ucs2encode(codePoints);
-    }
 
-    var utf8 = {
-    	version: '2.1.2',
-    	encode: utf8encode,
-    	decode: utf8decode
-    };
+    	/*--------------------------------------------------------------------------*/
+
+    	function readContinuationByte() {
+    		if (byteIndex >= byteCount) {
+    			throw Error('Invalid byte index');
+    		}
+
+    		var continuationByte = byteArray[byteIndex] & 0xFF;
+    		byteIndex++;
+
+    		if ((continuationByte & 0xC0) == 0x80) {
+    			return continuationByte & 0x3F;
+    		}
+
+    		// If we end up here, it’s not a continuation byte
+    		throw Error('Invalid continuation byte');
+    	}
+
+    	function decodeSymbol(strict) {
+    		var byte1;
+    		var byte2;
+    		var byte3;
+    		var byte4;
+    		var codePoint;
+
+    		if (byteIndex > byteCount) {
+    			throw Error('Invalid byte index');
+    		}
+
+    		if (byteIndex == byteCount) {
+    			return false;
+    		}
+
+    		// Read first byte
+    		byte1 = byteArray[byteIndex] & 0xFF;
+    		byteIndex++;
+
+    		// 1-byte sequence (no continuation bytes)
+    		if ((byte1 & 0x80) == 0) {
+    			return byte1;
+    		}
+
+    		// 2-byte sequence
+    		if ((byte1 & 0xE0) == 0xC0) {
+    			byte2 = readContinuationByte();
+    			codePoint = ((byte1 & 0x1F) << 6) | byte2;
+    			if (codePoint >= 0x80) {
+    				return codePoint;
+    			} else {
+    				throw Error('Invalid continuation byte');
+    			}
+    		}
+
+    		// 3-byte sequence (may include unpaired surrogates)
+    		if ((byte1 & 0xF0) == 0xE0) {
+    			byte2 = readContinuationByte();
+    			byte3 = readContinuationByte();
+    			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
+    			if (codePoint >= 0x0800) {
+    				return checkScalarValue(codePoint, strict) ? codePoint : 0xFFFD;
+    			} else {
+    				throw Error('Invalid continuation byte');
+    			}
+    		}
+
+    		// 4-byte sequence
+    		if ((byte1 & 0xF8) == 0xF0) {
+    			byte2 = readContinuationByte();
+    			byte3 = readContinuationByte();
+    			byte4 = readContinuationByte();
+    			codePoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) |
+    				(byte3 << 0x06) | byte4;
+    			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
+    				return codePoint;
+    			}
+    		}
+
+    		throw Error('Invalid UTF-8 detected');
+    	}
+
+    	var byteArray;
+    	var byteCount;
+    	var byteIndex;
+    	function utf8decode(byteString, opts) {
+    		opts = opts || {};
+    		var strict = false !== opts.strict;
+
+    		byteArray = ucs2decode(byteString);
+    		byteCount = byteArray.length;
+    		byteIndex = 0;
+    		var codePoints = [];
+    		var tmp;
+    		while ((tmp = decodeSymbol(strict)) !== false) {
+    			codePoints.push(tmp);
+    		}
+    		return ucs2encode(codePoints);
+    	}
+
+    	/*--------------------------------------------------------------------------*/
+
+    	var utf8 = {
+    		'version': '2.1.2',
+    		'encode': utf8encode,
+    		'decode': utf8decode
+    	};
+
+    	// Some AMD build optimizers, like r.js, check for specific condition patterns
+    	// like the following:
+    	if (freeExports && !freeExports.nodeType) {
+    		if (freeModule) { // in Node.js or RingoJS v0.8.0+
+    			freeModule.exports = utf8;
+    		} else { // in Narwhal or RingoJS v0.7.0-
+    			var object = {};
+    			var hasOwnProperty = object.hasOwnProperty;
+    			for (var key in utf8) {
+    				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
+    			}
+    		}
+    	} else { // in Rhino or a web browser
+    		root.utf8 = utf8;
+    	}
+
+    }(commonjsGlobal));
+    });
 
     var base64Arraybuffer = createCommonjsModule(function (module, exports) {
     /*
@@ -19809,11 +19700,10 @@
      * Create a blob builder even when vendor prefixes exist
      */
 
-    var BlobBuilder = typeof BlobBuilder !== 'undefined' ? BlobBuilder :
-      typeof WebKitBlobBuilder !== 'undefined' ? WebKitBlobBuilder :
-      typeof MSBlobBuilder !== 'undefined' ? MSBlobBuilder :
-      typeof MozBlobBuilder !== 'undefined' ? MozBlobBuilder : 
-      false;
+    var BlobBuilder = commonjsGlobal.BlobBuilder
+      || commonjsGlobal.WebKitBlobBuilder
+      || commonjsGlobal.MSBlobBuilder
+      || commonjsGlobal.MozBlobBuilder;
 
     /**
      * Check if Blob constructor is supported
@@ -19857,7 +19747,8 @@
      */
 
     function mapArrayBufferViews(ary) {
-      return ary.map(function(chunk) {
+      for (var i = 0; i < ary.length; i++) {
+        var chunk = ary[i];
         if (chunk.buffer instanceof ArrayBuffer) {
           var buf = chunk.buffer;
 
@@ -19869,34 +19760,30 @@
             buf = copy.buffer;
           }
 
-          return buf;
+          ary[i] = buf;
         }
-
-        return chunk;
-      });
+      }
     }
 
     function BlobBuilderConstructor(ary, options) {
       options = options || {};
 
       var bb = new BlobBuilder();
-      mapArrayBufferViews(ary).forEach(function(part) {
-        bb.append(part);
-      });
+      mapArrayBufferViews(ary);
+
+      for (var i = 0; i < ary.length; i++) {
+        bb.append(ary[i]);
+      }
 
       return (options.type) ? bb.getBlob(options.type) : bb.getBlob();
     }
     function BlobConstructor(ary, options) {
-      return new Blob(mapArrayBufferViews(ary), options || {});
+      mapArrayBufferViews(ary);
+      return new Blob(ary, options || {});
     }
-    if (typeof Blob !== 'undefined') {
-      BlobBuilderConstructor.prototype = Blob.prototype;
-      BlobConstructor.prototype = Blob.prototype;
-    }
-
     var blob = (function() {
       if (blobSupported) {
-        return blobSupportsArrayBufferView ? Blob : BlobConstructor;
+        return blobSupportsArrayBufferView ? commonjsGlobal.Blob : BlobConstructor;
       } else if (blobBuilderSupported) {
         return BlobBuilderConstructor;
       } else {
@@ -19916,7 +19803,7 @@
 
 
     var base64encoder;
-    if (typeof ArrayBuffer !== 'undefined') {
+    if (commonjsGlobal && commonjsGlobal.ArrayBuffer) {
       base64encoder = base64Arraybuffer;
     }
 
@@ -20008,9 +19895,9 @@
         ? undefined
         : packet.data.buffer || packet.data;
 
-      if (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer) {
+      if (commonjsGlobal.ArrayBuffer && data instanceof ArrayBuffer) {
         return encodeArrayBuffer(packet, supportsBinary, callback);
-      } else if (typeof blob !== 'undefined' && data instanceof blob) {
+      } else if (blob && data instanceof commonjsGlobal.Blob) {
         return encodeBlob(packet, supportsBinary, callback);
       }
 
@@ -20065,7 +19952,8 @@
 
       var fr = new FileReader();
       fr.onload = function() {
-        exports.encodePacket({ type: packet.type, data: fr.result }, supportsBinary, true, callback);
+        packet.data = fr.result;
+        exports.encodePacket(packet, supportsBinary, true, callback);
       };
       return fr.readAsArrayBuffer(packet.data);
     }
@@ -20095,7 +19983,7 @@
 
     exports.encodeBase64Packet = function(packet, callback) {
       var message = 'b' + exports.packets[packet.type];
-      if (typeof blob !== 'undefined' && packet.data instanceof blob) {
+      if (blob && packet.data instanceof commonjsGlobal.Blob) {
         var fr = new FileReader();
         fr.onload = function() {
           var b64 = fr.result.split(',')[1];
@@ -20116,7 +20004,7 @@
         }
         b64data = String.fromCharCode.apply(null, basic);
       }
-      message += btoa(b64data);
+      message += commonjsGlobal.btoa(b64data);
       return callback(message);
     };
 
@@ -20566,9 +20454,6 @@
       this.rejectUnauthorized = opts.rejectUnauthorized;
       this.forceNode = opts.forceNode;
 
-      // results of ReactNative environment detection
-      this.isReactNative = opts.isReactNative;
-
       // other options for Node.js client
       this.extraHeaders = opts.extraHeaders;
       this.localAddress = opts.localAddress;
@@ -20801,159 +20686,6 @@
     yeast.decode = decode$1;
     var yeast_1 = yeast;
 
-    /**
-     * Helpers.
-     */
-
-    var s$2 = 1000;
-    var m$2 = s$2 * 60;
-    var h$2 = m$2 * 60;
-    var d$2 = h$2 * 24;
-    var y$2 = d$2 * 365.25;
-
-    /**
-     * Parse or format the given `val`.
-     *
-     * Options:
-     *
-     *  - `long` verbose formatting [false]
-     *
-     * @param {String|Number} val
-     * @param {Object} [options]
-     * @throws {Error} throw an error if val is not a non-empty string or a number
-     * @return {String|Number}
-     * @api public
-     */
-
-    var ms$2 = function(val, options) {
-      options = options || {};
-      var type = typeof val;
-      if (type === 'string' && val.length > 0) {
-        return parse$2(val);
-      } else if (type === 'number' && isNaN(val) === false) {
-        return options.long ? fmtLong$2(val) : fmtShort$2(val);
-      }
-      throw new Error(
-        'val is not a non-empty string or a valid number. val=' +
-          JSON.stringify(val)
-      );
-    };
-
-    /**
-     * Parse the given `str` and return milliseconds.
-     *
-     * @param {String} str
-     * @return {Number}
-     * @api private
-     */
-
-    function parse$2(str) {
-      str = String(str);
-      if (str.length > 100) {
-        return;
-      }
-      var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
-        str
-      );
-      if (!match) {
-        return;
-      }
-      var n = parseFloat(match[1]);
-      var type = (match[2] || 'ms').toLowerCase();
-      switch (type) {
-        case 'years':
-        case 'year':
-        case 'yrs':
-        case 'yr':
-        case 'y':
-          return n * y$2;
-        case 'days':
-        case 'day':
-        case 'd':
-          return n * d$2;
-        case 'hours':
-        case 'hour':
-        case 'hrs':
-        case 'hr':
-        case 'h':
-          return n * h$2;
-        case 'minutes':
-        case 'minute':
-        case 'mins':
-        case 'min':
-        case 'm':
-          return n * m$2;
-        case 'seconds':
-        case 'second':
-        case 'secs':
-        case 'sec':
-        case 's':
-          return n * s$2;
-        case 'milliseconds':
-        case 'millisecond':
-        case 'msecs':
-        case 'msec':
-        case 'ms':
-          return n;
-        default:
-          return undefined;
-      }
-    }
-
-    /**
-     * Short format for `ms`.
-     *
-     * @param {Number} ms
-     * @return {String}
-     * @api private
-     */
-
-    function fmtShort$2(ms) {
-      if (ms >= d$2) {
-        return Math.round(ms / d$2) + 'd';
-      }
-      if (ms >= h$2) {
-        return Math.round(ms / h$2) + 'h';
-      }
-      if (ms >= m$2) {
-        return Math.round(ms / m$2) + 'm';
-      }
-      if (ms >= s$2) {
-        return Math.round(ms / s$2) + 's';
-      }
-      return ms + 'ms';
-    }
-
-    /**
-     * Long format for `ms`.
-     *
-     * @param {Number} ms
-     * @return {String}
-     * @api private
-     */
-
-    function fmtLong$2(ms) {
-      return plural$2(ms, d$2, 'day') ||
-        plural$2(ms, h$2, 'hour') ||
-        plural$2(ms, m$2, 'minute') ||
-        plural$2(ms, s$2, 'second') ||
-        ms + ' ms';
-    }
-
-    /**
-     * Pluralization helper.
-     */
-
-    function plural$2(ms, n, name) {
-      if (ms < n) {
-        return;
-      }
-      if (ms < n * 1.5) {
-        return Math.floor(ms / n) + ' ' + name;
-      }
-      return Math.ceil(ms / n) + ' ' + name + 's';
-    }
-
     var debug$3 = createCommonjsModule(function (module, exports) {
     /**
      * This is the common logic for both the Node.js and web browser
@@ -20967,7 +20699,7 @@
     exports.disable = disable;
     exports.enable = enable;
     exports.enabled = enabled;
-    exports.humanize = ms$2;
+    exports.humanize = ms;
 
     /**
      * Active `debug` instances.
@@ -21641,8 +21373,6 @@
       return schema + '://' + (ipv6 ? '[' + this.hostname + ']' : this.hostname) + port + this.path + query;
     };
 
-    /* global attachEvent */
-
     /**
      * Module requirements.
      */
@@ -21678,7 +21408,7 @@
       this.requestTimeout = opts.requestTimeout;
       this.extraHeaders = opts.extraHeaders;
 
-      if (typeof location !== 'undefined') {
+      if (commonjsGlobal.location) {
         var isSSL = 'https:' === location.protocol;
         var port = location.port;
 
@@ -21687,7 +21417,7 @@
           port = isSSL ? 443 : 80;
         }
 
-        this.xd = (typeof location !== 'undefined' && opts.hostname !== location.hostname) ||
+        this.xd = opts.hostname !== commonjsGlobal.location.hostname ||
           port !== opts.port;
         this.xs = opts.secure !== isSSL;
       }
@@ -21916,7 +21646,7 @@
         return;
       }
 
-      if (typeof document !== 'undefined') {
+      if (commonjsGlobal.document) {
         this.index = Request.requestsCount++;
         Request.requests[this.index] = this;
       }
@@ -21978,7 +21708,7 @@
         } catch (e) {}
       }
 
-      if (typeof document !== 'undefined') {
+      if (commonjsGlobal.document) {
         delete Request.requests[this.index];
       }
 
@@ -22018,7 +21748,7 @@
      */
 
     Request.prototype.hasXDR = function () {
-      return typeof XDomainRequest !== 'undefined' && !this.xs && this.enablesXDR;
+      return 'undefined' !== typeof commonjsGlobal.XDomainRequest && !this.xs && this.enablesXDR;
     };
 
     /**
@@ -22040,12 +21770,11 @@
     Request.requestsCount = 0;
     Request.requests = {};
 
-    if (typeof document !== 'undefined') {
-      if (typeof attachEvent === 'function') {
-        attachEvent('onunload', unloadHandler);
-      } else if (typeof addEventListener === 'function') {
-        var terminationEvent = 'onpagehide' in self ? 'pagehide' : 'unload';
-        addEventListener(terminationEvent, unloadHandler, false);
+    if (commonjsGlobal.document) {
+      if (commonjsGlobal.attachEvent) {
+        commonjsGlobal.attachEvent('onunload', unloadHandler);
+      } else if (commonjsGlobal.addEventListener) {
+        commonjsGlobal.addEventListener('beforeunload', unloadHandler, false);
       }
     }
 
@@ -22091,15 +21820,6 @@
     function empty$1 () { }
 
     /**
-     * Until https://github.com/tc39/proposal-global is shipped.
-     */
-    function glob () {
-      return typeof self !== 'undefined' ? self
-          : typeof window !== 'undefined' ? window
-          : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : {};
-    }
-
-    /**
      * JSONP Polling constructor.
      *
      * @param {Object} opts.
@@ -22115,8 +21835,8 @@
       // we do this here (lazily) to avoid unneeded global pollution
       if (!callbacks) {
         // we need to consider multiple engines in the same page
-        var global = glob();
-        callbacks = global.___eio = (global.___eio || []);
+        if (!commonjsGlobal.___eio) commonjsGlobal.___eio = [];
+        callbacks = commonjsGlobal.___eio;
       }
 
       // callback identifier
@@ -22132,8 +21852,8 @@
       this.query.j = this.index;
 
       // prevent spurious errors from being emitted when the window is unloaded
-      if (typeof addEventListener === 'function') {
-        addEventListener('beforeunload', function () {
+      if (commonjsGlobal.document && commonjsGlobal.addEventListener) {
+        commonjsGlobal.addEventListener('beforeunload', function () {
           if (self.script) self.script.onerror = empty$1;
         }, false);
       }
@@ -22310,14 +22030,9 @@
 
 
     var debug$6 = browser$3('engine.io-client:websocket');
-
-    var BrowserWebSocket, NodeWebSocket;
-
-    if (typeof WebSocket !== 'undefined') {
-      BrowserWebSocket = WebSocket;
-    } else if (typeof self !== 'undefined') {
-      BrowserWebSocket = self.WebSocket || self.MozWebSocket;
-    } else {
+    var BrowserWebSocket = commonjsGlobal.WebSocket || commonjsGlobal.MozWebSocket;
+    var NodeWebSocket;
+    if (typeof window === 'undefined') {
       try {
         NodeWebSocket = require$$1;
       } catch (e) { }
@@ -22329,7 +22044,10 @@
      * interface exposed by `ws` for Node-like environment.
      */
 
-    var WebSocketImpl = BrowserWebSocket || NodeWebSocket;
+    var WebSocket = BrowserWebSocket;
+    if (!WebSocket && typeof window === 'undefined') {
+      WebSocket = NodeWebSocket;
+    }
 
     /**
      * Module exports.
@@ -22353,7 +22071,7 @@
       this.usingBrowserWebSocket = BrowserWebSocket && !opts.forceNode;
       this.protocols = opts.protocols;
       if (!this.usingBrowserWebSocket) {
-        WebSocketImpl = NodeWebSocket;
+        WebSocket = NodeWebSocket;
       }
       transport.call(this, opts);
     }
@@ -22413,12 +22131,7 @@
       }
 
       try {
-        this.ws =
-          this.usingBrowserWebSocket && !this.isReactNative
-            ? protocols
-              ? new WebSocketImpl(uri, protocols)
-              : new WebSocketImpl(uri)
-            : new WebSocketImpl(uri, protocols, opts);
+        this.ws = this.usingBrowserWebSocket ? (protocols ? new WebSocket(uri, protocols) : new WebSocket(uri)) : new WebSocket(uri, protocols, opts);
       } catch (err) {
         return this.emit('error', err);
       }
@@ -22485,7 +22198,7 @@
               }
 
               if (self.perMessageDeflate) {
-                var len = 'string' === typeof data ? Buffer.byteLength(data) : data.length;
+                var len = 'string' === typeof data ? commonjsGlobal.Buffer.byteLength(data) : data.length;
                 if (len < self.perMessageDeflate.threshold) {
                   opts.compress = false;
                 }
@@ -22591,7 +22304,7 @@
      */
 
     WS.prototype.check = function () {
-      return !!WebSocketImpl && !('__initialize' in WebSocketImpl && this.name === WS.prototype.name);
+      return !!WebSocket && !('__initialize' in WebSocket && this.name === WS.prototype.name);
     };
 
     /**
@@ -22623,7 +22336,7 @@
       var xs = false;
       var jsonp = false !== opts.jsonp;
 
-      if (typeof location !== 'undefined') {
+      if (commonjsGlobal.location) {
         var isSSL = 'https:' === location.protocol;
         var port = location.port;
 
@@ -22710,7 +22423,7 @@
       }
 
       this.secure = null != opts.secure ? opts.secure
-        : (typeof location !== 'undefined' && 'https:' === location.protocol);
+        : (commonjsGlobal.location && 'https:' === location.protocol);
 
       if (opts.hostname && !opts.port) {
         // if no port is specified manually, use the protocol default
@@ -22719,8 +22432,8 @@
 
       this.agent = opts.agent || false;
       this.hostname = opts.hostname ||
-        (typeof location !== 'undefined' ? location.hostname : 'localhost');
-      this.port = opts.port || (typeof location !== 'undefined' && location.port
+        (commonjsGlobal.location ? location.hostname : 'localhost');
+      this.port = opts.port || (commonjsGlobal.location && location.port
           ? location.port
           : (this.secure ? 443 : 80));
       this.query = opts.query || {};
@@ -22759,11 +22472,9 @@
       this.rejectUnauthorized = opts.rejectUnauthorized === undefined ? true : opts.rejectUnauthorized;
       this.forceNode = !!opts.forceNode;
 
-      // detect ReactNative environment
-      this.isReactNative = (typeof navigator !== 'undefined' && typeof navigator.product === 'string' && navigator.product.toLowerCase() === 'reactnative');
-
-      // other options for Node.js or ReactNative client
-      if (typeof self === 'undefined' || this.isReactNative) {
+      // other options for Node.js client
+      var freeGlobal = typeof commonjsGlobal === 'object' && commonjsGlobal;
+      if (freeGlobal.global === freeGlobal) {
         if (opts.extraHeaders && Object.keys(opts.extraHeaders).length > 0) {
           this.extraHeaders = opts.extraHeaders;
         }
@@ -22863,8 +22574,7 @@
         forceNode: options.forceNode || this.forceNode,
         localAddress: options.localAddress || this.localAddress,
         requestTimeout: options.requestTimeout || this.requestTimeout,
-        protocols: options.protocols || void (0),
-        isReactNative: this.isReactNative
+        protocols: options.protocols || void (0)
       });
 
       return transport;

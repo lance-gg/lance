@@ -17918,6 +17918,7 @@ class ServerEngine {
      * @param {Object} options - server options
      * @param {Number} options.stepRate - number of steps per second
      * @param {Number} options.updateRate - number of steps in each update (sync)
+     * @param {Number} options.fullSyncRate - rate at which full-syncs are sent, in step count
      * @param {String} options.tracesPath - path where traces should go
      * @param {Boolean} options.countConnections - should ping player connections to lance.gg
      * @param {Boolean} options.updateOnObjectCreation - should send update immediately when new object is created
@@ -17928,6 +17929,7 @@ class ServerEngine {
         this.options = Object.assign({
             updateRate: 6,
             stepRate: 60,
+            fullSyncRate: 20,
             timeoutInterval: 180,
             updateOnObjectCreation: true,
             tracesPath: '',
@@ -18057,8 +18059,9 @@ class ServerEngine {
                 }
             }
 
-            // also, one in twenty syncs is a full update
-            if (room.syncCounter++ % 20 === 0) diffUpdate = false;
+            // also, one in N syncs is a full update, or a special request
+            if ((room.syncCounter++ % this.options.fullSyncRate === 0) || room.requestFullSync)
+                diffUpdate = false;
 
             const payload = this.serializeUpdate(roomName, { diffUpdate });
             this.gameEngine.trace.info(() => `========== sending world update ${this.gameEngine.world.stepCount} to room ${roomName} is delta update: ${diffUpdate} ==========`);
@@ -18066,6 +18069,7 @@ class ServerEngine {
                 this.connectedPlayers[socketId].socket.emit('worldUpdate', payload);
             this.networkTransmitter.clearPayload();
             room.requestImmediateSync = false;
+            room.requestFullSync = false;
         }
     }
 
@@ -18160,6 +18164,8 @@ class ServerEngine {
         this.gameEngine.emit('server__roomUpdate', roomUpdate);
         this.gameEngine.trace.info(() => `ROOM UPDATE: playerId ${playerId} from room ${player.roomName} to room ${roomName}`);
         player.roomName = roomName;
+        room.requestImmediateSync = true;
+        room.requestFullSync = true;
     }
 
     // handle the object creation
