@@ -6,6 +6,7 @@
 * adds rollup-js for native modules
 * one-page games
 * support for rooms (game object name-spacing)
+* upgrade to babel 7.0
 
 ## Future Releases
 
