@@ -84,7 +84,8 @@ class GameEngine {
          * @param {String} eventName - name of the event
          * @param {Function} eventHandler - handler function
          */
-        this.removeListener = eventEmitter.removeListener;
+        this.removeListener = eventEmitter.off;
+        this.off = eventEmitter.off;
 
         this.emit = eventEmitter.emit;
 

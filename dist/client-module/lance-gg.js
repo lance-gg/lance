@@ -720,7 +720,8 @@
              * @param {String} eventName - name of the event
              * @param {Function} eventHandler - handler function
              */
-            this.removeListener = eventEmitter$1.removeListener;
+            this.removeListener = eventEmitter$1.off;
+            this.off = eventEmitter$1.off;
 
             this.emit = eventEmitter$1.emit;
 

@@ -888,7 +888,8 @@ function () {
      * @param {Function} eventHandler - handler function
      */
 
-    this.removeListener = eventEmitter$1.removeListener;
+    this.removeListener = eventEmitter$1.off;
+    this.off = eventEmitter$1.off;
     this.emit = eventEmitter$1.emit; // set up trace
 
     this.trace = new Trace({
