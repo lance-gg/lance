@@ -3,27 +3,35 @@ let differenceVector = new TwoVector();
 
 // The collision detection of SimplePhysicsEngine is a brute-force approach
 export default class BruteForceCollisionDetection {
-
-    // I would eventually like to change it so auto resolve
-    // allows for object pushing (an array of what objects to push)
     
+    // Might be a good idea to allow limitCollisionTo to allow pairs as well.
+
     constructor(options) {
         this.options = Object.assign({
-            limitCollisionTo: [],
-            hardCollide: [],
-            ignore: [],
-            ignorePairs: []
+            softCollision: {
+                limitCollisionTo: [],
+                ignore: [],
+                ignorePairs: []
+            }, 
+            hardCollision: {
+                limitCollisionTo: [],
+                ignore: [],
+                ignorePairs: []            
+            }
         }, options);
-        
+
         // Ensure arrays were submitted
-        if(!Array.isArray(this.options.limitCollisionTo)) { console.log('Invalid limitCollisionTo value - must be array'); return }
-        if(!Array.isArray(this.options.hardCollide)) { console.log('Invalid hardCollide value - must be array'); return }
-        if(!Array.isArray(this.options.ignore)) { console.log('Invalid ignore value - must be array'); return }
-        if(!Array.isArray(this.options.ignorePairs)) { console.log('Invalid ignorePairs value - must be array'); return }
+        if(!Array.isArray(this.options.softCollision.limitCollisionTo)) { console.log('Invalid limitCollisionTo value - must be array'); return }
+        if(!Array.isArray(this.options.softCollision.ignore)) { console.log('Invalid ignore value - must be array'); return }
+        if(!Array.isArray(this.options.softCollision.ignorePairs)) { console.log('Invalid ignorePairs value - must be array'); return }
+        if(!Array.isArray(this.options.hardCollision.limitCollisionTo)) { console.log('Invalid limitCollisionTo value - must be array'); return }
+        if(!Array.isArray(this.options.hardCollision.ignore)) { console.log('Invalid ignore value - must be array'); return }
+        if(!Array.isArray(this.options.hardCollision.ignorePairs)) { console.log('Invalid ignorePairs value - must be array'); return }
 
         // Turn ignore pairs into map
-        this.options.ignorePairs = new Map(this.options.ignorePairs)
-
+        this.options.softCollision.ignorePairs = new Map(this.options.softCollision.ignorePairs)
+        this.options.hardCollision.ignorePairs = new Map(this.options.hardCollision.ignorePairs)
+        
         this.collisionPairs = {};
     }
 
@@ -59,7 +67,17 @@ export default class BruteForceCollisionDetection {
             return false;
 
         // only auto resolve with static objects (static w/ non static)
-        if(this.options.hardCollide.includes(o1.constructor.name) || this.options.hardCollide.includes(o2.constructor.name)) {
+        if((this.options.hardCollision.limitCollisionTo.includes(o1.constructor.name) || this.options.hardCollision.limitCollisionTo.includes(o2.constructor.name)) && 
+        (!this.options.hardCollision.ignore.includes(o1.constructor.name) || !this.options.hardCollision.ignore.includes(o2.constructor.name))) {
+
+            // Ignore Pairs
+            if(Array.isArray(this.options.hardCollision.ignorePairs.get(o1.constructor.name))) {
+                this.options.hardCollision.ignorePairs.get(o1.constructor.name).forEach((item)=>{
+                    if(item == o1.constructor.name) return 2
+                })
+            } else {
+                if(this.options.hardCollision.ignorePairs.get(o1.constructor.name) == o1.constructor.name) return 2
+            }
 
             // need to auto-resolve
             let shiftY1 = o2Box.yMax - o1Box.yMin;
@@ -128,18 +146,18 @@ export default class BruteForceCollisionDetection {
                 this.gameEngine.emit('collisionStart', { o1, o2 });
                 
                 // Limit Collision To
-                if(this.options.limitCollisionTo.length && !this.options.limitCollisionTo.includes(o1.constructor.name) && !this.options.limitCollisionTo.includes(o2.constructor.name)) return 2
+                if(this.options.softCollision.limitCollisionTo.length && !this.options.softCollision.limitCollisionTo.includes(o1.constructor.name) && !this.options.softCollision.limitCollisionTo.includes(o2.constructor.name)) return 2
 
                 // Ignore
-                if(this.options.ignore.includes(o1.constructor.name) || this.options.ignore.includes(o2.constructor.name)) return 2
+                if(this.options.softCollision.ignore.includes(o1.constructor.name) || this.options.softCollision.ignore.includes(o2.constructor.name)) return 2
 
                 // Ignore Pairs
-                if(Array.isArray(this.options.ignorePairs.get(o1.constructor.name))) {
-                    this.options.ignorePairs.get(o1.constructor.name).forEach((item)=>{
+                if(Array.isArray(this.options.softCollision.ignorePairs.get(o1.constructor.name))) {
+                    this.options.softCollision.ignorePairs.get(o1.constructor.name).forEach((item)=>{
                         if(item == o1.constructor.name) return 3
                     })
                 } else {
-                    if(this.options.ignorePairs.get(o1.constructor.name) == o1.constructor.name) return 2
+                    if(this.options.softCollision.ignorePairs.get(o1.constructor.name) == o1.constructor.name) return 2
                 }
 
                 // Trigger collision function
