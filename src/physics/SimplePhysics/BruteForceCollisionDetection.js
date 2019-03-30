@@ -66,9 +66,9 @@ export default class BruteForceCollisionDetection {
             o2Box.yMin > o1Box.yMax)
             return false;
 
-        // only auto resolve with static objects (static w/ non static)
+        // Conditions for hardCollision
         if((this.options.hardCollision.limitCollisionTo.includes(o1.constructor.name) || this.options.hardCollision.limitCollisionTo.includes(o2.constructor.name)) && 
-        (!this.options.hardCollision.ignore.includes(o1.constructor.name) || !this.options.hardCollision.ignore.includes(o2.constructor.name))) {
+        (!this.options.hardCollision.ignore.includes(o1.constructor.name) && !this.options.hardCollision.ignore.includes(o2.constructor.name))) {
 
             // Ignore Pairs
             if(Array.isArray(this.options.hardCollision.ignorePairs.get(o1.constructor.name))) {
