@@ -37,7 +37,6 @@ export default class BruteForceCollisionDetection {
 
     init(options) {
         this.gameEngine = options.gameEngine;
-        this.once = true
     }
 
     findCollision(o1, o2) {
