@@ -12507,30 +12507,35 @@
       bodyB.angularForce += torque;
   };
 
-  var _from = "p2@^0.7.1";
+  var _args = [
+  	[
+  		"p2@0.7.1",
+  		"/Users/alexanderson/Projects/lance"
+  	]
+  ];
+  var _from = "p2@0.7.1";
   var _id = "p2@0.7.1";
   var _inBundle = false;
   var _integrity = "sha1-JfJHTZvDptMUCh2iamfJ4RislUM=";
-  var _location = "/lance-gg/p2";
+  var _location = "/p2";
   var _phantomChildren = {
   };
   var _requested = {
-  	type: "range",
+  	type: "version",
   	registry: true,
-  	raw: "p2@^0.7.1",
+  	raw: "p2@0.7.1",
   	name: "p2",
   	escapedName: "p2",
-  	rawSpec: "^0.7.1",
+  	rawSpec: "0.7.1",
   	saveSpec: null,
-  	fetchSpec: "^0.7.1"
+  	fetchSpec: "0.7.1"
   };
   var _requiredBy = [
-  	"/lance-gg"
+  	"/"
   ];
   var _resolved = "https://registry.npmjs.org/p2/-/p2-0.7.1.tgz";
-  var _shasum = "25f2474d9bc3a6d3140a1da26a67c9e118ac9543";
-  var _spec = "p2@^0.7.1";
-  var _where = "C:\\work\\git\\lance";
+  var _spec = "0.7.1";
+  var _where = "/Users/alexanderson/Projects/lance";
   var author = {
   	name: "Stefan Hedman",
   	email: "schteppe@gmail.com",
@@ -12539,11 +12544,9 @@
   var bugs = {
   	url: "https://github.com/schteppe/p2.js/issues"
   };
-  var bundleDependencies = false;
   var dependencies = {
   	"poly-decomp": "0.1.1"
   };
-  var deprecated = false;
   var description = "A JavaScript 2D physics engine.";
   var devDependencies = {
   	grunt: "^0.4.5",
@@ -12578,6 +12581,7 @@
   };
   var version = "0.7.1";
   var _package = {
+  	_args: _args,
   	_from: _from,
   	_id: _id,
   	_inBundle: _inBundle,
@@ -12587,14 +12591,11 @@
   	_requested: _requested,
   	_requiredBy: _requiredBy,
   	_resolved: _resolved,
-  	_shasum: _shasum,
   	_spec: _spec,
   	_where: _where,
   	author: author,
   	bugs: bugs,
-  	bundleDependencies: bundleDependencies,
   	dependencies: dependencies,
-  	deprecated: deprecated,
   	description: description,
   	devDependencies: devDependencies,
   	engines: engines,
@@ -12608,6 +12609,7 @@
   };
 
   var _package$1 = /*#__PURE__*/Object.freeze({
+    _args: _args,
     _from: _from,
     _id: _id,
     _inBundle: _inBundle,
@@ -12617,14 +12619,11 @@
     _requested: _requested,
     _requiredBy: _requiredBy,
     _resolved: _resolved,
-    _shasum: _shasum,
     _spec: _spec,
     _where: _where,
     author: author,
     bugs: bugs,
-    bundleDependencies: bundleDependencies,
     dependencies: dependencies,
-    deprecated: deprecated,
     description: description,
     devDependencies: devDependencies,
     engines: engines,
@@ -16179,6 +16178,505 @@
   }(PhysicsEngine);
 
   /**
+   * A ThreeVector is a geometric object which is completely described
+   * by three values.
+   */
+
+  var ThreeVector =
+  /*#__PURE__*/
+  function (_Serializable) {
+    _inherits(ThreeVector, _Serializable);
+
+    _createClass(ThreeVector, null, [{
+      key: "netScheme",
+      get: function get() {
+        return {
+          x: {
+            type: BaseTypes.TYPES.FLOAT32
+          },
+          y: {
+            type: BaseTypes.TYPES.FLOAT32
+          },
+          z: {
+            type: BaseTypes.TYPES.FLOAT32
+          }
+        };
+      }
+      /**
+      * Creates an instance of a ThreeVector.
+      * @param {Number} x - first value
+      * @param {Number} y - second value
+      * @param {Number} z - second value
+      * @return {ThreeVector} v - the new ThreeVector
+      */
+
+    }]);
+
+    function ThreeVector(x, y, z) {
+      var _this;
+
+      _classCallCheck(this, ThreeVector);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(ThreeVector).call(this));
+      _this.x = x;
+      _this.y = y;
+      _this.z = z;
+      return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
+    }
+    /**
+     * Formatted textual description of the ThreeVector.
+     * @return {String} description
+     */
+
+
+    _createClass(ThreeVector, [{
+      key: "toString",
+      value: function toString() {
+        function round3(x) {
+          return Math.round(x * 1000) / 1000;
+        }
+
+        return "[".concat(round3(this.x), ", ").concat(round3(this.y), ", ").concat(round3(this.z), "]");
+      }
+      /**
+       * Multiply this ThreeVector by a scalar
+       *
+       * @param {Number} s the scale
+       * @return {ThreeVector} returns self
+       */
+
+    }, {
+      key: "multiplyScalar",
+      value: function multiplyScalar(s) {
+        this.x *= s;
+        this.y *= s;
+        this.z *= s;
+        return this;
+      }
+      /**
+       * Get vector length
+       *
+       * @return {Number} length of this vector
+       */
+
+    }, {
+      key: "length",
+      value: function length() {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+      }
+      /**
+       * Add other vector to this vector
+       *
+       * @param {ThreeVector} other the other vector
+       * @return {ThreeVector} returns self
+       */
+
+    }, {
+      key: "add",
+      value: function add(other) {
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+        return this;
+      }
+      /**
+       * Subtract other vector from this vector
+       *
+       * @param {ThreeVector} other the other vector
+       * @return {ThreeVector} returns self
+       */
+
+    }, {
+      key: "subtract",
+      value: function subtract(other) {
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+        return this;
+      }
+      /**
+       * Normalize this vector, in-place
+       *
+       * @return {ThreeVector} returns self
+       */
+
+    }, {
+      key: "normalize",
+      value: function normalize() {
+        this.multiplyScalar(1 / this.length());
+        return this;
+      }
+      /**
+       * Copy values from another ThreeVector into this ThreeVector
+       *
+       * @param {ThreeVector} sourceObj the other vector
+       * @return {ThreeVector} returns self
+       */
+
+    }, {
+      key: "copy",
+      value: function copy(sourceObj) {
+        this.x = sourceObj.x;
+        this.y = sourceObj.y;
+        this.z = sourceObj.z;
+        return this;
+      }
+      /**
+       * Set ThreeVector values
+       *
+       * @param {Number} x x-value
+       * @param {Number} y y-value
+       * @param {Number} z z-value
+       * @return {ThreeVector} returns self
+       */
+
+    }, {
+      key: "set",
+      value: function set(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+      }
+      /**
+       * Create a clone of this vector
+       *
+       * @return {ThreeVector} returns clone
+       */
+
+    }, {
+      key: "clone",
+      value: function clone() {
+        return new ThreeVector(this.x, this.y, this.z);
+      }
+      /**
+       * Apply in-place lerp (linear interpolation) to this ThreeVector
+       * towards another ThreeVector
+       * @param {ThreeVector} target the target vector
+       * @param {Number} p The percentage to interpolate
+       * @return {ThreeVector} returns self
+       */
+
+    }, {
+      key: "lerp",
+      value: function lerp(target, p) {
+        this.x += (target.x - this.x) * p;
+        this.y += (target.y - this.y) * p;
+        this.z += (target.z - this.z) * p;
+        return this;
+      }
+      /**
+       * Get bending Delta Vector
+       * towards another ThreeVector
+       * @param {ThreeVector} target the target vector
+       * @param {Object} options bending options
+       * @param {Number} options.increments number of increments
+       * @param {Number} options.percent The percentage to bend
+       * @param {Number} options.min No less than this value
+       * @param {Number} options.max No more than this value
+       * @return {ThreeVector} returns new Incremental Vector
+       */
+
+    }, {
+      key: "getBendingDelta",
+      value: function getBendingDelta(target, options) {
+        var increment = target.clone();
+        increment.subtract(this);
+        increment.multiplyScalar(options.percent); // check for max case
+
+        if (options.max && increment.length() > options.max || options.max && increment.length() < options.min) {
+          return new ThreeVector(0, 0, 0);
+        } // divide into increments
+
+
+        increment.multiplyScalar(1 / options.increments);
+        return increment;
+      }
+    }]);
+
+    return ThreeVector;
+  }(Serializable);
+
+  var MAX_DEL_THETA = 0.2;
+  /**
+   * A Quaternion is a geometric object which can be used to
+   * represent a three-dimensional rotation.
+   */
+
+  var Quaternion =
+  /*#__PURE__*/
+  function (_Serializable) {
+    _inherits(Quaternion, _Serializable);
+
+    _createClass(Quaternion, null, [{
+      key: "netScheme",
+      get: function get() {
+        return {
+          w: {
+            type: BaseTypes.TYPES.FLOAT32
+          },
+          x: {
+            type: BaseTypes.TYPES.FLOAT32
+          },
+          y: {
+            type: BaseTypes.TYPES.FLOAT32
+          },
+          z: {
+            type: BaseTypes.TYPES.FLOAT32
+          }
+        };
+      }
+      /**
+      * Creates an instance of a Quaternion.
+      * @param {Number} w - first value
+      * @param {Number} x - second value
+      * @param {Number} y - third value
+      * @param {Number} z - fourth value
+      * @return {Quaternion} v - the new Quaternion
+      */
+
+    }]);
+
+    function Quaternion(w, x, y, z) {
+      var _this;
+
+      _classCallCheck(this, Quaternion);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(Quaternion).call(this));
+      _this.w = w;
+      _this.x = x;
+      _this.y = y;
+      _this.z = z;
+      return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
+    }
+    /**
+     * Formatted textual description of the Quaternion.
+     * @return {String} description
+     */
+
+
+    _createClass(Quaternion, [{
+      key: "toString",
+      value: function toString() {
+        function round3(x) {
+          return Math.round(x * 1000) / 1000;
+        }
+
+        {
+          var axisAngle = this.toAxisAngle();
+          return "[".concat(round3(axisAngle.angle), ",").concat(axisAngle.axis.toString(), "]");
+        }
+
+        return "[".concat(round3(this.w), ", ").concat(round3(this.x), ", ").concat(round3(this.y), ", ").concat(round3(this.z), "]");
+      }
+      /**
+       * copy values from another quaternion into this quaternion
+       *
+       * @param {Quaternion} sourceObj the quaternion to copy from
+       * @return {Quaternion} returns self
+       */
+
+    }, {
+      key: "copy",
+      value: function copy(sourceObj) {
+        this.set(sourceObj.w, sourceObj.x, sourceObj.y, sourceObj.z);
+        return this;
+      }
+      /**
+       * set quaternion values
+       *
+       * @param {Number} w w-value
+       * @param {Number} x x-value
+       * @param {Number} y y-value
+       * @param {Number} z z-value
+       * @return {Quaternion} returns self
+       */
+
+    }, {
+      key: "set",
+      value: function set(w, x, y, z) {
+        this.w = w;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+      }
+      /**
+       * return an axis-angle representation of this quaternion
+       *
+       * @return {Object} contains two attributes: axis (ThreeVector) and angle.
+       */
+
+    }, {
+      key: "toAxisAngle",
+      value: function toAxisAngle() {
+        // assuming quaternion normalised then w is less than 1, so term always positive.
+        var axis = new ThreeVector(1, 0, 0);
+        this.normalize();
+        var angle = 2 * Math.acos(this.w);
+        var s = Math.sqrt(1 - this.w * this.w);
+
+        if (s > 0.001) {
+          var divS = 1 / s;
+          axis.x = this.x * divS;
+          axis.y = this.y * divS;
+          axis.z = this.z * divS;
+        }
+
+        if (s > Math.PI) {
+          s -= 2 * Math.PI;
+        }
+
+        return {
+          axis: axis,
+          angle: angle
+        };
+      }
+    }, {
+      key: "normalize",
+      value: function normalize() {
+        var l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+
+        if (l === 0) {
+          this.x = 0;
+          this.y = 0;
+          this.z = 0;
+          this.w = 0;
+        } else {
+          l = 1 / l;
+          this.x *= l;
+          this.y *= l;
+          this.z *= l;
+          this.w *= l;
+        }
+
+        return this;
+      }
+      /**
+       * set the values of this quaternion from an axis/angle representation
+       *
+       * @param {ThreeVector} axis The axis
+       * @param {Number} angle angle in radians
+       * @return {Quaternion} returns self
+       */
+
+    }, {
+      key: "setFromAxisAngle",
+      value: function setFromAxisAngle(axis, angle) {
+        if (angle < 0) angle += Math.PI * 2;
+        var halfAngle = angle * 0.5;
+        var s = Math.sin(halfAngle);
+        this.x = axis.x * s;
+        this.y = axis.y * s;
+        this.z = axis.z * s;
+        this.w = Math.cos(halfAngle);
+        return this;
+      }
+      /**
+       * conjugate the quaternion, in-place
+       *
+       * @return {Quaternion} returns self
+       */
+
+    }, {
+      key: "conjugate",
+      value: function conjugate() {
+        this.x *= -1;
+        this.y *= -1;
+        this.z *= -1;
+        return this;
+      }
+      /* eslint-disable */
+
+      /**
+       * multiply this quaternion by another, in-place
+       *
+       * @param {Quaternion} other The other quaternion
+       * @return {Quaternion} returns self
+       */
+
+    }, {
+      key: "multiply",
+      value: function multiply(other) {
+        var aw = this.w,
+            ax = this.x,
+            ay = this.y,
+            az = this.z;
+        var bw = other.w,
+            bx = other.x,
+            by = other.y,
+            bz = other.z;
+        this.x = ax * bw + aw * bx + ay * bz - az * by;
+        this.y = ay * bw + aw * by + az * bx - ax * bz;
+        this.z = az * bw + aw * bz + ax * by - ay * bx;
+        this.w = aw * bw - ax * bx - ay * by - az * bz;
+        return this;
+      }
+      /* eslint-enable */
+
+      /* eslint-disable */
+
+      /**
+       * Apply in-place slerp (spherical linear interpolation) to this quaternion,
+       * towards another quaternion.
+       *
+       * @param {Quaternion} target The target quaternion
+       * @param {Number} bending The percentage to interpolate
+       * @return {Quaternion} returns self
+       */
+
+    }, {
+      key: "slerp",
+      value: function slerp(target, bending) {
+        if (bending <= 0) return this;
+        if (bending >= 1) return this.copy(target);
+        var aw = this.w,
+            ax = this.x,
+            ay = this.y,
+            az = this.z;
+        var bw = target.w,
+            bx = target.x,
+            by = target.y,
+            bz = target.z;
+        var cosHalfTheta = aw * bw + ax * bx + ay * by + az * bz;
+
+        if (cosHalfTheta < 0) {
+          this.set(-bw, -bx, -by, -bz);
+          cosHalfTheta = -cosHalfTheta;
+        } else {
+          this.copy(target);
+        }
+
+        if (cosHalfTheta >= 1.0) {
+          this.set(aw, ax, ay, az);
+          return this;
+        }
+
+        var sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
+
+        if (sqrSinHalfTheta < Number.EPSILON) {
+          var s = 1 - bending;
+          this.set(s * aw + bending * this.w, s * ax + bending * this.x, s * ay + bending * this.y, s * az + bending * this.z);
+          return this.normalize();
+        }
+
+        var sinHalfTheta = Math.sqrt(sqrSinHalfTheta);
+        var halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
+        var delTheta = bending * halfTheta;
+        if (Math.abs(delTheta) > MAX_DEL_THETA) delTheta = MAX_DEL_THETA * Math.sign(delTheta);
+        var ratioA = Math.sin(halfTheta - delTheta) / sinHalfTheta;
+        var ratioB = Math.sin(delTheta) / sinHalfTheta;
+        this.set(aw * ratioA + this.w * ratioB, ax * ratioA + this.x * ratioB, ay * ratioA + this.y * ratioB, az * ratioA + this.z * ratioB);
+        return this;
+      }
+      /* eslint-enable */
+
+    }]);
+
+    return Quaternion;
+  }(Serializable);
+
+  /**
    * GameObject is the base class of all game objects.
    * It is created only for the purpose of clearly defining the game
    * object interface.
@@ -17145,505 +17643,6 @@
 
     return PhysicalObject2D;
   }(GameObject);
-
-  /**
-   * A ThreeVector is a geometric object which is completely described
-   * by three values.
-   */
-
-  var ThreeVector =
-  /*#__PURE__*/
-  function (_Serializable) {
-    _inherits(ThreeVector, _Serializable);
-
-    _createClass(ThreeVector, null, [{
-      key: "netScheme",
-      get: function get() {
-        return {
-          x: {
-            type: BaseTypes.TYPES.FLOAT32
-          },
-          y: {
-            type: BaseTypes.TYPES.FLOAT32
-          },
-          z: {
-            type: BaseTypes.TYPES.FLOAT32
-          }
-        };
-      }
-      /**
-      * Creates an instance of a ThreeVector.
-      * @param {Number} x - first value
-      * @param {Number} y - second value
-      * @param {Number} z - second value
-      * @return {ThreeVector} v - the new ThreeVector
-      */
-
-    }]);
-
-    function ThreeVector(x, y, z) {
-      var _this;
-
-      _classCallCheck(this, ThreeVector);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(ThreeVector).call(this));
-      _this.x = x;
-      _this.y = y;
-      _this.z = z;
-      return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
-    }
-    /**
-     * Formatted textual description of the ThreeVector.
-     * @return {String} description
-     */
-
-
-    _createClass(ThreeVector, [{
-      key: "toString",
-      value: function toString() {
-        function round3(x) {
-          return Math.round(x * 1000) / 1000;
-        }
-
-        return "[".concat(round3(this.x), ", ").concat(round3(this.y), ", ").concat(round3(this.z), "]");
-      }
-      /**
-       * Multiply this ThreeVector by a scalar
-       *
-       * @param {Number} s the scale
-       * @return {ThreeVector} returns self
-       */
-
-    }, {
-      key: "multiplyScalar",
-      value: function multiplyScalar(s) {
-        this.x *= s;
-        this.y *= s;
-        this.z *= s;
-        return this;
-      }
-      /**
-       * Get vector length
-       *
-       * @return {Number} length of this vector
-       */
-
-    }, {
-      key: "length",
-      value: function length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-      }
-      /**
-       * Add other vector to this vector
-       *
-       * @param {ThreeVector} other the other vector
-       * @return {ThreeVector} returns self
-       */
-
-    }, {
-      key: "add",
-      value: function add(other) {
-        this.x += other.x;
-        this.y += other.y;
-        this.z += other.z;
-        return this;
-      }
-      /**
-       * Subtract other vector from this vector
-       *
-       * @param {ThreeVector} other the other vector
-       * @return {ThreeVector} returns self
-       */
-
-    }, {
-      key: "subtract",
-      value: function subtract(other) {
-        this.x -= other.x;
-        this.y -= other.y;
-        this.z -= other.z;
-        return this;
-      }
-      /**
-       * Normalize this vector, in-place
-       *
-       * @return {ThreeVector} returns self
-       */
-
-    }, {
-      key: "normalize",
-      value: function normalize() {
-        this.multiplyScalar(1 / this.length());
-        return this;
-      }
-      /**
-       * Copy values from another ThreeVector into this ThreeVector
-       *
-       * @param {ThreeVector} sourceObj the other vector
-       * @return {ThreeVector} returns self
-       */
-
-    }, {
-      key: "copy",
-      value: function copy(sourceObj) {
-        this.x = sourceObj.x;
-        this.y = sourceObj.y;
-        this.z = sourceObj.z;
-        return this;
-      }
-      /**
-       * Set ThreeVector values
-       *
-       * @param {Number} x x-value
-       * @param {Number} y y-value
-       * @param {Number} z z-value
-       * @return {ThreeVector} returns self
-       */
-
-    }, {
-      key: "set",
-      value: function set(x, y, z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        return this;
-      }
-      /**
-       * Create a clone of this vector
-       *
-       * @return {ThreeVector} returns clone
-       */
-
-    }, {
-      key: "clone",
-      value: function clone() {
-        return new ThreeVector(this.x, this.y, this.z);
-      }
-      /**
-       * Apply in-place lerp (linear interpolation) to this ThreeVector
-       * towards another ThreeVector
-       * @param {ThreeVector} target the target vector
-       * @param {Number} p The percentage to interpolate
-       * @return {ThreeVector} returns self
-       */
-
-    }, {
-      key: "lerp",
-      value: function lerp(target, p) {
-        this.x += (target.x - this.x) * p;
-        this.y += (target.y - this.y) * p;
-        this.z += (target.z - this.z) * p;
-        return this;
-      }
-      /**
-       * Get bending Delta Vector
-       * towards another ThreeVector
-       * @param {ThreeVector} target the target vector
-       * @param {Object} options bending options
-       * @param {Number} options.increments number of increments
-       * @param {Number} options.percent The percentage to bend
-       * @param {Number} options.min No less than this value
-       * @param {Number} options.max No more than this value
-       * @return {ThreeVector} returns new Incremental Vector
-       */
-
-    }, {
-      key: "getBendingDelta",
-      value: function getBendingDelta(target, options) {
-        var increment = target.clone();
-        increment.subtract(this);
-        increment.multiplyScalar(options.percent); // check for max case
-
-        if (options.max && increment.length() > options.max || options.max && increment.length() < options.min) {
-          return new ThreeVector(0, 0, 0);
-        } // divide into increments
-
-
-        increment.multiplyScalar(1 / options.increments);
-        return increment;
-      }
-    }]);
-
-    return ThreeVector;
-  }(Serializable);
-
-  var MAX_DEL_THETA = 0.2;
-  /**
-   * A Quaternion is a geometric object which can be used to
-   * represent a three-dimensional rotation.
-   */
-
-  var Quaternion =
-  /*#__PURE__*/
-  function (_Serializable) {
-    _inherits(Quaternion, _Serializable);
-
-    _createClass(Quaternion, null, [{
-      key: "netScheme",
-      get: function get() {
-        return {
-          w: {
-            type: BaseTypes.TYPES.FLOAT32
-          },
-          x: {
-            type: BaseTypes.TYPES.FLOAT32
-          },
-          y: {
-            type: BaseTypes.TYPES.FLOAT32
-          },
-          z: {
-            type: BaseTypes.TYPES.FLOAT32
-          }
-        };
-      }
-      /**
-      * Creates an instance of a Quaternion.
-      * @param {Number} w - first value
-      * @param {Number} x - second value
-      * @param {Number} y - third value
-      * @param {Number} z - fourth value
-      * @return {Quaternion} v - the new Quaternion
-      */
-
-    }]);
-
-    function Quaternion(w, x, y, z) {
-      var _this;
-
-      _classCallCheck(this, Quaternion);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Quaternion).call(this));
-      _this.w = w;
-      _this.x = x;
-      _this.y = y;
-      _this.z = z;
-      return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
-    }
-    /**
-     * Formatted textual description of the Quaternion.
-     * @return {String} description
-     */
-
-
-    _createClass(Quaternion, [{
-      key: "toString",
-      value: function toString() {
-        function round3(x) {
-          return Math.round(x * 1000) / 1000;
-        }
-
-        {
-          var axisAngle = this.toAxisAngle();
-          return "[".concat(round3(axisAngle.angle), ",").concat(axisAngle.axis.toString(), "]");
-        }
-
-        return "[".concat(round3(this.w), ", ").concat(round3(this.x), ", ").concat(round3(this.y), ", ").concat(round3(this.z), "]");
-      }
-      /**
-       * copy values from another quaternion into this quaternion
-       *
-       * @param {Quaternion} sourceObj the quaternion to copy from
-       * @return {Quaternion} returns self
-       */
-
-    }, {
-      key: "copy",
-      value: function copy(sourceObj) {
-        this.set(sourceObj.w, sourceObj.x, sourceObj.y, sourceObj.z);
-        return this;
-      }
-      /**
-       * set quaternion values
-       *
-       * @param {Number} w w-value
-       * @param {Number} x x-value
-       * @param {Number} y y-value
-       * @param {Number} z z-value
-       * @return {Quaternion} returns self
-       */
-
-    }, {
-      key: "set",
-      value: function set(w, x, y, z) {
-        this.w = w;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        return this;
-      }
-      /**
-       * return an axis-angle representation of this quaternion
-       *
-       * @return {Object} contains two attributes: axis (ThreeVector) and angle.
-       */
-
-    }, {
-      key: "toAxisAngle",
-      value: function toAxisAngle() {
-        // assuming quaternion normalised then w is less than 1, so term always positive.
-        var axis = new ThreeVector(1, 0, 0);
-        this.normalize();
-        var angle = 2 * Math.acos(this.w);
-        var s = Math.sqrt(1 - this.w * this.w);
-
-        if (s > 0.001) {
-          var divS = 1 / s;
-          axis.x = this.x * divS;
-          axis.y = this.y * divS;
-          axis.z = this.z * divS;
-        }
-
-        if (s > Math.PI) {
-          s -= 2 * Math.PI;
-        }
-
-        return {
-          axis: axis,
-          angle: angle
-        };
-      }
-    }, {
-      key: "normalize",
-      value: function normalize() {
-        var l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
-
-        if (l === 0) {
-          this.x = 0;
-          this.y = 0;
-          this.z = 0;
-          this.w = 0;
-        } else {
-          l = 1 / l;
-          this.x *= l;
-          this.y *= l;
-          this.z *= l;
-          this.w *= l;
-        }
-
-        return this;
-      }
-      /**
-       * set the values of this quaternion from an axis/angle representation
-       *
-       * @param {ThreeVector} axis The axis
-       * @param {Number} angle angle in radians
-       * @return {Quaternion} returns self
-       */
-
-    }, {
-      key: "setFromAxisAngle",
-      value: function setFromAxisAngle(axis, angle) {
-        if (angle < 0) angle += Math.PI * 2;
-        var halfAngle = angle * 0.5;
-        var s = Math.sin(halfAngle);
-        this.x = axis.x * s;
-        this.y = axis.y * s;
-        this.z = axis.z * s;
-        this.w = Math.cos(halfAngle);
-        return this;
-      }
-      /**
-       * conjugate the quaternion, in-place
-       *
-       * @return {Quaternion} returns self
-       */
-
-    }, {
-      key: "conjugate",
-      value: function conjugate() {
-        this.x *= -1;
-        this.y *= -1;
-        this.z *= -1;
-        return this;
-      }
-      /* eslint-disable */
-
-      /**
-       * multiply this quaternion by another, in-place
-       *
-       * @param {Quaternion} other The other quaternion
-       * @return {Quaternion} returns self
-       */
-
-    }, {
-      key: "multiply",
-      value: function multiply(other) {
-        var aw = this.w,
-            ax = this.x,
-            ay = this.y,
-            az = this.z;
-        var bw = other.w,
-            bx = other.x,
-            by = other.y,
-            bz = other.z;
-        this.x = ax * bw + aw * bx + ay * bz - az * by;
-        this.y = ay * bw + aw * by + az * bx - ax * bz;
-        this.z = az * bw + aw * bz + ax * by - ay * bx;
-        this.w = aw * bw - ax * bx - ay * by - az * bz;
-        return this;
-      }
-      /* eslint-enable */
-
-      /* eslint-disable */
-
-      /**
-       * Apply in-place slerp (spherical linear interpolation) to this quaternion,
-       * towards another quaternion.
-       *
-       * @param {Quaternion} target The target quaternion
-       * @param {Number} bending The percentage to interpolate
-       * @return {Quaternion} returns self
-       */
-
-    }, {
-      key: "slerp",
-      value: function slerp(target, bending) {
-        if (bending <= 0) return this;
-        if (bending >= 1) return this.copy(target);
-        var aw = this.w,
-            ax = this.x,
-            ay = this.y,
-            az = this.z;
-        var bw = target.w,
-            bx = target.x,
-            by = target.y,
-            bz = target.z;
-        var cosHalfTheta = aw * bw + ax * bx + ay * by + az * bz;
-
-        if (cosHalfTheta < 0) {
-          this.set(-bw, -bx, -by, -bz);
-          cosHalfTheta = -cosHalfTheta;
-        } else {
-          this.copy(target);
-        }
-
-        if (cosHalfTheta >= 1.0) {
-          this.set(aw, ax, ay, az);
-          return this;
-        }
-
-        var sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
-
-        if (sqrSinHalfTheta < Number.EPSILON) {
-          var s = 1 - bending;
-          this.set(s * aw + bending * this.w, s * ax + bending * this.x, s * ay + bending * this.y, s * az + bending * this.z);
-          return this.normalize();
-        }
-
-        var sinHalfTheta = Math.sqrt(sqrSinHalfTheta);
-        var halfTheta = Math.atan2(sinHalfTheta, cosHalfTheta);
-        var delTheta = bending * halfTheta;
-        if (Math.abs(delTheta) > MAX_DEL_THETA) delTheta = MAX_DEL_THETA * Math.sign(delTheta);
-        var ratioA = Math.sin(halfTheta - delTheta) / sinHalfTheta;
-        var ratioB = Math.sin(delTheta) / sinHalfTheta;
-        this.set(aw * ratioA + this.w * ratioB, ax * ratioA + this.x * ratioB, ay * ratioA + this.y * ratioB, az * ratioA + this.z * ratioB);
-        return this;
-      }
-      /* eslint-enable */
-
-    }]);
-
-    return Quaternion;
-  }(Serializable);
 
   /**
    * The PhysicalObject3D is the base class for physical game objects
@@ -27271,6 +27270,8 @@
   exports.SimplePhysicsEngine = SimplePhysicsEngine;
   exports.BaseTypes = BaseTypes;
   exports.TwoVector = TwoVector;
+  exports.ThreeVector = ThreeVector;
+  exports.Quaternion = Quaternion;
   exports.DynamicObject = DynamicObject;
   exports.PhysicalObject2D = PhysicalObject2D;
   exports.PhysicalObject3D = PhysicalObject3D;
