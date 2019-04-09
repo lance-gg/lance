@@ -12290,30 +12290,35 @@ RotationalSpring.prototype.applyForce = function(){
     bodyB.angularForce += torque;
 };
 
-var _from = "p2@^0.7.1";
+var _args = [
+	[
+		"p2@0.7.1",
+		"/mnt/c/work/git/temp/lance"
+	]
+];
+var _from = "p2@0.7.1";
 var _id = "p2@0.7.1";
 var _inBundle = false;
 var _integrity = "sha1-JfJHTZvDptMUCh2iamfJ4RislUM=";
-var _location = "/lance-gg/p2";
+var _location = "/p2";
 var _phantomChildren = {
 };
 var _requested = {
-	type: "range",
+	type: "version",
 	registry: true,
-	raw: "p2@^0.7.1",
+	raw: "p2@0.7.1",
 	name: "p2",
 	escapedName: "p2",
-	rawSpec: "^0.7.1",
+	rawSpec: "0.7.1",
 	saveSpec: null,
-	fetchSpec: "^0.7.1"
+	fetchSpec: "0.7.1"
 };
 var _requiredBy = [
-	"/lance-gg"
+	"/"
 ];
 var _resolved = "https://registry.npmjs.org/p2/-/p2-0.7.1.tgz";
-var _shasum = "25f2474d9bc3a6d3140a1da26a67c9e118ac9543";
-var _spec = "p2@^0.7.1";
-var _where = "C:\\work\\git\\lance";
+var _spec = "0.7.1";
+var _where = "/mnt/c/work/git/temp/lance";
 var author = {
 	name: "Stefan Hedman",
 	email: "schteppe@gmail.com",
@@ -12322,11 +12327,9 @@ var author = {
 var bugs = {
 	url: "https://github.com/schteppe/p2.js/issues"
 };
-var bundleDependencies = false;
 var dependencies = {
 	"poly-decomp": "0.1.1"
 };
-var deprecated = false;
 var description = "A JavaScript 2D physics engine.";
 var devDependencies = {
 	grunt: "^0.4.5",
@@ -12361,6 +12364,7 @@ var repository = {
 };
 var version = "0.7.1";
 var _package = {
+	_args: _args,
 	_from: _from,
 	_id: _id,
 	_inBundle: _inBundle,
@@ -12370,14 +12374,11 @@ var _package = {
 	_requested: _requested,
 	_requiredBy: _requiredBy,
 	_resolved: _resolved,
-	_shasum: _shasum,
 	_spec: _spec,
 	_where: _where,
 	author: author,
 	bugs: bugs,
-	bundleDependencies: bundleDependencies,
 	dependencies: dependencies,
-	deprecated: deprecated,
 	description: description,
 	devDependencies: devDependencies,
 	engines: engines,
@@ -12391,6 +12392,7 @@ var _package = {
 };
 
 var _package$1 = /*#__PURE__*/Object.freeze({
+    _args: _args,
     _from: _from,
     _id: _id,
     _inBundle: _inBundle,
@@ -12400,14 +12402,11 @@ var _package$1 = /*#__PURE__*/Object.freeze({
     _requested: _requested,
     _requiredBy: _requiredBy,
     _resolved: _resolved,
-    _shasum: _shasum,
     _spec: _spec,
     _where: _where,
     author: author,
     bugs: bugs,
-    bundleDependencies: bundleDependencies,
     dependencies: dependencies,
-    deprecated: deprecated,
     description: description,
     devDependencies: devDependencies,
     engines: engines,
