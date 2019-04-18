@@ -1,6 +1,6 @@
 {
   "name": "lance-gg",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "A Node.js based real-time multiplayer game server",
   "main": "dist/server/lance-gg.js",
   "browser": "dist/client/lance-gg.js",
