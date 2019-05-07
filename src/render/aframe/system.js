@@ -1,7 +1,6 @@
 /* global THREE */
 const FRAME_HISTORY_SIZE = 20;
 const MAX_SLOW_FRAMES = 10;
-const CAMERA_OFFSET_VEC = new THREE.Vector3(0, 5, -10);
 
 export default {
     schema: {
@@ -16,6 +15,7 @@ export default {
         //       setting the quaternion, position, material, game-object-id
         //       and obj-model.  Same goes for objects which use primitive
         //       geometric objects.  Remember to also remove them.
+        this.CAMERA_OFFSET_VEC = new THREE.Vector3(0, 5, -10);
         this.frameRateHistory = [];
         for (let i = 0; i < FRAME_HISTORY_SIZE; i++)
             this.frameRateHistory.push(false);
@@ -53,7 +53,7 @@ export default {
                 // if a chase camera is configured, update it
                 if (this.cameraEl && this.gameEngine.playerId === o.playerId) {
                     let camera = this.cameraEl.object3D.children[0];
-                    let relativeCameraOffset = CAMERA_OFFSET_VEC.clone();
+                    let relativeCameraOffset = this.CAMERA_OFFSET_VEC.clone();
                     let cameraOffset = relativeCameraOffset.applyMatrix4(o.renderEl.object3D.matrixWorld);
                     camera.position.copy(cameraOffset);
                     camera.lookAt(o.renderEl.object3D.position);
