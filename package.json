@@ -2,6 +2,7 @@
   "name": "incheon-site",
   "main": "webpack.config.js",
   "dependencies": {
+    "acorn": "^6.1.1",
     "smooth-scroll": "github:cferdinandi/smooth-scroll",
     "waypoints": "^4.0.1",
     "zenscroll": "^3.3.0"
