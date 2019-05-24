@@ -167,7 +167,16 @@ const keyCodeTable = {
 };
 
 /**
- * This class allows easy usage of device keyboard controls
+ * This class allows easy usage of device keyboard controls.  Use the method {@link KeyboardControls#bindKey} to
+ * generate events whenever a key is pressed.
+ *
+ * @example
+ *    // in the ClientEngine constructor
+ *    this.controls = new KeyboardControls(this);
+ *    this.controls.bindKey('left', 'left', { repeat: true } );
+ *    this.controls.bindKey('right', 'right', { repeat: true } );
+ *    this.controls.bindKey('space', 'space');
+ *
  */
 class KeyboardControls {
 
@@ -204,6 +213,20 @@ class KeyboardControls {
         document.addEventListener('keyup', (e) => { this.onKeyChange(e, false);});
     }
 
+    /**
+     * Bind a keyboard key to a Lance client event.  Each time the key is pressed,
+     * an event will be transmitted by the client engine, using {@link ClientEngine#sendInput},
+     * and the specified event name.
+     *
+     * Common key names: up, down, left, right, enter, shift, ctrl, alt,
+     * escape, space, page up, page down, end, home, 0..9, a..z, A..Z.
+     * For a full list, please check the source link above.
+     *
+     * @param {String} keys - keyboard key (or array of keys) which will cause the event.
+     * @param {String} actionName - the event name
+     * @param {Object} options - options object
+     * @param {Boolean} options.repeat - if set to true, an event continues to be sent on each game step, while the key is pressed
+     */
     bindKey(keys, actionName, options) {
         if (!Array.isArray(keys)) keys = [keys];
 

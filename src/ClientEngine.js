@@ -17,6 +17,9 @@ const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution b
  * process, starting the game engine, listening to network messages,
  * starting client steps, and handling world updates which arrive from
  * the server.
+ * Normally, a game will implement its own sub-class of ClientEngine, and may
+ * override the constructor {@link ClientEngine#constructor} and the methods
+ * {@link ClientEngine#start} and {@link ClientEngine#connect}
  */
 class ClientEngine {
 
@@ -31,9 +34,9 @@ class ClientEngine {
       * @param {Number} inputOptions.delayInputCount - if set, inputs will be delayed by this many steps before they are actually applied on the client.
       * @param {Number} inputOptions.healthCheckInterval - health check message interval (millisec). Default is 1000.
       * @param {Number} inputOptions.healthCheckRTTSample - health check RTT calculation sample size. Default is 10.
-      * @param {Object} inputOptions.syncOptions - an object describing the synchronization method. If not set, will be set to extrapolate, with local object bending set to 0.0 and remote object bending set to 0.6. If the query-string parameter "sync" is defined, then that value is passed to this object's sync attribute.
       * @param {String} inputOptions.scheduler - When set to "render-schedule" the game step scheduling is controlled by the renderer and step time is variable.  When set to "fixed" the game step is run independently with a fixed step time. Default is "render-schedule".
-      * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be interpolate, extrapolate, or frameSync
+      * @param {Object} inputOptions.syncOptions - an object describing the synchronization method. If not set, will be set to extrapolate, with local object bending set to 0.0 and remote object bending set to 0.6. If the query-string parameter "sync" is defined, then that value is passed to this object's sync attribute.
+      * @param {String} inputOptions.syncOptions.sync - chosen sync option, can be "interpolate", "extrapolate", or "frameSync"
       * @param {Number} inputOptions.syncOptions.localObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for local objects
       * @param {Number} inputOptions.syncOptions.remoteObjBending - amount (0 to 1.0) of bending towards original client position, after each sync, for remote objects
       * @param {String} inputOptions.serverURL - Socket server url
@@ -342,7 +345,7 @@ class ClientEngine {
      * so configured) and will transmit the input to the server as well.
      *
      * This function can be called by the extended client engine class,
-     * typically at the beginning of client-side step processing (see event client__preStep)
+     * typically at the beginning of client-side step processing {@see GameEngine#client__preStep}.
      *
      * @param {String} input - string representing the input
      * @param {Object} inputOptions - options for the input

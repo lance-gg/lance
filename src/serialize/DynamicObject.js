@@ -4,8 +4,8 @@ import BaseTypes from './BaseTypes';
 import MathUtils from '../lib/MathUtils';
 
 /**
- * DynamicObject is the base class of the game's objects, for games which
- * rely on SimplePhysicsEngine.  It defines the
+ * DynamicObject is the base class of the game's objects, for 2D games which
+ * rely on {@link SimplePhysicsEngine}.  It defines the
  * base object which can move around in the game world.  The
  * extensions of this object (the subclasses)
  * will be periodically synchronized from the server to every client.
@@ -52,7 +52,9 @@ class DynamicObject extends GameObject {
 
     /**
     * Creates an instance of a dynamic object.
-    * NOTE: all subclasses of this class must comply with this constructor signature.
+    * NOTE 1: do not add logic to subcclasses of this function, instead, create an instance and
+    *       assign attributes to the new objects.
+    * NOTE 2: all subclasses of this class must comply with this constructor signature.
     *       This is required because the engine will create temporary instances when
     *       syncs arrive on the clients.
     * @param {GameEngine} gameEngine - the gameEngine this object will be used in
@@ -183,7 +185,7 @@ class DynamicObject extends GameObject {
      * Each object class can define its own bending overrides.
      * return an object which can include attributes: position, velocity,
      * and angle.  In each case, you can specify a min value, max
-     * value, and a percent value.
+     * value, and a percent value.  { @see GameObject.bending }
      *
      * @return {Object} bending - an object with bending paramters
      */
@@ -249,7 +251,7 @@ class DynamicObject extends GameObject {
     get maxSpeed() { return null; }
 
     /**
-    * Copy the netscheme variables from another DynamicObject
+    * Copy the netscheme variables from another DynamicObject.
     * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
     * @param {DynamicObject} other DynamicObject
     */

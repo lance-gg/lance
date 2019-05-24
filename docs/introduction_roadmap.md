@@ -12,11 +12,14 @@
 
 All releases listed here, along with their planned release dates and their listed contents, are a statement of intentions, and are provided with no guarantee whatsoever.  Lance is an open-source project and as such depends on the available time of its developers.  The roadmap is subject to change at any time.
 
-### r5.0.0 - *Noether* - December 2019
+### r5.0.0 - *Maxwell* - December 2019
 
 ## Roadmap Candidates
 
+There are many candidates, please upvote your favourite at the corresponding github issue-request.
+
 * entity-component-system redesign
+* typescript
 * UDP via WebRTC
 * Electron support
 * MatterJS support

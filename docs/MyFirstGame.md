@@ -14,7 +14,7 @@ $ npm install
 
 The entire tutorial will be limited to editing a single file, `src/common/Game.js` for the sake of simplicity.  All the Pong game logic is implemented in this one file.  However, you may want to look around. The boilerplate directory includes a `dist/index.html` file, which will be served to the clients, and a `main.js` file, which is the entry point of the node.js server.  `src/client/clientEntryPoint.js` is the entry point of the client.  The game code is inside the `src` directory, and more advanced games will take advantage of the sub-directories `client`, `server`, and `common` to structure the code.
 
-Take a look at `webpack.config.js` which shows how the game is packaged, and `.babelrc` shows how the game loads the lance library.
+Take a look at `webpack.config.js` which shows how the game is packaged for clients, and `babel.config.js` shows how the game is built for the server.
 
 
 ## Step 1: Create the Game Object Classes

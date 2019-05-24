@@ -1,6 +1,6 @@
 
 /**
- * The BaseTypes class defines the base types used in lance.
+ * The BaseTypes class defines the base types used in Lance.
  * These are the types which can be used to define an object's netscheme attributes,
  * which can be serialized by lance.
  * @example

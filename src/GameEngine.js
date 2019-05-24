@@ -29,8 +29,7 @@ class GameEngine {
       * once on the server, and once on each client.
       *
       * @param {Object} options - options object
-      * @param {Number} options.traceLevel - the trace level from 0 to 5.  Lower value traces more.
-      * @param {Number} options.delayInputCount - client side only.  Introduce an artificial delay on the client to better match the time it will occur on the server.  This value sets the number of steps the client will wait before applying the input locally
+      * @param {Number} options.traceLevel - the trace level.
       */
     constructor(options) {
 
@@ -40,7 +39,7 @@ class GameEngine {
         glob.LANCE = { gameEngine: this };
 
         // set options
-        const defaultOpts = { GameWorld: GameWorld, traceLevel: Trace.TRACE_NONE };
+        const defaultOpts = { traceLevel: Trace.TRACE_NONE };
         if (!isServerSide) defaultOpts.clientIDSpace = 1000000;
         this.options = Object.assign(defaultOpts, options);
 
@@ -200,7 +199,7 @@ class GameEngine {
      * is using delayed-input, and the RTT is very low.
      *
      * @param {Object} object - the object.
-     * @return {Object} object - the final object.
+     * @return {Object} the final object.
      */
     addObjectToWorld(object) {
 
@@ -295,8 +294,8 @@ class GameEngine {
      *
      * @example
      * registerClasses(serializer) {
-     *   serializer.registerClass(require('../common/Paddle'));
-     *   serializer.registerClass(require('../common/Ball'));
+     *   serializer.registerClass(Paddle);
+     *   serializer.registerClass(Ball);
      * }
      *
      * @param {Serializer} serializer - the serializer
