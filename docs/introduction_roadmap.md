@@ -1,11 +1,13 @@
 
 ## Current Release
 
-### r4.0.0 - *Noether* - March 2019
+### r4.0.0 - *Noether* - May 2019
 
-* adds rollup-js for native modules
-* one-page games
-* support for rooms (game object name-spacing)
+Release 4.0.0 is now available for npm-installing.  It provides mostly infrastructure improvements, which were required for some basic feature implementation.
+
+* adds rollup-js for native modules.  This will allow tree-shaking on the game side, making the client code smaller.  It also enables TypeScript exports, which is the most popular feature request.
+* one-page games.  There are several one-page game examples in the examples repo [tinygames](https://github.com/lance-gg/tinygames).
+* support for rooms (game object name-spacing).  Using new methods in the ServerEngine: `createRoom()`, `assignObjectToRoom()`, and `assignPlayerToRoom()`
 * upgrade to babel 7.0
 
 ## Future Releases
