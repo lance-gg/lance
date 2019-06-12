@@ -50,7 +50,10 @@ class GameEngine {
         this.playerId = NaN;
 
         // set up event emitting and interface
-        let eventEmitter = new EventEmitter();
+        let eventEmitter = this.options.eventEmitter
+        if (typeof eventEmitter === 'undefined') {
+          eventEmitter = new EventEmitter();
+        }
 
         /**
          * Register a handler for an event
