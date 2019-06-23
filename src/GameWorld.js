@@ -1,12 +1,13 @@
 /**
- * This class represents an instance of the game world,
- * where all data pertaining to the current state of the
- * world is saved.
+ * This class implements a singleton game world instance, created by Lance.
+ * It represents an instance of the game world, and includes all the game objects.
+ * It is the state of the game.
  */
 class GameWorld {
 
     /**
      * Constructor of the World instance
+     * @ignore
      */
     constructor() {
         this.stepCount = 0;
@@ -18,6 +19,7 @@ class GameWorld {
     /**
      * Gets a new, fresh and unused id that can be used for a new object
      * @return {Number} the new id
+     * @ignore
      */
     getNewId() {
         let possibleId = this.idCount;
@@ -37,7 +39,7 @@ class GameWorld {
      * @param {Class} [query.instanceType] matches whether `object instanceof instanceType`
      * @param {Array} [query.components] An array of component names
      * @param {Boolean} [query.returnSingle] Return the first object matched
-     * @returns {Array | Object} All game objects which match all the query parameters, or the first match if returnSingle was specified
+     * @return {Array | Object} All game objects which match all the query parameters, or the first match if returnSingle was specified
      */
     queryObjects(query) {
         let queriedObjects = [];
@@ -80,9 +82,9 @@ class GameWorld {
 
     /**
      * Returns The first game object encountered which matches a criteria.
-     * Syntactic sugar for {@link queryObject} with `returnSingle: true`
-     * @param query See queryObjects
-     * @returns {Object}
+     * Syntactic sugar for {@link queryObjects} with `returnSingle: true`
+     * @param {Object} query See queryObjects
+     * @return {Object} The game object, if found
      */
     queryObject(query) {
         return this.queryObjects(Object.assign(query, {
@@ -93,6 +95,7 @@ class GameWorld {
     /**
      * Add an object to the game world
      * @param {Object} object object to add
+     * @ignore
      */
     addObject(object) {
         this.objects[object.id] = object;
@@ -101,6 +104,7 @@ class GameWorld {
     /**
      * Remove an object from the game world
      * @param {number} id id of the object to remove
+     * @ignore
      */
     removeObject(id) {
         delete this.objects[id];
