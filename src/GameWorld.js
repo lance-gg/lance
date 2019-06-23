@@ -6,8 +6,9 @@
 class GameWorld {
 
     /**
-     * Constructor of the World instance
-     * @ignore
+     * Constructor of the World instance.  Invoked by Lance on startup.
+     *
+     * @hideconstructor
      */
     constructor() {
         this.stepCount = 0;
@@ -18,8 +19,8 @@ class GameWorld {
 
     /**
      * Gets a new, fresh and unused id that can be used for a new object
+     * @private
      * @return {Number} the new id
-     * @ignore
      */
     getNewId() {
         let possibleId = this.idCount;
@@ -94,8 +95,8 @@ class GameWorld {
 
     /**
      * Add an object to the game world
+     * @private
      * @param {Object} object object to add
-     * @ignore
      */
     addObject(object) {
         this.objects[object.id] = object;
@@ -103,8 +104,8 @@ class GameWorld {
 
     /**
      * Remove an object from the game world
+     * @private
      * @param {number} id id of the object to remove
-     * @ignore
      */
     removeObject(id) {
         delete this.objects[id];
