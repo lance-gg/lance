@@ -7,6 +7,7 @@ import BaseTypes from '../serialize/BaseTypes.js';
 import TwoVector from '../serialize/TwoVector.js';
 import ThreeVector from '../serialize/ThreeVector.js';
 import Quaternion from '../serialize/Quaternion.js';
+import GameObject from '../serialize/GameObject.js';
 import DynamicObject from '../serialize/DynamicObject.js';
 import PhysicalObject2D from '../serialize/PhysicalObject2D.js';
 import PhysicalObject3D from '../serialize/PhysicalObject3D.js';
@@ -26,6 +27,7 @@ export {
   TwoVector,
   ThreeVector,
   Quaternion,
+  GameObject,
   DynamicObject,
   PhysicalObject2D,
   PhysicalObject3D,

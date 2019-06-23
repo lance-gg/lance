@@ -30,14 +30,14 @@
     "url": "git://github.com/lance-gg/lance.git"
   },
   "dependencies": {
+    "bufferutil": "^4.0.1",
     "cannon": "^0.6.2",
     "event-emitter": "^0.3.5",
-    "jsdoc": "^3.5.5",
+    "jsdoc": "^3.6.2",
     "mkdirp": "^0.5.1",
     "p2": "^0.7.1",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
-    "bufferutil": "^4.0.1",
     "utf-8-validate": "^5.0.2"
   },
   "files": [
