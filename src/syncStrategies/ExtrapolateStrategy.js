@@ -18,7 +18,6 @@ export default class ExtrapolateStrategy extends SyncStrategy {
         super(clientEngine, options);
 
         this.lastSync = null;
-        this.needFirstSync = true;
         this.recentInputs = {};
         this.gameEngine.on('client__processInput', this.clientInputSave.bind(this));
         this.STEP_DRIFT_THRESHOLDS = {

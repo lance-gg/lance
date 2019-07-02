@@ -9,68 +9,51 @@ export default class FrameSyncStrategy extends SyncStrategy {
 
     constructor(clientEngine, inputOptions) {
 
-        super(clientEngine, inputOptions);
-        this.options = Object.assign(defaults, inputOptions);
+        const options = Object.assign({}, defaults, inputOptions);
+        super(clientEngine, options);
 
         this.gameEngine = this.clientEngine.gameEngine;
-        this.gameEngine.on('postStep', this.frameSync.bind(this));
-        this.gameEngine.on('client__syncReceived', this.keepSnapshot.bind(this));
     }
 
-    // keep snapshot if it's the most recent we've seen
-    keepSnapshot(e) {
-        if (!this.latestSnapshot || e.snapshot.stepCount > this.latestSnapshot.stepCount) {
-            this.latestSnapshot = e.snapshot;
-        }
-    }
+    // apply a new sync
+    applySync(sync, required) {
 
-    /**
-     * Perform client-side interpolation.
-     */
-    frameSync() {
-
+        this.needFirstSync = false;
+        this.gameEngine.trace.debug(() => 'framySync applying sync');
         let world = this.gameEngine.world;
-        let nextWorld = this.latestSnapshot;
 
-        // see if we need to sync
-        // TODO: might as well exit this function now if (nextWorld.step == world.step)
-        if (!nextWorld) {
-            return;
-        }
-
-        // create new objects, interpolate existing objects
-        for (let objId in nextWorld.objects) {
-            if (nextWorld.objects.hasOwnProperty(objId)) {
-
-                let curObj = null;
-                let nextObj = nextWorld.objects[objId];
-
-                // if the object is new, add it
-                if (!world.objects.hasOwnProperty(objId)) {
-
-                    curObj = new nextObj.constructor();
-                    curObj.copyFrom(nextObj);
-                    world.objects[objId] = curObj;
-                    curObj.init({
-                        velX: nextObj.velX,
-                        velY: nextObj.velY,
-                        velZ: nextObj.velZ
-                    });
-                    curObj.initRenderObject(this.gameEngine.renderer);
-
-                    // if this game keeps a physics engine on the client side,
-                    // we need to update it as well
-                    if (this.gameEngine.physicsEngine) {
-                        curObj.initPhysicsObject(this.gameEngine.physicsEngine);
-                    }
-                } else {
-                    curObj = world.objects[objId];
-                    curObj.copy(nextObj);
-                }
-
-                // update render sub-object
-                curObj.updateRenderObject();
+        for (let ids of Object.keys(sync.syncObjects)) {
+            let ev = sync.syncObjects[ids][0];
+            let curObj = world.objects[ev.objectInstance.id];
+            if (curObj) {
+                curObj.syncTo(ev.objectInstance);
+            } else {
+                this.addNewObject(ev.objectInstance.id, ev.objectInstance);
             }
         }
+
+        // destroy objects
+        for (let objId of Object.keys(world.objects)) {
+
+            let objEvents = sync.syncObjects[objId];
+
+            // if this was a full sync, and we did not get a corresponding object,
+            // remove the local object
+            if (sync.fullUpdate && !objEvents && objId < this.gameEngine.options.clientIDSpace) {
+                this.gameEngine.removeObjectFromWorld(objId);
+                continue;
+            }
+
+            if (!objEvents || objId >= this.gameEngine.options.clientIDSpace)
+                continue;
+
+            // if we got an objectDestroy event, destroy the object
+            objEvents.forEach((e) => {
+                if (e.eventName === 'objectDestroy') this.gameEngine.removeObjectFromWorld(objId);
+            });
+        }
+
+        return this.SYNC_APPLIED;
     }
+
 }
