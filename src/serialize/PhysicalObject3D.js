@@ -32,7 +32,6 @@ class PhysicalObject3D extends GameObject {
     */
     static get netScheme() {
         return Object.assign({
-            playerId: { type: BaseTypes.TYPES.INT16 },
             position: { type: BaseTypes.TYPES.CLASSINSTANCE },
             quaternion: { type: BaseTypes.TYPES.CLASSINSTANCE },
             velocity: { type: BaseTypes.TYPES.CLASSINSTANCE },
@@ -55,8 +54,7 @@ class PhysicalObject3D extends GameObject {
     * @param {ThreeVector} props.angularVelocity - 3-vector representation of angular velocity
     */
     constructor(gameEngine, options, props) {
-        super(gameEngine, options);
-        this.playerId = 0;
+        super(gameEngine, options, props);
         this.bendingIncrements = 0;
 
         // set default position, velocity and quaternion

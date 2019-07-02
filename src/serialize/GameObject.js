@@ -12,7 +12,8 @@ class GameObject extends Serializable {
 
     static get netScheme() {
         return {
-            id: { type: BaseTypes.TYPES.INT32 }
+            id: { type: BaseTypes.TYPES.INT32 },
+            playerId: { type: BaseTypes.TYPES.INT16 }
         };
     }
 
@@ -21,8 +22,10 @@ class GameObject extends Serializable {
     * @param {GameEngine} gameEngine - the gameEngine this object will be used in
     * @param {Object} options - options for instantiation of the GameObject
     * @param {Number} id - if set, the new instantiated object will be set to this id instead of being generated a new one. Use with caution!
+    * @param {Object} props - additional properties for creation
+    * @param {Number} props.playerId - the playerId value of the player who owns this object
     */
-    constructor(gameEngine, options) {
+    constructor(gameEngine, options, props) {
         super();
         /**
          * The gameEngine this object will be used in
@@ -48,6 +51,12 @@ class GameObject extends Serializable {
             this.id = options.id;
         else if (this.gameEngine)
             this.id = this.gameEngine.world.getNewId();
+
+        /**
+        * playerId of player who created this object
+        * @member {Number}
+        */
+        this.playerId = (props && props.playerId) ? props.playerId : 0;
 
         this.components = {};
     }
@@ -143,6 +152,7 @@ class GameObject extends Serializable {
      */
     syncTo(other) {
         super.syncTo(other);
+        this.playerId = other.playerId;
     }
 
     // copy physical attributes to physics sub-object

@@ -40,7 +40,6 @@ class DynamicObject extends GameObject {
     */
     static get netScheme() {
         return Object.assign({
-            playerId: { type: BaseTypes.TYPES.INT16 },
             position: { type: BaseTypes.TYPES.CLASSINSTANCE },
             width: { type: BaseTypes.TYPES.INT16 },
             height: { type: BaseTypes.TYPES.INT16 },
@@ -66,13 +65,7 @@ class DynamicObject extends GameObject {
     * @param {Number} props.width - object width
     */
     constructor(gameEngine, options, props) {
-        super(gameEngine, options);
-
-        /**
-        * ID of player who created this object
-        * @member {Number}
-        */
-        this.playerId = (props && props.playerId) ? props.playerId : 0;
+        super(gameEngine, options, props);
 
         this.bendingIncrements = 0;
 
@@ -102,12 +95,6 @@ class DynamicObject extends GameObject {
          * @member {TwoVector}
          */
         this.friction = new TwoVector(1, 1);
-
-        /**
-        * playerId
-        * @member {Number}
-        */
-        if (props && props.playerId) this.playerId = props.playerId;
 
         /**
         * position

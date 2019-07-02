@@ -32,7 +32,6 @@ class PhysicalObject2D extends GameObject {
     */
     static get netScheme() {
         return Object.assign({
-            playerId: { type: BaseTypes.TYPES.INT16 },
             mass: { type: BaseTypes.TYPES.FLOAT32 },
             position: { type: BaseTypes.TYPES.CLASSINSTANCE },
             angle: { type: BaseTypes.TYPES.FLOAT32 },
@@ -57,8 +56,7 @@ class PhysicalObject2D extends GameObject {
     * @param {Number} props.angularVelocity - angular velocity
     */
     constructor(gameEngine, options, props) {
-        super(gameEngine, options);
-        this.playerId = 0;
+        super(gameEngine, options, props);
         this.bendingIncrements = 0;
 
         // set default position, velocity and quaternion
@@ -70,7 +68,6 @@ class PhysicalObject2D extends GameObject {
 
         // use values if provided
         props = props || {};
-        if (props.playerId) this.playerId = props.playerId;
         if (props.position) this.position.copy(props.position);
         if (props.velocity) this.velocity.copy(props.velocity);
         if (props.angle) this.angle = props.angle;
