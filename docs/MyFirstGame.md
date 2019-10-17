@@ -199,6 +199,7 @@ serverSideInit() {
 
 }
 ```
+- NOTE: Be sure to import the `TwoVector` class from `lance-gg`
 
 ### New Client Connections
 The methods **serverSidePlayerJoined()** and **serverSidePlayerDisconnected()** were previously registered to handle connection events.  They attach players to the paddles when they join or disconnect.  Fill out the following two methods:
@@ -277,6 +278,7 @@ clientSideDraw() {
     updateEl(document.querySelector('.paddle2'), paddles[1]);
 }
 ```
+- NOTE: Be sure to import the `KeyboardControls` class from `lance-gg`
 
 ## Step 5: Running the Game
 
