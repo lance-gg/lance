@@ -199,8 +199,18 @@ class KeyboardControls {
 
                     // handle repeat press
                     if (this.boundKeys[keyName].options.repeat || this.keyState[keyName].count == 0) {
+
+                        // callback to get live parameters if function
+                        let parameters = this.boundKeys[keyName].parameters;
+                        if (typeof parameters === "function") {
+                            parameters = parameters();
+                        }
+
                         // todo movement is probably redundant
-                        this.clientEngine.sendInput(this.boundKeys[keyName].actionName, { movement: true });
+                        let inputOptions = Object.assign({
+                            movement: true
+                        }, parameters || {});
+                        this.clientEngine.sendInput(this.boundKeys[keyName].actionName, inputOptions);
                         this.keyState[keyName].count++;
                     }
                 }
@@ -226,8 +236,10 @@ class KeyboardControls {
      * @param {String} actionName - the event name
      * @param {Object} options - options object
      * @param {Boolean} options.repeat - if set to true, an event continues to be sent on each game step, while the key is pressed
+     * @param {Object/Function} parameters - parameters (or function to get parameters) to be sent to
+     *                                       the server with sendInput as the inputOptions
      */
-    bindKey(keys, actionName, options) {
+    bindKey(keys, actionName, options, parameters) {
         if (!Array.isArray(keys)) keys = [keys];
 
         let keyOptions = Object.assign({
@@ -235,7 +247,7 @@ class KeyboardControls {
         }, options);
 
         keys.forEach(keyName => {
-            this.boundKeys[keyName] = { actionName, options: keyOptions };
+            this.boundKeys[keyName] = { actionName, options: keyOptions, parameters: parameters };
         });
     }
 
