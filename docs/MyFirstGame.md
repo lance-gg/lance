@@ -17,7 +17,18 @@ The entire tutorial will be limited to editing a single file, `src/common/Game.j
 Take a look at `webpack.config.js` which shows how the game is packaged for clients, and `babel.config.js` shows how the game is built for the server.
 
 
-## Step 1: Create the Game Object Classes
+## Step 1: Add additional imports
+
+Open the file `src/common/Game.js` with your favorite editor, and find the `import { GameEngine, BaseTypes, DynamicObject,...` line. Remove the line, and replace it with this instead:
+
+```javascript
+import { GameEngine, BaseTypes, DynamicObject, SimplePhysicsEngine, TwoVector, KeyboardControls } from 'lance-gg';
+```
+
+This will add `TwoVector` and `KeyboardControls` modules which this pong game uses in later steps.
+
+
+## Step 2: Create the Game Object Classes
 
 There are only two kinds of objects in Pong, the paddle and the ball.
 These classes Paddle and Ball are sub-classes of the `DynamicObject` class, and are quite simple.  Open the file `src/common/Game.js` with your favorite editor, and find the *GAME OBJECTS* section.  Remove the class `YourGameObject` and add the following two classes instead.
@@ -73,7 +84,7 @@ class Ball extends DynamicObject {
 }
 ```
 
-## Step 2: Implement a GameEngine Sub-Class
+## Step 3: Implement a GameEngine Sub-Class
 
 The **GameEngine** sub-class is called **Game**. It runs on both the server and the client, and executes the game's logic.  The client runs the game engine to predict what will happen, but the server execution is the true game progress, overriding what the clients might have predicted.
 
@@ -179,7 +190,7 @@ processInput(inputData, playerId) {
 }
 ```
 
-## Step 3: Server-Only Code
+## Step 4: Server-Only Code
 
 The server engine will initialize the game engine when the game is started, and handle player connections and "disconnections".
 
@@ -224,7 +235,7 @@ serverSidePlayerDisconnected(ev) {
 }
 ```
 
-## Step 4: Client-Only Code
+## Step 5: Client-Only Code
 
 The client-side code must initialize the client, and draw the game on the screen on each render-frame. First, let's add some objects in the HTML file, found in `dist/index.html`.
 
@@ -278,7 +289,7 @@ clientSideDraw() {
 }
 ```
 
-## Step 5: Running the Game
+## Step 6: Running the Game
 
 Once everything has been put together the end result should look like
 the pong sub-directory in the same repository.
