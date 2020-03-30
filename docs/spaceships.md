@@ -153,11 +153,11 @@ The game engine logic has three major tasks:
 1. `destroyMissile()`.  Remove a missile.
 
 
-## Step 3: `clientMain.js`, `SpaaaceClientEngine.js`, and `SpaaaceRenderer.js`
+## Step 3: `clientEntryPoint.js`, `SpaaaceClientEngine.js`, and `SpaaaceRenderer.js`
 
 The client entry code creates a game engine, a client engine, and their options.  The options configure the synchronization.
 
-The full sample code is in [`src/client/clientMain.js`](https://github.com/lance-gg/spaaace/blob/master/src/client/clientMain.js) and is implemented as follows:
+The full sample code is in [`src/client/clientEntryPoint.js`](https://github.com/lance-gg/spaaace/blob/master/src/client/clientEntryPoint.js) and is implemented as follows:
 
 ```javascript
 import Trace from 'lance/lib/Trace';
