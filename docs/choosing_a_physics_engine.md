@@ -35,7 +35,7 @@ See the sample game [Spaaace](https://github.com/lance-gg/spaaace) to see how th
 
 Games which require true physics in 2D can use this mode.  In order to use real physics in 2D, you will need to initialize an instance of `P2PhysicsEngine` in the `GameEngine` constructor.  The underlying physics engine used in this case is P2.  A very lightweight 2D physics engine.  All game object classes must extend the `PhysicalObject2D` base class.
 
-See the sample game [Asteroids](https://github.com/lance-gg/asteroids) to see how this is done.  Also, you may want to compare Spaaace and Asteroids to see how the game experience changes from pseudo-physics to real physics.
+See the sample game [Asteroids](https://github.com/lance-gg/tinygames) to see how this is done.  Also, you may want to compare Spaaace and Asteroids to see how the game experience changes from pseudo-physics to real physics.
 
 
 ## 3D Real Physics
