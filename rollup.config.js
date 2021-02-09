@@ -2,10 +2,11 @@ import pjson from '@rollup/plugin-json';
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
 
 
-const serverPlugins = [resolve(), pjson(), commonjs({ include: 'node_modules/**' })];
-const clientPlugins = [resolve({ browser: true, preferBuiltins: false }), pjson(), commonjs({ include: 'node_modules/**' })];
+const serverPlugins = [resolve(), typescript(), pjson(), commonjs({ include: 'node_modules/**' })];
+const clientPlugins = [resolve({ browser: true, preferBuiltins: false }), typescript(), pjson(), commonjs({ include: 'node_modules/**' })];
 
 export default [
     {

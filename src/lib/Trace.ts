@@ -5,23 +5,44 @@
  * example, setting traceLevel to Trace.TRACE_INFO will cause info,
  * warn, and error traces to be recorded.
  */
+
+interface TraceOptions {
+    traceLevel: number;
+}
+
+interface TraceEntry {
+    data: string;
+    level: number;
+    step: string;
+    time: Date;
+}
+
 class Trace {
 
-    constructor(options) {
+    options: TraceOptions;
+    traceBuffer: TraceEntry[];
+    step: string;
+    error: (cb: () => string) => void;
+    warn: (cb: () => string) => void;
+    info: (cb: () => string) => void;
+    debug: (cb: () => string) => void;
+    trace: (cb: () => string) => void;
+
+    constructor(options: TraceOptions) {
 
         this.options = Object.assign({
-            traceLevel: this.TRACE_DEBUG
+            traceLevel: Trace.TRACE_DEBUG
         }, options);
 
         this.traceBuffer = [];
         this.step = 'initializing';
 
         // syntactic sugar functions
-        this.error = this.trace.bind(this, Trace.TRACE_ERROR);
-        this.warn = this.trace.bind(this, Trace.TRACE_WARN);
-        this.info = this.trace.bind(this, Trace.TRACE_INFO);
-        this.debug = this.trace.bind(this, Trace.TRACE_DEBUG);
-        this.trace = this.trace.bind(this, Trace.TRACE_ALL);
+        this.error = this.traceAtLevel.bind(this, Trace.TRACE_ERROR);
+        this.warn = this.traceAtLevel.bind(this, Trace.TRACE_WARN);
+        this.info = this.traceAtLevel.bind(this, Trace.TRACE_INFO);
+        this.debug = this.traceAtLevel.bind(this, Trace.TRACE_DEBUG);
+        this.trace = this.traceAtLevel.bind(this, Trace.TRACE_ALL);
     }
 
     /**
@@ -66,12 +87,7 @@ class Trace {
       */
     static get TRACE_NONE() { return 1000; }
 
-    trace(level, dataCB) {
-
-         // all traces must be functions which return strings
-        if (typeof dataCB !== 'function') {
-            throw new Error(`Lance trace was called but instead of passing a function, it received a [${typeof dataCB}]`);
-        }
+    traceAtLevel(level: number, dataCB: () => string) {
 
         if (level < this.options.traceLevel)
             return;
