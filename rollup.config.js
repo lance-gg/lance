@@ -1,7 +1,8 @@
-import pjson from 'rollup-plugin-json';
-import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
+import pjson from '@rollup/plugin-json';
+import babel from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+
 
 const serverPlugins = [resolve(), pjson(), commonjs({ include: 'node_modules/**' })];
 const clientPlugins = [resolve({ browser: true, preferBuiltins: false }), pjson(), commonjs({ include: 'node_modules/**' })];
