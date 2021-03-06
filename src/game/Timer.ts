@@ -54,14 +54,26 @@ export default class Timer {
         delete this.events[eventId];
     }
 
+    loop(time, callback, thisContext = undefined, args = undefined) {
+        let timerEvent = new TimerEvent(this,
+            TimerEventType.Repeat,
+            time,
+            callback,
+            thisContext,
+            args);
+
+        this.events[timerEvent.id] = timerEvent;
+
+        return timerEvent;
+    }
+
     add(time, callback, thisContext, args) {
         let timerEvent = new TimerEvent(this,
             TimerEventType.Single,
             time,
             callback,
             thisContext,
-            args
-        );
+            args);
 
         this.events[timerEvent.id] = timerEvent;
         return timerEvent;

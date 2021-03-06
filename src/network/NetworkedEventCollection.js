@@ -6,7 +6,7 @@ import Serializable from '../serialize/Serializable';
  */
 export default class NetworkedEventCollection extends Serializable {
 
-    static get netScheme() {
+    get netScheme() {
         return {
             events: {
                 type: BaseTypes.TYPES.LIST,

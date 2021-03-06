@@ -6,7 +6,7 @@ import Serializable from '../../src/serialize/Serializable';
 
 class TestObject extends Serializable {
 
-    static get netScheme() {
+    get netScheme() {
         return {
             helloString: { type: BaseTypes.TYPES.STRING },
             color: { type: BaseTypes.TYPES.STRING }

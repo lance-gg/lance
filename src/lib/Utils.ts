@@ -1,9 +1,8 @@
 export default class Utils {
 
-    static hashStr(str, bits) {
+    static hashStr(str: string, bits = 8): number {
         let hash = 5381;
         let i = str.length;
-        bits = bits ? bits : 8;
 
         while (i) {
             hash = (hash * 33) ^ str.charCodeAt(--i);
@@ -17,7 +16,7 @@ export default class Utils {
         return hash;
     }
 
-    static arrayBuffersEqual(buf1, buf2) {
+    static arrayBuffersEqual(buf1: ArrayBuffer, buf2: ArrayBuffer) {
         if (buf1.byteLength !== buf2.byteLength) return false;
         let dv1 = new Int8Array(buf1);
         let dv2 = new Int8Array(buf2);
@@ -27,7 +26,7 @@ export default class Utils {
         return true;
     }
 
-    static httpGetPromise(url) {
+    static httpGetPromise(url: string) {
         return new Promise((resolve, reject) => {
             let req = new XMLHttpRequest();
             req.open('GET', url, true);

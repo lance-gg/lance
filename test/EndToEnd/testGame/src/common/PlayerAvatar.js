@@ -4,7 +4,7 @@ const DynamicObject = incheon.serialize.DynamicObject;
 
 class PlayerAvatar extends DynamicObject {
 
-    static get netScheme() {
+    get netScheme() {
         return Object.assign({}, super.netScheme);
     }
 

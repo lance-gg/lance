@@ -7,7 +7,7 @@ import BaseTypes from './BaseTypes';
  */
 class ThreeVector extends Serializable {
 
-    static get netScheme() {
+    get netScheme() {
         return {
             x: { type: BaseTypes.TYPES.FLOAT32 },
             y: { type: BaseTypes.TYPES.FLOAT32 },

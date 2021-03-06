@@ -30,7 +30,7 @@ class PhysicalObject2D extends GameObject {
     *         }, super.netScheme);
     *     }
     */
-    static get netScheme() {
+    get netScheme() {
         return Object.assign({
             mass: { type: BaseTypes.TYPES.FLOAT32 },
             position: { type: BaseTypes.TYPES.CLASSINSTANCE },

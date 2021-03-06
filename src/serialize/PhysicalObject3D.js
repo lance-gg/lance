@@ -30,7 +30,7 @@ class PhysicalObject3D extends GameObject {
     *         }, super.netScheme);
     *     }
     */
-    static get netScheme() {
+    get netScheme() {
         return Object.assign({
             position: { type: BaseTypes.TYPES.CLASSINSTANCE },
             quaternion: { type: BaseTypes.TYPES.CLASSINSTANCE },

@@ -6,7 +6,7 @@ import BaseTypes from '../../src/serialize/BaseTypes';
 
 class TestObject extends Serializable {
 
-    static get netScheme(){
+    get netScheme(){
         return {
             float32: { type: BaseTypes.TYPES.FLOAT32 },
             int32: { type: BaseTypes.TYPES.INT32 },

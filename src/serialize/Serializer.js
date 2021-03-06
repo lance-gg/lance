@@ -75,8 +75,17 @@ class Serializer {
 
         // create de-referenced instance of the class. gameEngine and id will be 'tacked on' later at the sync strategies
         let obj = new objectClass(null, { id: null });
-        for (let property of Object.keys(objectClass.netScheme).sort()) {
-            let read = this.readDataView(dataView, byteOffset + localByteOffset, objectClass.netScheme[property]);
+
+        // the netScheme should always be on the object (not the object type)
+        // but for legacy reasons,we still have objects (see networkedEventPrototype) which stores
+        // the netscheme in the class itself.  If those classes become regular instances, the netScheme
+        // will always be on the object instance, and the if-statement below can be removed.
+        let netScheme = obj.netScheme;
+        if (!netScheme) {
+            netScheme = objectClass.netScheme;
+        }
+        for (let property of Object.keys(netScheme).sort()) {
+            let read = this.readDataView(dataView, byteOffset + localByteOffset, netScheme[property]);
             obj[property] = read.data;
             localByteOffset += read.bufferSize;
         }

@@ -8,7 +8,7 @@ const SimplePhysicsEngine = require('../../src/physics/SimplePhysicsEngine');
 
 class TestObject extends DynamicObject {
 
-    static get netScheme(){
+    get netScheme(){
         return Object.assign({
             height: BaseTypes.TYPES.UINT16,
             width: BaseTypes.TYPES.UINT16

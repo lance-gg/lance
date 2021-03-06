@@ -10,11 +10,11 @@ import BaseTypes from './BaseTypes';
  */
 class GameObject extends Serializable {
 
-    static get netScheme() {
-        return {
+    get netScheme() {
+        return Object.assign({
             id: { type: BaseTypes.TYPES.INT32 },
             playerId: { type: BaseTypes.TYPES.INT16 }
-        };
+        }, super.netScheme);
     }
 
     /**

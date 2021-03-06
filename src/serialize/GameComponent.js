@@ -1,5 +1,5 @@
 export default class GameComponent {
-    
+
     constructor(){
         /**
          * the gameObject this component is attached to. This gets set in the addComponent method
@@ -12,7 +12,7 @@ export default class GameComponent {
         return this.constructor.name;
     }
 
-    static get netScheme(){
+    get netScheme(){
         return null;
     }
 }
