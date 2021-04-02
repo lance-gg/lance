@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/lance-gg/lance.svg?branch=master)](https://travis-ci.org/lance-gg/lance) [![Inline docs](http://inch-ci.org/github/lance-gg/lance.svg?branch=develop)](http://inch-ci.org/github/lance-gg/lance)
-
 <img src="https://cloud.githubusercontent.com/assets/3951311/24590344/0b7748b8-17f4-11e7-84fc-d24c44c7a27a.jpg" style="width: 100%" alt="Lance logo">
 
 # [Lance](https://lance-gg.github.io/lance/) is a real-time multiplayer game server
@@ -37,12 +35,11 @@ More features in the pipeline:
 
 ## That's so neat! Where do I start?
 
-The official [Lance documentation](http://docs.lance.gg) contains articles on theory and rational, as well as the structure and architecture of the project.
+The official [Lance documentation](https://lance-gg.github.io/lance/docs_out/index.html) contains articles on theory and rationale, as well as the structure and architecture of the project.
 
 ## Something went wrong! I need help!
 
 If you're not exactly sure how to do something, [Stack Overflow](http://stackoverflow.com/questions/tagged/lance) is your friend.
 
 If you've encountered a bug and it's not already in the [issues page](https://github.com/lance-gg/lance/issues), open a new issue.
-
 
