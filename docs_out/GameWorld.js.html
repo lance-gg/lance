@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GameWorld.js - Documentation</title>
+
+
+    <link rel="shortcut icon" href="http://lance.gg/favicon.ico">
+    <link rel="icon" sizes="16x16 32x32 64x64" href="http://lance.gg/favicon.ico">
+    <link rel="icon" type="image/png" sizes="196x196" href="http://lance.gg/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="http://lance.gg/favicon-160.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="http://lance.gg/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="http://lance.gg/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="http://lance.gg/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="http://lance.gg/favicon-16.png">
+        
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/9.8.0/styles/atelier-sulphurpool-light.min.css">
+</head>
+<body>
+
+    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+
+    <label for="nav-trigger" class="overlay"></label>
+
+    <nav>
+        <h2 class="home"><a href="index.html">Lance</a></h2><h2>Concepts</h2><ul class="tutorials"><li><span class='category'>Introduction<ul><li><a href="tutorial-introduction.html">Introduction</a></li><li><a href="tutorial-introduction_prologue.html">Prologue</a></li><li><a href="tutorial-introduction_community.html">Community</a></li><li><a href="tutorial-introduction_roadmap.html">Development Roadmap</a></li><li><a href="tutorial-introduction_faq.html">Frequently Asked Questions</a></li></ul></li><li><span class='category'>Overview<ul><li><a href="tutorial-overview_architecture.html">Architecture of a Multiplayer Game</a></li><li><a href="tutorial-choosing_a_physics_engine.html">Choosing a Physics Engine</a></li><li><a href="tutorial-guide_gameengine.html">Game Engine</a></li><li><a href="tutorial-guide_serverengine.html">Server Engine</a></li><li><a href="tutorial-guide_clientengine.html">Client Engine</a></li><li><a href="tutorial-guide_renderer.html">Renderer</a></li><li><a href="tutorial-guide_gameworld.html">Game World and Game Objects</a></li><li><a href="tutorial-guide_serialization.html">Serialization and Communication</a></li></ul></li><li><span class='category'>Synchronization Methods<ul><li><a href="tutorial-guide_syncinterpolation.html">Interpolation</a></li><li><a href="tutorial-guide_syncextrapolation.html">Extrapolation</a></li></ul></li><li><span class='category'>Tutorials<ul><li><a href="tutorial-MyFirstGame.html">My First Game: Pong</a></li><li><a href="tutorial-spaceships.html">Spaaace</a></li></ul></li><li><span class='category'>Extras<ul><li><a href="tutorial-guide_tuningdebugging.html">Fine Tuning and Debugging</a></li><li><a href="tutorial-furtherreading.html">Further Reading</a></li></ul></li></ul><h2>API Reference</h2><h3 class="classes">Classes</h3><ul><li><a href="AFrameRenderer.html">AFrameRenderer</a><ul class='methods'><li data-type='method'><a href="AFrameRenderer.html#draw">draw</a></li><li data-type='method'><a href="AFrameRenderer.html#init">init</a></li></ul></li><li><a href="BaseTypes.html">BaseTypes</a></li><li><a href="CannonPhysicsEngine.html">CannonPhysicsEngine</a></li><li><a href="ClientEngine.html">ClientEngine</a><ul class='methods'><li data-type='method'><a href="ClientEngine.html#connect">connect</a></li><li data-type='method'><a href="ClientEngine.html#disconnect">disconnect</a></li><li data-type='method'><a href="ClientEngine.html#sendInput">sendInput</a></li><li data-type='method'><a href="ClientEngine.html#start">start</a></li></ul></li><li><a href="DynamicObject.html">DynamicObject</a><ul class='methods'><li data-type='method'><a href="DynamicObject.html#accelerate">accelerate</a></li><li data-type='method'><a href="DynamicObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="DynamicObject.html#collidesWith">collidesWith</a></li><li data-type='method'><a href="DynamicObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="DynamicObject.html#toString">toString</a></li><li data-type='method'><a href="DynamicObject.html#turnLeft">turnLeft</a></li><li data-type='method'><a href="DynamicObject.html#turnRight">turnRight</a></li></ul></li><li><a href="GameEngine.html">GameEngine</a><ul class='methods'><li data-type='method'><a href="GameEngine.html#addObjectToWorld">addObjectToWorld</a></li><li data-type='method'><a href="GameEngine.html#getPlayerGameOverResult">getPlayerGameOverResult</a></li><li data-type='method'><a href="GameEngine.html#isOwnedByPlayer">isOwnedByPlayer</a></li><li data-type='method'><a href="GameEngine.html#on">on</a></li><li data-type='method'><a href="GameEngine.html#once">once</a></li><li data-type='method'><a href="GameEngine.html#processInput">processInput</a></li><li data-type='method'><a href="GameEngine.html#registerClasses">registerClasses</a></li><li data-type='method'><a href="GameEngine.html#removeListener">removeListener</a></li><li data-type='method'><a href="GameEngine.html#removeObjectFromWorld">removeObjectFromWorld</a></li><li data-type='method'><a href="GameEngine.html#start">start</a></li><li data-type='method'><a href="GameEngine.html#step">step</a></li></ul></li><li><a href="GameObject.html">GameObject</a><ul class='methods'><li data-type='method'><a href="GameObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="GameObject.html#hasComponent">hasComponent</a></li><li data-type='method'><a href="GameObject.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="GameObject.html#onRemoveFromWorld">onRemoveFromWorld</a></li><li data-type='method'><a href="GameObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="GameObject.html#toString">toString</a></li></ul></li><li><a href="GameWorld.html">GameWorld</a><ul class='methods'><li data-type='method'><a href="GameWorld.html#forEachObject">forEachObject</a></li><li data-type='method'><a href="GameWorld.html#queryObject">queryObject</a></li><li data-type='method'><a href="GameWorld.html#queryObjects">queryObjects</a></li></ul></li><li><a href="KeyboardControls.html">KeyboardControls</a><ul class='methods'><li data-type='method'><a href="KeyboardControls.html#bindKey">bindKey</a></li></ul></li><li><a href="PhysicalObject2D.html">PhysicalObject2D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject2D.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="PhysicalObject2D.html#toString">toString</a></li></ul></li><li><a href="PhysicalObject3D.html">PhysicalObject3D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject3D.html#toString">toString</a></li></ul></li><li><a href="Quaternion.html">Quaternion</a><ul class='methods'><li data-type='method'><a href="Quaternion.html#conjugate">conjugate</a></li><li data-type='method'><a href="Quaternion.html#copy">copy</a></li><li data-type='method'><a href="Quaternion.html#multiply">multiply</a></li><li data-type='method'><a href="Quaternion.html#set">set</a></li><li data-type='method'><a href="Quaternion.html#setFromAxisAngle">setFromAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#slerp">slerp</a></li><li data-type='method'><a href="Quaternion.html#toAxisAngle">toAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#toString">toString</a></li></ul></li><li><a href="Renderer.html">Renderer</a><ul class='methods'><li data-type='method'><a href="Renderer.html#addObject">addObject</a></li><li data-type='method'><a href="Renderer.html#draw">draw</a></li><li data-type='method'><a href="Renderer.html#init">init</a></li><li data-type='method'><a href="Renderer.html#removeObject">removeObject</a></li><li data-type='method'><a href="Renderer.html#runClientStep">runClientStep</a></li><li data-type='method'><a href="Renderer.html#stop">stop</a></li></ul></li><li><a href="Serializer.html">Serializer</a><ul class='methods'><li data-type='method'><a href="Serializer.html#.typeCanAssign">typeCanAssign</a></li><li data-type='method'><a href="Serializer.html#addCustomType">addCustomType</a></li><li data-type='method'><a href="Serializer.html#registerClass">registerClass</a></li></ul></li><li><a href="ServerEngine.html">ServerEngine</a><ul class='methods'><li data-type='method'><a href="ServerEngine.html#assignObjectToRoom">assignObjectToRoom</a></li><li data-type='method'><a href="ServerEngine.html#assignPlayerToRoom">assignPlayerToRoom</a></li><li data-type='method'><a href="ServerEngine.html#createRoom">createRoom</a></li><li data-type='method'><a href="ServerEngine.html#gameStatus">gameStatus</a></li></ul></li><li><a href="SimplePhysicsEngine.html">SimplePhysicsEngine</a></li><li><a href="ThreeVector.html">ThreeVector</a><ul class='methods'><li data-type='method'><a href="ThreeVector.html#add">add</a></li><li data-type='method'><a href="ThreeVector.html#clone">clone</a></li><li data-type='method'><a href="ThreeVector.html#copy">copy</a></li><li data-type='method'><a href="ThreeVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="ThreeVector.html#length">length</a></li><li data-type='method'><a href="ThreeVector.html#lerp">lerp</a></li><li data-type='method'><a href="ThreeVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="ThreeVector.html#normalize">normalize</a></li><li data-type='method'><a href="ThreeVector.html#set">set</a></li><li data-type='method'><a href="ThreeVector.html#subtract">subtract</a></li><li data-type='method'><a href="ThreeVector.html#toString">toString</a></li></ul></li><li><a href="Trace.html">Trace</a></li><li><a href="TwoVector.html">TwoVector</a><ul class='methods'><li data-type='method'><a href="TwoVector.html#add">add</a></li><li data-type='method'><a href="TwoVector.html#clone">clone</a></li><li data-type='method'><a href="TwoVector.html#copy">copy</a></li><li data-type='method'><a href="TwoVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="TwoVector.html#length">length</a></li><li data-type='method'><a href="TwoVector.html#lerp">lerp</a></li><li data-type='method'><a href="TwoVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="TwoVector.html#normalize">normalize</a></li><li data-type='method'><a href="TwoVector.html#set">set</a></li><li data-type='method'><a href="TwoVector.html#subtract">subtract</a></li><li data-type='method'><a href="TwoVector.html#toString">toString</a></li></ul></li></ul><h3 class="events">Events</h3><ul><li><a href="GameEngine.html#event:client__postStep">client__postStep</a></li><li><a href="GameEngine.html#event:client__preStep">client__preStep</a></li><li><a href="GameEngine.html#event:client__processInput">client__processInput</a></li><li><a href="GameEngine.html#event:client__roomUpdate">client__roomUpdate</a></li><li><a href="GameEngine.html#event:client__slowFrameRate">client__slowFrameRate</a></li><li><a href="GameEngine.html#event:client__stepReset">client__stepReset</a></li><li><a href="GameEngine.html#event:client__syncReceived">client__syncReceived</a></li><li><a href="GameEngine.html#event:objectAdded">objectAdded</a></li><li><a href="GameEngine.html#event:objectDestroyed">objectDestroyed</a></li><li><a href="GameEngine.html#event:playerDisconnected">playerDisconnected</a></li><li><a href="GameEngine.html#event:playerJoined">playerJoined</a></li><li><a href="GameEngine.html#event:postStep">postStep</a></li><li><a href="GameEngine.html#event:preStep">preStep</a></li><li><a href="GameEngine.html#event:processInput">processInput</a></li><li><a href="GameEngine.html#event:server__inputReceived">server__inputReceived</a></li><li><a href="GameEngine.html#event:server__playerDisconnected">server__playerDisconnected</a></li><li><a href="GameEngine.html#event:server__playerJoined">server__playerJoined</a></li><li><a href="GameEngine.html#event:server__postStep">server__postStep</a></li><li><a href="GameEngine.html#event:server__preStep">server__preStep</a></li><li><a href="GameEngine.html#event:server__processInput">server__processInput</a></li><li><a href="GameEngine.html#event:server__roomUpdate">server__roomUpdate</a></li><li><a href="GameEngine.html#event:start">start</a></li><li><a href="GameEngine.html#event:syncReceived">syncReceived</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DEFAULT_ROOM_NAME">DEFAULT_ROOM_NAME</a></li></ul>
+    </nav>
+
+    <div id="main">
+        
+        <h1 class="page-title">GameWorld.js</h1>
+        
+
+        
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * This class implements a singleton game world instance, created by Lance.
+ * It represents an instance of the game world, and includes all the game objects.
+ * It is the state of the game.
+ */
+class GameWorld {
+
+    /**
+     * Constructor of the World instance.  Invoked by Lance on startup.
+     *
+     * @hideconstructor
+     */
+    constructor() {
+        this.stepCount = 0;
+        this.objects = {};
+        this.playerCount = 0;
+        this.idCount = 0;
+    }
+
+    /**
+     * Gets a new, fresh and unused id that can be used for a new object
+     * @private
+     * @return {Number} the new id
+     */
+    getNewId() {
+        let possibleId = this.idCount;
+        // find a free id
+        while (possibleId in this.objects)
+            possibleId++;
+
+        this.idCount = possibleId + 1;
+        return possibleId;
+    }
+
+    /**
+     * Returns all the game world objects which match a criteria
+     * @param {Object} query The query object
+     * @param {Object} [query.id] object id
+     * @param {Object} [query.playerId] player id
+     * @param {Class} [query.instanceType] matches whether `object instanceof instanceType`
+     * @param {Array} [query.components] An array of component names
+     * @param {Boolean} [query.returnSingle] Return the first object matched
+     * @return {Array | Object} All game objects which match all the query parameters, or the first match if returnSingle was specified
+     */
+    queryObjects(query) {
+        let queriedObjects = [];
+
+        // todo this is currently a somewhat inefficient implementation for API testing purposes.
+        // It should be implemented with cached dictionaries like in nano-ecs
+        this.forEachObject((id, object) => {
+            let conditions = [];
+
+            // object id condition
+            conditions.push(!('id' in query) || query.id !== null &amp;&amp; object.id === query.id);
+
+            // player id condition
+            conditions.push(!('playerId' in query) || query.playerId !== null &amp;&amp; object.playerId === query.playerId);
+
+            // instance type conditio
+            conditions.push(!('instanceType' in query) || query.instanceType !== null &amp;&amp; object instanceof query.instanceType);
+
+            // components conditions
+            if ('components' in query) {
+                query.components.forEach(componentClass => {
+                    conditions.push(object.hasComponent(componentClass));
+                });
+            }
+
+            // all conditions are true, object is qualified for the query
+            if (conditions.every(value => value)) {
+                queriedObjects.push(object);
+                if (query.returnSingle) return false;
+            }
+        });
+
+        // return a single object or null
+        if (query.returnSingle) {
+            return queriedObjects.length > 0 ? queriedObjects[0] : null;
+        }
+
+        return queriedObjects;
+    }
+
+    /**
+     * Returns The first game object encountered which matches a criteria.
+     * Syntactic sugar for {@link queryObjects} with `returnSingle: true`
+     * @param {Object} query See queryObjects
+     * @return {Object} The game object, if found
+     */
+    queryObject(query) {
+        return this.queryObjects(Object.assign(query, {
+            returnSingle: true
+        }));
+    }
+
+    /**
+     * Add an object to the game world
+     * @private
+     * @param {Object} object object to add
+     */
+    addObject(object) {
+        this.objects[object.id] = object;
+    }
+
+    /**
+     * Remove an object from the game world
+     * @private
+     * @param {number} id id of the object to remove
+     */
+    removeObject(id) {
+        delete this.objects[id];
+    }
+
+    /**
+     * World object iterator.
+     * Invoke callback(objId, obj) for each object
+     *
+     * @param {function} callback function receives id and object. If callback returns false, the iteration will cease
+     */
+    forEachObject(callback) {
+        for (let id of Object.keys(this.objects)) {
+            let returnValue = callback(id, this.objects[id]);  // TODO: the key should be Number(id)
+            if (returnValue === false) break;
+        }
+    }
+
+}
+
+export default GameWorld;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    </div>
+
+    <br class="clear">
+
+    <footer>
+        Did you find a mistake? Do you have an improvement? <a href="https://github.com/lance-gg/lance/issues">Let us know!</a>
+    </footer>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-88335360-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    <script src="https://use.typekit.net/lai1bbe.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script src="scripts/linenumber.js"></script>
+</body>
+</html>

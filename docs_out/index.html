@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Home - Documentation</title>
+
+
+    <link rel="shortcut icon" href="http://lance.gg/favicon.ico">
+    <link rel="icon" sizes="16x16 32x32 64x64" href="http://lance.gg/favicon.ico">
+    <link rel="icon" type="image/png" sizes="196x196" href="http://lance.gg/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="http://lance.gg/favicon-160.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="http://lance.gg/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="http://lance.gg/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="http://lance.gg/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="http://lance.gg/favicon-16.png">
+        
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/9.8.0/styles/atelier-sulphurpool-light.min.css">
+</head>
+<body>
+
+    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+
+    <label for="nav-trigger" class="overlay"></label>
+
+    <nav>
+        <h2 class="home"><a href="index.html">Lance</a></h2><h2>Concepts</h2><ul class="tutorials"><li><span class='category'>Introduction<ul><li><a href="tutorial-introduction.html">Introduction</a></li><li><a href="tutorial-introduction_prologue.html">Prologue</a></li><li><a href="tutorial-introduction_community.html">Community</a></li><li><a href="tutorial-introduction_roadmap.html">Development Roadmap</a></li><li><a href="tutorial-introduction_faq.html">Frequently Asked Questions</a></li></ul></li><li><span class='category'>Overview<ul><li><a href="tutorial-overview_architecture.html">Architecture of a Multiplayer Game</a></li><li><a href="tutorial-choosing_a_physics_engine.html">Choosing a Physics Engine</a></li><li><a href="tutorial-guide_gameengine.html">Game Engine</a></li><li><a href="tutorial-guide_serverengine.html">Server Engine</a></li><li><a href="tutorial-guide_clientengine.html">Client Engine</a></li><li><a href="tutorial-guide_renderer.html">Renderer</a></li><li><a href="tutorial-guide_gameworld.html">Game World and Game Objects</a></li><li><a href="tutorial-guide_serialization.html">Serialization and Communication</a></li></ul></li><li><span class='category'>Synchronization Methods<ul><li><a href="tutorial-guide_syncinterpolation.html">Interpolation</a></li><li><a href="tutorial-guide_syncextrapolation.html">Extrapolation</a></li></ul></li><li><span class='category'>Tutorials<ul><li><a href="tutorial-MyFirstGame.html">My First Game: Pong</a></li><li><a href="tutorial-spaceships.html">Spaaace</a></li></ul></li><li><span class='category'>Extras<ul><li><a href="tutorial-guide_tuningdebugging.html">Fine Tuning and Debugging</a></li><li><a href="tutorial-furtherreading.html">Further Reading</a></li></ul></li></ul><h2>API Reference</h2><h3 class="classes">Classes</h3><ul><li><a href="AFrameRenderer.html">AFrameRenderer</a><ul class='methods'><li data-type='method'><a href="AFrameRenderer.html#draw">draw</a></li><li data-type='method'><a href="AFrameRenderer.html#init">init</a></li></ul></li><li><a href="BaseTypes.html">BaseTypes</a></li><li><a href="CannonPhysicsEngine.html">CannonPhysicsEngine</a></li><li><a href="ClientEngine.html">ClientEngine</a><ul class='methods'><li data-type='method'><a href="ClientEngine.html#connect">connect</a></li><li data-type='method'><a href="ClientEngine.html#disconnect">disconnect</a></li><li data-type='method'><a href="ClientEngine.html#sendInput">sendInput</a></li><li data-type='method'><a href="ClientEngine.html#start">start</a></li></ul></li><li><a href="DynamicObject.html">DynamicObject</a><ul class='methods'><li data-type='method'><a href="DynamicObject.html#accelerate">accelerate</a></li><li data-type='method'><a href="DynamicObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="DynamicObject.html#collidesWith">collidesWith</a></li><li data-type='method'><a href="DynamicObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="DynamicObject.html#toString">toString</a></li><li data-type='method'><a href="DynamicObject.html#turnLeft">turnLeft</a></li><li data-type='method'><a href="DynamicObject.html#turnRight">turnRight</a></li></ul></li><li><a href="GameEngine.html">GameEngine</a><ul class='methods'><li data-type='method'><a href="GameEngine.html#addObjectToWorld">addObjectToWorld</a></li><li data-type='method'><a href="GameEngine.html#getPlayerGameOverResult">getPlayerGameOverResult</a></li><li data-type='method'><a href="GameEngine.html#isOwnedByPlayer">isOwnedByPlayer</a></li><li data-type='method'><a href="GameEngine.html#on">on</a></li><li data-type='method'><a href="GameEngine.html#once">once</a></li><li data-type='method'><a href="GameEngine.html#processInput">processInput</a></li><li data-type='method'><a href="GameEngine.html#registerClasses">registerClasses</a></li><li data-type='method'><a href="GameEngine.html#removeListener">removeListener</a></li><li data-type='method'><a href="GameEngine.html#removeObjectFromWorld">removeObjectFromWorld</a></li><li data-type='method'><a href="GameEngine.html#start">start</a></li><li data-type='method'><a href="GameEngine.html#step">step</a></li></ul></li><li><a href="GameObject.html">GameObject</a><ul class='methods'><li data-type='method'><a href="GameObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="GameObject.html#hasComponent">hasComponent</a></li><li data-type='method'><a href="GameObject.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="GameObject.html#onRemoveFromWorld">onRemoveFromWorld</a></li><li data-type='method'><a href="GameObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="GameObject.html#toString">toString</a></li></ul></li><li><a href="GameWorld.html">GameWorld</a><ul class='methods'><li data-type='method'><a href="GameWorld.html#forEachObject">forEachObject</a></li><li data-type='method'><a href="GameWorld.html#queryObject">queryObject</a></li><li data-type='method'><a href="GameWorld.html#queryObjects">queryObjects</a></li></ul></li><li><a href="KeyboardControls.html">KeyboardControls</a><ul class='methods'><li data-type='method'><a href="KeyboardControls.html#bindKey">bindKey</a></li></ul></li><li><a href="PhysicalObject2D.html">PhysicalObject2D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject2D.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="PhysicalObject2D.html#toString">toString</a></li></ul></li><li><a href="PhysicalObject3D.html">PhysicalObject3D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject3D.html#toString">toString</a></li></ul></li><li><a href="Quaternion.html">Quaternion</a><ul class='methods'><li data-type='method'><a href="Quaternion.html#conjugate">conjugate</a></li><li data-type='method'><a href="Quaternion.html#copy">copy</a></li><li data-type='method'><a href="Quaternion.html#multiply">multiply</a></li><li data-type='method'><a href="Quaternion.html#set">set</a></li><li data-type='method'><a href="Quaternion.html#setFromAxisAngle">setFromAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#slerp">slerp</a></li><li data-type='method'><a href="Quaternion.html#toAxisAngle">toAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#toString">toString</a></li></ul></li><li><a href="Renderer.html">Renderer</a><ul class='methods'><li data-type='method'><a href="Renderer.html#addObject">addObject</a></li><li data-type='method'><a href="Renderer.html#draw">draw</a></li><li data-type='method'><a href="Renderer.html#init">init</a></li><li data-type='method'><a href="Renderer.html#removeObject">removeObject</a></li><li data-type='method'><a href="Renderer.html#runClientStep">runClientStep</a></li><li data-type='method'><a href="Renderer.html#stop">stop</a></li></ul></li><li><a href="Serializer.html">Serializer</a><ul class='methods'><li data-type='method'><a href="Serializer.html#.typeCanAssign">typeCanAssign</a></li><li data-type='method'><a href="Serializer.html#addCustomType">addCustomType</a></li><li data-type='method'><a href="Serializer.html#registerClass">registerClass</a></li></ul></li><li><a href="ServerEngine.html">ServerEngine</a><ul class='methods'><li data-type='method'><a href="ServerEngine.html#assignObjectToRoom">assignObjectToRoom</a></li><li data-type='method'><a href="ServerEngine.html#assignPlayerToRoom">assignPlayerToRoom</a></li><li data-type='method'><a href="ServerEngine.html#createRoom">createRoom</a></li><li data-type='method'><a href="ServerEngine.html#gameStatus">gameStatus</a></li></ul></li><li><a href="SimplePhysicsEngine.html">SimplePhysicsEngine</a></li><li><a href="ThreeVector.html">ThreeVector</a><ul class='methods'><li data-type='method'><a href="ThreeVector.html#add">add</a></li><li data-type='method'><a href="ThreeVector.html#clone">clone</a></li><li data-type='method'><a href="ThreeVector.html#copy">copy</a></li><li data-type='method'><a href="ThreeVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="ThreeVector.html#length">length</a></li><li data-type='method'><a href="ThreeVector.html#lerp">lerp</a></li><li data-type='method'><a href="ThreeVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="ThreeVector.html#normalize">normalize</a></li><li data-type='method'><a href="ThreeVector.html#set">set</a></li><li data-type='method'><a href="ThreeVector.html#subtract">subtract</a></li><li data-type='method'><a href="ThreeVector.html#toString">toString</a></li></ul></li><li><a href="Trace.html">Trace</a></li><li><a href="TwoVector.html">TwoVector</a><ul class='methods'><li data-type='method'><a href="TwoVector.html#add">add</a></li><li data-type='method'><a href="TwoVector.html#clone">clone</a></li><li data-type='method'><a href="TwoVector.html#copy">copy</a></li><li data-type='method'><a href="TwoVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="TwoVector.html#length">length</a></li><li data-type='method'><a href="TwoVector.html#lerp">lerp</a></li><li data-type='method'><a href="TwoVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="TwoVector.html#normalize">normalize</a></li><li data-type='method'><a href="TwoVector.html#set">set</a></li><li data-type='method'><a href="TwoVector.html#subtract">subtract</a></li><li data-type='method'><a href="TwoVector.html#toString">toString</a></li></ul></li></ul><h3 class="events">Events</h3><ul><li><a href="GameEngine.html#event:client__postStep">client__postStep</a></li><li><a href="GameEngine.html#event:client__preStep">client__preStep</a></li><li><a href="GameEngine.html#event:client__processInput">client__processInput</a></li><li><a href="GameEngine.html#event:client__roomUpdate">client__roomUpdate</a></li><li><a href="GameEngine.html#event:client__slowFrameRate">client__slowFrameRate</a></li><li><a href="GameEngine.html#event:client__stepReset">client__stepReset</a></li><li><a href="GameEngine.html#event:client__syncReceived">client__syncReceived</a></li><li><a href="GameEngine.html#event:objectAdded">objectAdded</a></li><li><a href="GameEngine.html#event:objectDestroyed">objectDestroyed</a></li><li><a href="GameEngine.html#event:playerDisconnected">playerDisconnected</a></li><li><a href="GameEngine.html#event:playerJoined">playerJoined</a></li><li><a href="GameEngine.html#event:postStep">postStep</a></li><li><a href="GameEngine.html#event:preStep">preStep</a></li><li><a href="GameEngine.html#event:processInput">processInput</a></li><li><a href="GameEngine.html#event:server__inputReceived">server__inputReceived</a></li><li><a href="GameEngine.html#event:server__playerDisconnected">server__playerDisconnected</a></li><li><a href="GameEngine.html#event:server__playerJoined">server__playerJoined</a></li><li><a href="GameEngine.html#event:server__postStep">server__postStep</a></li><li><a href="GameEngine.html#event:server__preStep">server__preStep</a></li><li><a href="GameEngine.html#event:server__processInput">server__processInput</a></li><li><a href="GameEngine.html#event:server__roomUpdate">server__roomUpdate</a></li><li><a href="GameEngine.html#event:start">start</a></li><li><a href="GameEngine.html#event:syncReceived">syncReceived</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DEFAULT_ROOM_NAME">DEFAULT_ROOM_NAME</a></li></ul>
+    </nav>
+
+    <div id="main">
+        
+
+        
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><p><a href="https://travis-ci.org/lance-gg/lance"><img src="https://travis-ci.org/lance-gg/lance.svg?branch=master" alt="Build Status"></a> <a href="http://inch-ci.org/github/lance-gg/lance"><img src="http://inch-ci.org/github/lance-gg/lance.svg?branch=develop" alt="Inline docs"></a>
+<a href="http://slack.lance.gg"><img src="http://slack.lance.gg/badge.svg" alt="Slack"></a></p>
+<img src="https://cloud.githubusercontent.com/assets/3951311/24590344/0b7748b8-17f4-11e7-84fc-d24c44c7a27a.jpg" style="width: 100%" alt="Lance logo">
+<h1><a href="http://lance.gg">Lance</a> is a real-time multiplayer game server</h1>
+<p>Lance provides an extendible Node.JS based server, on which game logic runs, as well as a client-side library
+which synchronizes the client's game state with the server game state.  In order
+to provide a smooth visual experience for each connected client, Lance implements
+efficient networking methods, position interpolation and extrapolation, user input
+coordination, shadow objects, physics and pseudo-physical movement, automatic
+handling of network spikes.</p>
+<p>Lance aims to optimize the player's visual experience, while providing
+a simple development model which is highly configurable and easy to analyze
+and debug.</p>
+<h2>See it in action</h2>
+<p>Check out the official demo: <a href="http://spaaace.herokuapp.com">Spaaace</a></p>
+<p><img src="https://cloud.githubusercontent.com/assets/3951311/21784604/ffc2d282-d6c4-11e6-97f0-0ada12c4fab7.gif" alt="spaaace"></p>
+<h2>Features:</h2>
+<ul>
+<li>Focus on writing your game. Lance takes care of the netcode</li>
+<li>Can support any type of game or genre</li>
+<li>Optimized networking
+<ul>
+<li>TCP via websockets</li>
+<li>Communication is packed and serialized into binary</li>
+<li>Automatic handling of network spikes with step correction</li>
+</ul>
+</li>
+<li>Intelligent synchronization strategies for lag handling
+<ul>
+<li>Extrapolation (client side prediction) with step re-enactment, or:</li>
+<li>Interpolation for optimal object motion</li>
+</ul>
+</li>
+<li>Tools for debugging and tracing</li>
+</ul>
+<h2>That's so neat! Where do I start?</h2>
+<p>To get a bird's eye view on what's Lance all about and how to use it to make a multiplayer game, we recommend reading the guide: <a href="tutorial-overview_architecture.html">Architecture of a Multiplayer Game</a></p>
+<p>If you're more of the learning-by-doing type, you can start with the first tutorial,  <a href="tutorial-MyFirstGame.html">My First Game: Pong</a> which contains step-by-step instructions on how to implement a networked version of this classic game.</p>
+<h2>Join the fun!</h2>
+<p>We are working hard to build an active, positive and inclusive <a href="tutorial-introduction_community.html">Community</a></p>
+<h2>Need help?</h2>
+<p>If you're not exactly sure how to do something, <a href="http://stackoverflow.com/questions/tagged/lance">Stack Overflow</a> is your friend.</p>
+<p>If you've encountered a bug and it's not already in the <a href="https://github.com/lance-gg/lance/issues">issues page</a>, open a new issue.</p>
+<h2>Built something cool with Lance?</h2>
+<p>Please <a href="http://www.twitter.com/opherv">Let us know</a>! We'd love to play it, and feature it on the <a href="http://lance.gg">Lance homepage</a>.</p></article>
+    </section>
+
+
+
+
+
+
+    </div>
+
+    <br class="clear">
+
+    <footer>
+        Did you find a mistake? Do you have an improvement? <a href="https://github.com/lance-gg/lance/issues">Let us know!</a>
+    </footer>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-88335360-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    <script src="https://use.typekit.net/lai1bbe.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script src="scripts/linenumber.js"></script>
+</body>
+</html>

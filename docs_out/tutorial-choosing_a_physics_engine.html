@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Choosing a Physics Engine - Documentation</title>
+
+
+    <link rel="shortcut icon" href="http://lance.gg/favicon.ico">
+    <link rel="icon" sizes="16x16 32x32 64x64" href="http://lance.gg/favicon.ico">
+    <link rel="icon" type="image/png" sizes="196x196" href="http://lance.gg/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="http://lance.gg/favicon-160.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="http://lance.gg/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="http://lance.gg/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="http://lance.gg/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="http://lance.gg/favicon-16.png">
+        
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/9.8.0/styles/atelier-sulphurpool-light.min.css">
+</head>
+<body>
+
+    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+
+    <label for="nav-trigger" class="overlay"></label>
+
+    <nav>
+        <h2 class="home"><a href="index.html">Lance</a></h2><h2>Concepts</h2><ul class="tutorials"><li><span class='category'>Introduction<ul><li><a href="tutorial-introduction.html">Introduction</a></li><li><a href="tutorial-introduction_prologue.html">Prologue</a></li><li><a href="tutorial-introduction_community.html">Community</a></li><li><a href="tutorial-introduction_roadmap.html">Development Roadmap</a></li><li><a href="tutorial-introduction_faq.html">Frequently Asked Questions</a></li></ul></li><li><span class='category'>Overview<ul><li><a href="tutorial-overview_architecture.html">Architecture of a Multiplayer Game</a></li><li><a href="tutorial-choosing_a_physics_engine.html">Choosing a Physics Engine</a></li><li><a href="tutorial-guide_gameengine.html">Game Engine</a></li><li><a href="tutorial-guide_serverengine.html">Server Engine</a></li><li><a href="tutorial-guide_clientengine.html">Client Engine</a></li><li><a href="tutorial-guide_renderer.html">Renderer</a></li><li><a href="tutorial-guide_gameworld.html">Game World and Game Objects</a></li><li><a href="tutorial-guide_serialization.html">Serialization and Communication</a></li></ul></li><li><span class='category'>Synchronization Methods<ul><li><a href="tutorial-guide_syncinterpolation.html">Interpolation</a></li><li><a href="tutorial-guide_syncextrapolation.html">Extrapolation</a></li></ul></li><li><span class='category'>Tutorials<ul><li><a href="tutorial-MyFirstGame.html">My First Game: Pong</a></li><li><a href="tutorial-spaceships.html">Spaaace</a></li></ul></li><li><span class='category'>Extras<ul><li><a href="tutorial-guide_tuningdebugging.html">Fine Tuning and Debugging</a></li><li><a href="tutorial-furtherreading.html">Further Reading</a></li></ul></li></ul><h2>API Reference</h2><h3 class="classes">Classes</h3><ul><li><a href="AFrameRenderer.html">AFrameRenderer</a><ul class='methods'><li data-type='method'><a href="AFrameRenderer.html#draw">draw</a></li><li data-type='method'><a href="AFrameRenderer.html#init">init</a></li></ul></li><li><a href="BaseTypes.html">BaseTypes</a></li><li><a href="CannonPhysicsEngine.html">CannonPhysicsEngine</a></li><li><a href="ClientEngine.html">ClientEngine</a><ul class='methods'><li data-type='method'><a href="ClientEngine.html#connect">connect</a></li><li data-type='method'><a href="ClientEngine.html#disconnect">disconnect</a></li><li data-type='method'><a href="ClientEngine.html#sendInput">sendInput</a></li><li data-type='method'><a href="ClientEngine.html#start">start</a></li></ul></li><li><a href="DynamicObject.html">DynamicObject</a><ul class='methods'><li data-type='method'><a href="DynamicObject.html#accelerate">accelerate</a></li><li data-type='method'><a href="DynamicObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="DynamicObject.html#collidesWith">collidesWith</a></li><li data-type='method'><a href="DynamicObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="DynamicObject.html#toString">toString</a></li><li data-type='method'><a href="DynamicObject.html#turnLeft">turnLeft</a></li><li data-type='method'><a href="DynamicObject.html#turnRight">turnRight</a></li></ul></li><li><a href="GameEngine.html">GameEngine</a><ul class='methods'><li data-type='method'><a href="GameEngine.html#addObjectToWorld">addObjectToWorld</a></li><li data-type='method'><a href="GameEngine.html#getPlayerGameOverResult">getPlayerGameOverResult</a></li><li data-type='method'><a href="GameEngine.html#isOwnedByPlayer">isOwnedByPlayer</a></li><li data-type='method'><a href="GameEngine.html#on">on</a></li><li data-type='method'><a href="GameEngine.html#once">once</a></li><li data-type='method'><a href="GameEngine.html#processInput">processInput</a></li><li data-type='method'><a href="GameEngine.html#registerClasses">registerClasses</a></li><li data-type='method'><a href="GameEngine.html#removeListener">removeListener</a></li><li data-type='method'><a href="GameEngine.html#removeObjectFromWorld">removeObjectFromWorld</a></li><li data-type='method'><a href="GameEngine.html#start">start</a></li><li data-type='method'><a href="GameEngine.html#step">step</a></li></ul></li><li><a href="GameObject.html">GameObject</a><ul class='methods'><li data-type='method'><a href="GameObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="GameObject.html#hasComponent">hasComponent</a></li><li data-type='method'><a href="GameObject.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="GameObject.html#onRemoveFromWorld">onRemoveFromWorld</a></li><li data-type='method'><a href="GameObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="GameObject.html#toString">toString</a></li></ul></li><li><a href="GameWorld.html">GameWorld</a><ul class='methods'><li data-type='method'><a href="GameWorld.html#forEachObject">forEachObject</a></li><li data-type='method'><a href="GameWorld.html#queryObject">queryObject</a></li><li data-type='method'><a href="GameWorld.html#queryObjects">queryObjects</a></li></ul></li><li><a href="KeyboardControls.html">KeyboardControls</a><ul class='methods'><li data-type='method'><a href="KeyboardControls.html#bindKey">bindKey</a></li></ul></li><li><a href="PhysicalObject2D.html">PhysicalObject2D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject2D.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="PhysicalObject2D.html#toString">toString</a></li></ul></li><li><a href="PhysicalObject3D.html">PhysicalObject3D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject3D.html#toString">toString</a></li></ul></li><li><a href="Quaternion.html">Quaternion</a><ul class='methods'><li data-type='method'><a href="Quaternion.html#conjugate">conjugate</a></li><li data-type='method'><a href="Quaternion.html#copy">copy</a></li><li data-type='method'><a href="Quaternion.html#multiply">multiply</a></li><li data-type='method'><a href="Quaternion.html#set">set</a></li><li data-type='method'><a href="Quaternion.html#setFromAxisAngle">setFromAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#slerp">slerp</a></li><li data-type='method'><a href="Quaternion.html#toAxisAngle">toAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#toString">toString</a></li></ul></li><li><a href="Renderer.html">Renderer</a><ul class='methods'><li data-type='method'><a href="Renderer.html#addObject">addObject</a></li><li data-type='method'><a href="Renderer.html#draw">draw</a></li><li data-type='method'><a href="Renderer.html#init">init</a></li><li data-type='method'><a href="Renderer.html#removeObject">removeObject</a></li><li data-type='method'><a href="Renderer.html#runClientStep">runClientStep</a></li><li data-type='method'><a href="Renderer.html#stop">stop</a></li></ul></li><li><a href="Serializer.html">Serializer</a><ul class='methods'><li data-type='method'><a href="Serializer.html#.typeCanAssign">typeCanAssign</a></li><li data-type='method'><a href="Serializer.html#addCustomType">addCustomType</a></li><li data-type='method'><a href="Serializer.html#registerClass">registerClass</a></li></ul></li><li><a href="ServerEngine.html">ServerEngine</a><ul class='methods'><li data-type='method'><a href="ServerEngine.html#assignObjectToRoom">assignObjectToRoom</a></li><li data-type='method'><a href="ServerEngine.html#assignPlayerToRoom">assignPlayerToRoom</a></li><li data-type='method'><a href="ServerEngine.html#createRoom">createRoom</a></li><li data-type='method'><a href="ServerEngine.html#gameStatus">gameStatus</a></li></ul></li><li><a href="SimplePhysicsEngine.html">SimplePhysicsEngine</a></li><li><a href="ThreeVector.html">ThreeVector</a><ul class='methods'><li data-type='method'><a href="ThreeVector.html#add">add</a></li><li data-type='method'><a href="ThreeVector.html#clone">clone</a></li><li data-type='method'><a href="ThreeVector.html#copy">copy</a></li><li data-type='method'><a href="ThreeVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="ThreeVector.html#length">length</a></li><li data-type='method'><a href="ThreeVector.html#lerp">lerp</a></li><li data-type='method'><a href="ThreeVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="ThreeVector.html#normalize">normalize</a></li><li data-type='method'><a href="ThreeVector.html#set">set</a></li><li data-type='method'><a href="ThreeVector.html#subtract">subtract</a></li><li data-type='method'><a href="ThreeVector.html#toString">toString</a></li></ul></li><li><a href="Trace.html">Trace</a></li><li><a href="TwoVector.html">TwoVector</a><ul class='methods'><li data-type='method'><a href="TwoVector.html#add">add</a></li><li data-type='method'><a href="TwoVector.html#clone">clone</a></li><li data-type='method'><a href="TwoVector.html#copy">copy</a></li><li data-type='method'><a href="TwoVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="TwoVector.html#length">length</a></li><li data-type='method'><a href="TwoVector.html#lerp">lerp</a></li><li data-type='method'><a href="TwoVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="TwoVector.html#normalize">normalize</a></li><li data-type='method'><a href="TwoVector.html#set">set</a></li><li data-type='method'><a href="TwoVector.html#subtract">subtract</a></li><li data-type='method'><a href="TwoVector.html#toString">toString</a></li></ul></li></ul><h3 class="events">Events</h3><ul><li><a href="GameEngine.html#event:client__postStep">client__postStep</a></li><li><a href="GameEngine.html#event:client__preStep">client__preStep</a></li><li><a href="GameEngine.html#event:client__processInput">client__processInput</a></li><li><a href="GameEngine.html#event:client__roomUpdate">client__roomUpdate</a></li><li><a href="GameEngine.html#event:client__slowFrameRate">client__slowFrameRate</a></li><li><a href="GameEngine.html#event:client__stepReset">client__stepReset</a></li><li><a href="GameEngine.html#event:client__syncReceived">client__syncReceived</a></li><li><a href="GameEngine.html#event:objectAdded">objectAdded</a></li><li><a href="GameEngine.html#event:objectDestroyed">objectDestroyed</a></li><li><a href="GameEngine.html#event:playerDisconnected">playerDisconnected</a></li><li><a href="GameEngine.html#event:playerJoined">playerJoined</a></li><li><a href="GameEngine.html#event:postStep">postStep</a></li><li><a href="GameEngine.html#event:preStep">preStep</a></li><li><a href="GameEngine.html#event:processInput">processInput</a></li><li><a href="GameEngine.html#event:server__inputReceived">server__inputReceived</a></li><li><a href="GameEngine.html#event:server__playerDisconnected">server__playerDisconnected</a></li><li><a href="GameEngine.html#event:server__playerJoined">server__playerJoined</a></li><li><a href="GameEngine.html#event:server__postStep">server__postStep</a></li><li><a href="GameEngine.html#event:server__preStep">server__preStep</a></li><li><a href="GameEngine.html#event:server__processInput">server__processInput</a></li><li><a href="GameEngine.html#event:server__roomUpdate">server__roomUpdate</a></li><li><a href="GameEngine.html#event:start">start</a></li><li><a href="GameEngine.html#event:syncReceived">syncReceived</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DEFAULT_ROOM_NAME">DEFAULT_ROOM_NAME</a></li></ul>
+    </nav>
+
+    <div id="main">
+        
+        <h1 class="page-title">Choosing a Physics Engine</h1>
+        
+
+        <section>
+
+<header>
+    
+</header>
+
+<article>
+    <p>There are many different kinds of multiplayer games, and different games have different approaches to physics.  Lance supports three basic physics models.</p>
+<ul>
+<li><strong>2D Simple Physics</strong>: A pseudo-physics arcade mode, which only tracks position, velocity, and angle for each object.</li>
+<li><strong>2D Physics Engine</strong>: A true physics engine mode, based on the engine <a href="https://github.com/schteppe/p2.js">P2</a>.</li>
+<li><strong>3D Physics Engine</strong>: A true 3D physics engine mode, based on the engine <a href="https://github.com/schteppe/cannon.js/">Cannon</a>.</li>
+</ul>
+<h2>2D Simple Physics</h2>
+<p>This is probably the most common mode, and is appropriate for 2D games which don't need a real physics engine.  Consider arcade games, fighting/brawler games, dungeon room games, platform, shooter, RPG, RTS, and runners.  In all these cases, the game code doesn't require true physics.  Instead, physical aspects such as position, velocity, and collisions are easily implemented using simple game logic.  Even jumping from one platform to the next can be implemented as a sequence of height changes.</p>
+<p>In fact, many of these games are more fun to play using simplified (or pseudo) physics as they become more deterministic and predictable to the player.</p>
+<p>In order to use simple physics in Lance, you will need to initialize a <code>SimplePhysicsEngine</code> instance in the <code>GameEngine</code> constructor.  In addition, all game object classes must extend the <code>DynamicObject</code> class.</p>
+<p>For example:</p>
+<pre class="prettyprint source lang-javascript"><code>export default class Simple2DGameEngine extends GameEngine {
+
+    constructor(options) {
+        super(options);
+        this.physicsEngine = new SimplePhysicsEngine({
+            gameEngine: this,
+            collisions: {
+                type: 'brute'
+            }
+        });
+    }
+}
+</code></pre>
+<p>See the sample game <a href="https://github.com/lance-gg/spaaace">Spaaace</a> to see how this is done.</p>
+<h2>2D Real Physics</h2>
+<p>Games which require true physics in 2D can use this mode.  In order to use real physics in 2D, you will need to initialize an instance of <code>P2PhysicsEngine</code> in the <code>GameEngine</code> constructor.  The underlying physics engine used in this case is P2.  A very lightweight 2D physics engine.  All game object classes must extend the <code>PhysicalObject2D</code> base class.</p>
+<p>See the sample game <a href="https://github.com/lance-gg/asteroids">Asteroids</a> to see how this is done.  Also, you may want to compare Spaaace and Asteroids to see how the game experience changes from pseudo-physics to real physics.</p>
+<h2>3D Real Physics</h2>
+<p>3D physics games are not common.  In fact, many games which appear to be 3D physics games are in fact 2.5D pseudo-physics games.  In those cases, the map is really a two dimensional map, but the objects are allowed to also have a height.  The lance 3D physics mode uses the native javascript Cannon physics engine, written by Schteppe.</p>
+<p>To use 3D real physics, initialize an instance of <code>P2PhysicsEngine</code> in the <code>GameEngine</code> constructor.  All game object classes must extend the <code>PhysicalObject3D</code> base class.</p>
+<p>See <a href="https://github.com/lance-gg/sprocketleague">SprocketLeague</a> for a sample implementation.</p>
+<p>Next: <a href="tutorial-guide_gameengine.html">Game Engine</a></p>
+</article>
+
+</section>
+
+    </div>
+
+    <br class="clear">
+
+    <footer>
+        Did you find a mistake? Do you have an improvement? <a href="https://github.com/lance-gg/lance/issues">Let us know!</a>
+    </footer>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-88335360-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    <script src="https://use.typekit.net/lai1bbe.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script src="scripts/linenumber.js"></script>
+</body>
+</html>

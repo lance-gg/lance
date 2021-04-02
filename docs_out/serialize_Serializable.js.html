@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>serialize/Serializable.js - Documentation</title>
+
+
+    <link rel="shortcut icon" href="http://lance.gg/favicon.ico">
+    <link rel="icon" sizes="16x16 32x32 64x64" href="http://lance.gg/favicon.ico">
+    <link rel="icon" type="image/png" sizes="196x196" href="http://lance.gg/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="http://lance.gg/favicon-160.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="http://lance.gg/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="http://lance.gg/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="http://lance.gg/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="http://lance.gg/favicon-16.png">
+        
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/9.8.0/styles/atelier-sulphurpool-light.min.css">
+</head>
+<body>
+
+    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+
+    <label for="nav-trigger" class="overlay"></label>
+
+    <nav>
+        <h2 class="home"><a href="index.html">Lance</a></h2><h2>Concepts</h2><ul class="tutorials"><li><span class='category'>Introduction<ul><li><a href="tutorial-introduction.html">Introduction</a></li><li><a href="tutorial-introduction_prologue.html">Prologue</a></li><li><a href="tutorial-introduction_community.html">Community</a></li><li><a href="tutorial-introduction_roadmap.html">Development Roadmap</a></li><li><a href="tutorial-introduction_faq.html">Frequently Asked Questions</a></li></ul></li><li><span class='category'>Overview<ul><li><a href="tutorial-overview_architecture.html">Architecture of a Multiplayer Game</a></li><li><a href="tutorial-choosing_a_physics_engine.html">Choosing a Physics Engine</a></li><li><a href="tutorial-guide_gameengine.html">Game Engine</a></li><li><a href="tutorial-guide_serverengine.html">Server Engine</a></li><li><a href="tutorial-guide_clientengine.html">Client Engine</a></li><li><a href="tutorial-guide_renderer.html">Renderer</a></li><li><a href="tutorial-guide_gameworld.html">Game World and Game Objects</a></li><li><a href="tutorial-guide_serialization.html">Serialization and Communication</a></li></ul></li><li><span class='category'>Synchronization Methods<ul><li><a href="tutorial-guide_syncinterpolation.html">Interpolation</a></li><li><a href="tutorial-guide_syncextrapolation.html">Extrapolation</a></li></ul></li><li><span class='category'>Tutorials<ul><li><a href="tutorial-MyFirstGame.html">My First Game: Pong</a></li><li><a href="tutorial-spaceships.html">Spaaace</a></li></ul></li><li><span class='category'>Extras<ul><li><a href="tutorial-guide_tuningdebugging.html">Fine Tuning and Debugging</a></li><li><a href="tutorial-furtherreading.html">Further Reading</a></li></ul></li></ul><h2>API Reference</h2><h3 class="classes">Classes</h3><ul><li><a href="AFrameRenderer.html">AFrameRenderer</a><ul class='methods'><li data-type='method'><a href="AFrameRenderer.html#draw">draw</a></li><li data-type='method'><a href="AFrameRenderer.html#init">init</a></li></ul></li><li><a href="BaseTypes.html">BaseTypes</a></li><li><a href="CannonPhysicsEngine.html">CannonPhysicsEngine</a></li><li><a href="ClientEngine.html">ClientEngine</a><ul class='methods'><li data-type='method'><a href="ClientEngine.html#connect">connect</a></li><li data-type='method'><a href="ClientEngine.html#disconnect">disconnect</a></li><li data-type='method'><a href="ClientEngine.html#sendInput">sendInput</a></li><li data-type='method'><a href="ClientEngine.html#start">start</a></li></ul></li><li><a href="DynamicObject.html">DynamicObject</a><ul class='methods'><li data-type='method'><a href="DynamicObject.html#accelerate">accelerate</a></li><li data-type='method'><a href="DynamicObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="DynamicObject.html#collidesWith">collidesWith</a></li><li data-type='method'><a href="DynamicObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="DynamicObject.html#toString">toString</a></li><li data-type='method'><a href="DynamicObject.html#turnLeft">turnLeft</a></li><li data-type='method'><a href="DynamicObject.html#turnRight">turnRight</a></li></ul></li><li><a href="GameEngine.html">GameEngine</a><ul class='methods'><li data-type='method'><a href="GameEngine.html#addObjectToWorld">addObjectToWorld</a></li><li data-type='method'><a href="GameEngine.html#getPlayerGameOverResult">getPlayerGameOverResult</a></li><li data-type='method'><a href="GameEngine.html#isOwnedByPlayer">isOwnedByPlayer</a></li><li data-type='method'><a href="GameEngine.html#on">on</a></li><li data-type='method'><a href="GameEngine.html#once">once</a></li><li data-type='method'><a href="GameEngine.html#processInput">processInput</a></li><li data-type='method'><a href="GameEngine.html#registerClasses">registerClasses</a></li><li data-type='method'><a href="GameEngine.html#removeListener">removeListener</a></li><li data-type='method'><a href="GameEngine.html#removeObjectFromWorld">removeObjectFromWorld</a></li><li data-type='method'><a href="GameEngine.html#start">start</a></li><li data-type='method'><a href="GameEngine.html#step">step</a></li></ul></li><li><a href="GameObject.html">GameObject</a><ul class='methods'><li data-type='method'><a href="GameObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="GameObject.html#hasComponent">hasComponent</a></li><li data-type='method'><a href="GameObject.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="GameObject.html#onRemoveFromWorld">onRemoveFromWorld</a></li><li data-type='method'><a href="GameObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="GameObject.html#toString">toString</a></li></ul></li><li><a href="GameWorld.html">GameWorld</a><ul class='methods'><li data-type='method'><a href="GameWorld.html#forEachObject">forEachObject</a></li><li data-type='method'><a href="GameWorld.html#queryObject">queryObject</a></li><li data-type='method'><a href="GameWorld.html#queryObjects">queryObjects</a></li></ul></li><li><a href="KeyboardControls.html">KeyboardControls</a><ul class='methods'><li data-type='method'><a href="KeyboardControls.html#bindKey">bindKey</a></li></ul></li><li><a href="PhysicalObject2D.html">PhysicalObject2D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject2D.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="PhysicalObject2D.html#toString">toString</a></li></ul></li><li><a href="PhysicalObject3D.html">PhysicalObject3D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject3D.html#toString">toString</a></li></ul></li><li><a href="Quaternion.html">Quaternion</a><ul class='methods'><li data-type='method'><a href="Quaternion.html#conjugate">conjugate</a></li><li data-type='method'><a href="Quaternion.html#copy">copy</a></li><li data-type='method'><a href="Quaternion.html#multiply">multiply</a></li><li data-type='method'><a href="Quaternion.html#set">set</a></li><li data-type='method'><a href="Quaternion.html#setFromAxisAngle">setFromAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#slerp">slerp</a></li><li data-type='method'><a href="Quaternion.html#toAxisAngle">toAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#toString">toString</a></li></ul></li><li><a href="Renderer.html">Renderer</a><ul class='methods'><li data-type='method'><a href="Renderer.html#addObject">addObject</a></li><li data-type='method'><a href="Renderer.html#draw">draw</a></li><li data-type='method'><a href="Renderer.html#init">init</a></li><li data-type='method'><a href="Renderer.html#removeObject">removeObject</a></li><li data-type='method'><a href="Renderer.html#runClientStep">runClientStep</a></li><li data-type='method'><a href="Renderer.html#stop">stop</a></li></ul></li><li><a href="Serializer.html">Serializer</a><ul class='methods'><li data-type='method'><a href="Serializer.html#.typeCanAssign">typeCanAssign</a></li><li data-type='method'><a href="Serializer.html#addCustomType">addCustomType</a></li><li data-type='method'><a href="Serializer.html#registerClass">registerClass</a></li></ul></li><li><a href="ServerEngine.html">ServerEngine</a><ul class='methods'><li data-type='method'><a href="ServerEngine.html#assignObjectToRoom">assignObjectToRoom</a></li><li data-type='method'><a href="ServerEngine.html#assignPlayerToRoom">assignPlayerToRoom</a></li><li data-type='method'><a href="ServerEngine.html#createRoom">createRoom</a></li><li data-type='method'><a href="ServerEngine.html#gameStatus">gameStatus</a></li></ul></li><li><a href="SimplePhysicsEngine.html">SimplePhysicsEngine</a></li><li><a href="ThreeVector.html">ThreeVector</a><ul class='methods'><li data-type='method'><a href="ThreeVector.html#add">add</a></li><li data-type='method'><a href="ThreeVector.html#clone">clone</a></li><li data-type='method'><a href="ThreeVector.html#copy">copy</a></li><li data-type='method'><a href="ThreeVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="ThreeVector.html#length">length</a></li><li data-type='method'><a href="ThreeVector.html#lerp">lerp</a></li><li data-type='method'><a href="ThreeVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="ThreeVector.html#normalize">normalize</a></li><li data-type='method'><a href="ThreeVector.html#set">set</a></li><li data-type='method'><a href="ThreeVector.html#subtract">subtract</a></li><li data-type='method'><a href="ThreeVector.html#toString">toString</a></li></ul></li><li><a href="Trace.html">Trace</a></li><li><a href="TwoVector.html">TwoVector</a><ul class='methods'><li data-type='method'><a href="TwoVector.html#add">add</a></li><li data-type='method'><a href="TwoVector.html#clone">clone</a></li><li data-type='method'><a href="TwoVector.html#copy">copy</a></li><li data-type='method'><a href="TwoVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="TwoVector.html#length">length</a></li><li data-type='method'><a href="TwoVector.html#lerp">lerp</a></li><li data-type='method'><a href="TwoVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="TwoVector.html#normalize">normalize</a></li><li data-type='method'><a href="TwoVector.html#set">set</a></li><li data-type='method'><a href="TwoVector.html#subtract">subtract</a></li><li data-type='method'><a href="TwoVector.html#toString">toString</a></li></ul></li></ul><h3 class="events">Events</h3><ul><li><a href="GameEngine.html#event:client__postStep">client__postStep</a></li><li><a href="GameEngine.html#event:client__preStep">client__preStep</a></li><li><a href="GameEngine.html#event:client__processInput">client__processInput</a></li><li><a href="GameEngine.html#event:client__roomUpdate">client__roomUpdate</a></li><li><a href="GameEngine.html#event:client__slowFrameRate">client__slowFrameRate</a></li><li><a href="GameEngine.html#event:client__stepReset">client__stepReset</a></li><li><a href="GameEngine.html#event:client__syncReceived">client__syncReceived</a></li><li><a href="GameEngine.html#event:objectAdded">objectAdded</a></li><li><a href="GameEngine.html#event:objectDestroyed">objectDestroyed</a></li><li><a href="GameEngine.html#event:playerDisconnected">playerDisconnected</a></li><li><a href="GameEngine.html#event:playerJoined">playerJoined</a></li><li><a href="GameEngine.html#event:postStep">postStep</a></li><li><a href="GameEngine.html#event:preStep">preStep</a></li><li><a href="GameEngine.html#event:processInput">processInput</a></li><li><a href="GameEngine.html#event:server__inputReceived">server__inputReceived</a></li><li><a href="GameEngine.html#event:server__playerDisconnected">server__playerDisconnected</a></li><li><a href="GameEngine.html#event:server__playerJoined">server__playerJoined</a></li><li><a href="GameEngine.html#event:server__postStep">server__postStep</a></li><li><a href="GameEngine.html#event:server__preStep">server__preStep</a></li><li><a href="GameEngine.html#event:server__processInput">server__processInput</a></li><li><a href="GameEngine.html#event:server__roomUpdate">server__roomUpdate</a></li><li><a href="GameEngine.html#event:start">start</a></li><li><a href="GameEngine.html#event:syncReceived">syncReceived</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DEFAULT_ROOM_NAME">DEFAULT_ROOM_NAME</a></li></ul>
+    </nav>
+
+    <div id="main">
+        
+        <h1 class="page-title">serialize/Serializable.js</h1>
+        
+
+        
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Utils from './../lib/Utils';
+import BaseTypes from './BaseTypes';
+
+class Serializable {
+    /**
+     *  Class can be serialized using either:
+     * - a class based netScheme
+     * - an instance based netScheme
+     * - completely dynamically (not implemented yet)
+     *
+     * @param {Object} serializer - Serializer instance
+     * @param {Object} [options] - Options object
+     * @param {Object} options.dataBuffer [optional] - Data buffer to write to. If null a new data buffer will be created
+     * @param {Number} options.bufferOffset [optional] - The buffer data offset to start writing at. Default: 0
+     * @param {String} options.dry [optional] - Does not actually write to the buffer (useful to gather serializeable size)
+     * @return {Object} the serialized object.  Contains attributes: dataBuffer - buffer which contains the serialized data;  bufferOffset - offset where the serialized data starts.
+     */
+    serialize(serializer, options) {
+        options = Object.assign({
+            bufferOffset: 0
+        }, options);
+
+        let netScheme;
+        let dataBuffer;
+        let dataView;
+        let classId = 0;
+        let bufferOffset = options.bufferOffset;
+        let localBufferOffset = 0; // used for counting the bufferOffset
+
+        // instance classId
+        if (this.classId) {
+            classId = this.classId;
+        } else {
+            classId = Utils.hashStr(this.constructor.name);
+        }
+
+        // instance netScheme
+        if (this.netScheme) {
+            netScheme = this.netScheme;
+        } else if (this.constructor.netScheme) {
+            netScheme = this.constructor.netScheme;
+        } else {
+            // todo define behaviour when a netScheme is undefined
+            console.warn('no netScheme defined! This will result in awful performance');
+        }
+
+        // TODO: currently we serialize every node twice, once to calculate the size
+        //       of the buffers and once to write them out.  This can be reduced to
+        //       a single pass by starting with a large (and static) ArrayBuffer and
+        //       recursively building it up.
+        // buffer has one Uint8Array for class id, then payload
+        if (options.dataBuffer == null &amp;&amp; options.dry != true) {
+            let bufferSize = this.serialize(serializer, { dry: true }).bufferOffset;
+            dataBuffer = new ArrayBuffer(bufferSize);
+        } else {
+            dataBuffer = options.dataBuffer;
+        }
+
+        if (options.dry != true) {
+            dataView = new DataView(dataBuffer);
+            // first set the id of the class, so that the deserializer can fetch information about it
+            dataView.setUint8(bufferOffset + localBufferOffset, classId);
+        }
+
+        // advance the offset counter
+        localBufferOffset += Uint8Array.BYTES_PER_ELEMENT;
+
+        if (netScheme) {
+            for (let property of Object.keys(netScheme).sort()) {
+
+                // write the property to buffer
+                if (options.dry != true) {
+                    serializer.writeDataView(dataView, this[property], bufferOffset + localBufferOffset, netScheme[property]);
+                }
+
+                if (netScheme[property].type === BaseTypes.TYPES.STRING) {
+                    // derive the size of the string
+                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+                    if (this[property] !== null &amp;&amp; this[property] !== undefined)
+                        localBufferOffset += this[property].length * Uint16Array.BYTES_PER_ELEMENT;
+                } else if (netScheme[property].type === BaseTypes.TYPES.CLASSINSTANCE) {
+                    // derive the size of the included class
+                    let objectInstanceBufferOffset = this[property].serialize(serializer, { dry: true }).bufferOffset;
+                    localBufferOffset += objectInstanceBufferOffset;
+                } else if (netScheme[property].type === BaseTypes.TYPES.LIST) {
+                    // derive the size of the list
+                    // list starts with number of elements
+                    localBufferOffset += Uint16Array.BYTES_PER_ELEMENT;
+
+                    for (let item of this[property]) {
+                        // todo inelegant, currently doesn't support list of lists
+                        if (netScheme[property].itemType === BaseTypes.TYPES.CLASSINSTANCE) {
+                            let listBufferOffset = item.serialize(serializer, { dry: true }).bufferOffset;
+                            localBufferOffset += listBufferOffset;
+                        } else if (netScheme[property].itemType === BaseTypes.TYPES.STRING) {
+                            // size includes string length plus double-byte characters
+                            localBufferOffset += Uint16Array.BYTES_PER_ELEMENT * (1 + item.length);
+                        } else {
+                            localBufferOffset += serializer.getTypeByteSize(netScheme[property].itemType);
+                        }
+                    }
+                } else {
+                    // advance offset
+                    localBufferOffset += serializer.getTypeByteSize(netScheme[property].type);
+                }
+
+            }
+        } else {
+            // TODO no netScheme, dynamic class
+        }
+
+        return { dataBuffer, bufferOffset: localBufferOffset };
+    }
+
+    // build a clone of this object with pruned strings (if necessary)
+    prunedStringsClone(serializer, prevObject) {
+
+        if (!prevObject) return this;
+        prevObject = serializer.deserialize(prevObject).obj;
+
+        // get list of string properties which changed
+        let netScheme = this.constructor.netScheme;
+        let isString = p => netScheme[p].type === BaseTypes.TYPES.STRING;
+        let hasChanged = p => prevObject[p] !== this[p];
+        let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
+        if (changedStrings.length == 0) return this;
+
+        // build a clone with pruned strings
+        let prunedCopy = new this.constructor(null, { id: null });
+        for (let p of Object.keys(netScheme))
+            prunedCopy[p] = changedStrings.indexOf(p) &lt; 0 ? this[p] : null;
+
+        return prunedCopy;
+    }
+
+    syncTo(other) {
+        let netScheme = this.constructor.netScheme;
+        for (let p of Object.keys(netScheme)) {
+
+            // ignore classes and lists
+            if (netScheme[p].type === BaseTypes.TYPES.LIST || netScheme[p].type === BaseTypes.TYPES.CLASSINSTANCE)
+                continue;
+
+            // strings might be pruned
+            if (netScheme[p].type === BaseTypes.TYPES.STRING) {
+                if (typeof other[p] === 'string') this[p] = other[p];
+                continue;
+            }
+
+            // all other values are copied
+            this[p] = other[p];
+        }
+    }
+
+}
+
+export default Serializable;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    </div>
+
+    <br class="clear">
+
+    <footer>
+        Did you find a mistake? Do you have an improvement? <a href="https://github.com/lance-gg/lance/issues">Let us know!</a>
+    </footer>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-88335360-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    <script src="https://use.typekit.net/lai1bbe.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script src="scripts/linenumber.js"></script>
+</body>
+</html>

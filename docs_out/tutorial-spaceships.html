@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Spaaace - Documentation</title>
+
+
+    <link rel="shortcut icon" href="http://lance.gg/favicon.ico">
+    <link rel="icon" sizes="16x16 32x32 64x64" href="http://lance.gg/favicon.ico">
+    <link rel="icon" type="image/png" sizes="196x196" href="http://lance.gg/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="http://lance.gg/favicon-160.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="http://lance.gg/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="http://lance.gg/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="http://lance.gg/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="http://lance.gg/favicon-16.png">
+        
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/9.8.0/styles/atelier-sulphurpool-light.min.css">
+</head>
+<body>
+
+    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+
+    <label for="nav-trigger" class="overlay"></label>
+
+    <nav>
+        <h2 class="home"><a href="index.html">Lance</a></h2><h2>Concepts</h2><ul class="tutorials"><li><span class='category'>Introduction<ul><li><a href="tutorial-introduction.html">Introduction</a></li><li><a href="tutorial-introduction_prologue.html">Prologue</a></li><li><a href="tutorial-introduction_community.html">Community</a></li><li><a href="tutorial-introduction_roadmap.html">Development Roadmap</a></li><li><a href="tutorial-introduction_faq.html">Frequently Asked Questions</a></li></ul></li><li><span class='category'>Overview<ul><li><a href="tutorial-overview_architecture.html">Architecture of a Multiplayer Game</a></li><li><a href="tutorial-choosing_a_physics_engine.html">Choosing a Physics Engine</a></li><li><a href="tutorial-guide_gameengine.html">Game Engine</a></li><li><a href="tutorial-guide_serverengine.html">Server Engine</a></li><li><a href="tutorial-guide_clientengine.html">Client Engine</a></li><li><a href="tutorial-guide_renderer.html">Renderer</a></li><li><a href="tutorial-guide_gameworld.html">Game World and Game Objects</a></li><li><a href="tutorial-guide_serialization.html">Serialization and Communication</a></li></ul></li><li><span class='category'>Synchronization Methods<ul><li><a href="tutorial-guide_syncinterpolation.html">Interpolation</a></li><li><a href="tutorial-guide_syncextrapolation.html">Extrapolation</a></li></ul></li><li><span class='category'>Tutorials<ul><li><a href="tutorial-MyFirstGame.html">My First Game: Pong</a></li><li><a href="tutorial-spaceships.html">Spaaace</a></li></ul></li><li><span class='category'>Extras<ul><li><a href="tutorial-guide_tuningdebugging.html">Fine Tuning and Debugging</a></li><li><a href="tutorial-furtherreading.html">Further Reading</a></li></ul></li></ul><h2>API Reference</h2><h3 class="classes">Classes</h3><ul><li><a href="AFrameRenderer.html">AFrameRenderer</a><ul class='methods'><li data-type='method'><a href="AFrameRenderer.html#draw">draw</a></li><li data-type='method'><a href="AFrameRenderer.html#init">init</a></li></ul></li><li><a href="BaseTypes.html">BaseTypes</a></li><li><a href="CannonPhysicsEngine.html">CannonPhysicsEngine</a></li><li><a href="ClientEngine.html">ClientEngine</a><ul class='methods'><li data-type='method'><a href="ClientEngine.html#connect">connect</a></li><li data-type='method'><a href="ClientEngine.html#disconnect">disconnect</a></li><li data-type='method'><a href="ClientEngine.html#sendInput">sendInput</a></li><li data-type='method'><a href="ClientEngine.html#start">start</a></li></ul></li><li><a href="DynamicObject.html">DynamicObject</a><ul class='methods'><li data-type='method'><a href="DynamicObject.html#accelerate">accelerate</a></li><li data-type='method'><a href="DynamicObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="DynamicObject.html#collidesWith">collidesWith</a></li><li data-type='method'><a href="DynamicObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="DynamicObject.html#toString">toString</a></li><li data-type='method'><a href="DynamicObject.html#turnLeft">turnLeft</a></li><li data-type='method'><a href="DynamicObject.html#turnRight">turnRight</a></li></ul></li><li><a href="GameEngine.html">GameEngine</a><ul class='methods'><li data-type='method'><a href="GameEngine.html#addObjectToWorld">addObjectToWorld</a></li><li data-type='method'><a href="GameEngine.html#getPlayerGameOverResult">getPlayerGameOverResult</a></li><li data-type='method'><a href="GameEngine.html#isOwnedByPlayer">isOwnedByPlayer</a></li><li data-type='method'><a href="GameEngine.html#on">on</a></li><li data-type='method'><a href="GameEngine.html#once">once</a></li><li data-type='method'><a href="GameEngine.html#processInput">processInput</a></li><li data-type='method'><a href="GameEngine.html#registerClasses">registerClasses</a></li><li data-type='method'><a href="GameEngine.html#removeListener">removeListener</a></li><li data-type='method'><a href="GameEngine.html#removeObjectFromWorld">removeObjectFromWorld</a></li><li data-type='method'><a href="GameEngine.html#start">start</a></li><li data-type='method'><a href="GameEngine.html#step">step</a></li></ul></li><li><a href="GameObject.html">GameObject</a><ul class='methods'><li data-type='method'><a href="GameObject.html#bendingToString">bendingToString</a></li><li data-type='method'><a href="GameObject.html#hasComponent">hasComponent</a></li><li data-type='method'><a href="GameObject.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="GameObject.html#onRemoveFromWorld">onRemoveFromWorld</a></li><li data-type='method'><a href="GameObject.html#syncTo">syncTo</a></li><li data-type='method'><a href="GameObject.html#toString">toString</a></li></ul></li><li><a href="GameWorld.html">GameWorld</a><ul class='methods'><li data-type='method'><a href="GameWorld.html#forEachObject">forEachObject</a></li><li data-type='method'><a href="GameWorld.html#queryObject">queryObject</a></li><li data-type='method'><a href="GameWorld.html#queryObjects">queryObjects</a></li></ul></li><li><a href="KeyboardControls.html">KeyboardControls</a><ul class='methods'><li data-type='method'><a href="KeyboardControls.html#bindKey">bindKey</a></li></ul></li><li><a href="PhysicalObject2D.html">PhysicalObject2D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject2D.html#onAddToWorld">onAddToWorld</a></li><li data-type='method'><a href="PhysicalObject2D.html#toString">toString</a></li></ul></li><li><a href="PhysicalObject3D.html">PhysicalObject3D</a><ul class='methods'><li data-type='method'><a href="PhysicalObject3D.html#toString">toString</a></li></ul></li><li><a href="Quaternion.html">Quaternion</a><ul class='methods'><li data-type='method'><a href="Quaternion.html#conjugate">conjugate</a></li><li data-type='method'><a href="Quaternion.html#copy">copy</a></li><li data-type='method'><a href="Quaternion.html#multiply">multiply</a></li><li data-type='method'><a href="Quaternion.html#set">set</a></li><li data-type='method'><a href="Quaternion.html#setFromAxisAngle">setFromAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#slerp">slerp</a></li><li data-type='method'><a href="Quaternion.html#toAxisAngle">toAxisAngle</a></li><li data-type='method'><a href="Quaternion.html#toString">toString</a></li></ul></li><li><a href="Renderer.html">Renderer</a><ul class='methods'><li data-type='method'><a href="Renderer.html#addObject">addObject</a></li><li data-type='method'><a href="Renderer.html#draw">draw</a></li><li data-type='method'><a href="Renderer.html#init">init</a></li><li data-type='method'><a href="Renderer.html#removeObject">removeObject</a></li><li data-type='method'><a href="Renderer.html#runClientStep">runClientStep</a></li><li data-type='method'><a href="Renderer.html#stop">stop</a></li></ul></li><li><a href="Serializer.html">Serializer</a><ul class='methods'><li data-type='method'><a href="Serializer.html#.typeCanAssign">typeCanAssign</a></li><li data-type='method'><a href="Serializer.html#addCustomType">addCustomType</a></li><li data-type='method'><a href="Serializer.html#registerClass">registerClass</a></li></ul></li><li><a href="ServerEngine.html">ServerEngine</a><ul class='methods'><li data-type='method'><a href="ServerEngine.html#assignObjectToRoom">assignObjectToRoom</a></li><li data-type='method'><a href="ServerEngine.html#assignPlayerToRoom">assignPlayerToRoom</a></li><li data-type='method'><a href="ServerEngine.html#createRoom">createRoom</a></li><li data-type='method'><a href="ServerEngine.html#gameStatus">gameStatus</a></li></ul></li><li><a href="SimplePhysicsEngine.html">SimplePhysicsEngine</a></li><li><a href="ThreeVector.html">ThreeVector</a><ul class='methods'><li data-type='method'><a href="ThreeVector.html#add">add</a></li><li data-type='method'><a href="ThreeVector.html#clone">clone</a></li><li data-type='method'><a href="ThreeVector.html#copy">copy</a></li><li data-type='method'><a href="ThreeVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="ThreeVector.html#length">length</a></li><li data-type='method'><a href="ThreeVector.html#lerp">lerp</a></li><li data-type='method'><a href="ThreeVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="ThreeVector.html#normalize">normalize</a></li><li data-type='method'><a href="ThreeVector.html#set">set</a></li><li data-type='method'><a href="ThreeVector.html#subtract">subtract</a></li><li data-type='method'><a href="ThreeVector.html#toString">toString</a></li></ul></li><li><a href="Trace.html">Trace</a></li><li><a href="TwoVector.html">TwoVector</a><ul class='methods'><li data-type='method'><a href="TwoVector.html#add">add</a></li><li data-type='method'><a href="TwoVector.html#clone">clone</a></li><li data-type='method'><a href="TwoVector.html#copy">copy</a></li><li data-type='method'><a href="TwoVector.html#getBendingDelta">getBendingDelta</a></li><li data-type='method'><a href="TwoVector.html#length">length</a></li><li data-type='method'><a href="TwoVector.html#lerp">lerp</a></li><li data-type='method'><a href="TwoVector.html#multiplyScalar">multiplyScalar</a></li><li data-type='method'><a href="TwoVector.html#normalize">normalize</a></li><li data-type='method'><a href="TwoVector.html#set">set</a></li><li data-type='method'><a href="TwoVector.html#subtract">subtract</a></li><li data-type='method'><a href="TwoVector.html#toString">toString</a></li></ul></li></ul><h3 class="events">Events</h3><ul><li><a href="GameEngine.html#event:client__postStep">client__postStep</a></li><li><a href="GameEngine.html#event:client__preStep">client__preStep</a></li><li><a href="GameEngine.html#event:client__processInput">client__processInput</a></li><li><a href="GameEngine.html#event:client__roomUpdate">client__roomUpdate</a></li><li><a href="GameEngine.html#event:client__slowFrameRate">client__slowFrameRate</a></li><li><a href="GameEngine.html#event:client__stepReset">client__stepReset</a></li><li><a href="GameEngine.html#event:client__syncReceived">client__syncReceived</a></li><li><a href="GameEngine.html#event:objectAdded">objectAdded</a></li><li><a href="GameEngine.html#event:objectDestroyed">objectDestroyed</a></li><li><a href="GameEngine.html#event:playerDisconnected">playerDisconnected</a></li><li><a href="GameEngine.html#event:playerJoined">playerJoined</a></li><li><a href="GameEngine.html#event:postStep">postStep</a></li><li><a href="GameEngine.html#event:preStep">preStep</a></li><li><a href="GameEngine.html#event:processInput">processInput</a></li><li><a href="GameEngine.html#event:server__inputReceived">server__inputReceived</a></li><li><a href="GameEngine.html#event:server__playerDisconnected">server__playerDisconnected</a></li><li><a href="GameEngine.html#event:server__playerJoined">server__playerJoined</a></li><li><a href="GameEngine.html#event:server__postStep">server__postStep</a></li><li><a href="GameEngine.html#event:server__preStep">server__preStep</a></li><li><a href="GameEngine.html#event:server__processInput">server__processInput</a></li><li><a href="GameEngine.html#event:server__roomUpdate">server__roomUpdate</a></li><li><a href="GameEngine.html#event:start">start</a></li><li><a href="GameEngine.html#event:syncReceived">syncReceived</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DEFAULT_ROOM_NAME">DEFAULT_ROOM_NAME</a></li></ul>
+    </nav>
+
+    <div id="main">
+        
+        <h1 class="page-title">Spaaace</h1>
+        
+
+        <section>
+
+<header>
+    
+</header>
+
+<article>
+    <h1>Lance Game Tutorial</h1>
+<p>This 45-minute tutorial will guide you in the building of a
+JavaScript networked game.  It is meant as a more advanced
+tutorial, a follow-up to <a href="tutorial-MyFirstGame.html">My First Game: Pong</a>.
+This tutorial repeats the environment setup, but goes further in-depth,
+introducing the concepts and basic components of a
+networked game,
+and sequence flows on the server and the clients.</p>
+<p>All the code in this tutorial references the <a href="https://github.com/lance-gg/spaaace">spaaace</a> repository - so
+first, clone that repository to see the referenced files:</p>
+<pre class="prettyprint source lang-shell"><code>git clone https://github.com/lance-gg/spaaace
+cd spaaace
+npm install
+npm start
+</code></pre>
+<p>Open one or more browsers at http://localhost:3000 to see the game running.</p>
+<h2>The Components of a Networked Game</h2>
+<p>The networked game is architected around the following components:</p>
+<ul>
+<li><strong>The server</strong>.  Implemented by the <code>ServerEngine</code> class.  The code in this class will run on the authoritative server only.</li>
+<li><strong>The clients</strong>.  Implemented by the <code>ClientEngine</code> class.  The code in this class will run on each browser playing the game.  The client code will need to collect the user's inputs, and send them to the server.</li>
+<li><strong>The game logic</strong>.  Implemented by the <code>GameEngine</code> class.  In interpolation mode, the code in this class runs only on the server.  However, in extrapolation mode, the code in this class runs on the server, and is also executed on each client, as each client attempts to extrapolate (predict) what is happening on the authoritative server.</li>
+<li><strong>Multiple game objects</strong>.  The <code>GameObject</code> is the base class for all kinds of game objects.  Each game object can be associated with one or more render assets (such as sprites), as well as one or more physics objects.  For example, in a game of spaceships, each spaceship is a game object, but each spaceship game object will have multiple render objects associated with it, such as the spaceship image, the engine thrust images, and an explosion image which is rendered when the spaceship explodes.  In addition, a single spaceship game object is linked to physical objects in a physics engine.  And the physical object will likely be a very simple shape, like a rectangle or a circle or a point.</li>
+<li><strong>Physics</strong>.  Lance supports three physics models.  For this game, we will use the simplified <em>2D Simple Physics</em> mode.  In this mode, all game objects inherit from the <code>DynamicObject</code> class, and the corresponding physics engine is <code>SimplePhysicsEngine</code>.</li>
+<li><strong>Synchronization</strong>.  Lance provides several ways to synchronize between the server and the clients.  The game developer must configure which synchronization method works best for any given game.  For this game we will use extrapolation mode.</li>
+</ul>
+<p>As you write your game, you will need to implement your own extensions (sub-classes) of the classes above.  But most of the game logic will happen in your extensions of <code>GameEngine</code> and <code>ServerEngine</code>.</p>
+<h2>Basic Flow</h2>
+<p>The basic flow of the game can be seen as a sequence of <em>game steps</em>.
+Steps will be executed both on the server and the client.  Each step is numbered,
+and depending on the synchronization strategy, clients may be executing a given
+step before the corresponding state data has arrived from the server (i.e. extrapolation) or after (i.e. interpolation).
+Ideally, a given step 𝑵 represents the same point in game play on both the server
+and the client, and occurs at the same time.  But this is not always the case.</p>
+<h3>Server Flow:</h3>
+<p>The server main entry point is a simple javascript file which initializes an instance of an extended <code>ServerEngine</code> class and an instance of an extended <code>GameEngine</code> class. In our tutorial the file is called <a href="https://github.com/lance-gg/spaaace/blob/master/main.js"><code>main.js</code></a>.</p>
+<p>The server engine schedules a <code>step</code> function to be called at a regular interval.  The
+flow is:</p>
+<ul>
+<li><strong>ServerEngine</strong> - start of a single server step
+<ul>
+<li>GameEngine - <strong>collect inputs from all players:</strong> process any inputs that arrived</li>
+<li>GameEngine - start of a single game step
+<ul>
+<li>PhysicsEngine - handle physics step</li>
+</ul>
+</li>
+<li><strong>Broadcast game state to clients:</strong> If a game-state broadcast is due
+<ul>
+<li>For each connected player Pᵢ
+<ul>
+<li>Transmit a &quot;world update&quot; to player Pᵢ</li>
+<li>This world update is called a &quot;sync&quot; and contains only the necessary changes to game objects</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Note: the flow described above is already implemented in Lance.  The game developer creates a sub-classes which inherits from <code>ServerEngine</code> and a sub-class which inherits from <code>GameEngine</code>.  These two sub-classes contain server and game logic.</p>
+<h3>Client Flow:</h3>
+<p>The client flow is actually more complicated than the server flow, because of synchronization strategies and the rendering.  The client consists of three independent work schedules: The game step logic, the render step logic, and the server update sync logic.</p>
+<ul>
+<li><strong>ClientEngine</strong> - Renderer draw event
+<ul>
+<li>At the draw event, the client will typically execute one client game step</li>
+<li>Check inbound messages / world updates
+<ul>
+<li>if a world update has arrived from the server, apply all the changes to the local game state</li>
+</ul>
+</li>
+<li>Capture local user inputs that have occurred since previous step</li>
+<li>Transmit inputs to server</li>
+<li>Handle inputs locally (extrapolation mode only)</li>
+<li>GameEngine - start of a game step
+<ul>
+<li>PhysicsEngine - handle physics step</li>
+</ul>
+</li>
+<li>For each object in the world Oᵢ:
+<ul>
+<li>update the associated render objects for Oᵢ</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Note: the flow described above is already implemented in Lance.  The game developer creates a sub-class which inherits from <code>ClientEngine</code>.  This sub class contains client code for the game.</p>
+<h2>Step 1: main.js and the ServerEngine</h2>
+<h3>Build your own ServerEngine sub-class:</h3>
+<p>The first step is to build your own ServerEngine-derived class.  For this tutorial
+you can look at file <a href="https://github.com/lance-gg/spaaace/blob/master/src/server/SpaaaceServerEngine.js"><code>src/server/SpaaaceServerEngine.js</code></a></p>
+<p>This file does the following:</p>
+<ol>
+<li>Start the server, by creating the robot ships, and registering a function which will handle missile hits.  See method <code>start()</code>.</li>
+<li>Handle player-connection logic by creating a ship for the new player.  See method <code>onPlayerConnected()</code>.  Notice that this method receives a socket object, which can be used to handle client events.</li>
+<li>Handle player-disconnection logic by removing the ship of the disconnected player.  See method <code>onPlayerDisconnected()</code>.</li>
+<li>Note the <code>makeBot()</code> method, it creates AI-controlled spaceships, which are controlled on the server only.  The AI-control code is implemented in the GameEngine, but since it is only called by the ServerEngine class, it will only run on the server.  This is the preferred technique to implement game code which only executes on the server.</li>
+</ol>
+<h3>Build the main entry point:</h3>
+<p>The next step is to write the server entry code.  For this tutorial the corresponding
+file is <a href="https://github.com/lance-gg/spaaace/blob/master/main.js"><code>main.js</code></a></p>
+<p>The file does the following:</p>
+<ol>
+<li>create an express server and configure the root route '/'</li>
+<li>create a socketIO handler</li>
+<li>create an instance of SpaaaceServerEngine</li>
+<li>create an instance of SpaaaceGameEngine</li>
+<li>start the serverEngine instance</li>
+</ol>
+<p>Sample entry code will look like this:</p>
+<pre class="prettyprint source lang-javascript"><code>const express = require('express');
+const socketIO = require('socket.io');
+const path = require('path');
+
+const PORT = process.env.PORT || 3000;
+const INDEX = path.join(__dirname, './index.html');
+
+// define routes and socket
+const server = express();
+server.get('/', function(req, res) { res.sendFile(INDEX); });
+server.use('/', express.static(path.join(__dirname, './dist/')));
+let requestHandler = server.listen(PORT, () => console.log(`Listening on ${ PORT }`));
+const io = socketIO(requestHandler);
+
+// Game Server
+import SpaaaceServerEngine from './src/server/SpaaaceServerEngine.js';
+import SpaaaceGameEngine from './src/common/SpaaaceGameEngine.js';
+
+
+// Game Instances
+const gameEngine = new SpaaaceGameEngine();
+const serverEngine = new SpaaaceServerEngine(io, gameEngine, {
+    debug: {},
+    updateRate: 6,
+    timeoutInterval: 0 // no timeout
+});
+
+// start the game
+serverEngine.start();
+</code></pre>
+<h2>Step 2: the GameEngine</h2>
+<p>To implement the game logic, you must create a new class which inherits from the <strong>GameEngine</strong> class.  This is where your game mechanics (a.k.a. game rules, or game logic) are implemented.
+Methods which are explicitly invoked by the ServerEngine will run on the server only.  But much of the code is meant to execute on both client and server.</p>
+<p>For this tutorial, take a look at <a href="https://github.com/lance-gg/spaaace/blob/master/src/common/SpaaaceGameEngine.js"><code>src/common/SpaaaceGameEngine.js</code></a>
+The game engine logic has three major tasks:</p>
+<ol>
+<li>Extend the <code>start()</code> method.  Listen to collision events, and check if a missile hit a ship.  If so - emit an event called <strong>missileHit</strong>.</li>
+<li>Extend the <code>processInput()</code> method.  This is the logic which handles new user input such as movement, firing, activate ability, etc.  In the sample code the <code>processInput()</code> method handles the keyboard inputs &quot;up&quot;, &quot;right&quot;, &quot;left&quot;, &quot;space&quot;.  The inputs will cause the spaceship to accelerate, turn right or left, or to fire a missile.</li>
+<li><code>makeShip()</code>.  Creates a new ship, as a result of a new connection received on the server.  Only called by the <strong>ServerEngine</strong>, so this method will only run on the server.</li>
+<li><code>makeMissile()</code>.  Create a new missile, as a result of one ship firing.  Called by the <strong>GameEngine</strong>, so this method will run on both clients and server.</li>
+<li><code>destroyMissile()</code>.  Remove a missile.</li>
+</ol>
+<h2>Step 3: <code>clientEntryPoint.js</code>, <code>SpaaaceClientEngine.js</code>, and <code>SpaaaceRenderer.js</code></h2>
+<p>The client entry code creates a game engine, a client engine, and their options.  The options configure the synchronization.</p>
+<p>The full sample code is in <a href="https://github.com/lance-gg/spaaace/blob/master/src/client/clientEntryPoint.js"><code>src/client/clientEntryPoint.js</code></a> and is implemented as follows:</p>
+<pre class="prettyprint source lang-javascript"><code>import Trace from 'lance/lib/Trace';
+import SpaaaceClientEngine from './SpaaaceClientEngine';
+import SpaaaceGameEngine from '../common/SpaaaceGameEngine';
+import '../../dist/assets/sass/main.scss';
+
+// sent to both game engine and client engine
+const options = {
+    traceLevel: Trace.TRACE_NONE,
+    delayInputCount: 8,
+    scheduler: 'render-schedule',
+    syncOptions: {
+        sync: 'extrapolate',
+        localObjBending: 0.2,
+        remoteObjBending: 0.5
+    }
+};
+
+// create a client engine and a game engine
+const gameEngine = new SpaaaceGameEngine(options);
+const clientEngine = new SpaaaceClientEngine(gameEngine, options);
+
+clientEngine.start();
+</code></pre>
+<h2>Step 4: DynamicObjects</h2>
+<p>Your game objects, including monsters, spaceships, zombies, and bosses, all inherit from
+the <code>DynamicObject</code> class.  More advanced games which require a true physics engine will prefer to inherit from <code>PhysicalObject2D</code> or <code>PhysicalObject3D</code>, but that is outside the scope of this tutorial.  The <code>DynamicObject</code> base class is a
+serializable class, meaning that the server can serialize any instance of the class
+(or sub-class) into a binary object, and transmit those instances to clients.</p>
+<p>The serialization mechanism doesn't know which attributes of the game objects are important, and need to be included in the serializations.  This requires sub-classes to explicitly list the attribute names which will be included during the serialization.  This list of attributes is described using the <code>netscheme</code> mechanism.</p>
+<p>Take a look at the <code>netScheme()</code> getter in <a href="https://github.com/lance-gg/spaaace/blob/master/src/common/Ship.js"><code>src/common/Ship.js</code></a> and
+<a href="https://github.com/lance-gg/spaaace/blob/master/src/common/Missile.js"><code>src/common/Missile.js</code></a>.  The <code>netScheme()</code> getter extends the super-class netScheme.  In both files you will find that the base class provides most of the needed logic for movement,
+and synchronization.</p>
+<p>For example, the netscheme of the Ship object shown here, includes the netscheme attributes of the super class (i.e. DynamicObject), and adds to that list an attribute called <strong>showThrust</strong>, of type <strong>INT32</strong>.</p>
+<pre class="prettyprint source lang-javascript"><code>static get netScheme() {
+    return Object.assign({
+        showThrust: { type: BaseTypes.TYPES.INT32 }
+    }, super.netScheme);
+}
+</code></pre>
+<h2>Step 5: Putting it all together</h2>
+<p>For the full game, you will need to create a <a href="https://github.com/lance-gg/spaaace/blob/master/package.json"><code>package.json</code></a> file, and an <a href="https://github.com/lance-gg/spaaace/blob/master/index.html"><code>index.html</code></a> file,
+examples of which are available in the <a href="https://github.com/lance-gg/spaaace">spaaace</a> repository.</p>
+<p>To run the server run <code>npm run build</code> followed by <code>npm start</code>.</p>
+<p>Keep in mind that the server has two roles: <strong>(1)</strong> it acts as an HTTP server, serving index.html to clients
+which connect to the game;
+and <strong>(2)</strong> it runs the ServerEngine socket.io entry point, which involves accepting client connections, running the server-authoritative game engine, and broadcasting updates to the clients.  In a published game, you will likely want to store the static files in a CDN, so your server engine can focus on the second role.</p>
+<h2>Game Events</h2>
+<p>It is good programming practice to implement your code using event handlers,
+so that it is clear what each chunk of logic is handling.</p>
+<p>The full list of events is available in the <a href="GameEngine.html">API GameEngine reference</a>, so we will only list the most
+important events here.</p>
+<ul>
+<li><code>preStep</code> and <code>postStep</code> - emitted by game engine, just before and just after step execution.  The event handlers receive the step number and whether or not this step is a reenactment.</li>
+<li><code>objectAdded</code> and <code>objectDestroyed</code> - emitted on object addition/destruction, the handlers receive the object as an argument.</li>
+<li><code>syncReceived</code> - emitted on the client when a sync (e.g world update) is received.</li>
+<li><code>playerJoined</code> and <code>playerDisconnected</code> - emitted on player connect/disconnect.  The handlers receive an object describing the player.  The object contains attribute playerId.</li>
+</ul>
+<h2>Traces &amp; Debugging</h2>
+<p>For debugging purposes, the <strong>GameEngine</strong> super-class provides a tracing service.  The trace
+service exposes functions <code>trace()</code>, <code>debug()</code>, <code>info()</code>, <code>warn()</code> and <code>error()</code>.
+The functions are listed above in increasing order of importance.  When the
+game engine is started, it can be passed a minimum trace level option.  For example
+a minimum trace level of <code>TRACE_INFO</code> will mean that entries of type &quot;trace&quot; and &quot;debug&quot;
+will be ignored.</p>
+<p>A trace message is usually recorded as follows:</p>
+<pre class="prettyprint source lang-javascript"><code>gameEngine.trace.info(() => `this just happened: ${foobar()}`);
+</code></pre>
+<p>The trace methods receive arrow functions as an input, because if they would receive the template string then this template string will be evaluated even in those cases where no tracing is done.  This has been shown to add a heavy load to the garbage collection.</p>
+<p>By default, Lance already traces a lot of information, describing
+the progress of the game and each step in detail.
+The traces are text files, written on the server side.  The server trace
+file is called <strong>server.trace</strong> and the client trace files are called <strong>client.𝑵.trace</strong>
+where <strong>𝑵</strong> is the player's id.</p>
+<h3>How to enable traces</h3>
+<p>In our tutorial example, the URL's query-string parameters become options which are
+passed to the game engine constructor.  So the client-side traces can be activated from the query string, simply by setting the parameter <code>&amp;traceLevel=0</code> on the query
+string.</p>
+<p>On the server side traces can be enabled by setting the <code>traceLevel</code> option on the <code>GameEngine</code>, this option specifies the minimum trace level to record, so by setting this option to 0 you can get all trace messages.</p>
+</article>
+
+</section>
+
+    </div>
+
+    <br class="clear">
+
+    <footer>
+        Did you find a mistake? Do you have an improvement? <a href="https://github.com/lance-gg/lance/issues">Let us know!</a>
+    </footer>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-88335360-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    <script src="https://use.typekit.net/lai1bbe.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script src="scripts/linenumber.js"></script>
+</body>
+</html>
