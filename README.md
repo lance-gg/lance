@@ -35,7 +35,7 @@ More features in the pipeline:
 
 ## That's so neat! Where do I start?
 
-The official [Lance documentation](http://docs.lance.gg) contains articles on theory and rational, as well as the structure and architecture of the project.
+The official [Lance documentation](https://lance-gg.github.io/lance/docs_out/index.html) contains articles on theory and rationale, as well as the structure and architecture of the project.
 
 ## Something went wrong! I need help!
 
