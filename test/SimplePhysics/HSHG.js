@@ -7,7 +7,7 @@ const HSHG = require('../../src/physics/SimplePhysics/HSHG');
 
 class TestObject extends DynamicObject {
 
-    get netScheme(){
+    static get netScheme(){
         return {
             height: BaseTypes.TYPES.UINT16,
             width: BaseTypes.TYPES.UINT16

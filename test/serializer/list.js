@@ -5,7 +5,7 @@ import BaseTypes from '../../src/serialize/BaseTypes';
 
 class TestObject extends Serializable {
 
-    get netScheme() {
+    static get netScheme() {
         return {
             playerAges: {
                 type: BaseTypes.TYPES.LIST,

@@ -7,7 +7,7 @@ import BaseTypes from './BaseTypes';
  */
 class TwoVector extends Serializable {
 
-    get netScheme() {
+    static get netScheme() {
         return {
             x: { type: BaseTypes.TYPES.FLOAT32 },
             y: { type: BaseTypes.TYPES.FLOAT32 }

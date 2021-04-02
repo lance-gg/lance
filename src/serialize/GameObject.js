@@ -1,14 +1,5 @@
 import Serializable from './Serializable';
 import BaseTypes from './BaseTypes';
-import GameEngine from '../GameEngine';
-
-interface GameObjectOptions {
-    id: Number
-}
-
-interface GameObjectProps {
-    playerId: Number
-}
 
 /**
  * GameObject is the base class of all game objects.
@@ -19,16 +10,11 @@ interface GameObjectProps {
  */
 class GameObject extends Serializable {
 
-    id: Number;
-    gameEngine: GameEngine;
-    playerId: Number;
-    savedCopy: GameObject;
-
-    public netScheme() {
-        return Object.assign({
+    static get netScheme() {
+        return {
             id: { type: BaseTypes.TYPES.INT32 },
             playerId: { type: BaseTypes.TYPES.INT16 }
-        }, super.netScheme());
+        };
     }
 
     /**
@@ -39,7 +25,7 @@ class GameObject extends Serializable {
     * @param {Object} props - additional properties for creation
     * @param {Number} props.playerId - the playerId value of the player who owns this object
     */
-    constructor(gameEngine: GameEngine, options: GameObjectOptions, props: GameObjectProps) {
+    constructor(gameEngine, options, props) {
         super();
         /**
          * The gameEngine this object will be used in
@@ -71,6 +57,8 @@ class GameObject extends Serializable {
         * @member {Number}
         */
         this.playerId = (props && props.playerId) ? props.playerId : 0;
+
+        this.components = {};
     }
 
     /**
@@ -104,8 +92,8 @@ class GameObject extends Serializable {
         return 'no bending';
     }
 
-    saveState(other: GameObject) {
-        this.savedCopy = (new (this.constructor as any)(this.gameEngine, { id: null }));
+    saveState(other) {
+        this.savedCopy = (new this.constructor(this.gameEngine, { id: null }));
         this.savedCopy.syncTo(other ? other : this);
     }
    /**
@@ -178,6 +166,40 @@ class GameObject extends Serializable {
 
     // clean up resources
     destroy() {}
+
+    addComponent(componentInstance) {
+        componentInstance.parentObject = this;
+        this.components[componentInstance.constructor.name] = componentInstance;
+
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentAdded', this, componentInstance);
+        }
+    }
+
+    removeComponent(componentName) {
+        // todo cleanup of the component ?
+        delete this.components[componentName];
+
+        // a gameEngine might not exist if this class is instantiated by the serializer
+        if (this.gameEngine) {
+            this.gameEngine.emit('componentRemoved', this, componentName);
+        }
+    }
+
+    /**
+     * Check whether this game object has a certain component
+     * @param {Object} componentClass the comp
+     * @return {Boolean} true if the gameObject contains this component
+     */
+    hasComponent(componentClass) {
+        return componentClass.name in this.components;
+    }
+
+    getComponent(componentClass) {
+        return this.components[componentClass.name];
+    }
+
 }
 
 export default GameObject;

@@ -38,7 +38,7 @@ class DynamicObject extends GameObject {
     *         }, super.netScheme);
     *     }
     */
-    get netScheme() {
+    static get netScheme() {
         return Object.assign({
             position: { type: BaseTypes.TYPES.CLASSINSTANCE },
             width: { type: BaseTypes.TYPES.INT16 },

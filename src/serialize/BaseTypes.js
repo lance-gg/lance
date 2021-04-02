@@ -1,21 +1,10 @@
 
-interface NamedTypes {
-    FLOAT32: string;
-    INT32: string;
-    INT16: string;
-    INT8: string;
-    UINT8: string;
-    STRING: string;
-    CLASSINSTANCE: string;
-    LIST: string;
-}
-
 /**
  * The BaseTypes class defines the base types used in Lance.
  * These are the types which can be used to define an object's netscheme attributes,
  * which can be serialized by lance.
  * @example
- *     get netScheme() {
+ *     static get netScheme() {
  *       return {
  *             strength: { type: BaseTypes.TYPES.FLOAT32 },
  *             shield: { type: BaseTypes.TYPES.INT8 },
@@ -28,9 +17,7 @@ interface NamedTypes {
  *         };
  *     }
  */
-class BaseTypes {
-    static TYPES: NamedTypes;
-}
+class BaseTypes {}
 
 /**
  * @type {object}

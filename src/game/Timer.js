@@ -5,15 +5,11 @@
 //   - Timer.cancel(cb)
 export default class Timer {
 
-    currentTime: number;
-    isActive: boolean;
-    idCounter: number;
-    events: object;
-
     constructor() {
         this.currentTime = 0;
         this.isActive = false;
         this.idCounter = 0;
+
         this.events = {};
     }
 
@@ -54,13 +50,12 @@ export default class Timer {
         delete this.events[eventId];
     }
 
-    loop(time, callback, thisContext = undefined, args = undefined) {
+    loop(time, callback) {
         let timerEvent = new TimerEvent(this,
-            TimerEventType.Repeat,
+            TimerEvent.TYPES.repeat,
             time,
-            callback,
-            thisContext,
-            args);
+            callback
+        );
 
         this.events[timerEvent.id] = timerEvent;
 
@@ -69,11 +64,12 @@ export default class Timer {
 
     add(time, callback, thisContext, args) {
         let timerEvent = new TimerEvent(this,
-            TimerEventType.Single,
+            TimerEvent.TYPES.single,
             time,
             callback,
             thisContext,
-            args);
+            args
+        );
 
         this.events[timerEvent.id] = timerEvent;
         return timerEvent;
@@ -86,25 +82,9 @@ export default class Timer {
     }
 }
 
-enum TimerEventType {
-    Repeat, Single
-}
-
 // timer event
 class TimerEvent {
-    id: number;
-    timer: Timer;
-    type: TimerEventType;
-    time: number;
-    callback: (context: any, args: any) => void;
-    startOffset: number;
-    thisContext: any;
-    args: any;
-    destroy: (id: number) => void;
-
-    constructor(timer: Timer, type: TimerEventType, time: number,
-        callback: (context: any, args: any) => void, thisContext: any,
-        args:any) {
+    constructor(timer, type, time, callback, thisContext, args) {
         this.id = ++timer.idCounter;
         this.timer = timer;
         this.type = type;
@@ -119,3 +99,8 @@ class TimerEvent {
         };
     }
 }
+
+TimerEvent.TYPES = {
+    repeat: 'repeat',
+    single: 'single'
+};

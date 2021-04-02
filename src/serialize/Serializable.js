@@ -1,19 +1,7 @@
 import Utils from './../lib/Utils';
 import BaseTypes from './BaseTypes';
 
-interface SerializableOptions {
-    dataBuffer?: ArrayBuffer;
-    bufferOffset?: number;
-    dry: boolean;
-}
-
 class Serializable {
-
-    classId: number;
-    public netScheme() {
-        return {};
-    }
-
     /**
      *  Class can be serialized using either:
      * - a class based netScheme
@@ -27,12 +15,12 @@ class Serializable {
      * @param {String} options.dry [optional] - Does not actually write to the buffer (useful to gather serializeable size)
      * @return {Object} the serialized object.  Contains attributes: dataBuffer - buffer which contains the serialized data;  bufferOffset - offset where the serialized data starts.
      */
-    serialize(serializer: any, options: SerializableOptions) {
+    serialize(serializer, options) {
         options = Object.assign({
             bufferOffset: 0
         }, options);
 
-        let netScheme = this.netScheme;
+        let netScheme;
         let dataBuffer;
         let dataView;
         let classId = 0;
@@ -44,6 +32,16 @@ class Serializable {
             classId = this.classId;
         } else {
             classId = Utils.hashStr(this.constructor.name);
+        }
+
+        // instance netScheme
+        if (this.netScheme) {
+            netScheme = this.netScheme;
+        } else if (this.constructor.netScheme) {
+            netScheme = this.constructor.netScheme;
+        } else {
+            // todo define behaviour when a netScheme is undefined
+            console.warn('no netScheme defined! This will result in awful performance');
         }
 
         // TODO: currently we serialize every node twice, once to calculate the size
@@ -121,22 +119,22 @@ class Serializable {
         prevObject = serializer.deserialize(prevObject).obj;
 
         // get list of string properties which changed
-        let netScheme = this.netScheme;
+        let netScheme = this.constructor.netScheme;
         let isString = p => netScheme[p].type === BaseTypes.TYPES.STRING;
         let hasChanged = p => prevObject[p] !== this[p];
         let changedStrings = Object.keys(netScheme).filter(isString).filter(hasChanged);
         if (changedStrings.length == 0) return this;
 
         // build a clone with pruned strings
-        let prunedCopy = new Serializable();
+        let prunedCopy = new this.constructor(null, { id: null });
         for (let p of Object.keys(netScheme))
             prunedCopy[p] = changedStrings.indexOf(p) < 0 ? this[p] : null;
 
         return prunedCopy;
     }
 
-    syncTo(other: Serializable) {
-        let netScheme = this.netScheme;
+    syncTo(other) {
+        let netScheme = this.constructor.netScheme;
         for (let p of Object.keys(netScheme)) {
 
             // ignore classes and lists
