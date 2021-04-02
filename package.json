@@ -31,6 +31,7 @@
     "url": "git://github.com/lance-gg/lance.git"
   },
   "dependencies": {
+    "@types/event-emitter": "^0.3.3",
     "bufferutil": "^4.0.1",
     "cannon": "^0.6.2",
     "event-emitter": "^0.3.5",

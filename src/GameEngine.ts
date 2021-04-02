@@ -1,7 +1,14 @@
 import GameWorld from './GameWorld';
-import EventEmitter from 'event-emitter';
+import ee from 'event-emitter';
 import Timer from './game/Timer';
 import Trace from './lib/Trace';
+import PhysicsEngine from './physics/PhysicsEngine';
+
+interface GameEngineOptions {
+    traceLevel: number
+    clientIDSpace?: number
+    eventEmitter?: ee.Emitter
+}
 
 /**
  * The GameEngine contains the game logic.  Extend this class
@@ -24,6 +31,20 @@ import Trace from './lib/Trace';
  */
 class GameEngine {
 
+    playerId: number;
+    options: GameEngineOptions;
+    on: ee.EmitterMethod;
+    off: ee.EmitterMethod;
+    once: ee.EmitterMethod;
+    emit: (type: string, ...args: any[]) => void;
+    removeListener: ee.EmitterMethod;
+    trace: Trace;
+    world: GameWorld;
+    physicsEngine: PhysicsEngine;
+    worldSettings: any;
+    timer: Timer;
+    ignorePhysics: boolean;
+
     /**
       * Create a game engine instance.  This needs to happen
       * once on the server, and once on each client.
@@ -31,15 +52,15 @@ class GameEngine {
       * @param {Object} options - options object
       * @param {Number} options.traceLevel - the trace level.
       */
-    constructor(options) {
+    constructor(options: GameEngineOptions) {
 
         // place the game engine in the LANCE globals
         const isServerSide = (typeof window === 'undefined');
         const glob = isServerSide ? global : window;
-        glob.LANCE = { gameEngine: this };
+        glob["LANCE"] = { gameEngine: this };
 
         // set options
-        const defaultOpts = { traceLevel: Trace.TRACE_NONE };
+        const defaultOpts:GameEngineOptions = { traceLevel: Trace.TRACE_NONE };
         if (!isServerSide) defaultOpts.clientIDSpace = 1000000;
         this.options = Object.assign(defaultOpts, options);
 
@@ -52,7 +73,7 @@ class GameEngine {
         // set up event emitting and interface
         let eventEmitter = this.options.eventEmitter;
         if (typeof eventEmitter === 'undefined')
-            eventEmitter = new EventEmitter();
+            eventEmitter = ee();
 
         /**
          * Register a handler for an event
@@ -106,7 +127,7 @@ class GameEngine {
         return null;
     }
 
-    initWorld(worldSettings) {
+    initWorld(worldSettings?: any) {
 
         this.world = new GameWorld();
 

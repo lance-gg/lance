@@ -10,7 +10,9 @@ interface SerializableOptions {
 class Serializable {
 
     classId: number;
-    netScheme: object;
+    public netScheme() {
+        return {};
+    }
 
     /**
      *  Class can be serialized using either:

@@ -5,6 +5,11 @@
  */
 class GameWorld {
 
+    stepCount: number;
+    objects: any;
+    playerCount: number;
+    idCount: number;
+
     /**
      * Constructor of the World instance.  Invoked by Lance on startup.
      *
