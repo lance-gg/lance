@@ -48,7 +48,7 @@ class ServerEngine {
             timeoutInterval: 180,
             updateOnObjectCreation: true,
             tracesPath: '',
-            countConnections: true,
+            countConnections: false,
             debug: {
                 serverSendLag: false
             }
