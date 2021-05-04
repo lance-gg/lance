@@ -1,6 +1,6 @@
 <img src="https://cloud.githubusercontent.com/assets/3951311/24590344/0b7748b8-17f4-11e7-84fc-d24c44c7a27a.jpg" style="width: 100%" alt="Lance logo">
 
-# [Lance](https://lance-gg.github.io/lance/) is a real-time multiplayer game server
+# [Lance](https://lance-gg.github.io/) is a real-time multiplayer game server
 
 It provides an extendible Node.JS based server, on which game logic runs, as well as a client-side library
 which synchronizes the client's game state with the server game state.  In order
@@ -35,7 +35,7 @@ More features in the pipeline:
 
 ## That's so neat! Where do I start?
 
-The official [Lance documentation](https://lance-gg.github.io/lance/docs_out/index.html) contains articles on theory and rationale, as well as the structure and architecture of the project.
+The official [Lance documentation](https://lance-gg.github.io/docs_out/index.html) contains articles on theory and rationale, as well as the structure and architecture of the project.
 
 ## Something went wrong! I need help!
 
