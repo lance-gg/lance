@@ -76,7 +76,7 @@
     "eslint-config-google": "^0.6.0",
     "express": "^4.14.0",
     "lance-docs-template": "github:lance-gg/lance-docs-template#semver:^1.0.1",
-    "mocha": "^5.2.0",
+    "mocha": "^10.1.0",
     "query-string": "^4.3.1",
     "rollup": "^2.38.5",
     "should": "^11.0.0"
