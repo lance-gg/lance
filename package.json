@@ -1,16 +1,17 @@
 {
   "name": "lance-gg",
-  "version": "4.0.9",
+  "version": "5.0.0",
   "description": "A Node.js based real-time multiplayer game server",
+  "type": "module",
   "main": "dist/server/lance-gg.js",
   "browser": "dist/client/lance-gg.js",
-  "types": "dist/lance-gg.d.ts",
+  "types": "dist/types/lance-gg.d.ts",
   "scripts": {
     "docs": "jsdoc -c jsdoc.conf.json",
     "build": "rollup --config rollup.config.js",
     "test-all": "mocha test/EndToEnd/",
     "test-serializer": "mocha ./test/serializer/",
-    "test": "mocha ./test/serializer/ --compilers js:@babel/register"
+    "test": "mocha ./test/serializer/"
   },
   "keywords": [
     "pixijs",
@@ -31,14 +32,20 @@
     "url": "git://github.com/lance-gg/lance.git"
   },
   "dependencies": {
+    "@types/cannon": "^0.1.12",
+    "@types/event-emitter": "^0.3.5",
+    "@types/p2": "^0.7.44",
+    "@types/three": "^0.163.0",
     "bufferutil": "^4.0.1",
     "cannon": "^0.6.2",
     "event-emitter": "^0.3.5",
-    "jsdoc": "^3.6.3",
+    "jsdoc": "^4.0.2",
     "mkdirp": "^0.5.1",
     "p2": "^0.7.1",
-    "socket.io": "^2.1.1",
-    "socket.io-client": "^2.1.1",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "tslib": "^2.6.2",
+    "typescript": "next",
     "utf-8-validate": "^5.0.2"
   },
   "files": [
@@ -60,17 +67,10 @@
   },
   "homepage": "https://github.com/lance-gg/lance#readme",
   "devDependencies": {
-    "@babel/core": "^7.3.3",
-    "@babel/plugin-proposal-class-properties": "^7.3.4",
-    "@babel/preset-env": "^7.3.1",
-    "@babel/register": "^7.0.0",
-    "@rollup/plugin-babel": "^5.2.3",
-    "@rollup/plugin-commonjs": "^17.1.0",
-    "@rollup/plugin-node-resolve": "^11.1.1",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-typescript": "^8.1.1",
-    "babel-plugin-module-resolver": "^3.2.0",
-    "babel-preset-env": "^1.7.0",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
     "chai": "^3.5.0",
     "eslint": "^8.28.0",
     "eslint-config-google": "^0.6.0",
@@ -78,7 +78,8 @@
     "lance-docs-template": "github:lance-gg/lance-docs-template#semver:^1.0.1",
     "mocha": "^10.1.0",
     "query-string": "^4.3.1",
-    "rollup": "^2.38.5",
+    "rollup": "^4.14.2",
+    "rollup-plugin-dts": "^6.1.0",
     "should": "^11.0.0"
   }
 }

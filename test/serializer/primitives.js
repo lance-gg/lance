@@ -1,8 +1,8 @@
 import should from 'should';
 
-import Serializer from '../../src/serialize/Serializer';
-import Serializable from '../../src/serialize/Serializable';
-import BaseTypes from '../../src/serialize/BaseTypes';
+import Serializer from '../../src/serialize/Serializer.js';
+import Serializable from '../../src/serialize/Serializable.js';
+import BaseTypes from '../../src/serialize/BaseTypes.js';
 
 class TestObject extends Serializable {
 

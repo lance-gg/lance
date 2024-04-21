@@ -1,7 +1,7 @@
 'use strict';
 
 const incheon = require('../../../');
-const MyClientEngine = require('./src/client/MyClientEngine');
+const MyClientEngine = require('./src/client/MyClientEngine.js');
 const MyGameEngine = require('./src/common/MyGameEngine');
 const SimplePhysicsEngine = incheon.physics.SimplePhysicsEngine;
 const search = (typeof location === 'undefined') ? {} : location.search;
