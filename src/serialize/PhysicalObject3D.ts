@@ -127,7 +127,7 @@ class PhysicalObject3D extends GameObject {
     // - bendingQuaternionDelta
     // these can later be used to "bend" incrementally from the state described
     // by "original" to the state described by "self"
-    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
+    bendToCurrent(original: PhysicalObject3D, percent: number, worldSettings: any, isLocal: boolean, increments: number) {
 
         let bending = { increments, percent };
         // if the object has defined a bending multiples for this object, use them
@@ -227,7 +227,7 @@ class PhysicalObject3D extends GameObject {
     }
 
     // interpolate implementation
-    interpolate(nextObj, percent) {
+    interpolate(nextObj: PhysicalObject3D, percent: number) {
 
         // slerp to target position
         this.position.lerp(nextObj.position, percent);

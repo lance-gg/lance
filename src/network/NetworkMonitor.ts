@@ -1,6 +1,7 @@
 import EventEmitter from 'event-emitter';
 import http from 'http';
 import { ClientEngine } from '../ClientEngine.js';
+import { Socket } from 'socket.io-client';
 
 /**
  * Measures network performance between the client and the server
@@ -28,7 +29,7 @@ export default class NetworkMonitor {
     }
 
     // client
-    registerClient(clientEngine) {
+    registerClient(clientEngine: ClientEngine) {
         this.queryIdCounter = 0;
         this.RTTQueries = {};
 
@@ -47,7 +48,7 @@ export default class NetworkMonitor {
         this.queryIdCounter++;
     }
 
-    onReceivedRTTQuery(queryId) {
+    onReceivedRTTQuery(queryId: number) {
         let RTT = (new Date().getTime()) - this.RTTQueries[queryId];
 
         this.movingRTTAverageFrame.push(RTT);
@@ -62,11 +63,11 @@ export default class NetworkMonitor {
     }
 
     // server
-    registerPlayerOnServer(socket) {
+    registerPlayerOnServer(socket: Socket) {
         socket.on('RTTQuery', this.respondToRTTQuery.bind(this, socket));
     }
 
-    respondToRTTQuery(socket, queryId) {
+    respondToRTTQuery(socket: Socket, queryId: number) {
         socket.emit('RTTResponse', queryId);
     }
 

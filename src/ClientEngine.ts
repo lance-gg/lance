@@ -1,12 +1,13 @@
 import io from 'socket.io-client';
 import Utils from './lib/Utils.js';
-import Scheduler from './lib/Scheduler.js';
+import { Scheduler } from './lib/Scheduler.js';
 import Serializer from './serialize/Serializer.js';
 import NetworkMonitor from './network/NetworkMonitor.js';
 import NetworkTransmitter from './network/NetworkTransmitter.js';
 import { GameEngine } from './GameEngine.js';
 import Renderer from './render/Renderer.js';
 import { SyncStrategy } from './syncStrategies/SyncStrategy.js';
+import { Socket } from 'socket.io';
 
 
 // TODO: the GAME_UPS below should be common to the value implemented in the server engine,
@@ -45,7 +46,6 @@ class ClientEngine {
     public gameEngine: GameEngine;
     private networkTransmitter: NetworkTransmitter;
     private networkMonitor: NetworkMonitor;
-    private syncStrategy: SyncStrategy;
     private inboundMessages: any[];
     private outboundMessages: any[];
     private delayedInputs: any[];
@@ -60,6 +60,7 @@ class ClientEngine {
     private lastTimestamp: any;
     private skipOneStep: boolean;
     private resolveGame: (value: unknown) => void;
+    syncStrategy: SyncStrategy;
 
     /**
       * Create a client engine instance.

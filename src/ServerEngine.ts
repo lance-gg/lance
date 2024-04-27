@@ -1,7 +1,7 @@
 import fs from 'fs';
 import mkdirp from 'mkdirp';
 import Utils from './lib/Utils.js';
-import Scheduler from './lib/Scheduler.js';
+import { Scheduler } from './lib/Scheduler.js';
 import Serializer from './serialize/Serializer.js';
 import NetworkTransmitter from './network/NetworkTransmitter.js';
 import NetworkMonitor from './network/NetworkMonitor.js';

@@ -19,6 +19,7 @@ class GameObject extends Serializable {
     public playerId: number;
     private components: { [key: string]: any }
     private savedCopy: GameObject | null;
+    public refreshRenderObject?: () => void;
 
     netScheme() {
         return {
@@ -76,14 +77,14 @@ class GameObject extends Serializable {
      * and any other resources that should be created
      * @param {GameEngine} gameEngine the game engine
      */
-    onAddToWorld(gameEngine) {}
+    onAddToWorld(gameEngine: GameEngine) {}
 
     /**
      * Called after the object is removed from game-world.
      * This is where renderer sub-objects and any other resources should be freed
      * @param {GameEngine} gameEngine the game engine
      */
-    onRemoveFromWorld(gameEngine) {}
+    onRemoveFromWorld(gameEngine: GameEngine) {}
 
     /**
      * Formatted textual description of the game object.
@@ -101,7 +102,7 @@ class GameObject extends Serializable {
         return 'no bending';
     }
 
-    saveState(other?) {
+    saveState(other?: GameObject) {
         this.savedCopy = (new (<any> this.constructor)(this.gameEngine, { id: null }));
         this.savedCopy?.syncTo(other ? other : this);
     }
@@ -139,14 +140,14 @@ class GameObject extends Serializable {
     // TODO:
     // rather than pass worldSettings on each bend, they could
     // be passed in on the constructor just once.
-    bendToCurrentState(bending, worldSettings, isLocal, bendingIncrements) {
+    bendToCurrentState(bending: number, worldSettings: any, isLocal: boolean, bendingIncrements: number) {
         if (this.savedCopy) {
             this.bendToCurrent(this.savedCopy, bending, worldSettings, isLocal, bendingIncrements);
         }
         this.savedCopy = null;
     }
 
-    bendToCurrent(original, bending, worldSettings, isLocal, bendingIncrements) {
+    bendToCurrent(original: GameObject, bending: number, worldSettings: any, isLocal: boolean, bendingIncrements: number) {
     }
 
     /**
@@ -154,7 +155,7 @@ class GameObject extends Serializable {
      * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
      * @param {GameObject} other the other object to synchronize to
      */
-    syncTo(other) {
+    syncTo(other: GameObject) {
         super.syncTo(other);
         this.playerId = other.playerId;
     }

@@ -14,7 +14,7 @@ type SchedulerOptions = {
  * Scheduler class
  *
  */
-export default class Scheduler {
+class Scheduler {
 
     private options: SchedulerOptions;
     private nextExecTime: number;
@@ -108,3 +108,5 @@ export default class Scheduler {
         this.requestedDelay -= this.options.delay;
     }
 }
+
+export { Scheduler, SchedulerOptions }

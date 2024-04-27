@@ -12,6 +12,10 @@ class GameWorld {
         this.idCount = possibleId + 1;
         return possibleId;
     }
+    queryOneObject(query) {
+        let objs = this.queryObjects(query);
+        return objs.length > 0 ? objs[0] : null;
+    }
     queryObjects(query) {
         let queriedObjects = [];
         this.forEachObject((id, object) => {
@@ -30,9 +34,6 @@ class GameWorld {
                     return false;
             }
         });
-        if (query.returnSingle) {
-            return queriedObjects.length > 0 ? queriedObjects[0] : null;
-        }
         return queriedObjects;
     }
     queryObject(query) {
@@ -14264,8 +14265,7 @@ var BaseTypes;
 var BaseTypes$1 = BaseTypes;
 
 class Serializable {
-    constructor() {
-    }
+    constructor() { }
     netScheme() {
         return {};
     }
@@ -14953,7 +14953,7 @@ let dx = new TwoVector(0, 0);
 class SimplePhysicsEngine extends PhysicsEngine {
     constructor(options) {
         super(options);
-        if (options.collisions && options.collisions.type === 'HSHG') {
+        if (options.collisions && options.collisionsType === 'HSHG') {
             this.collisionDetection = new HSHGCollisionDetection(options.collisions);
         }
         else {
@@ -14962,7 +14962,7 @@ class SimplePhysicsEngine extends PhysicsEngine {
         this.gravity = new TwoVector(0, 0);
         if (options.gravity)
             this.gravity.copy(options.gravity);
-        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, options.collisionOptions);
+        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, options.collisions);
         this.collisionDetection.init(collisionOptions);
     }
     objectStep(o, dt) {

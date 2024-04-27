@@ -1,7 +1,7 @@
 import { GameObject, GameObjectOptions, GameObjectProps } from './GameObject.js';
 import BaseTypes from './BaseTypes.js';
 import { TwoVector } from './TwoVector.js';
-import MathUtils from '../lib/MathUtils.js';
+import { MathUtils } from '../lib/MathUtils.js';
 import { GameEngine } from '../GameEngine.js';
 
 interface PhysicalObject2DProps extends GameObjectProps {
@@ -159,7 +159,7 @@ class PhysicalObject2D extends GameObject {
     // - bendingAngleDelta
     // these can later be used to "bend" incrementally from the state described
     // by "original" to the state described by "self"
-    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
+    bendToCurrent(original: PhysicalObject2D, percent: number, worldSettings: any, isLocal: boolean, increments: number) {
 
         let bending = { increments, percent };
         // if the object has defined a bending multiples for this object, use them
@@ -229,7 +229,7 @@ class PhysicalObject2D extends GameObject {
     // physics engines have different implementations.
     // TODO: Better implementation: the physics engine implementor
     // should define copyFromLanceVector and copyToLanceVector
-    copyVector(source, target) {
+    copyVector(source: any, target: any) {
         let sourceVec = source;
         if (typeof source[0] === 'number' && typeof source[1] === 'number')
             sourceVec = { x: source[0], y: source[1] };
@@ -273,7 +273,7 @@ class PhysicalObject2D extends GameObject {
     }
 
     // interpolate implementation
-    interpolate(nextObj, percent) {
+    interpolate(nextObj: PhysicalObject2D, percent: number) {
 
         // slerp to target position
         this.position.lerp(nextObj.position, percent);

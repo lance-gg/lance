@@ -3,34 +3,6 @@ import P2, { CircleOptions, BodyOptions } from 'p2';
 import * as Cannon from 'cannon';
 import { Server } from 'socket.io';
 
-type TimerCallback = (args: any) => void;
-declare class Timer {
-    currentTime: number;
-    idCounter: number;
-    private isActive;
-    private events;
-    constructor();
-    play(): void;
-    tick(): void;
-    destroyEvent(eventId: number): void;
-    loop(time: number, callback: TimerCallback): TimerEvent;
-    add(time: number, callback: TimerCallback, thisContext: any, args: any): TimerEvent;
-    destroy(id: number): void;
-}
-declare class TimerEvent {
-    id: number;
-    private timer;
-    private type;
-    private time;
-    private callback;
-    private startOffset;
-    private thisContext;
-    private args;
-    destroy: () => void;
-    constructor(timer: Timer, type: TimerEventType, time: number, callback: any, thisContext?: any, args?: any);
-}
-type TimerEventType = 'repeat' | 'single';
-
 type NetScheme = {
     [key: string]: {
         'type': string;
@@ -78,7 +50,7 @@ declare class Serializable {
     netScheme(): NetScheme;
     serialize(serializer: Serializer, options: SerializableOptions): SerializedObj;
     prunedStringsClone(serializer: Serializer, prevObject: Serializable): any;
-    syncTo(other: any): void;
+    syncTo(other: Serializable): void;
 }
 
 declare enum BaseTypes {
@@ -104,6 +76,7 @@ declare class GameObject extends Serializable {
     playerId: number;
     private components;
     private savedCopy;
+    refreshRenderObject?: () => void;
     netScheme(): {
         id: {
             type: BaseTypes;
@@ -113,15 +86,15 @@ declare class GameObject extends Serializable {
         };
     };
     constructor(gameEngine: GameEngine, options: GameObjectOptions, props: GameObjectProps);
-    onAddToWorld(gameEngine: any): void;
-    onRemoveFromWorld(gameEngine: any): void;
+    onAddToWorld(gameEngine: GameEngine): void;
+    onRemoveFromWorld(gameEngine: GameEngine): void;
     toString(): string;
     bendingToString(): string;
-    saveState(other?: any): void;
+    saveState(other?: GameObject): void;
     get bending(): any;
-    bendToCurrentState(bending: any, worldSettings: any, isLocal: any, bendingIncrements: any): void;
-    bendToCurrent(original: any, bending: any, worldSettings: any, isLocal: any, bendingIncrements: any): void;
-    syncTo(other: any): void;
+    bendToCurrentState(bending: number, worldSettings: any, isLocal: boolean, bendingIncrements: number): void;
+    bendToCurrent(original: GameObject, bending: number, worldSettings: any, isLocal: boolean, bendingIncrements: number): void;
+    syncTo(other: GameObject): void;
     refreshToPhysics(): void;
     refreshFromPhysics(): void;
     applyIncrementalBending(stepDesc: any): void;
@@ -131,6 +104,58 @@ declare class GameObject extends Serializable {
     hasComponent(componentClass: any): boolean;
     getComponent(componentClass: any): any;
 }
+
+interface ObjectQuery {
+    id?: number;
+    playerId?: number;
+    instanceType?: typeof GameObject;
+    components?: string[];
+    returnSingle?: boolean;
+}
+declare class GameWorld {
+    objects: {
+        [key: number]: GameObject;
+    };
+    stepCount: number;
+    playerCount: number;
+    idCount: number;
+    constructor();
+    getNewId(): number;
+    queryOneObject(query: ObjectQuery): GameObject | null;
+    queryObjects(query: ObjectQuery): GameObject[];
+    queryObject(query: any): GameObject[];
+    addObject(object: any): void;
+    removeObject(id: any): void;
+    forEachObject(callback: any): void;
+}
+
+type TimerCallback = (args: any) => void;
+declare class Timer {
+    currentTime: number;
+    idCounter: number;
+    private isActive;
+    private events;
+    constructor();
+    play(): void;
+    tick(): void;
+    destroyEvent(eventId: number): void;
+    loop(time: number, callback: TimerCallback): TimerEvent;
+    add(time: number, callback: TimerCallback, thisContext: any, args: any): TimerEvent;
+    destroy(id: number): void;
+}
+declare class TimerEvent {
+    id: number;
+    private timer;
+    private type;
+    private time;
+    private callback;
+    private startOffset;
+    private thisContext;
+    private args;
+    destroy: () => void;
+    constructor(timer: Timer, type: TimerEventType, time: number, callback: any, thisContext?: any, args?: any);
+}
+type TimerEventType = 'repeat' | 'single';
 
 interface PhysicsEngineOptions {
     gameEngine: GameEngine;
@@ -166,7 +191,7 @@ interface InputDesc {
     };
 }
 declare class GameEngine {
-    world: any;
+    world: GameWorld;
     worldSettings: any;
     physicsEngine: PhysicsEngine;
     ignorePhysics: boolean;
@@ -194,29 +219,6 @@ declare class GameEngine {
     getPlayerGameOverResult(): any;
 }
 
-interface ObjectQuery {
-    id: number;
-    playerId: number;
-    instanceType: typeof GameObject;
-    components: string[];
-    returnSingle: boolean;
-}
-declare class GameWorld {
-    objects: {
-        [key: number]: GameObject;
-    };
-    private stepCount;
-    private playerCount;
-    private idCount;
-    constructor();
-    getNewId(): number;
-    queryObjects(query: ObjectQuery): GameObject | GameObject[];
-    queryObject(query: any): GameObject | GameObject[];
-    addObject(object: any): void;
-    removeObject(id: any): void;
-    forEachObject(callback: any): void;
-}
-
 interface P2PhysicsEngineOptions extends PhysicsEngineOptions {
     dt?: number;
 }
@@ -227,27 +229,6 @@ declare class P2PhysicsEngine extends PhysicsEngine {
     addCircle(circleOptions: CircleOptions, bodyOptions: BodyOptions): P2.Body;
     addBox(width: number, height: number, mass: number): P2.Body;
     removeObject(obj: P2.Body): void;
-}
-
-declare class SimplePhysicsEngine extends PhysicsEngine {
-    private collisionDetection;
-    private gravity;
-    constructor(options: any);
-    objectStep(o: any, dt: any): void;
-    step(dt: number, objectFilter: (o: GameObject) => boolean): void;
-}
-
-interface CannonPhysicsEngineOptions extends PhysicsEngineOptions {
-    dt: number;
-}
-declare class CannonPhysicsEngine extends PhysicsEngine {
-    private cannonPhysicsEngineOptions;
-    constructor(options: CannonPhysicsEngineOptions);
-    step(dt: number, objectFilter: (o: GameObject) => boolean): void;
-    addSphere(radius: number, mass: number): Cannon.Body;
-    addBox(x: number, y: number, z: number, mass: number, friction: number): Cannon.Body;
-    addCylinder(radiusTop: number, radiusBottom: number, height: number, numSegments: number, mass: number): Cannon.Body;
-    removeObject(obj: Cannon.Body): void;
 }
 
 interface TwoVectorBendingOptions {
@@ -280,6 +261,123 @@ declare class TwoVector extends Serializable {
     clone(): TwoVector;
     lerp(target: TwoVector, p: number): this;
     getBendingDelta(target: TwoVector, options: TwoVectorBendingOptions): TwoVector;
+}
+
+interface CollisionDetectionOptions {
+    gameEngine: GameEngine;
+}
+
+interface HSHGCollisionDetectionOptions extends CollisionDetectionOptions {
+    gameEngine: GameEngine;
+    COLLISION_DISTANCE?: number;
+}
+
+interface DynamicObjectProps extends GameObjectProps {
+    position: TwoVector;
+    velocity: TwoVector;
+    width: number;
+    height: number;
+    isStatic: number;
+}
+declare class DynamicObject extends GameObject {
+    private bendingIncrements;
+    position: TwoVector;
+    velocity: TwoVector;
+    friction: TwoVector;
+    width: number;
+    height: number;
+    isStatic: number;
+    angle: number;
+    isRotatingLeft: boolean;
+    isRotatingRight: boolean;
+    isAccelerating: boolean;
+    rotationSpeed: number;
+    acceleration: number;
+    deceleration: number;
+    private incrementScale;
+    private bendingAngle;
+    private bendingPositionDelta;
+    private bendingVelocityDelta;
+    private bendingAngleDelta;
+    private bendingTarget;
+    private bendingOptions;
+    netScheme(): {
+        position: {
+            type: BaseTypes;
+        };
+        width: {
+            type: BaseTypes;
+        };
+        height: {
+            type: BaseTypes;
+        };
+        isStatic: {
+            type: BaseTypes;
+        };
+        velocity: {
+            type: BaseTypes;
+        };
+        angle: {
+            type: BaseTypes;
+        };
+    } & {
+        id: {
+            type: BaseTypes;
+        };
+        playerId: {
+            type: BaseTypes;
+        };
+    };
+    constructor(gameEngine: GameEngine, options: GameObjectOptions, props: DynamicObjectProps);
+    get x(): number;
+    get y(): number;
+    toString(): string;
+    get bending(): any;
+    turnRight(deltaAngle: number): this;
+    turnLeft(deltaAngle: number): this;
+    accelerate(acceleration: number): this;
+    bendingToString(): string;
+    get maxSpeed(): any;
+    syncTo(other: DynamicObject): void;
+    bendToCurrent(original: DynamicObject, percent: number, worldSettings: any, isLocal: boolean, increments: number): void;
+    applyIncrementalBending(stepDesc: any): void;
+    getAABB(): {
+        min: number[];
+        max: number[];
+    };
+    collidesWith(other: DynamicObject): boolean;
+}
+
+interface BruteForceCollisionDetectionOptions extends CollisionDetectionOptions {
+    autoResolve: boolean;
+    collisionDistance: number;
+    gameEngine: GameEngine;
+}
+
+interface SimplePhysicsEngineOptions extends PhysicsEngineOptions {
+    collisionsType: "HSHG" | "bruteForce";
+    collisions: HSHGCollisionDetectionOptions | BruteForceCollisionDetectionOptions;
+    gravity: TwoVector;
+}
+declare class SimplePhysicsEngine extends PhysicsEngine {
+    private collisionDetection;
+    private gravity;
+    constructor(options: SimplePhysicsEngineOptions);
+    objectStep(o: any, dt: any): void;
+    step(dt: number, objectFilter: (o: GameObject) => boolean): void;
+}
+
+interface CannonPhysicsEngineOptions extends PhysicsEngineOptions {
+    dt: number;
+}
+declare class CannonPhysicsEngine extends PhysicsEngine {
+    private cannonPhysicsEngineOptions;
+    constructor(options: CannonPhysicsEngineOptions);
+    step(dt: number, objectFilter: (o: GameObject) => boolean): void;
+    addSphere(radius: number, mass: number): Cannon.Body;
+    addBox(x: number, y: number, z: number, mass: number, friction: number): Cannon.Body;
+    addCylinder(radiusTop: number, radiusBottom: number, height: number, numSegments: number, mass: number): Cannon.Body;
+    removeObject(obj: Cannon.Body): void;
 }
 
 interface ThreeVectorBendingOptions extends TwoVectorBendingOptions {
@@ -347,82 +445,6 @@ declare class Quaternion extends Serializable {
     slerp(target: Quaternion, bending: number): this;
 }
 
-interface DynamicObjectProps extends GameObjectProps {
-    position: TwoVector;
-    velocity: TwoVector;
-    width: number;
-    height: number;
-    isStatic: number;
-}
-declare class DynamicObject extends GameObject {
-    private bendingIncrements;
-    private position;
-    private velocity;
-    private friction;
-    private width;
-    private height;
-    private isStatic;
-    private angle;
-    private isRotatingLeft;
-    private isRotatingRight;
-    private isAccelerating;
-    private rotationSpeed;
-    private acceleration;
-    private deceleration;
-    private incrementScale;
-    private bendingAngle;
-    private bendingPositionDelta;
-    private bendingVelocityDelta;
-    private bendingAngleDelta;
-    private bendingTarget;
-    private bendingOptions;
-    netScheme(): {
-        position: {
-            type: BaseTypes;
-        };
-        width: {
-            type: BaseTypes;
-        };
-        height: {
-            type: BaseTypes;
-        };
-        isStatic: {
-            type: BaseTypes;
-        };
-        velocity: {
-            type: BaseTypes;
-        };
-        angle: {
-            type: BaseTypes;
-        };
-    } & {
-        id: {
-            type: BaseTypes;
-        };
-        playerId: {
-            type: BaseTypes;
-        };
-    };
-    constructor(gameEngine: GameEngine, options: GameObjectOptions, props: DynamicObjectProps);
-    get x(): number;
-    get y(): number;
-    toString(): string;
-    get bending(): any;
-    turnRight(deltaAngle: any): this;
-    turnLeft(deltaAngle: any): this;
-    accelerate(acceleration: any): this;
-    bendingToString(): string;
-    get maxSpeed(): any;
-    syncTo(other: any): void;
-    bendToCurrent(original: any, percent: any, worldSettings: any, isLocal: any, increments: any): void;
-    applyIncrementalBending(stepDesc: any): void;
-    getAABB(): {
-        min: number[];
-        max: number[];
-    };
-    collidesWith(other: any): boolean;
-}
-
 interface PhysicalObject2DProps extends GameObjectProps {
     position: TwoVector;
     velocity: TwoVector;
@@ -475,13 +497,13 @@ declare class PhysicalObject2D extends GameObject {
     toString(): string;
     get bending(): any;
     bendingToString(): string;
-    bendToCurrent(original: any, percent: any, worldSettings: any, isLocal: any, increments: any): void;
+    bendToCurrent(original: PhysicalObject2D, percent: number, worldSettings: any, isLocal: boolean, increments: number): void;
     syncTo(other: PhysicalObject2D, options?: any): void;
     refreshFromPhysics(): void;
     copyVector(source: any, target: any): void;
     refreshToPhysics(): void;
     applyIncrementalBending(stepDesc: any): void;
-    interpolate(nextObj: any, percent: any): void;
+    interpolate(nextObj: PhysicalObject2D, percent: number): void;
 }
 
 interface PhysicalObject3DProps extends GameObjectProps {
@@ -530,12 +552,12 @@ declare class PhysicalObject3D extends GameObject {
     constructor(gameEngine: GameEngine, options: GameObjectOptions, props: PhysicalObject3DProps);
     toString(): string;
     bendingToString(): string;
-    bendToCurrent(original: any, percent: any, worldSettings: any, isLocal: any, increments: any): void;
+    bendToCurrent(original: PhysicalObject3D, percent: number, worldSettings: any, isLocal: boolean, increments: number): void;
     syncTo(other: PhysicalObject3D, options?: any): void;
     refreshFromPhysics(): void;
     refreshToPhysics(): void;
     applyIncrementalBending(stepDesc: any): void;
-    interpolate(nextObj: any, percent: any): void;
+    interpolate(nextObj: PhysicalObject3D, percent: number): void;
 }
 
 type ServerEngineOptions = Partial<ServerEngineOptionsInternal>;
@@ -595,8 +617,8 @@ declare class Renderer {
     constructor(gameEngine: any);
     init(): Promise<void>;
     reportSlowFrameRate(): void;
-    draw(t: any, dt: any): void;
-    runClientStep(t: any): void;
+    draw(t: number, dt: number): void;
+    runClientStep(t: number): void;
     addObject(obj: any): void;
     removeObject(obj: any): void;
     stop(): void;
@@ -662,7 +684,6 @@ declare class ClientEngine {
     gameEngine: GameEngine;
     private networkTransmitter;
     private networkMonitor;
-    private syncStrategy;
     private inboundMessages;
     private outboundMessages;
     private delayedInputs;
@@ -677,6 +698,7 @@ declare class ClientEngine {
     private lastTimestamp;
     private skipOneStep;
     private resolveGame;
+    syncStrategy: SyncStrategy;
     constructor(gameEngine: GameEngine, syncStrategy: SyncStrategy, inputOptions: ClientEngineOptions, renderer: Renderer);
     connect(options?: {}): Promise<unknown>;
     start(): Promise<unknown>;
@@ -710,11 +732,11 @@ declare global {
 }
 declare class AFrameRenderer extends Renderer {
     protected scene: any;
-    constructor(gameEngine: any);
+    constructor(gameEngine: GameEngine);
     reportSlowFrameRate(): void;
     init(): Promise<void>;
     draw(): void;
-    tick(t: any, dt: any): void;
+    tick(t: number, dt: number): void;
 }
 
 interface ExtrapolateSyncStrategyOptions extends SyncStrategyOptions {
@@ -785,4 +807,4 @@ declare class FrameSyncStrategy extends SyncStrategy {
     applySync(sync: Sync, required: boolean): string;
 }
 
-export { AFrameRenderer, BaseTypes, CannonPhysicsEngine, ClientEngine, type ClientEngineOptions, DynamicObject, ExtrapolateStrategy, type ExtrapolateSyncStrategyOptions, FrameSyncStrategy, GameEngine, type GameEngineOptions, GameObject, GameWorld, type InputDesc, KeyboardControls, _default as Lib, P2PhysicsEngine, PhysicalObject2D, PhysicalObject3D, Quaternion, Renderer, ServerEngine, type ServerEngineOptions, SimplePhysicsEngine, SyncStrategy, type SyncStrategyOptions, ThreeVector, TwoVector };
+export { AFrameRenderer, BaseTypes, CannonPhysicsEngine, ClientEngine, type ClientEngineOptions, DynamicObject, ExtrapolateStrategy, type ExtrapolateSyncStrategyOptions, FrameSyncStrategy, GameEngine, type GameEngineOptions, GameObject, GameWorld, type InputDesc, KeyboardControls, _default as Lib, P2PhysicsEngine, PhysicalObject2D, PhysicalObject3D, Quaternion, Renderer, ServerEngine, type ServerEngineOptions, SimplePhysicsEngine, type SimplePhysicsEngineOptions, SyncStrategy, type SyncStrategyOptions, ThreeVector, TwoVector };

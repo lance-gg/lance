@@ -1,7 +1,7 @@
 import { TwoVector } from './TwoVector.js';
 import { GameObject, GameObjectOptions, GameObjectProps } from './GameObject.js';
 import BaseTypes from './BaseTypes.js';
-import MathUtils from '../lib/MathUtils.js';
+import { MathUtils } from '../lib/MathUtils.js';
 import { GameEngine } from '../GameEngine.js';
 
 interface DynamicObjectProps extends GameObjectProps {
@@ -27,19 +27,19 @@ class DynamicObject extends GameObject {
 
     // TODO: should be "protected" ?
     private bendingIncrements: number;
-    private position: TwoVector;
-    private velocity: TwoVector;
-    private friction: TwoVector;
-    private width: number;
-    private height: number;
-    private isStatic: number;
-    private angle: number;
-    private isRotatingLeft: boolean;
-    private isRotatingRight: boolean;
-    private isAccelerating: boolean;
-    private rotationSpeed: number;
-    private acceleration: number;
-    private deceleration: number;
+    public position: TwoVector;
+    public velocity: TwoVector;
+    public friction: TwoVector;
+    public width: number;
+    public height: number;
+    public isStatic: number;
+    public angle: number;
+    public isRotatingLeft: boolean;
+    public isRotatingRight: boolean;
+    public isAccelerating: boolean;
+    public rotationSpeed: number;
+    public acceleration: number;
+    public deceleration: number;
     private incrementScale: number;
     private bendingAngle: number;
     private bendingPositionDelta: TwoVector;
@@ -222,7 +222,7 @@ class DynamicObject extends GameObject {
     * @param {Number} deltaAngle - the angle to turn, in degrees
     * @return {DynamicObject} return this object
     */
-    turnRight(deltaAngle) {
+    turnRight(deltaAngle: number) {
         this.angle += deltaAngle;
         if (this.angle >= 360) { this.angle -= 360; }
         if (this.angle < 0) { this.angle += 360; }
@@ -234,7 +234,7 @@ class DynamicObject extends GameObject {
     * @param {Number} deltaAngle - the angle to turn, in degrees
     * @return {DynamicObject} return this object
     */
-    turnLeft(deltaAngle) {
+    turnLeft(deltaAngle: number) {
         return this.turnRight(-deltaAngle);
     }
 
@@ -243,7 +243,7 @@ class DynamicObject extends GameObject {
     * @param {Number} acceleration - the acceleration
     * @return {DynamicObject} return this object
     */
-    accelerate(acceleration) {
+    accelerate(acceleration: number) {
         let rad = this.angle * (Math.PI / 180);
         let dv = new TwoVector(Math.cos(rad), Math.sin(rad));
         dv.multiplyScalar(acceleration);
@@ -274,7 +274,7 @@ class DynamicObject extends GameObject {
     * This is used by the synchronizer to create temporary objects, and must be implemented by all sub-classes as well.
     * @param {DynamicObject} other DynamicObject
     */
-    syncTo(other) {
+    syncTo(other: DynamicObject) {
         super.syncTo(other);
         this.position.copy(other.position);
         this.velocity.copy(other.velocity);
@@ -286,7 +286,7 @@ class DynamicObject extends GameObject {
         this.deceleration = other.deceleration;
     }
 
-    bendToCurrent(original, percent, worldSettings, isLocal, increments) {
+    bendToCurrent(original: DynamicObject, percent: number, worldSettings: any, isLocal: boolean, increments: number) {
 
         let bending = { increments, percent };
         // if the object has defined a bending multiples for this object, use them
@@ -351,7 +351,7 @@ class DynamicObject extends GameObject {
     * @param {DynamicObject} other DynamicObject
     * @return {Boolean} true if the two objects collide
     */
-    collidesWith(other) {
+    collidesWith(other: DynamicObject) {
         return true;
     }
 

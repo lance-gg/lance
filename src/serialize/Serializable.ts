@@ -19,9 +19,7 @@ class Serializable {
 
     public classId: number;
 
-    constructor() {
-
-    }
+    constructor() {}
     
     netScheme(): NetScheme {
         return {};
@@ -155,7 +153,7 @@ class Serializable {
         return prunedCopy;
     }
 
-    syncTo(other) {
+    syncTo(other: Serializable) {
         let netScheme = this.netScheme();
         for (let p of Object.keys(netScheme)) {
 

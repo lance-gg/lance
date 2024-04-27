@@ -52,7 +52,7 @@ interface InputDesc {
  */
 class GameEngine {
 
-    public world: any;
+    public world: GameWorld;
     public worldSettings: any;
     public physicsEngine: PhysicsEngine;
     public ignorePhysics: boolean;

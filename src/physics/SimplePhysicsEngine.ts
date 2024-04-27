@@ -1,7 +1,7 @@
-import { PhysicsEngine } from './PhysicsEngine.js';
+import { PhysicsEngine, PhysicsEngineOptions } from './PhysicsEngine.js';
 import { TwoVector } from '../serialize/TwoVector.js';
-import HSHGCollisionDetection from './SimplePhysics/HSHGCollisionDetection.js';
-import { BruteForceCollisionDetection } from './SimplePhysics/BruteForceCollisionDetection.js';
+import { HSHGCollisionDetection, HSHGCollisionDetectionOptions } from './SimplePhysics/HSHGCollisionDetection.js';
+import { BruteForceCollisionDetection, BruteForceCollisionDetectionOptions } from './SimplePhysics/BruteForceCollisionDetection.js';
 import { CollisionDetection } from './SimplePhysics/CollisionDetection.js';
 import { GameEngine } from '../GameEngine.js';
 import { GameObject } from '../serialize/GameObject.js';
@@ -9,6 +9,11 @@ import { GameObject } from '../serialize/GameObject.js';
 let dv = new TwoVector(0, 0);
 let dx = new TwoVector(0, 0);
 
+interface SimplePhysicsEngineOptions extends PhysicsEngineOptions {
+    collisionsType: "HSHG" | "bruteForce",
+    collisions: HSHGCollisionDetectionOptions | BruteForceCollisionDetectionOptions,
+    gravity: TwoVector,
+}
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with
  * objects of class DynamicObject.
@@ -32,15 +37,15 @@ class SimplePhysicsEngine extends PhysicsEngine {
     * @param {Boolean} options.collisions.autoResolve - for brute force collision, colliding objects should be moved apart
     * @param {TwoVector} options.gravity - TwoVector instance which describes gravity, which will be added to the velocity of all objects at every step.  For example TwoVector(0, -0.01)
     */
-    constructor(options) {
+    constructor(options: SimplePhysicsEngineOptions) {
         super(options);
 
 
         // todo does this mean both modules always get loaded?
-        if (options.collisions && options.collisions.type === 'HSHG') {
+        if (options.collisions && options.collisionsType === 'HSHG') {
             this.collisionDetection = new HSHGCollisionDetection(options.collisions);
         } else {
-            this.collisionDetection = new BruteForceCollisionDetection(options.collisions);
+            this.collisionDetection = new BruteForceCollisionDetection(<BruteForceCollisionDetectionOptions> options.collisions);
         }
 
         /**
@@ -53,7 +58,7 @@ class SimplePhysicsEngine extends PhysicsEngine {
         if (options.gravity)
             this.gravity.copy(options.gravity);
 
-        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, options.collisionOptions);
+        let collisionOptions = Object.assign({ gameEngine: this.gameEngine }, options.collisions);
         this.collisionDetection.init(collisionOptions);
     }
 
@@ -140,4 +145,4 @@ class SimplePhysicsEngine extends PhysicsEngine {
     }
 }
 
-export default SimplePhysicsEngine;
+export { SimplePhysicsEngine, SimplePhysicsEngineOptions };

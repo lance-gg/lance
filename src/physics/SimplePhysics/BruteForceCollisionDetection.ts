@@ -1,4 +1,5 @@
 import { GameEngine } from '../../GameEngine.js';
+import DynamicObject from '../../serialize/DynamicObject.js';
 import { TwoVector } from '../../serialize/TwoVector.js';
 import { CollisionDetection, CollisionDetectionOptions } from './CollisionDetection.js';
 let differenceVector = new TwoVector(0, 0);
@@ -24,11 +25,12 @@ class BruteForceCollisionDetection implements CollisionDetection {
     }
 
     // TODO: why do we need init as well as constructor?
+    // TODO: HSHGCollisionDetectionOptions is uselessly passed twice, both on constructor and on init (below)
     init(options: BruteForceCollisionDetectionOptions) {
         this.gameEngine = options.gameEngine;
     }
 
-    findCollision(o1, o2) {
+    findCollision(o1: DynamicObject, o2: DynamicObject) {
 
         // static objects don't collide
         if (o1.isStatic && o2.isStatic)
@@ -109,7 +111,7 @@ class BruteForceCollisionDetection implements CollisionDetection {
     }
 
     // check if pair (id1, id2) have collided
-    checkPair(id1, id2) {
+    checkPair(id1: string, id2: string) {
         let objects = this.gameEngine.world.objects;
         let o1 = objects[id1];
         let o2 = objects[id2];
@@ -118,7 +120,7 @@ class BruteForceCollisionDetection implements CollisionDetection {
         if (!o1 || !o2) return;
         let pairId = [id1, id2].join(',');
 
-        if (this.findCollision(o1, o2)) {
+        if (this.findCollision(<DynamicObject> o1, <DynamicObject> o2)) {
             if (!(pairId in this.collisionPairs)) {
                 this.collisionPairs[pairId] = true;
                 this.gameEngine.emit('collisionStart', { o1, o2 });
@@ -148,7 +150,7 @@ class BruteForceCollisionDetection implements CollisionDetection {
 }
 
 // get bounding box of object o
-function getBox(o) {
+function getBox(o: DynamicObject) {
     return {
         xMin: o.position.x,
         xMax: o.position.x + o.width,

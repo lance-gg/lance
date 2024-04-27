@@ -1,5 +1,6 @@
 /* globals AFRAME */
 
+import { GameEngine } from '../GameEngine.js';
 import Renderer from './Renderer.js';
 import networkedPhysics from './aframe/system.js';
 
@@ -19,7 +20,7 @@ class AFrameRenderer extends Renderer {
     * @param {GameEngine} gameEngine - Reference to the GameEngine instance.
     * @param {ClientEngine} clientEngine - Reference to the ClientEngine instance.
     */
-    constructor(gameEngine) {
+    constructor(gameEngine: GameEngine) {
         super(gameEngine);
 
         // set up the networkedPhysics as an A-Frame system
@@ -58,7 +59,7 @@ class AFrameRenderer extends Renderer {
      */
     draw() {}
 
-    tick(t, dt) {
+    tick(t: number, dt: number) {
         super.draw(t, dt);
     }
 

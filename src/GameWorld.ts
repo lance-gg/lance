@@ -1,11 +1,11 @@
 import { GameObject } from "./serialize/GameObject.js";
 
 interface ObjectQuery {
-    id: number;
-    playerId: number;
-    instanceType: typeof GameObject;
-    components: string[];
-    returnSingle: boolean;
+    id?: number;
+    playerId?: number;
+    instanceType?: typeof GameObject;
+    components?: string[];
+    returnSingle?: boolean;
 }
 
 /**
@@ -16,9 +16,9 @@ interface ObjectQuery {
 class GameWorld {
 
     public objects: { [key: number]: GameObject }
-    private stepCount: number;
-    private playerCount: number;
-    private idCount: number;
+    public stepCount: number;
+    public playerCount: number;
+    public idCount: number;
 
     /**
      * Constructor of the World instance.  Invoked by Lance on startup.
@@ -48,6 +48,11 @@ class GameWorld {
         return possibleId;
     }
 
+    queryOneObject(query: ObjectQuery): GameObject | null {
+        let objs = this.queryObjects(query);
+        return objs.length > 0 ? objs[0] : null;
+    }
+
     /**
      * Returns all the game world objects which match a criteria
      * @param {Object} query The query object
@@ -55,10 +60,9 @@ class GameWorld {
      * @param {Object} [query.playerId] player id
      * @param {Class} [query.instanceType] matches whether `object instanceof instanceType`
      * @param {Array} [query.components] An array of component names
-     * @param {Boolean} [query.returnSingle] Return the first object matched
-     * @return {Array | Object} All game objects which match all the query parameters, or the first match if returnSingle was specified
+     * @return {Array} All game objects which match all the query parameters
      */
-    queryObjects(query: ObjectQuery) {
+    queryObjects(query: ObjectQuery): GameObject[] {
         let queriedObjects: GameObject[] = [];
 
         // todo this is currently a somewhat inefficient implementation for API testing purposes.
@@ -88,11 +92,6 @@ class GameWorld {
                 if (query.returnSingle) return false;
             }
         });
-
-        // return a single object or null
-        if (query.returnSingle) {
-            return queriedObjects.length > 0 ? queriedObjects[0] : null;
-        }
 
         return queriedObjects;
     }

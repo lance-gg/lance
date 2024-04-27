@@ -94,4 +94,4 @@ function getArrayPairId(arrayPair: CollisionObject[]): string {
     return sortedArrayPair[0].id + '-' + sortedArrayPair[1].id;
 }
 
-export default HSHGCollisionDetection;
+export { HSHGCollisionDetection, HSHGCollisionDetectionOptions }

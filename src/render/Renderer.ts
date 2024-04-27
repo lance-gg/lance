@@ -42,7 +42,7 @@ class Renderer {
      * Initialize the renderer.
      * @return {Promise} Resolves when renderer is ready.
     */
-    init() {
+    init(): Promise<void> {
         if ((typeof window === 'undefined') || !document) {
             console.log('renderer invoked on server side.');
         }
@@ -64,7 +64,7 @@ class Renderer {
      * @param {Number} t - current time (only required in render-schedule mode)
      * @param {Number} dt - time elapsed since last draw
      */
-    draw(t, dt) {
+    draw(t: number, dt: number) {
         this.gameEngine.emit('client__draw');
 
         if (this.clientEngine.options.scheduler === 'render-schedule')
@@ -78,7 +78,7 @@ class Renderer {
      * @param {Number} t - current time
      * @param {Number} dt - time elapsed since last draw
      */
-    runClientStep(t) {
+    runClientStep(t: number) {
         let p = this.clientEngine.options.stepPeriod;
         let dt = 0;
 

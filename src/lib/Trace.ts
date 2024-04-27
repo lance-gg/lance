@@ -102,7 +102,7 @@ class Trace {
         return buffer;
     }
 
-    get length() {
+    get length(): number {
         return this.traceBuffer.length;
     }
 
