@@ -19,13 +19,14 @@ import AFrameRenderer from '../render/AFrameRenderer.js';
 import { SyncStrategy, SyncStrategyOptions } from '../syncStrategies/SyncStrategy.js';
 import { ExtrapolateStrategy, ExtrapolateSyncStrategyOptions } from '../syncStrategies/ExtrapolateStrategy.js';
 import Lib from '../lib/lib.js';
-import { FrameSyncStrategy } from './clientExports.js';
+import { BruteForceCollisionDetectionOptions, FrameSyncStrategy, HSHGCollisionDetectionOptions } from './clientExports.js';
 
 export {
   GameEngine, GameEngineOptions,
   GameWorld,
   InputDesc,
   P2PhysicsEngine,
+  BruteForceCollisionDetectionOptions, HSHGCollisionDetectionOptions,
   SimplePhysicsEngine, SimplePhysicsEngineOptions,
   CannonPhysicsEngine,
   BaseTypes,

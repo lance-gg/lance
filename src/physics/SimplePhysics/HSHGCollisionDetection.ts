@@ -25,6 +25,7 @@ class HSHGCollisionDetection implements CollisionDetection {
     private previousCollisionPairs: PairsDict;
     private stepCollidingPairs: PairsDict;
 
+    // TODO: HSHGCollisionDetectionOptions is uselessly passed twice, both on constructor and on init (below)
     constructor(options: HSHGCollisionDetectionOptions) {
         this.options = Object.assign({ COLLISION_DISTANCE: 28 }, options);
     }

@@ -6,8 +6,7 @@ let differenceVector = new TwoVector(0, 0);
 
 interface BruteForceCollisionDetectionOptions extends CollisionDetectionOptions {
     autoResolve: boolean,
-    collisionDistance: number,
-    gameEngine: GameEngine
+    collisionDistance: number
 }
 
 // The collision detection of SimplePhysicsEngine is a brute-force approach

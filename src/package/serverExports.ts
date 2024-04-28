@@ -13,10 +13,17 @@ import { PhysicalObject2D } from '../serialize/PhysicalObject2D.js';
 import { PhysicalObject3D } from '../serialize/PhysicalObject3D.js';
 import { ServerEngine, ServerEngineOptions } from '../ServerEngine.js';
 import Lib from '../lib/lib.js';
+import Renderer from '../render/Renderer.js';
+
+// TODO: remove Renderer from server exports.
+// some games (Brawler) have a renderer which needs to be notified on object create,
+// and instead of just listening to the object-create event, they are invoked by the
+// object itself on creation
 
 export {
   GameEngine, GameEngineOptions,
   GameWorld,
+  Renderer,
   InputDesc,
   P2PhysicsEngine,
   SimplePhysicsEngine, SimplePhysicsEngineOptions,

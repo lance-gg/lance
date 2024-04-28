@@ -5,6 +5,7 @@ import { BruteForceCollisionDetection, BruteForceCollisionDetectionOptions } fro
 import { CollisionDetection } from './SimplePhysics/CollisionDetection.js';
 import { GameEngine } from '../GameEngine.js';
 import { GameObject } from '../serialize/GameObject.js';
+import DynamicObject from '../serialize/DynamicObject.js';
 
 let dv = new TwoVector(0, 0);
 let dx = new TwoVector(0, 0);
@@ -65,7 +66,7 @@ class SimplePhysicsEngine extends PhysicsEngine {
     // a single object advances, based on:
     // isRotatingRight, isRotatingLeft, isAccelerating, current velocity
     // wrap-around the world if necessary
-    objectStep(o, dt) {
+    objectStep(o: DynamicObject, dt: number) {
 
         // calculate factor
         if (dt === 0)

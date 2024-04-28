@@ -306,7 +306,7 @@ class DynamicObject extends GameObject {
         this.bendingVelocityDelta = original.velocity.getBendingDelta(this.velocity, velocityBending);
         this.bendingAngleDelta = MathUtils.interpolateDeltaWithWrapping(original.angle, this.angle, angleBending.percent, 0, 360) / increments;
 
-        this.bendingTarget = new (<any> this.constructor());
+        this.bendingTarget = new (<any> this.constructor)();
         this.bendingTarget.syncTo(this);
 
         // revert to original
