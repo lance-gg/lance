@@ -31,6 +31,12 @@ interface InputDesc {
     }
 }
 
+interface PreStepDesc {
+    step: number,
+    isReenact: boolean, 
+    dt: number
+}
+
 /**
  * The GameEngine contains the game logic.  Extend this class
  * to implement game mechanics.  The GameEngine derived
@@ -213,7 +219,8 @@ class GameEngine {
         isReenact = Boolean(isReenact);
         let step = ++this.world.stepCount;
         let clientIDSpace = this.options.clientIDSpace;
-        this.emit('preStep', { step, isReenact, dt });
+        let preStepDesc: PreStepDesc = { step, isReenact, dt };
+        this.emit('preStep', preStepDesc);
 
         // skip physics for shadow objects during re-enactment
         function objectFilter(o) {
@@ -570,4 +577,4 @@ class GameEngine {
 // when jsdoc is fixed, move this descriptor back to the class declaration,
 // in all relevant files (12 files)
 // see: https://github.com/jsdoc3/jsdoc/issues/1132
-export { GameEngine, GameEngineOptions, InputDesc }
+export { GameEngine, GameEngineOptions, InputDesc, PreStepDesc }

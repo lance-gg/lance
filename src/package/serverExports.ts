@@ -1,4 +1,4 @@
-import { GameEngine, GameEngineOptions, InputDesc } from '../GameEngine.js';
+import { GameEngine, GameEngineOptions, InputDesc, PreStepDesc } from '../GameEngine.js';
 import { GameWorld } from '../GameWorld.js';
 import { P2PhysicsEngine } from '../physics/P2PhysicsEngine.js';
 import { SimplePhysicsEngine, SimplePhysicsEngineOptions } from '../physics/SimplePhysicsEngine.js';
@@ -12,9 +12,9 @@ import DynamicObject from '../serialize/DynamicObject.js';
 import { PhysicalObject2D } from '../serialize/PhysicalObject2D.js';
 import { PhysicalObject3D } from '../serialize/PhysicalObject3D.js';
 import { ServerEngine, ServerEngineOptions } from '../ServerEngine.js';
-import Lib from '../lib/lib.js';
 import Renderer from '../render/Renderer.js';
-
+import Lib from '../lib/lib.js';
+import Serializer from '../serialize/Serializer.js';
 // TODO: remove Renderer from server exports.
 // some games (Brawler) have a renderer which needs to be notified on object create,
 // and instead of just listening to the object-create event, they are invoked by the
@@ -23,8 +23,10 @@ import Renderer from '../render/Renderer.js';
 export {
   GameEngine, GameEngineOptions,
   GameWorld,
+  Serializer,
   Renderer,
   InputDesc,
+  PreStepDesc,
   P2PhysicsEngine,
   SimplePhysicsEngine, SimplePhysicsEngineOptions,
   CannonPhysicsEngine,

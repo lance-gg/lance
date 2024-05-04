@@ -374,7 +374,7 @@ class ClientEngine {
      * @param {String} input - string representing the input
      * @param {Object} inputOptions - options for the input
      */
-    sendInput(input, inputOptions) {
+    sendInput(input: String, inputOptions: any) {
         let inputEvent = {
             command: 'move',
             data: {

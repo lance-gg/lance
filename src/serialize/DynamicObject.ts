@@ -6,10 +6,10 @@ import { GameEngine } from '../GameEngine.js';
 
 interface DynamicObjectProps extends GameObjectProps {
     position: TwoVector;
-    velocity: TwoVector;
-    width: number;
-    height: number;
-    isStatic: number; // TODO: convert to boolean (number is for serialization purposes)
+    velocity?: TwoVector;
+    width?: number;
+    height?: number;
+    isStatic?: number; // TODO: convert to boolean (number is for serialization purposes)
 }
 
 /**

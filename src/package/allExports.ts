@@ -1,4 +1,4 @@
-import { GameEngine, GameEngineOptions, InputDesc } from '../GameEngine.js';
+import { GameEngine, GameEngineOptions, InputDesc, PreStepDesc } from '../GameEngine.js';
 import { GameWorld } from '../GameWorld.js';
 import { P2PhysicsEngine } from '../physics/P2PhysicsEngine.js';
 import { SimplePhysicsEngine, SimplePhysicsEngineOptions } from '../physics/SimplePhysicsEngine.js';
@@ -19,12 +19,17 @@ import AFrameRenderer from '../render/AFrameRenderer.js';
 import { SyncStrategy, SyncStrategyOptions } from '../syncStrategies/SyncStrategy.js';
 import { ExtrapolateStrategy, ExtrapolateSyncStrategyOptions } from '../syncStrategies/ExtrapolateStrategy.js';
 import Lib from '../lib/lib.js';
-import { BruteForceCollisionDetectionOptions, FrameSyncStrategy, HSHGCollisionDetectionOptions } from './clientExports.js';
+import Serializer from '../serialize/Serializer.js';
+import { BruteForceCollisionDetectionOptions } from '../physics/SimplePhysics/BruteForceCollisionDetection.js';
+import { HSHGCollisionDetectionOptions } from '../physics/SimplePhysics/HSHGCollisionDetection.js';
+import { FrameSyncStrategy } from '../syncStrategies/FrameSyncStrategy.js';
 
 export {
   GameEngine, GameEngineOptions,
   GameWorld,
   InputDesc,
+  PreStepDesc,
+  Serializer,
   P2PhysicsEngine,
   BruteForceCollisionDetectionOptions, HSHGCollisionDetectionOptions,
   SimplePhysicsEngine, SimplePhysicsEngineOptions,
