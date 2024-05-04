@@ -11,9 +11,9 @@ let dv = new TwoVector(0, 0);
 let dx = new TwoVector(0, 0);
 
 interface SimplePhysicsEngineOptions extends PhysicsEngineOptions {
-    collisionsType: "HSHG" | "bruteForce",
-    collisions: HSHGCollisionDetectionOptions | BruteForceCollisionDetectionOptions,
-    gravity: TwoVector,
+    collisionsType?: "HSHG" | "bruteForce",
+    collisions?: HSHGCollisionDetectionOptions | BruteForceCollisionDetectionOptions,
+    gravity?: TwoVector,
 }
 /**
  * SimplePhysicsEngine is a pseudo-physics engine which works with

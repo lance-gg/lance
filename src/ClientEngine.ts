@@ -16,8 +16,8 @@ const GAME_UPS = 60; // default number of game steps per second
 const STEP_DELAY_MSEC = 12; // if forward drift detected, delay next execution by this amount
 const STEP_HURRY_MSEC = 8; // if backward drift detected, hurry next execution by this amount
 
-
-type ClientEngineOptions = {
+type ClientEngineOptions = Partial<ClientEngineOptionsInteral>;
+type ClientEngineOptionsInteral = {
     verbose: boolean,
     autoConnect: boolean,
     standaloneMode: boolean,
@@ -41,7 +41,7 @@ type ClientEngineOptions = {
  */
 class ClientEngine {
 
-    public options: ClientEngineOptions;
+    public options: ClientEngineOptionsInteral;
     private serializer: Serializer;
     public gameEngine: GameEngine;
     private networkTransmitter: NetworkTransmitter;
@@ -86,6 +86,10 @@ class ClientEngine {
             stepPeriod: 1000 / GAME_UPS,
             scheduler: 'render-schedule',
             serverURL: null,
+            verbose: false,
+            standaloneMode: false,
+            delayInputCount: 0,
+            matchmaker: null
         }, inputOptions);
 
         /**
