@@ -1,6 +1,6 @@
 {
   "name": "lance-gg",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "A Node.js based real-time multiplayer game server",
   "type": "module",
   "main": "dist/server/lance-gg.js",
