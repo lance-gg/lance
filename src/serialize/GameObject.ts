@@ -14,7 +14,7 @@ type GameObjectProps = { playerId?: number }
  */
 class GameObject extends Serializable {
 
-    public id: number | null;
+    public id: number;
     protected gameEngine: GameEngine;
     public playerId: number;
     private components: { [key: string]: any }
@@ -56,10 +56,9 @@ class GameObject extends Serializable {
         * angular velocity, and orientation.  In this case the id will be set to null.
         * @member {Number}
         */
-        this.id = null;
         if (options && options.id)
             this.id = options.id;
-        else if (this.gameEngine)
+        else
             this.id = this.gameEngine.world.getNewId();
 
         /**

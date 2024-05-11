@@ -2,6 +2,13 @@
 
 # Release Notes for Lance
 
+## Release 5.0.1 - May 2024
+
+* TypeScript Support
+* major version upgrades on dependencies - fixing npm audit
+* move to newer socket.io
+
+
 ## Release 3.0.0 - July 2018
 
 * 2D Physics Support via P2
